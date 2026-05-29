@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AAA HyperKernel</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#050505">
+    
+    <link rel="stylesheet" href="/css/job-list.css">
+    <link rel="stylesheet" href="/css/customer-job-flow.css">
+    <link rel="stylesheet" href="/css/arrival-hud.css">
+    <link rel="stylesheet" href="/css/voice-hud.css">
+    <link rel="stylesheet" href="/css/vision-hud.css">
+    <link rel="stylesheet" href="/css/closure-hud.css">
+</head>
+<body>
+    <div id="app-root"></div>
+
+    <script src="/js/core/runtime-clock.js"></script>
+    <script src="/js/core/id-factory.js"></script>
+    <script src="/js/core/local-first-storage.js"></script>
+    
+    <script src="/js/customers/customer-store.js"></script>
+    
+    <script src="/js/ai/sidekick-context-engine.js"></script>
+    <script src="/js/ai/sidekick-voice-engine.js"></script>
+    <script src="/js/ai/sidekick-vision-engine.js"></script>
+    <script src="/js/ai/sidekick-closure-engine.js"></script>
+    
+    <script src="/js/ui/customer-picker-ui.js"></script>
+    <script src="/js/ui/new-job-flow-ui.js"></script>
+    <script src="/js/ui/voice-hud-ui.js"></script>
+    <script src="/js/ui/vision-hud-ui.js"></script>
+    <script src="/js/ui/closure-hud-ui.js"></script>
+    <script src="/js/ui/job-list-ui.js"></script>
+    
+    <script src="/js/core/app-lifecycle.js"></script>
+    
+    <script>
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('HyperKernel Offline Worker Registered'))
+                    .catch(err => console.error('Worker registration failed:', err));
+            });
+        }
+
+        // Initialize App
+        async function bootApp() {
+            await window.AAA_LOCAL_FIRST_STORAGE.boot({ mode: 'persistent' });
+            if (window.AAA_CUSTOMER_STORE && typeof window.AAA_CUSTOMER_STORE.boot === 'function') {
+              await window.AAA_CUSTOMER_STORE.boot();
+            }
+            if (window.AAA_JOB_LIST_UI && typeof window.AAA_JOB_LIST_UI.boot === 'function') {
+              await window.AAA_JOB_LIST_UI.boot();
+            }
+            if (window.AAA_JOB_LIST_UI && typeof window.AAA_JOB_LIST_UI.render === 'function') {
+              await window.AAA_JOB_LIST_UI.render('app-root');
+            }
+        }
+        
+        bootApp();
+    </script>
+</body>
+</html>
