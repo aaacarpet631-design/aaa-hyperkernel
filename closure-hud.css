@@ -1,0 +1,140 @@
+/* Closure HUD styling for AAA On‑Site Sidekick
+ *
+ * This stylesheet defines the dark glassmorphism aesthetic for the
+ * departure checklist overlay.  It uses emerald accents for success,
+ * amber for warnings, and red for errors.  Buttons and checklists are
+ * large and easy to tap in the field.
+ */
+
+.closure-hud {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(20, 20, 25, 0.85);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+}
+
+.closure-hud.hidden {
+  display: none;
+}
+
+.closure-card {
+  background: rgba(30, 30, 35, 0.95);
+  border-radius: 24px;
+  padding: 2rem;
+  color: #ffffff;
+  max-width: 90%;
+  width: 420px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+}
+
+.closure-title {
+  margin-top: 0;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.auto-section,
+.manual-section {
+  margin-bottom: 1.5rem;
+}
+
+.auto-list,
+.manual-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.auto-list li {
+  padding: 0.5rem 0;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.auto-list li.item-ok::before {
+  content: '✔';
+  color: #00ff9d;
+  margin-right: 0.5rem;
+}
+
+.auto-list li.item-missing::before {
+  content: '✘';
+  color: #ff6b6b;
+  margin-right: 0.5rem;
+}
+
+.manual-list li {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+}
+
+.manual-list input[type='checkbox'] {
+  transform: scale(1.4);
+  margin-right: 0.5rem;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.closure-btn {
+  padding: 1rem;
+  border-radius: 12px;
+  border: none;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.closure-btn.primary {
+  background: #00ff9d;
+  color: #121212;
+}
+
+.closure-btn.secondary {
+  background: #ffab00;
+  color: #121212;
+}
+
+.closure-btn.tertiary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.closure-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Status colouring: the wrapper .action-buttons gets one of these classes */
+.action-buttons.status-error .closure-btn.primary {
+  background: #ff6b6b;
+  color: #121212;
+}
+
+.action-buttons.status-warning .closure-btn.primary {
+  background: #ffab00;
+  color: #121212;
+}
+
+.action-buttons.status-success .closure-btn.primary {
+  background: #00ff9d;
+  color: #121212;
+}
+
+.missing-msg {
+  color: #ff6b6b;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}

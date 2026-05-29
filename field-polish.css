@@ -1,0 +1,141 @@
+/* ============================================================
+   FIELD POLISH  —  makes the app easier to operate outdoors
+   ------------------------------------------------------------
+   Small, additive rules aimed at one-handed, in-the-field use:
+   - every tappable control is at least 44px tall (easy to hit
+     with a thumb, meets accessibility guidance)
+   - clearer press feedback so you know a tap registered
+   - the active page tab and dock pills are a touch larger
+   - disabled actions read as clearly off, not just faded
+   This file only adds/overrides spacing and sizing; it doesn't
+   change colors, layout structure, or behavior. Safe to remove.
+   ============================================================ */
+
+/* Minimum comfortable tap target on the main action buttons. */
+.add-room-btn,
+.send-btn,
+.header-btn {
+  min-height: 48px;
+}
+
+/* The bottom send row (Text / Email / etc.) is the most-used
+   control in the field — give it a little more height and a
+   stronger pressed state. */
+.send-btn {
+  min-height: 52px;
+  font-size: 1rem;
+}
+.send-btn:active {
+  transform: scale(0.96);
+  filter: brightness(0.94);
+}
+
+/* Page tabs: bigger thumb area + clearer active state. */
+#aaa-page-tabbar .ptab {
+  min-height: 56px;
+  padding: 8px 4px;
+}
+#aaa-page-tabbar .ptab svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Launcher dock pills: slightly taller so they're easy to hit
+   above the tab bar. */
+#aaa-launcher-dock .dock-pill {
+  min-height: 40px;
+}
+
+/* Clearer "this is off" styling for disabled actions, so you
+   don't tap a dead button and wonder why nothing happened. */
+.send-btn:disabled,
+.send-btn[aria-disabled="true"],
+.header-btn[aria-disabled="true"] {
+  opacity: 0.38;
+  filter: grayscale(0.3);
+}
+
+/* Bigger, easier-to-read form labels and help text outdoors. */
+.field label,
+.settings-label {
+  font-size: 0.95rem;
+}
+.trainer-help,
+.muted-small {
+  line-height: 1.5;
+}
+
+/* Keep momentum scrolling smooth on iOS within scrollable panels. */
+.section,
+.settings-drawer-body,
+.modal-body {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Respect users who prefer reduced motion (less animation = less
+   distraction and battery on a long day). */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   SLIMMER, CALMER BOTTOM BAR
+   The old bar crammed 5 equal buttons into a wrapping grid and
+   ate the bottom third of the screen. Now: a tighter total row,
+   two big primary actions (Text / Email), and a compact row of
+   secondary actions (Price / Contract / Rewrite).
+   ============================================================ */
+.sticky-total {
+  padding: 0.7rem 1rem 0.9rem !important;
+}
+.total-row {
+  margin-bottom: 0.6rem !important;
+}
+.total-amount {
+  font-size: 1.7rem !important;   /* was ~2rem — still bold, less bulky */
+}
+
+/* Primary actions: two big, easy targets. */
+.send-row-primary {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+  margin-bottom: 0.5rem;
+}
+.send-row-primary .send-btn {
+  min-height: 50px;
+}
+
+/* Secondary actions: smaller, three across, visually lighter. */
+.send-row-secondary {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.45rem;
+}
+.send-btn-sm {
+  min-height: 40px;
+  border: none;
+  border-radius: 100px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--paper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  transition: all 0.15s;
+}
+.send-btn-sm:active { transform: scale(0.96); }
+.send-btn-sm.preview { background: rgba(255, 230, 150, 0.92); color: var(--ink); }
+.send-btn-sm.contract { background: var(--paper); color: var(--ink); }
+.send-btn-sm:disabled,
+.send-btn-sm[aria-disabled="true"] {
+  opacity: 0.32;
+  pointer-events: none;
+}

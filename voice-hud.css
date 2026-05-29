@@ -1,0 +1,124 @@
+/*
+ * Voice HUD Styles for AAA On‑Site Sidekick
+ *
+ * This stylesheet defines a floating action button (FAB) and overlay for the
+ * hands‑free job logging feature. The FAB sits at the bottom right corner
+ * of the viewport. When active, it pulses with a soft purple/blue glow to
+ * indicate listening. The overlay displays the current status (listening,
+ * processing, saved, or error) and shows the transcribed text briefly
+ * before fading out.
+ */
+
+#voice-hud {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 10001;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+/* Floating action button */
+#voice-hud .voice-fab {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: #ffffff;
+  background: linear-gradient(135deg, #7f5af0, #57c7ff);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+}
+
+/* Pulse animation when listening */
+#voice-hud .voice-fab.listening {
+  animation: voice-pulse 1.6s infinite;
+}
+
+@keyframes voice-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(127, 90, 240, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 16px rgba(127, 90, 240, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(127, 90, 240, 0);
+  }
+}
+
+/* Overlay container */
+#voice-hud .voice-overlay {
+  margin-top: 1rem;
+  min-width: 250px;
+  max-width: 90vw;
+  background: rgba(20, 20, 25, 0.9);
+  color: #ffffff;
+  backdrop-filter: blur(6px);
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  display: none;
+}
+
+/* Visible state */
+#voice-hud .voice-overlay.visible {
+  display: block;
+}
+
+/* Status text */
+#voice-hud .voice-overlay .voice-status {
+  font-size: 1.25rem;
+  margin: 0;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #57c7ff;
+}
+
+/* Transcribed text */
+#voice-hud .voice-overlay .voice-text {
+  font-size: 1rem;
+  margin: 0;
+  color: #ffffff;
+  word-break: break-word;
+}
+
+/* Fallback text input container */
+#voice-hud .voice-overlay .voice-fallback {
+  margin-top: 1rem;
+}
+
+/* Fallback textarea for manual input */
+#voice-hud .voice-overlay .voice-fallback textarea {
+  width: 100%;
+  height: 120px;
+  resize: vertical;
+  border-radius: 8px;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #57c7ff;
+  background: rgba(30, 30, 35, 0.6);
+  color: #ffffff;
+  box-sizing: border-box;
+}
+
+/* Save button for fallback mode */
+#voice-hud .voice-overlay .voice-fallback .save-button {
+  margin-top: 0.5rem;
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #141419;
+  background-color: #57c7ff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
