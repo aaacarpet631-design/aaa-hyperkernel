@@ -37,6 +37,7 @@
     <script src="/js/agents/agent-os.js"></script>
     <script src="/js/agents/supervisor.js"></script>
     <script src="/js/agents/prompt-architect.js"></script>
+    <script src="/js/agents/self-improvement.js"></script>
     <script src="/js/agents/agent-marketplace.js"></script>
     <script src="/js/agents/agent-automation.js"></script>
     <script src="/js/agents/review-request-engine.js"></script>
@@ -46,7 +47,19 @@
     <script src="/js/ai/sidekick-voice-engine.js"></script>
     <script src="/js/ai/sidekick-vision-engine.js"></script>
     <script src="/js/ai/sidekick-closure-engine.js"></script>
-    
+
+    <!-- Bluetooth laser measurement layer (models → storage → BLE → quote/AI → UI) -->
+    <script src="/js/measurements/models/measurement-models.js"></script>
+    <script src="/js/measurements/storage/measurement-store.js"></script>
+    <script src="/js/bluetooth/services/raw-reading-log.js"></script>
+    <script src="/js/bluetooth/services/measurement-parser.js"></script>
+    <script src="/js/bluetooth/services/generic-ble-adapter.js"></script>
+    <script src="/js/bluetooth/services/device-adapter-registry.js"></script>
+    <script src="/js/bluetooth/hooks/use-bluetooth-connection.js"></script>
+    <script src="/js/quotes/integrations/measurement-to-quote.js"></script>
+    <script src="/js/measurements/measurement-ai-assistant.js"></script>
+    <script src="/js/bluetooth/screens/measurement-hud-ui.js"></script>
+
     <script src="/js/ui/customer-picker-ui.js"></script>
     <script src="/js/ui/new-job-flow-ui.js"></script>
     <script src="/js/ui/voice-hud-ui.js"></script>
@@ -103,7 +116,8 @@
             if (window.AAA_JOB_LIST_UI && window.AAA_JOB_LIST_UI.render) await window.AAA_JOB_LIST_UI.render('app-root');
             if (window.AAA_SYNC_ENGINE && window.AAA_SYNC_ENGINE.init) window.AAA_SYNC_ENGINE.init();
             if (window.AAA_AUTOMATION && window.AAA_AUTOMATION.init) window.AAA_AUTOMATION.init();
-            if (window.AAA_PROMPT_ARCHITECT && window.AAA_PROMPT_ARCHITECT.loadSaved) window.AAA_PROMPT_ARCHITECT.loadSaved();
+            if (window.AAA_PROMPT_ARCHITECT && window.AAA_PROMPT_ARCHITECT.loadSaved) await window.AAA_PROMPT_ARCHITECT.loadSaved();
+            if (window.AAA_SELF_IMPROVEMENT && window.AAA_SELF_IMPROVEMENT.loadTunings) await window.AAA_SELF_IMPROVEMENT.loadTunings();
         }
 
         bootApp().catch(function (err) { aaaShowError('Startup failed', err); });

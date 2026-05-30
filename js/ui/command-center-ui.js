@@ -143,6 +143,31 @@
       });
     }
 
+    // ---- Self-Improvement (Layer 13) ----
+    if (global.AAA_SELF_IMPROVEMENT) {
+      body.appendChild(section('Self-Improvement'));
+      const survey = await global.AAA_SELF_IMPROVEMENT.analyze();
+      if (survey.ok) {
+        const tuned = survey.agents.filter((a) => a.tuned);
+        body.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+          '<strong>' + survey.eligible + ' agent(s) ready to learn</strong>' +
+          '<div class="aaa-list-sub">Needs ' + survey.minScored + '+ scored decisions per agent. ' + tuned.length + ' currently tuned.</div>' }));
+        survey.agents.forEach((a) => {
+          if (!a.tuned && !a.eligible) return;
+          const t = a.tuning;
+          body.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+            '<strong>' + (a.tuned ? '🧠 ' : '○ ') + esc(a.title) + '</strong>' +
+            '<div class="aaa-list-sub">' + a.scoredCount + ' scored · win ' + fmtPct(a.winRate) + ' · conf ' + (a.avgConfidence != null ? a.avgConfidence + '%' : '—') + ' · calibration ' + fmtPct(a.avgCalibration) + '</div>' +
+            (t ? '<div class="aaa-list-sub">' + esc(t.calibration) + ' · bias ' + (t.confidenceBias >= 0 ? '+' : '') + t.confidenceBias + ' · v' + t.version + (t.summary ? ' — ' + esc(t.summary) : '') + '</div>' : '') }));
+        });
+        if (survey.eligible > 0) {
+          body.appendChild(ui.button({ label: 'Learn from outcomes', icon: '🧠', variant: 'primary', full: true, disabled: !aiReady, onClick: () => improveFlow(body) }));
+        } else {
+          body.appendChild(empty('Record more won/lost outcomes — the team starts tuning itself once any agent has ' + survey.minScored + ' scored decisions.'));
+        }
+      }
+    }
+
     // ---- Actions ----
     const actions = ui.el('div', { className: 'closure-actions' });
     if (global.AAA_PROMPT_ARCHITECT) {
@@ -152,6 +177,9 @@
       actions.appendChild(ui.button({ label: 'Agent Marketplace', icon: '🏪', variant: 'secondary', full: true, onClick: () => marketplaceFlow(body) }));
     }
     actions.appendChild(ui.button({ label: 'Cloud Settings', icon: '⚙️', variant: 'secondary', full: true, onClick: () => settingsFlow(body) }));
+    if (global.AAA_MEASUREMENT_QUOTE) {
+      actions.appendChild(ui.button({ label: 'Pricing / Rate Card', icon: '💲', variant: 'secondary', full: true, onClick: () => rateCardFlow(body) }));
+    }
     actions.appendChild(ui.button({ label: 'Run Company Standup', icon: '🧭', variant: 'primary', full: true, disabled: !aiReady, onClick: () => runStandup(body) }));
     if (provider === 'firebase' && global.AAA_CLOUD) {
       if (user) {
@@ -247,6 +275,42 @@
     // snapshot KPIs alongside the standup
     try { await data().saveKpiSnapshot('standup', global.AAA_SUPERVISOR ? await global.AAA_SUPERVISOR.metrics() : {}); } catch (_) {}
     await renderInto(body);
+  }
+
+  // Self-Improvement: tune every eligible agent from its real track record,
+  // then show exactly what changed and why (grounded in outcomes).
+  async function improveFlow(body) {
+    const ui = U();
+    body.innerHTML = '';
+    body.appendChild(ui.spinner('Learning from real outcomes…'));
+    const result = await global.AAA_SELF_IMPROVEMENT.improveAll();
+    body.innerHTML = '';
+    if (!result || !result.ok) {
+      const why = (result && result.error) === 'INSUFFICIENT_DATA'
+        ? 'Not enough scored decisions yet (need ' + (result.need || 3) + ' per agent). Record more won/lost outcomes.'
+        : 'Could not learn (' + ((result && result.error) || 'unknown') + ').';
+      body.appendChild(ui.el('p', { className: 'aaa-dialog__message', text: why }));
+      body.appendChild(ui.button({ label: 'Back', variant: 'ghost', full: true, onClick: () => renderInto(body) }));
+      return;
+    }
+    body.appendChild(ui.el('h2', { className: 'aaa-section-title', text: 'Tuned ' + result.improved + ' agent(s) from real outcomes' }));
+    result.results.forEach((r) => {
+      if (!r.ok) {
+        body.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+          '<strong>' + esc(r.agentId) + '</strong><div class="aaa-list-sub">skipped — ' + esc(r.error || '') + '</div>' }));
+        return;
+      }
+      const t = r.tuning;
+      body.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+        '<strong>🧠 ' + esc((global.AAA_AGENTS.get(r.agentId) || {}).title || r.agentId) + '</strong>' +
+        '<div class="aaa-list-sub">' + esc(t.calibration) + ' · confidence bias ' + (t.confidenceBias >= 0 ? '+' : '') + t.confidenceBias + ' · v' + t.version + '</div>' +
+        (t.summary ? '<div class="aaa-list-sub">' + esc(t.summary) + '</div>' : '') +
+        (t.promptAddendum ? '<div class="aaa-list-sub">↳ added guidance: ' + esc(t.promptAddendum.slice(0, 140)) + (t.promptAddendum.length > 140 ? '…' : '') + '</div>' : '') }));
+      body.appendChild(ui.button({ label: 'Revert ' + ((global.AAA_AGENTS.get(r.agentId) || {}).title || r.agentId), size: 'sm', variant: 'ghost',
+        onClick: async () => { await global.AAA_SELF_IMPROVEMENT.revert(r.agentId); await renderInto(body); } }));
+    });
+    body.appendChild(ui.el('p', { className: 'aaa-empty', text: 'These tunings apply to every future decision and get re-scored against new outcomes — so the team keeps adjusting.' }));
+    body.appendChild(ui.button({ label: 'Done', variant: 'primary', full: true, onClick: () => renderInto(body) }));
   }
 
   function signInFlow(parentBody) {
@@ -368,6 +432,68 @@
     status.textContent = (cfg.isFirebaseConfigured && cfg.isFirebaseConfigured())
       ? 'Connected to Firebase. Save, then Test AI connection.'
       : 'Enter Project ID + Web API key + Workspace ID + Cloud Function URL (/api/claude), Save, then Test.';
+  }
+
+  // Owner-facing rate card editor. Reads the live rates from the measurement
+  // quote module, lets the owner set their real prices, and persists them via
+  // AAA_CONFIG.set({ rateCard }) — the same override the quote engine reads.
+  function rateCardFlow(parentBody) {
+    const ui = U();
+    const Q = global.AAA_MEASUREMENT_QUOTE;
+    if (!Q) return;
+    const cfg = global.AAA_CONFIG || {};
+    const defaults = Q.defaultRates();
+    const current = Q.currentRates();
+    const s = ui.sheet({ title: 'Pricing / Rate Card', subtitle: 'Your rates feed every measurement quote. Saved on this device.' });
+    document.body.appendChild(s.overlay);
+
+    // [key, label, unit-hint]. Order groups labor, materials, then tuning knobs.
+    const FIELDS = [
+      ['install_per_sqft', 'Carpet install (labor)', '$ / ft²'],
+      ['material_per_sqft', 'Carpet material', '$ / ft²'],
+      ['pad_per_sqft', 'Padding', '$ / ft²'],
+      ['stretch_per_sqft', 'Carpet stretching', '$ / ft²'],
+      ['repair_per_linear_ft', 'Carpet repair', '$ / linear ft'],
+      ['shampoo_per_sqft', 'Carpet cleaning', '$ / ft²'],
+      ['stairs_each', 'Stairs', '$ / stair'],
+      ['hallway_per_sqft', 'Hallway', '$ / ft²'],
+      ['apartment_turn_flat', 'Apartment turn', '$ / unit (flat)'],
+      ['commercial_per_sqft', 'Commercial install', '$ / ft²'],
+      ['waste_factor', 'Material waste factor', '0.10 = +10%'],
+      ['min_job', 'Minimum job charge', '$'],
+      ['range_spread', 'Quote range spread', '0.12 = ±12%']
+    ];
+    const inputs = {};
+    FIELDS.forEach(([key, label, hint]) => {
+      const input = ui.el('input', { className: 'aaa-input', attrs: { type: 'number', step: '0.01', inputmode: 'decimal', placeholder: String(defaults[key]) } });
+      input.value = current[key] != null ? String(current[key]) : '';
+      inputs[key] = input;
+      s.body.appendChild(ui.el('div', { className: 'aaa-form' }, [
+        ui.el('label', { className: 'aaa-field-label', text: label + ' (' + hint + ')' }), input
+      ]));
+    });
+
+    const status = ui.el('p', { className: 'aaa-empty', text: 'Blank fields use the default shown in grey.' });
+    s.body.appendChild(status);
+    s.body.appendChild(ui.el('div', { className: 'aaa-dialog__actions' }, [
+      ui.button({ label: 'Save rates', variant: 'primary', full: true, onClick: () => {
+        const card = {};
+        FIELDS.forEach(([key]) => {
+          const raw = inputs[key].value.trim();
+          if (raw === '') return;                 // leave unset → default applies
+          const n = Number(raw);
+          if (isFinite(n) && n >= 0) card[key] = n;
+        });
+        if (cfg.set) cfg.set({ rateCard: card });
+        status.textContent = 'Saved ' + Object.keys(card).length + ' rate(s). New quotes use these immediately.';
+      } }),
+      ui.button({ label: 'Reset to defaults', variant: 'ghost', full: true, onClick: () => {
+        if (cfg.set) cfg.set({ rateCard: {} });
+        FIELDS.forEach(([key]) => { inputs[key].value = ''; });
+        status.textContent = 'Reset — all rates back to defaults.';
+      } })
+    ]));
+    s.body.appendChild(ui.button({ label: 'Done', variant: 'ghost', full: true, onClick: () => s.close() }));
   }
 
   function metricBadge(label, val, kind) {

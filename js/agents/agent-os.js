@@ -85,6 +85,16 @@
       const decision = parseDecision(res.text || '');
       if (!decision) return { ok: false, error: 'BAD_OUTPUT', roleId: roleId, raw: res.text };
 
+      // Apply the Self-Improvement confidence bias (learned from this agent's
+      // real track record). The raw value is preserved for transparency; the
+      // adjusted value is what the Supervisor will score next time.
+      const bias = (reg.confidenceBias ? reg.confidenceBias(roleId) : 0) || 0;
+      if (bias && decision.confidence != null) {
+        decision.rawConfidence = decision.confidence;
+        decision.confidence = Math.max(0, Math.min(100, Math.round(decision.confidence + bias)));
+        decision.confidenceBias = bias;
+      }
+
       // Persist to shared memory for the Supervisor + learning loop.
       let logged = null;
       try {
@@ -94,6 +104,8 @@
           decision: decision.recommendation,
           rationale: decision.rationale,
           confidence: decision.confidence,
+          rawConfidence: decision.rawConfidence != null ? decision.rawConfidence : decision.confidence,
+          confidenceBias: bias || 0,
           inputs: { task: task, context: context || {} }
         });
       } catch (_) {}

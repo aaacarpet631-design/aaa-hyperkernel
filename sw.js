@@ -6,7 +6,7 @@
  * app fully usable offline. Old caches are purged on activate, and the worker
  * takes control immediately to avoid serving a stale shell after an update.
  */
-const CACHE_NAME = 'hyperkernel-v15';
+const CACHE_NAME = 'hyperkernel-v18';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -35,6 +35,7 @@ const PRECACHE = [
   '/js/agents/agent-os.js',
   '/js/agents/supervisor.js',
   '/js/agents/prompt-architect.js',
+  '/js/agents/self-improvement.js',
   '/js/agents/agent-marketplace.js',
   '/js/agents/agent-automation.js',
   '/js/agents/review-request-engine.js',
@@ -50,7 +51,17 @@ const PRECACHE = [
   '/js/ai/sidekick-context-engine.js',
   '/js/ai/sidekick-voice-engine.js',
   '/js/ai/sidekick-vision-engine.js',
-  '/js/ai/sidekick-closure-engine.js'
+  '/js/ai/sidekick-closure-engine.js',
+  '/js/measurements/models/measurement-models.js',
+  '/js/measurements/storage/measurement-store.js',
+  '/js/measurements/measurement-ai-assistant.js',
+  '/js/bluetooth/services/raw-reading-log.js',
+  '/js/bluetooth/services/measurement-parser.js',
+  '/js/bluetooth/services/generic-ble-adapter.js',
+  '/js/bluetooth/services/device-adapter-registry.js',
+  '/js/bluetooth/hooks/use-bluetooth-connection.js',
+  '/js/bluetooth/screens/measurement-hud-ui.js',
+  '/js/quotes/integrations/measurement-to-quote.js'
 ];
 
 self.addEventListener('install', (event) => {
