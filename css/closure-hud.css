@@ -1,140 +1,94 @@
-/* Closure HUD styling for AAA On‑Site Sidekick
- *
- * This stylesheet defines the dark glassmorphism aesthetic for the
- * departure checklist overlay.  It uses emerald accents for success,
- * amber for warnings, and red for errors.  Buttons and checklists are
- * large and easy to tap in the field.
+/*
+ * Closure / Departure checklist — red/black/white theme, bottom-sheet layout.
  */
 
 .closure-hud {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(20, 20, 25, 0.85);
-  z-index: 9999;
+  inset: 0;
+  z-index: 10040;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(5px);
 }
-
-.closure-hud.hidden {
-  display: none;
-}
+.closure-hud.hidden { display: none; }
 
 .closure-card {
-  background: rgba(30, 30, 35, 0.95);
-  border-radius: 24px;
-  padding: 2rem;
-  color: #ffffff;
-  max-width: 90%;
-  width: 420px;
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+  width: 100%;
+  max-width: 560px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: var(--surface, #141418);
+  border: 1px solid var(--border, #2A2A33);
+  border-radius: 22px 22px 0 0;
+  padding: 0.5rem 1.1rem calc(1.2rem + env(safe-area-inset-bottom, 0px));
+  color: var(--text, #F8FAFC);
+  box-shadow: 0 -14px 50px rgba(0, 0, 0, 0.6);
+}
+@media (min-width: 600px) {
+  .closure-hud { align-items: center; }
+  .closure-card { border-radius: 22px; }
 }
 
-.closure-title {
-  margin-top: 0;
-  font-size: 2rem;
-  margin-bottom: 1rem;
+.closure-grip { width: 38px; height: 4px; border-radius: 2px; background: var(--border, #2A2A33); margin: 0.35rem auto 0.7rem; }
+.closure-title { margin: 0; font-size: 1.45rem; font-weight: 800; }
+.closure-sub { margin: 0.25rem 0 1rem; color: var(--muted, #A1A1AA); font-size: 0.9rem; }
+
+/* progress */
+.closure-progress { margin-bottom: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.closure-progress__row { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.85rem; color: var(--muted, #A1A1AA); }
+.closure-progress__count { color: var(--text, #F8FAFC); font-weight: 700; }
+
+/* sections */
+.closure-section { margin-bottom: 1.25rem; }
+.closure-section__title {
+  margin: 0 0 0.6rem; font-size: 0.75rem; text-transform: uppercase;
+  letter-spacing: 0.09em; color: var(--muted, #A1A1AA); font-weight: 700;
+}
+.closure-rows { display: flex; flex-direction: column; gap: 0.5rem; }
+
+/* auto rows */
+.closure-row {
+  display: flex; align-items: center; gap: 0.7rem;
+  background: var(--surface-2, #1C1C22); border: 1px solid var(--border, #2A2A33);
+  border-radius: 12px; padding: 0.75rem 0.85rem; min-height: var(--tap, 48px);
+}
+.closure-row__icon {
+  flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 800;
+}
+.closure-row.is-ok .closure-row__icon { background: rgba(16, 185, 129, 0.16); color: var(--success, #10B981); }
+.closure-row.is-missing .closure-row__icon { background: rgba(239, 68, 68, 0.16); color: var(--danger, #EF4444); }
+.closure-row__label { flex: 1; font-size: 0.95rem; }
+.closure-row__state { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; }
+.closure-row.is-ok .closure-row__state { color: var(--success, #10B981); }
+.closure-row.is-missing .closure-row__state { color: var(--danger, #EF4444); }
+
+/* manual tappable rows */
+.closure-check {
+  width: 100%; text-align: left; cursor: pointer;
+  display: flex; align-items: center; gap: 0.7rem; min-height: var(--tap, 48px);
+  background: var(--surface-2, #1C1C22); border: 1px solid var(--border, #2A2A33);
+  border-radius: 12px; padding: 0.7rem 0.85rem; color: var(--text, #F8FAFC);
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.closure-check:active { transform: scale(0.995); }
+.closure-check:focus-visible { outline: 2px solid var(--red, #DC2626); outline-offset: 2px; }
+.closure-check__box {
+  flex-shrink: 0; width: 26px; height: 26px; border-radius: 8px;
+  border: 2px solid var(--border, #2A2A33); background: transparent;
+  display: flex; align-items: center; justify-content: center; font-size: 0.95rem; font-weight: 800; color: #fff;
+}
+.closure-check.is-checked { border-color: rgba(16, 185, 129, 0.5); background: rgba(16, 185, 129, 0.08); }
+.closure-check.is-checked .closure-check__box { background: var(--success, #10B981); border-color: var(--success, #10B981); color: #04140d; }
+.closure-check__label { flex: 1; font-size: 0.95rem; }
+
+.closure-missing {
+  margin: 0 0 1rem; padding: 0.6rem 0.75rem; font-size: 0.85rem;
+  color: var(--danger, #EF4444); background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 10px;
 }
 
-.auto-section,
-.manual-section {
-  margin-bottom: 1.5rem;
-}
-
-.auto-list,
-.manual-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.auto-list li {
-  padding: 0.5rem 0;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-}
-
-.auto-list li.item-ok::before {
-  content: '✔';
-  color: #00ff9d;
-  margin-right: 0.5rem;
-}
-
-.auto-list li.item-missing::before {
-  content: '✘';
-  color: #ff6b6b;
-  margin-right: 0.5rem;
-}
-
-.manual-list li {
-  margin: 0.5rem 0;
-  font-size: 1rem;
-}
-
-.manual-list input[type='checkbox'] {
-  transform: scale(1.4);
-  margin-right: 0.5rem;
-}
-
-.action-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-top: 1.5rem;
-}
-
-.closure-btn {
-  padding: 1rem;
-  border-radius: 12px;
-  border: none;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.closure-btn.primary {
-  background: #00ff9d;
-  color: #121212;
-}
-
-.closure-btn.secondary {
-  background: #ffab00;
-  color: #121212;
-}
-
-.closure-btn.tertiary {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-}
-
-.closure-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Status colouring: the wrapper .action-buttons gets one of these classes */
-.action-buttons.status-error .closure-btn.primary {
-  background: #ff6b6b;
-  color: #121212;
-}
-
-.action-buttons.status-warning .closure-btn.primary {
-  background: #ffab00;
-  color: #121212;
-}
-
-.action-buttons.status-success .closure-btn.primary {
-  background: #00ff9d;
-  color: #121212;
-}
-
-.missing-msg {
-  color: #ff6b6b;
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-}
+.closure-actions { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.5rem; }
+.closure-hint { text-align: center; color: var(--muted, #A1A1AA); font-size: 0.8rem; margin: 0.6rem 0 0; }

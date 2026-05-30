@@ -71,8 +71,11 @@
     return {
       type: 'GENERAL_INSPECTION',
       severity: 'MEDIUM',
+      confidence: null,
       estimatedTimeMins: 45,
+      estimatedQuoteRange: null,
       materials: ['Seam Tape'],
+      recommendedNextStep: 'Confirm details on site, then enter the estimate manually.',
       summary: 'Backend unavailable — enter details manually or retry on a connection.'
     };
   }

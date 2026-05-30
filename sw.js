@@ -6,7 +6,7 @@
  * app fully usable offline. Old caches are purged on activate, and the worker
  * takes control immediately to avoid serving a stale shell after an update.
  */
-const CACHE_NAME = 'hyperkernel-v2';
+const CACHE_NAME = 'hyperkernel-v3';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -23,6 +23,7 @@ const PRECACHE = [
   '/js/core/sync-engine.js',
   '/js/core/app-lifecycle.js',
   '/js/customers/customer-store.js',
+  '/js/ui/ui-kit.js',
   '/js/ui/customer-picker-ui.js',
   '/js/ui/new-job-flow-ui.js',
   '/js/ui/voice-hud-ui.js',

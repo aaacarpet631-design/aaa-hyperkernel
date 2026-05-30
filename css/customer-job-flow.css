@@ -1,7 +1,8 @@
 /*
- * Customer + New Job flow styles for AAA HyperKernel.
- * Shared modal shell (.aaa-modal-overlay / .aaa-modal), form inputs, and the
- * customer picker list. Buttons reuse the .aaa-btn system from job-list.css.
+ * Customer + New Job flow styles — red/black/white theme.
+ * Modal shell (.aaa-modal*) and the customer picker list. Buttons reuse the
+ * .aaa-btn base from job-list.css; the *-primary / *-ghost aliases below keep
+ * the existing picker/new-job markup working with the new theme.
  */
 
 .aaa-modal-overlay {
@@ -11,94 +12,67 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  background: rgba(5, 5, 5, 0.7);
-  backdrop-filter: blur(6px);
-  padding: 1rem;
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(4px);
+  padding: 0;
 }
 
 .aaa-modal {
   width: 100%;
-  max-width: 520px;
-  max-height: 88vh;
+  max-width: 560px;
+  max-height: 90vh;
   overflow-y: auto;
-  background: #16161c;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px 20px 18px 18px;
-  padding: 1.25rem 1.25rem calc(1.25rem + env(safe-area-inset-bottom, 0px));
-  color: #f5f5f7;
-  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.5);
+  background: var(--surface, #141418);
+  border: 1px solid var(--border, #2A2A33);
+  border-radius: 22px 22px 0 0;
+  padding: 0.5rem 1.1rem calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  color: var(--text, #F8FAFC);
+  box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.55);
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.8rem;
+}
+.aaa-modal::before {
+  content: ""; display: block; width: 38px; height: 4px; border-radius: 2px;
+  background: var(--border, #2A2A33); margin: 0.35rem auto 0.4rem;
 }
 
 @media (min-width: 600px) {
-  .aaa-modal-overlay { align-items: center; }
-  .aaa-modal { border-radius: 20px; }
+  .aaa-modal-overlay { align-items: center; padding: 1rem; }
+  .aaa-modal { border-radius: 22px; }
 }
 
-.aaa-modal-title { margin: 0; font-size: 1.3rem; font-weight: 700; }
+.aaa-modal-title { margin: 0; font-size: 1.3rem; font-weight: 800; }
 .aaa-modal-subtitle {
-  margin: 0.5rem 0 0;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #8a8a93;
+  margin: 0.5rem 0 0; font-size: 0.78rem; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--muted, #A1A1AA);
 }
 
 .aaa-form { display: flex; flex-direction: column; gap: 0.6rem; }
-.aaa-field-label { font-size: 0.85rem; color: #8a8a93; }
-
-.aaa-input {
-  width: 100%;
-  background: #1f1f27;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
-  padding: 0.8rem 0.9rem;
-  font-size: 1rem;
-  color: #f5f5f7;
-  outline: none;
-}
-.aaa-input:focus { border-color: #00ff9d; }
-.aaa-input::placeholder { color: #6a6a73; }
-.aaa-input-error { border-color: #ff6b6b; }
-.aaa-textarea { min-height: 90px; resize: vertical; font-family: inherit; }
 
 .aaa-modal-actions { display: flex; gap: 0.6rem; justify-content: flex-end; margin-top: 0.25rem; }
 .aaa-modal-actions .aaa-btn { flex: 1; }
 
+/* Button aliases so existing modal markup matches the new theme */
+.aaa-btn-primary { background: var(--grad-red, #DC2626); color: #fff; box-shadow: 0 6px 18px rgba(220, 38, 38, 0.28); }
+.aaa-btn-ghost { background: transparent; color: var(--text, #fff); border-color: var(--border, #2A2A33); }
+.aaa-input-error { border-color: var(--danger, #EF4444); }
+
 /* Customer picker list */
-.aaa-picker-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  max-height: 38vh;
-  overflow-y: auto;
-}
+.aaa-picker-list { display: flex; flex-direction: column; gap: 0.4rem; max-height: 38vh; overflow-y: auto; }
 .aaa-picker-row {
-  width: 100%;
-  text-align: left;
-  background: #1f1f27;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 0.75rem 0.9rem;
-  color: #f5f5f7;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
+  width: 100%; text-align: left; min-height: var(--tap, 48px);
+  background: var(--surface-2, #1C1C22); border: 1px solid var(--border, #2A2A33);
+  border-radius: 12px; padding: 0.7rem 0.9rem; color: var(--text, #F8FAFC);
+  cursor: pointer; display: flex; flex-direction: column; gap: 0.15rem; justify-content: center;
 }
-.aaa-picker-row:hover { border-color: rgba(255, 255, 255, 0.2); }
-.aaa-picker-name { font-weight: 600; }
-.aaa-picker-sub { color: #8a8a93; font-size: 0.85rem; }
-.aaa-empty { color: #8a8a93; text-align: center; padding: 1rem; margin: 0; }
+.aaa-picker-row:hover { border-color: #3a3a45; }
+.aaa-picker-row:active { background: #24242c; }
+.aaa-picker-name { font-weight: 700; }
+.aaa-picker-sub { color: var(--muted, #A1A1AA); font-size: 0.85rem; }
+.aaa-empty { color: var(--muted, #A1A1AA); text-align: center; padding: 1rem; margin: 0; }
 
 .aaa-job-customer {
-  background: #1f1f27;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 0.75rem 0.9rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
+  background: var(--surface-2, #1C1C22); border: 1px solid var(--border, #2A2A33);
+  border-radius: 12px; padding: 0.75rem 0.9rem; display: flex; flex-direction: column; gap: 0.15rem;
 }
