@@ -177,7 +177,7 @@
       actions.appendChild(ui.button({ label: 'Agent Marketplace', icon: '🏪', variant: 'secondary', full: true, onClick: () => marketplaceFlow(body) }));
     }
     actions.appendChild(ui.button({ label: 'Cloud Settings', icon: '⚙️', variant: 'secondary', full: true, onClick: () => settingsFlow(body) }));
-    if (global.AAA_MEASUREMENT_QUOTE) {
+    if (global.AAA_MEASUREMENT_QUOTE && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_PRICING_RATES'))) {
       actions.appendChild(ui.button({ label: 'Pricing / Rate Card', icon: '💲', variant: 'secondary', full: true, onClick: () => rateCardFlow(body) }));
     }
     actions.appendChild(ui.button({ label: 'Run Company Standup', icon: '🧭', variant: 'primary', full: true, disabled: !aiReady, onClick: () => runStandup(body) }));
@@ -375,6 +375,31 @@
       field('Cloud Function URL (optional)', 'firebaseFunctionUrl', 'https://us-central1-<id>.cloudfunctions.net/claudeProxy')
     ];
     fields.forEach((f) => s.body.appendChild(f.wrap));
+
+    // ---- Role (RBAC) — who is using this device. Owner-only to change. ----
+    if (global.AAA_RBAC) {
+      const rbac = global.AAA_RBAC;
+      s.body.appendChild(ui.el('h2', { className: 'aaa-section-title', text: 'Device role' }));
+      if (rbac.can('MANAGE_SETTINGS')) {
+        const sel = ui.el('select', { className: 'aaa-input' });
+        rbac.ROLES.forEach((r) => {
+          const opt = ui.el('option', { text: rbac.label(r), attrs: { value: r } });
+          if (r === rbac.role()) opt.setAttribute('selected', 'selected');
+          sel.appendChild(opt);
+        });
+        sel.addEventListener('change', () => {
+          rbac.setRole(sel.value);
+          status.textContent = 'Role set to ' + rbac.label() + '. Restricted areas update immediately.';
+        });
+        s.body.appendChild(ui.el('div', { className: 'aaa-form' }, [
+          ui.el('label', { className: 'aaa-field-label', text: 'This device is used by' }), sel
+        ]));
+        s.body.appendChild(ui.el('p', { className: 'aaa-voice-hint', text: 'Crew see only field work. Managers run production. Owner sees financials.' }));
+      } else {
+        s.body.appendChild(ui.el('div', { className: 'aaa-list-row', html: '<strong>Role: ' + esc(rbac.label()) + '</strong><div class="aaa-list-sub">Only the owner can change roles.</div>' }));
+      }
+    }
+
     const status = ui.el('p', { className: 'aaa-empty', text: '' });
     s.body.appendChild(status);
 

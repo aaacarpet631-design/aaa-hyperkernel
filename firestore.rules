@@ -7,13 +7,26 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    function memberDoc(ws) {
+      return get(/databases/$(database)/documents/workspaces/$(ws)/members/$(request.auth.uid));
+    }
     function isMember(ws) {
       return request.auth != null
         && exists(/databases/$(database)/documents/workspaces/$(ws)/members/$(request.auth.uid));
     }
+    // Members without an explicit role are treated as 'crew' (least privilege).
+    function role(ws) {
+      return isMember(ws) ? (('role' in memberDoc(ws).data) ? memberDoc(ws).data.role : 'crew') : 'none';
+    }
+    function isOwner(ws) { return role(ws) == 'owner'; }
 
-    // The workspace doc + membership list: a member can read; writes to
-    // membership should be done by an admin/console (kept locked here).
+    // Collections that expose money internals — owner-only, enforced server-side
+    // so a tampered or crew client still cannot read them.
+    function isFinancialCollection(c) {
+      return c == 'accounting' || c == 'invoices' || c == 'payments'
+          || c == 'expenses' || c == 'kpi_snapshots' || c == 'rate_cards';
+    }
+
     match /workspaces/{ws} {
       allow read: if isMember(ws);
       allow write: if false;
@@ -23,13 +36,21 @@ service cloud.firestore {
         allow write: if false; // manage members from the console / a trusted backend
       }
 
-      // All other workspace-scoped collections (customers, jobs, estimates,
-      // outcomes, agent_decisions, agent_logs, kpi_snapshots, …).
+      // Audit log: any member may append; nobody may edit/delete (tamper-proof);
+      // only the owner may read the full trail.
+      match /audit_log/{docId} {
+        allow create: if isMember(ws);
+        allow read: if isOwner(ws);
+        allow update, delete: if false;
+      }
+
+      // All other workspace-scoped collections. Financial collections are
+      // owner-only; everything else is any member.
       match /{collection}/{docId} {
-        allow read, write: if isMember(ws);
+        allow read, write: if isMember(ws) && (!isFinancialCollection(collection) || isOwner(ws));
       }
       match /{collection}/{docId}/{sub=**} {
-        allow read, write: if isMember(ws);
+        allow read, write: if isMember(ws) && (!isFinancialCollection(collection) || isOwner(ws));
       }
     }
   }

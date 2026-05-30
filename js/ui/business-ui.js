@@ -27,6 +27,18 @@
   async function render(container) {
     const ui = U();
     container.innerHTML = '';
+
+    // RBAC: the Business tab exposes revenue, close rate, channel ROI and the
+    // knowledge graph — owner-only financials. Crew/managers are stopped here
+    // with an honest message rather than being shown the numbers.
+    const rbac = global.AAA_RBAC;
+    if (rbac && !rbac.can('VIEW_FINANCIALS')) {
+      container.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+        '<strong>🔒 Financials are owner-only</strong>' +
+        '<div class="aaa-list-sub">Signed in as ' + esc(rbac.label()) + '. Revenue, margins, and business analytics are restricted to the owner.</div>' }));
+      return;
+    }
+
     container.appendChild(ui.spinner('Loading business overview…'));
 
     const jobs = await data().listJobs();

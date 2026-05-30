@@ -324,12 +324,15 @@
       if (!selections.length) { toast(body, 'Pick at least one service.', '#F59E0B'); return; }
       const q = quote().buildQuote(selections);
       state._lastQuote = q; state._lastSessions = sessions;
+      // RBAC: only roles that may see margins get the labor/material breakdown.
+      const rbac = global.AAA_RBAC;
+      const showMargins = !rbac || rbac.can('VIEW_MARGINS');
       out.innerHTML = '';
-      out.appendChild(title('Draft (internal) — needs your review'));
+      out.appendChild(title(showMargins ? 'Draft (internal) — needs your review' : 'Draft quote — needs owner review'));
       q.lines.forEach((l) => out.appendChild(ui.el('div', { className: 'aaa-list-row', html:
         '<strong>' + esc(l.label) + ' · ' + l.range + '</strong>' +
-        '<div class="aaa-list-sub">' + esc(l.basis) + ' · labor $' + l._labor + ' · material $' + l._material + '</div>' })));
-      out.appendChild(ui.el('div', { className: 'aaa-list-row', html: '<strong>Total ' + q.totalRange + '</strong><div class="aaa-list-sub">internal labor $' + q._laborTotal + ' · material $' + q._materialTotal + '</div>' }));
+        '<div class="aaa-list-sub">' + esc(l.basis) + (showMargins ? ' · labor $' + l._labor + ' · material $' + l._material : '') + '</div>' })));
+      out.appendChild(ui.el('div', { className: 'aaa-list-row', html: '<strong>Total ' + q.totalRange + '</strong>' + (showMargins ? '<div class="aaa-list-sub">internal labor $' + q._laborTotal + ' · material $' + q._materialTotal + '</div>' : '') }));
       out.appendChild(ui.button({ label: 'Preview customer receipt', icon: '🧾', variant: 'secondary', full: true, onClick: () => showReceipt(q) }));
       out.appendChild(ui.button({ label: 'Apply to job (for review)', icon: '✅', variant: 'primary', full: true, onClick: () => applyToJob(body, q, sessions) }));
     } }));
