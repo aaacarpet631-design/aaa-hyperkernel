@@ -39,6 +39,27 @@
       global.AAA_EVENTS.on('job.created', (p) => this._onJobCreated(p));
       global.AAA_EVENTS.on('estimate.added', (p) => this._onEstimate(p));
       global.AAA_EVENTS.on('job.closed', (p) => this._onClosed(p));
+      // Custom agents (Prompt Architect / Marketplace) with an enabled trigger.
+      global.AAA_EVENTS.on('*', (p, type) => this._runCustomTriggers(type, p));
+    },
+
+    /**
+     * Run any saved custom agent whose trigger matches this event and is
+     * enabled. Per-agent opt-in (triggerEnabled); requires the proxy to be
+     * ready. Scheduled delays need a server scheduler — for now it runs on the
+     * event and records the intended delay in the decision context.
+     */
+    async _runCustomTriggers(type, payload) {
+      if (!os() || !os().isReady || !os().isReady() || !data()) return;
+      if (['job.created', 'estimate.added', 'job.closed'].indexOf(type) === -1) return;
+      let agents;
+      try { agents = await data().list('custom_agents'); } catch (_) { return; }
+      for (const rec of agents) {
+        if (!rec || !rec.triggerEnabled || !rec.trigger || rec.trigger.event !== type) continue;
+        const job = payload && payload.jobId ? await this._job(payload.jobId) : null;
+        const ctx = Object.assign(job ? this._ctx(job) : {}, { triggerEvent: type, intendedDelayHours: rec.trigger.delayHours || 0 });
+        await os().runAgent(rec.id, rec.trigger.task || 'Act on this event.', ctx);
+      }
     },
 
     async _job(jobId) { return data() ? data().get('jobs', jobId) : null; },

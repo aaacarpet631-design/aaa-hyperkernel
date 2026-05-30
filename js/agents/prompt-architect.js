@@ -30,6 +30,17 @@
       goals: STRLIST, constraints: STRLIST, memoryRules: STRLIST, escalationRules: STRLIST,
       successMetrics: STRLIST, failureMetrics: STRLIST,
       integrations: STRLIST, workflow: { type: 'array', items: { type: 'string' }, description: 'Ordered workflow steps.' },
+      trigger: {
+        type: 'object',
+        description: 'When this agent should auto-run. Use "none" if it should only run on demand.',
+        properties: {
+          event: { type: 'string', enum: ['none', 'job.created', 'estimate.added', 'job.closed'] },
+          delayHours: { type: 'integer', description: 'Intended delay after the event (0 = immediately).' },
+          task: { type: 'string', description: 'What the agent should do when triggered.' }
+        },
+        required: ['event', 'delayHours', 'task'],
+        additionalProperties: false
+      },
       analysis: {
         type: 'object',
         properties: {
@@ -41,7 +52,7 @@
         additionalProperties: false
       }
     },
-    required: ['name', 'mission', 'role', 'systemPrompt', 'goals', 'constraints', 'memoryRules', 'escalationRules', 'successMetrics', 'failureMetrics', 'integrations', 'workflow', 'analysis'],
+    required: ['name', 'mission', 'role', 'systemPrompt', 'goals', 'constraints', 'memoryRules', 'escalationRules', 'successMetrics', 'failureMetrics', 'integrations', 'workflow', 'trigger', 'analysis'],
     additionalProperties: false
   };
 
@@ -51,6 +62,7 @@
     'The systemPrompt you write must be directly usable as that agent\'s instructions. Ground goals, constraints, metrics, and workflow in AAA Carpet\'s real operations (jobs, estimates, scheduling, dispatch, follow-up, reviews, marketing). ' +
     'Pick integrations only from what exists or is realistic: shared memory (jobs/customers/estimates/outcomes), SMS, Email, Google Business reviews, QuickBooks, Calendar, Google Ads. ' +
     'Require human review for anything customer-facing, financial, or irreversible (put it in escalationRules). ' +
+    'In "trigger", propose when the agent should auto-run from these events: job.created, estimate.added, job.closed (or "none" for on-demand only), with a sensible delayHours and the task to perform. ' +
     'Be honest in analysis scores — do not inflate. Respond ONLY as JSON matching the schema.';
 
   function slug(name) {
@@ -93,7 +105,12 @@
       const history = existing
         ? (existing.history || []).concat([{ version: existing.version, spec: existing.spec, at: existing.updatedAt }])
         : [];
-      const rec = { id: id, title: spec.name, version: version, spec: spec, createdAt: existing ? existing.createdAt : now, updatedAt: now, history: history };
+      const rec = {
+        id: id, title: spec.name, version: version, spec: spec,
+        trigger: spec.trigger || { event: 'none', delayHours: 0, task: '' },
+        triggerEnabled: existing ? !!existing.triggerEnabled : false,
+        createdAt: existing ? existing.createdAt : now, updatedAt: now, history: history
+      };
       await data().put('custom_agents', id, rec);
       await cloudUpsert(rec);
       this._register(rec);
@@ -103,6 +120,18 @@
 
     _register(rec) {
       if (global.AAA_AGENTS && global.AAA_AGENTS.registerCustom) global.AAA_AGENTS.registerCustom(rec);
+    },
+
+    /** Turn a saved agent's auto-run trigger on/off. */
+    async setTriggerEnabled(id, enabled) {
+      const rec = await this.get(id);
+      if (!rec) return { ok: false, error: 'NOT_FOUND' };
+      rec.triggerEnabled = !!enabled;
+      rec.updatedAt = clock() ? clock().now() : Date.now();
+      await data().put('custom_agents', id, rec);
+      await cloudUpsert(rec);
+      this._register(rec);
+      return { ok: true, agent: rec };
     },
 
     async list() { return data() ? data().list('custom_agents') : []; },

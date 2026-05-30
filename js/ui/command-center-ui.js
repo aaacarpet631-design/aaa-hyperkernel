@@ -60,6 +60,8 @@
     const outcomes = await data().list('outcomes');
     const metrics = global.AAA_SUPERVISOR ? await global.AAA_SUPERVISOR.metrics() : { ok: false };
     const aiReady = global.AAA_AGENT_OS && global.AAA_AGENT_OS.isReady && global.AAA_AGENT_OS.isReady();
+    const customRecs = global.AAA_PROMPT_ARCHITECT ? await global.AAA_PROMPT_ARCHITECT.list() : [];
+    const customMap = {}; customRecs.forEach((r) => { customMap[r.id] = r; });
 
     body.innerHTML = '';
 
@@ -95,14 +97,26 @@
           (p ? '<div class="aaa-list-sub">' + p.decisions + ' decisions · conf ' + (p.avgConfidence != null ? p.avgConfidence + '%' : '—') +
             (p.avgScore != null ? ' · accuracy ' + Math.round(p.avgScore * 100) + '%' : '') + '</div>' : '') }));
       });
-      // Custom agents created by the Prompt Architect.
+      // Custom agents (Prompt Architect / Marketplace) — with auto-run toggle.
       (reg.customIds ? reg.customIds() : []).forEach((id) => {
         const a = reg.get(id); if (!a) return;
+        const rec = customMap[id];
+        const trig = (rec && rec.trigger) || (a.spec && a.spec.trigger) || {};
         const p = per[id];
-        body.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+        const row = ui.el('div', { className: 'aaa-list-row' });
+        row.innerHTML =
           '<strong>✨ ' + esc(a.title) + '</strong> <span class="aaa-list-sub">custom · ' + (aiReady ? 'online' : 'standby') + '</span>' +
           '<div class="aaa-list-sub">' + esc((a.spec && a.spec.mission) || '') + '</div>' +
-          (p ? '<div class="aaa-list-sub">' + p.decisions + ' decisions</div>' : '') }));
+          (trig.event && trig.event !== 'none' ? '<div class="aaa-list-sub">auto-run on ' + esc(trig.event) + '</div>' : '') +
+          (p ? '<div class="aaa-list-sub">' + p.decisions + ' decisions</div>' : '');
+        if (rec && trig.event && trig.event !== 'none' && global.AAA_PROMPT_ARCHITECT) {
+          row.appendChild(ui.button({
+            label: 'Auto-run: ' + (rec.triggerEnabled ? 'On' : 'Off'), size: 'sm',
+            variant: rec.triggerEnabled ? 'success' : 'ghost',
+            onClick: async () => { await global.AAA_PROMPT_ARCHITECT.setTriggerEnabled(id, !rec.triggerEnabled); await renderInto(body); }
+          }));
+        }
+        body.appendChild(row);
       });
     }
 
@@ -133,6 +147,9 @@
     const actions = ui.el('div', { className: 'closure-actions' });
     if (global.AAA_PROMPT_ARCHITECT) {
       actions.appendChild(ui.button({ label: 'Create Agent (describe it)', icon: '✨', variant: 'primary', full: true, onClick: () => architectFlow(body) }));
+    }
+    if (global.AAA_MARKETPLACE) {
+      actions.appendChild(ui.button({ label: 'Agent Marketplace', icon: '🏪', variant: 'secondary', full: true, onClick: () => marketplaceFlow(body) }));
     }
     actions.appendChild(ui.button({ label: 'Cloud Settings', icon: '⚙️', variant: 'secondary', full: true, onClick: () => settingsFlow(body) }));
     actions.appendChild(ui.button({ label: 'Run Company Standup', icon: '🧭', variant: 'primary', full: true, disabled: !aiReady, onClick: () => runStandup(body) }));
@@ -339,6 +356,12 @@
     };
     list('Goals', spec.goals); list('Workflow', spec.workflow); list('Guardrails', spec.constraints);
     list('Escalation', spec.escalationRules); list('Integrations', spec.integrations); list('Success metrics', spec.successMetrics);
+    if (spec.trigger && spec.trigger.event && spec.trigger.event !== 'none') {
+      container.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+        '<strong>Auto-run</strong><div class="aaa-list-sub">on ' + esc(spec.trigger.event) +
+        (spec.trigger.delayHours ? ' (after ~' + spec.trigger.delayHours + 'h)' : '') +
+        ' — ' + esc(spec.trigger.task || '') + '</div>' }));
+    }
     container.appendChild(ui.el('div', { className: 'aaa-dialog__actions' }, [
       ui.button({ label: 'Discard', variant: 'ghost', full: true, onClick: () => { container.innerHTML = ''; } }),
       ui.button({ label: 'Save as Agent', variant: 'primary', full: true, onClick: async () => {
@@ -370,6 +393,29 @@
       renderSpec(out, r.spec, parentBody, s);
     } }));
     s.body.appendChild(out);
+  }
+
+  async function marketplaceFlow(parentBody) {
+    const ui = U();
+    const m = global.AAA_MARKETPLACE;
+    const s = ui.sheet({ title: 'Agent Marketplace', subtitle: 'Prebuilt AAA Carpet agents — install in one tap' });
+    document.body.appendChild(s.overlay);
+    const items = m.catalog();
+    for (const cat of m.categories()) {
+      s.body.appendChild(ui.el('h2', { className: 'aaa-section-title', text: cat }));
+      const inCat = items.filter((x) => x.category === cat);
+      for (const it of inCat) {
+        const installed = await m.isInstalled(it.id);
+        const row = ui.el('div', { className: 'aaa-list-row' });
+        row.innerHTML = '<strong>' + esc(it.name) + '</strong><div class="aaa-list-sub">' + esc(it.mission) + '</div>' +
+          (it.trigger && it.trigger.event !== 'none' ? '<div class="aaa-list-sub">auto-run on ' + esc(it.trigger.event) + '</div>' : '');
+        row.appendChild(ui.button({
+          label: installed ? 'Installed ✓' : 'Install', size: 'sm', variant: installed ? 'ghost' : 'primary', disabled: installed,
+          onClick: async () => { await m.install(it.id); s.close(); await renderInto(parentBody); }
+        }));
+        s.body.appendChild(row);
+      }
+    }
   }
 
   function section(title) { return U().el('h2', { className: 'aaa-section-title', text: title }); }
