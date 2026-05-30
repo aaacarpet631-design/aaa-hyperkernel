@@ -147,7 +147,11 @@
       const jobs = await this._allJobs();
 
       const header = this._header('<span class="aaa-title-mark">AAA</span> HyperKernel', null, true);
-      header.querySelector('.aaa-header-actions').appendChild(
+      const headerActions = header.querySelector('.aaa-header-actions');
+      if (global.AAA_COMMAND_CENTER) {
+        headerActions.appendChild(ui.button({ label: '', icon: '🧭', variant: 'ghost', size: 'sm', ariaLabel: 'Open Command Center', onClick: () => global.AAA_COMMAND_CENTER.open() }));
+      }
+      headerActions.appendChild(
         ui.button({ label: 'New Job', icon: '+', variant: 'primary', size: 'sm', onClick: () => this._onNewJob(), ariaLabel: 'Create a new job' })
       );
 

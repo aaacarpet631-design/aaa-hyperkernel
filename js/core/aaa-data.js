@@ -55,6 +55,17 @@
       return rec;
     },
 
+    /** Persist a KPI snapshot (metrics rollup) to shared memory + cloud. */
+    async saveKpiSnapshot(period, metrics) {
+      const id = ids() ? ids().createId('kpi') : String(Date.now());
+      const rec = { id: id, period: period || 'day', metrics: metrics || {}, createdAt: clock() ? clock().now() : Date.now() };
+      await store().put('kpi_snapshots', id, rec);
+      if (this.cloudReady()) {
+        try { await sb().insert('kpi_snapshots', [{ workspace_id: cfg().workspaceId, period: rec.period, metrics: rec.metrics }]); } catch (_) {}
+      }
+      return rec;
+    },
+
     /** Append an agent log line into shared memory. */
     async logAgent(agent, message, context) {
       const id = ids() ? ids().createId('log') : String(Date.now());

@@ -93,8 +93,9 @@
     closeBtn.addEventListener('click', close);
     overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
     document.addEventListener('keydown', onKey);
-    // animate in
-    requestAnimationFrame(() => overlay.classList.add('aaa-sheet-overlay--in'));
+    // animate in (guard rAF for non-browser/test contexts)
+    var raf = global.requestAnimationFrame || function (f) { return setTimeout(f, 0); };
+    raf(function () { overlay.classList.add('aaa-sheet-overlay--in'); });
     return { overlay: overlay, body: body, header: header, close: close };
   }
 
