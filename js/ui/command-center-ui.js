@@ -90,6 +90,7 @@
 
     // ---- Actions ----
     const actions = ui.el('div', { className: 'closure-actions' });
+    actions.appendChild(ui.button({ label: 'Cloud Settings', icon: '⚙️', variant: 'secondary', full: true, onClick: () => settingsFlow(body) }));
     actions.appendChild(ui.button({ label: 'Run Company Standup', icon: '🧭', variant: 'primary', full: true, disabled: !aiReady, onClick: () => runStandup(body) }));
     if (provider === 'firebase' && global.AAA_CLOUD) {
       if (user) {
@@ -226,6 +227,45 @@
       res.next_actions.forEach((a) => body.appendChild(ui.el('div', { className: 'aaa-list-row', text: a })));
     }
     body.appendChild(ui.button({ label: 'Back to overview', variant: 'ghost', full: true, onClick: () => renderInto(body) }));
+  }
+
+  function settingsFlow(parentBody) {
+    const ui = U();
+    const cfg = global.AAA_CONFIG || {};
+    const s = ui.sheet({ title: 'Cloud Settings', subtitle: 'Connect Firebase (Google Cloud). Saved on this device only.' });
+    document.body.appendChild(s.overlay);
+
+    function field(label, key, placeholder, type) {
+      const input = ui.el('input', { className: 'aaa-input', attrs: { type: type || 'text', placeholder: placeholder || '' } });
+      input.value = (cfg[key] != null ? cfg[key] : '');
+      input._key = key;
+      return { wrap: ui.el('div', { className: 'aaa-form' }, [ui.el('label', { className: 'aaa-field-label', text: label }), input]), input: input };
+    }
+    const fields = [
+      field('Firebase Project ID', 'firebaseProjectId', 'e.g. aaacarpet-12345'),
+      field('Firebase Web API Key', 'firebaseApiKey', 'AIza…'),
+      field('Workspace ID', 'workspaceId', 'e.g. aaa'),
+      field('Business name', 'businessName', 'AAA Carpet'),
+      field('Google review link', 'reviewUrl', 'https://g.page/r/…'),
+      field('Cloud Function URL (optional)', 'firebaseFunctionUrl', 'https://us-central1-<id>.cloudfunctions.net/claudeProxy')
+    ];
+    fields.forEach((f) => s.body.appendChild(f.wrap));
+    const status = ui.el('p', { className: 'aaa-empty', text: '' });
+    s.body.appendChild(status);
+
+    s.body.appendChild(ui.el('div', { className: 'aaa-dialog__actions' }, [
+      ui.button({ label: 'Cancel', variant: 'ghost', full: true, onClick: () => s.close() }),
+      ui.button({ label: 'Save', variant: 'primary', full: true, onClick: async () => {
+        const patch = {};
+        fields.forEach((f) => { patch[f.input._key] = f.input.value.trim() || null; });
+        if (cfg.set) cfg.set(patch);
+        s.close();
+        await renderInto(parentBody);
+      } })
+    ]));
+    status.textContent = (cfg.isFirebaseConfigured && cfg.isFirebaseConfigured())
+      ? 'Connected to Firebase. Sign in to sync.'
+      : 'Enter your Firebase Project ID + Web API key + a Workspace ID to connect.';
   }
 
   function section(title) { return U().el('h2', { className: 'aaa-section-title', text: title }); }
