@@ -20,7 +20,8 @@
     <script src="/js/core/runtime-clock.js"></script>
     <script src="/js/core/id-factory.js"></script>
     <script src="/js/core/local-first-storage.js"></script>
-    
+    <script src="/js/core/sync-engine.js"></script>
+
     <script src="/js/customers/customer-store.js"></script>
     
     <script src="/js/ai/sidekick-context-engine.js"></script>
@@ -58,6 +59,9 @@
             }
             if (window.AAA_JOB_LIST_UI && typeof window.AAA_JOB_LIST_UI.render === 'function') {
               await window.AAA_JOB_LIST_UI.render('app-root');
+            }
+            if (window.AAA_SYNC_ENGINE && typeof window.AAA_SYNC_ENGINE.init === 'function') {
+              window.AAA_SYNC_ENGINE.init();
             }
         }
         

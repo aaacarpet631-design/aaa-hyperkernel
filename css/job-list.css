@@ -1,1 +1,190 @@
-/* placeholder job-list.css */
+/*
+ * Job List + app shell styles for AAA HyperKernel.
+ * Dark, glassy theme with an emerald (#00ff9d) primary accent. Also defines
+ * the shared .aaa-btn button system used across the app and modals.
+ */
+
+:root {
+  --bg: #050505;
+  --surface: #16161c;
+  --surface-2: #1f1f27;
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #f5f5f7;
+  --muted: #8a8a93;
+  --accent: #00ff9d;
+  --accent-ink: #05140d;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app-root {
+  min-height: 100vh;
+  max-width: 720px;
+  margin: 0 auto;
+  padding-bottom: 6rem; /* room for the voice FAB */
+}
+
+/* ---- Header ---- */
+.aaa-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: calc(env(safe-area-inset-top, 0px) + 1rem) 1rem 1rem;
+  background: linear-gradient(180deg, rgba(5, 5, 5, 0.98), rgba(5, 5, 5, 0.85));
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+.aaa-header-left { display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
+.aaa-title {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.aaa-header-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+.aaa-back {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* ---- Main ---- */
+.aaa-main { padding: 1rem; display: flex; flex-direction: column; gap: 1.25rem; }
+
+.aaa-group { display: flex; flex-direction: column; gap: 0.6rem; }
+.aaa-group-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  font-weight: 700;
+}
+.aaa-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.aaa-count {
+  background: var(--surface-2);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 0.05rem 0.5rem;
+  font-size: 0.7rem;
+}
+
+/* ---- Job cards ---- */
+.aaa-card {
+  width: 100%;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1rem;
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  transition: transform 0.12s ease, border-color 0.12s ease;
+}
+.aaa-card:active { transform: scale(0.99); }
+.aaa-card:hover { border-color: rgba(255, 255, 255, 0.18); }
+.aaa-card-top { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.aaa-card-name { font-size: 1.1rem; font-weight: 600; }
+.aaa-card-sub { color: var(--muted); font-size: 0.9rem; }
+.aaa-card-meta { display: flex; flex-wrap: wrap; gap: 0.75rem; color: var(--muted); font-size: 0.85rem; margin-top: 0.15rem; }
+
+.aaa-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid;
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  white-space: nowrap;
+}
+
+/* ---- Detail view ---- */
+.aaa-detail-summary {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+.aaa-detail-line { margin: 0; color: var(--text); font-size: 0.95rem; }
+.aaa-detail-notes {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+.aaa-detail-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+.aaa-voice-hint { color: var(--muted); font-size: 0.85rem; text-align: center; margin: 0.25rem 0 0; }
+
+.aaa-section-title {
+  margin: 0.5rem 0 0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.aaa-list-row {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+  font-size: 0.95rem;
+}
+.aaa-list-sub { color: var(--muted); font-size: 0.8rem; margin-top: 0.2rem; }
+
+/* ---- Empty states ---- */
+.aaa-empty-state { text-align: center; color: var(--muted); padding: 4rem 1rem; }
+.aaa-empty-state p { margin: 0.25rem 0; }
+.aaa-empty-sub { font-size: 0.9rem; }
+
+/* ---- Buttons (shared) ---- */
+.aaa-btn {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+.aaa-btn:active { transform: scale(0.98); }
+.aaa-btn:disabled { opacity: 0.45; cursor: default; }
+.aaa-btn-primary { background: var(--accent); color: var(--accent-ink); }
+.aaa-btn-accent { background: #57c7ff; color: #05121c; }
+.aaa-btn-success { background: #22c98a; color: #05140d; }
+.aaa-btn-ghost { background: transparent; color: var(--text); border-color: var(--border); }
+.aaa-new-job { padding: 0.6rem 0.9rem; }

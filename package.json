@@ -1,0 +1,11 @@
+{
+  "name": "aaa-hyperkernel",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "AAA HyperKernel — local-first field PWA with Claude-backed vision estimating and Netlify Blobs sync.",
+  "dependencies": {
+    "@anthropic-ai/sdk": "latest",
+    "@netlify/blobs": "latest"
+  }
+}

@@ -1,0 +1,19 @@
+# Netlify configuration for AAA HyperKernel.
+# Static site served from the repo root; serverless functions under netlify/functions.
+[build]
+  publish = "."
+
+[functions]
+  node_bundler = "esbuild"
+  directory = "netlify/functions"
+
+# Friendly routes -> functions (functions also self-declare these via `config.path`).
+[[redirects]]
+  from = "/api/vision"
+  to = "/.netlify/functions/vision"
+  status = 200
+
+[[redirects]]
+  from = "/api/sync"
+  to = "/.netlify/functions/sync"
+  status = 200

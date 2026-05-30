@@ -1,1 +1,104 @@
-/* placeholder customer-job-flow.css */
+/*
+ * Customer + New Job flow styles for AAA HyperKernel.
+ * Shared modal shell (.aaa-modal-overlay / .aaa-modal), form inputs, and the
+ * customer picker list. Buttons reuse the .aaa-btn system from job-list.css.
+ */
+
+.aaa-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(5, 5, 5, 0.7);
+  backdrop-filter: blur(6px);
+  padding: 1rem;
+}
+
+.aaa-modal {
+  width: 100%;
+  max-width: 520px;
+  max-height: 88vh;
+  overflow-y: auto;
+  background: #16161c;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px 20px 18px 18px;
+  padding: 1.25rem 1.25rem calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  color: #f5f5f7;
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+@media (min-width: 600px) {
+  .aaa-modal-overlay { align-items: center; }
+  .aaa-modal { border-radius: 20px; }
+}
+
+.aaa-modal-title { margin: 0; font-size: 1.3rem; font-weight: 700; }
+.aaa-modal-subtitle {
+  margin: 0.5rem 0 0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #8a8a93;
+}
+
+.aaa-form { display: flex; flex-direction: column; gap: 0.6rem; }
+.aaa-field-label { font-size: 0.85rem; color: #8a8a93; }
+
+.aaa-input {
+  width: 100%;
+  background: #1f1f27;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 0.8rem 0.9rem;
+  font-size: 1rem;
+  color: #f5f5f7;
+  outline: none;
+}
+.aaa-input:focus { border-color: #00ff9d; }
+.aaa-input::placeholder { color: #6a6a73; }
+.aaa-input-error { border-color: #ff6b6b; }
+.aaa-textarea { min-height: 90px; resize: vertical; font-family: inherit; }
+
+.aaa-modal-actions { display: flex; gap: 0.6rem; justify-content: flex-end; margin-top: 0.25rem; }
+.aaa-modal-actions .aaa-btn { flex: 1; }
+
+/* Customer picker list */
+.aaa-picker-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-height: 38vh;
+  overflow-y: auto;
+}
+.aaa-picker-row {
+  width: 100%;
+  text-align: left;
+  background: #1f1f27;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+  color: #f5f5f7;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.aaa-picker-row:hover { border-color: rgba(255, 255, 255, 0.2); }
+.aaa-picker-name { font-weight: 600; }
+.aaa-picker-sub { color: #8a8a93; font-size: 0.85rem; }
+.aaa-empty { color: #8a8a93; text-align: center; padding: 1rem; margin: 0; }
+
+.aaa-job-customer {
+  background: #1f1f27;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
