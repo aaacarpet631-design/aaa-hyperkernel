@@ -180,6 +180,9 @@
     if (global.AAA_MEASUREMENT_QUOTE && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_PRICING_RATES'))) {
       actions.appendChild(ui.button({ label: 'Pricing / Rate Card', icon: '💲', variant: 'secondary', full: true, onClick: () => rateCardFlow(body) }));
     }
+    if (global.AAA_RUNTIME_GATEWAY && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_AUDIT_LOG'))) {
+      actions.appendChild(ui.button({ label: 'Audit Log', icon: '🛡', variant: 'secondary', full: true, onClick: () => auditFlow(body) }));
+    }
     actions.appendChild(ui.button({ label: 'Run Company Standup', icon: '🧭', variant: 'primary', full: true, disabled: !aiReady, onClick: () => runStandup(body) }));
     if (provider === 'firebase' && global.AAA_CLOUD) {
       if (user) {
@@ -518,6 +521,26 @@
         status.textContent = 'Reset — all rates back to defaults.';
       } })
     ]));
+    s.body.appendChild(ui.button({ label: 'Done', variant: 'ghost', full: true, onClick: () => s.close() }));
+  }
+
+  // Owner-facing audit trail: every gateway decision (allowed/denied/error),
+  // including AI-blocked attempts. Read-only — the log is append-only by design.
+  async function auditFlow(parentBody) {
+    const ui = U();
+    const s = ui.sheet({ title: 'Audit Log', subtitle: 'Every guarded action — who, what, allowed or denied' });
+    document.body.appendChild(s.overlay);
+    s.body.appendChild(ui.spinner('Loading audit trail…'));
+    const entries = await global.AAA_RUNTIME_GATEWAY.recentAudit(80);
+    s.body.innerHTML = '';
+    if (!entries.length) { s.body.appendChild(ui.el('p', { className: 'aaa-empty', text: 'No audited actions yet.' })); }
+    const color = { allowed: '#10B981', denied: '#EF4444', error: '#F59E0B' };
+    entries.forEach((e) => {
+      s.body.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+        '<strong style="color:' + (color[e.decision] || '#A1A1AA') + '">' + esc(e.decision.toUpperCase()) + ' · ' + esc(e.action) + '</strong>' +
+        '<div class="aaa-list-sub">' + esc(e.origin) + (e.actor ? ' · ' + esc(String(e.actor)) : '') + (e.role ? ' (' + esc(e.role) + ')' : '') + (e.reason ? ' · ' + esc(e.reason) : '') + '</div>' +
+        '<div class="aaa-list-sub">' + esc(fmtDate(Date.parse(e.at))) + (e.target ? ' · ' + esc(e.target.type || '') + ' ' + esc(String(e.target.id || '')) : '') + '</div>' }));
+    });
     s.body.appendChild(ui.button({ label: 'Done', variant: 'ghost', full: true, onClick: () => s.close() }));
   }
 

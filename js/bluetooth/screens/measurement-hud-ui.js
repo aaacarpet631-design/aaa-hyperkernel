@@ -353,14 +353,28 @@
   async function applyToJob(body, q, sessions) {
     if (!state.jobId) { toast(body, 'Open this from a job to apply estimates.', '#F59E0B'); return; }
     const entries = quote().toEstimateEntries(q, { sessionIds: sessions.map((s) => s.id) });
-    const storage = global.AAA_LOCAL_FIRST_STORAGE;
-    let job = await storage.get('jobs', state.jobId);
-    if (!job) { toast(body, 'Job not found.', '#EF4444'); return; }
-    const updated = Object.assign({}, job, { estimates: (Array.isArray(job.estimates) ? job.estimates : []).concat(entries) });
-    await storage.put('jobs', state.jobId, updated);
-    // Mirror via the unified data layer so it syncs like every other estimate.
-    try { if (global.AAA_DATA && global.AAA_DATA.put) await global.AAA_DATA.put('jobs', state.jobId, updated); } catch (_) {}
-    if (events()) events().emit('estimate.added', { jobId: state.jobId, count: entries.length, source: 'measurement' });
+
+    // Route through the Runtime Gateway: human-origin ADD_ESTIMATE, RBAC-checked
+    // and audited. (These estimates stay needsReview — finalizing the customer
+    // price is a separate FINALIZE_PRICE action a person approves.)
+    const gw = global.AAA_RUNTIME_GATEWAY;
+    const doMutate = async () => {
+      const storage = global.AAA_LOCAL_FIRST_STORAGE;
+      const job = await storage.get('jobs', state.jobId);
+      if (!job) throw new Error('Job not found.');
+      const updated = Object.assign({}, job, { estimates: (Array.isArray(job.estimates) ? job.estimates : []).concat(entries) });
+      await storage.put('jobs', state.jobId, updated);
+      try { if (global.AAA_DATA && global.AAA_DATA.put) await global.AAA_DATA.put('jobs', state.jobId, updated); } catch (_) {}
+      if (events()) events().emit('estimate.added', { jobId: state.jobId, count: entries.length, source: 'measurement' });
+      return updated;
+    };
+
+    if (gw) {
+      const res = await gw.run({ action: 'ADD_ESTIMATE', origin: 'human', target: { type: 'job', id: state.jobId }, detail: { count: entries.length, source: 'measurement' }, mutate: doMutate });
+      if (!res.ok) { toast(body, res.message || res.error, '#EF4444'); return; }
+    } else {
+      await doMutate();
+    }
     toast(body, entries.length + ' estimate(s) added to the job for your review.', '#10B981');
   }
 
