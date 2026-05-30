@@ -58,39 +58,54 @@
     <script src="/js/core/app-lifecycle.js"></script>
     
     <script>
+        // ---- Visible boot-error reporter (no more silent blank screens) ----
+        function aaaShowError(where, err) {
+            try {
+                var msg = (err && (err.stack || err.message)) ? (err.stack || err.message) : String(err);
+                var root = document.getElementById('app-root') || document.body;
+                root.innerHTML =
+                  '<div style="max-width:560px;margin:0 auto;padding:24px;color:#F8FAFC;font-family:-apple-system,system-ui,sans-serif">' +
+                  '<h2 style="color:#DC2626;margin:0 0 8px">Something went wrong loading the app</h2>' +
+                  '<p style="color:#A1A1AA;margin:0 0 12px">' + where + '</p>' +
+                  '<pre style="white-space:pre-wrap;word-break:break-word;background:#141418;border:1px solid #2A2A33;border-radius:12px;padding:12px;font-size:12px;color:#F8FAFC;max-height:40vh;overflow:auto">' +
+                  String(msg).replace(/[&<>]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]; }) + '</pre>' +
+                  '<button id="aaa-reset" style="margin-top:14px;width:100%;min-height:48px;border:none;border-radius:12px;background:#DC2626;color:#fff;font-weight:700;font-size:16px">Reset &amp; reload</button>' +
+                  '</div>';
+                var btn = document.getElementById('aaa-reset');
+                if (btn) btn.onclick = async function () {
+                    try {
+                        if (window.caches && caches.keys) { var ks = await caches.keys(); await Promise.all(ks.map(function (k) { return caches.delete(k); })); }
+                        if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
+                            var rs = await navigator.serviceWorker.getRegistrations(); await Promise.all(rs.map(function (r) { return r.unregister(); }));
+                        }
+                    } catch (e) {}
+                    location.reload(true);
+                };
+            } catch (e) { /* last resort: leave console error */ }
+        }
+        window.addEventListener('error', function (e) { aaaShowError('Script error', e.error || e.message); });
+        window.addEventListener('unhandledrejection', function (e) { aaaShowError('Startup failed', e.reason); });
+
         // PWA Service Worker Registration
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('HyperKernel Offline Worker Registered'))
-                    .catch(err => console.error('Worker registration failed:', err));
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('/sw.js').catch(function (err) { console.error('Worker registration failed:', err); });
             });
         }
 
         // Initialize App
         async function bootApp() {
+            if (!window.AAA_LOCAL_FIRST_STORAGE) throw new Error('Core scripts did not load (AAA_LOCAL_FIRST_STORAGE missing). A script likely failed to download — try Reset & reload.');
             await window.AAA_LOCAL_FIRST_STORAGE.boot({ mode: 'persistent' });
-            if (window.AAA_CUSTOMER_STORE && typeof window.AAA_CUSTOMER_STORE.boot === 'function') {
-              await window.AAA_CUSTOMER_STORE.boot();
-            }
-            if (window.AAA_JOB_LIST_UI && typeof window.AAA_JOB_LIST_UI.boot === 'function') {
-              await window.AAA_JOB_LIST_UI.boot();
-            }
-            if (window.AAA_JOB_LIST_UI && typeof window.AAA_JOB_LIST_UI.render === 'function') {
-              await window.AAA_JOB_LIST_UI.render('app-root');
-            }
-            if (window.AAA_SYNC_ENGINE && typeof window.AAA_SYNC_ENGINE.init === 'function') {
-              window.AAA_SYNC_ENGINE.init();
-            }
-            if (window.AAA_AUTOMATION && typeof window.AAA_AUTOMATION.init === 'function') {
-              window.AAA_AUTOMATION.init();
-            }
-            if (window.AAA_PROMPT_ARCHITECT && typeof window.AAA_PROMPT_ARCHITECT.loadSaved === 'function') {
-              window.AAA_PROMPT_ARCHITECT.loadSaved();
-            }
+            if (window.AAA_CUSTOMER_STORE && window.AAA_CUSTOMER_STORE.boot) await window.AAA_CUSTOMER_STORE.boot();
+            if (window.AAA_JOB_LIST_UI && window.AAA_JOB_LIST_UI.boot) await window.AAA_JOB_LIST_UI.boot();
+            if (window.AAA_JOB_LIST_UI && window.AAA_JOB_LIST_UI.render) await window.AAA_JOB_LIST_UI.render('app-root');
+            if (window.AAA_SYNC_ENGINE && window.AAA_SYNC_ENGINE.init) window.AAA_SYNC_ENGINE.init();
+            if (window.AAA_AUTOMATION && window.AAA_AUTOMATION.init) window.AAA_AUTOMATION.init();
+            if (window.AAA_PROMPT_ARCHITECT && window.AAA_PROMPT_ARCHITECT.loadSaved) window.AAA_PROMPT_ARCHITECT.loadSaved();
         }
-        
-        bootApp();
+
+        bootApp().catch(function (err) { aaaShowError('Startup failed', err); });
     </script>
 </body>
 </html>
