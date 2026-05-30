@@ -37,6 +37,8 @@
     body.appendChild(ui.spinner('Loading operations…'));
 
     const cfg = global.AAA_CONFIG || {};
+    const provider = global.AAA_CLOUD ? global.AAA_CLOUD.provider() : null;
+    const user = global.AAA_CLOUD && global.AAA_CLOUD.currentUser ? global.AAA_CLOUD.currentUser() : null;
     const jobs = await data().listJobs();
     const customers = await data().listCustomers();
     const decisions = (await data().list('agent_decisions')).slice().sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
@@ -50,14 +52,15 @@
     // ---- System health ----
     body.appendChild(section('System Health'));
     const healthRows = [
-      ['Cloud (Supabase)', cfg.isSupabaseConfigured && cfg.isSupabaseConfigured() ? 'Connected' : 'Local-only', cfg.isSupabaseConfigured && cfg.isSupabaseConfigured() ? '#10B981' : '#F59E0B'],
+      ['Cloud backend', provider ? ('Connected · ' + provider) : 'Local-only', provider ? '#10B981' : '#F59E0B'],
       ['AI agents', aiReady ? 'Online' : 'Not configured', aiReady ? '#10B981' : '#F59E0B'],
+      (provider === 'firebase' ? ['Signed in', user ? ('yes (' + String(user).slice(0, 6) + '…)') : 'no', user ? '#10B981' : '#F59E0B'] : null),
       ['Customers', String(customers.length), '#A1A1AA'],
       ['Jobs', String(jobs.length), '#A1A1AA'],
       ['Agent decisions', String(decisions.length), '#A1A1AA'],
       ['Outcomes recorded', String(outcomes.length), '#A1A1AA']
     ];
-    healthRows.forEach((r) => body.appendChild(kv(r[0], r[1], r[2])));
+    healthRows.filter(Boolean).forEach((r) => body.appendChild(kv(r[0], r[1], r[2])));
     if (!aiReady) {
       body.appendChild(ui.el('p', { className: 'aaa-dialog__message', text: 'Connect Supabase + the Claude proxy (see SETUP.md) to bring the AI team online.' }));
     }
@@ -88,6 +91,13 @@
     // ---- Actions ----
     const actions = ui.el('div', { className: 'closure-actions' });
     actions.appendChild(ui.button({ label: 'Run Company Standup', icon: '🧭', variant: 'primary', full: true, disabled: !aiReady, onClick: () => runStandup(body) }));
+    if (provider === 'firebase' && global.AAA_CLOUD) {
+      if (user) {
+        actions.appendChild(ui.button({ label: 'Sign out of cloud', variant: 'ghost', full: true, onClick: async () => { global.AAA_CLOUD.signOut(); await renderInto(body); } }));
+      } else {
+        actions.appendChild(ui.button({ label: 'Sign in to cloud', icon: '🔑', variant: 'secondary', full: true, onClick: () => signInFlow(body) }));
+      }
+    }
     if (global.AAA_AUTOMATION) {
       const autoOn = global.AAA_AUTOMATION.enabled();
       actions.appendChild(ui.button({
@@ -153,6 +163,27 @@
     // snapshot KPIs alongside the standup
     try { await data().saveKpiSnapshot('standup', global.AAA_SUPERVISOR ? await global.AAA_SUPERVISOR.metrics() : {}); } catch (_) {}
     await renderInto(body);
+  }
+
+  function signInFlow(parentBody) {
+    const ui = U();
+    const s = ui.sheet({ title: 'Connect cloud', subtitle: 'Sign in with your AAA workspace account', size: 'sm' });
+    document.body.appendChild(s.overlay);
+    const email = ui.el('input', { className: 'aaa-input', attrs: { type: 'email', placeholder: 'Email', autocomplete: 'username' } });
+    const pw = ui.el('input', { className: 'aaa-input', attrs: { type: 'password', placeholder: 'Password', autocomplete: 'current-password' } });
+    const status = ui.el('p', { className: 'aaa-empty', text: '' });
+    s.body.appendChild(ui.el('div', { className: 'aaa-form' }, [email, pw]));
+    s.body.appendChild(status);
+    async function attempt(fn) {
+      status.textContent = 'Connecting…';
+      const r = await fn(email.value.trim(), pw.value);
+      if (r && r.ok) { s.close(); await renderInto(parentBody); }
+      else { status.textContent = 'Could not sign in (' + ((r && (r.detail && r.detail.error && r.detail.error.message)) || (r && r.error) || 'error') + ').'; }
+    }
+    s.body.appendChild(ui.el('div', { className: 'aaa-dialog__actions' }, [
+      ui.button({ label: 'Create account', variant: 'ghost', full: true, onClick: () => attempt(global.AAA_CLOUD.signUp.bind(global.AAA_CLOUD)) }),
+      ui.button({ label: 'Sign in', variant: 'primary', full: true, onClick: () => attempt(global.AAA_CLOUD.signIn.bind(global.AAA_CLOUD)) })
+    ]));
   }
 
   function section(title) { return U().el('h2', { className: 'aaa-section-title', text: title }); }

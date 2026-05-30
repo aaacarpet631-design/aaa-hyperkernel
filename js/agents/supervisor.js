@@ -33,15 +33,10 @@
 
   async function persistDecision(dec) {
     await data().put('agent_decisions', dec.id, dec);
-    // Best-effort cloud sync of the new score + outcome link.
+    // Best-effort cloud sync of the new score + outcome link (any backend).
     try {
-      if (data().cloudReady && data().cloudReady() && sb()) {
-        await sb().upsert('agent_decisions', [{
-          workspace_id: cfg().workspaceId, client_id: dec.id,
-          agent: dec.agent || 'unknown', decision: dec.decision || '',
-          confidence: dec.confidence != null ? dec.confidence : null,
-          score: dec.score != null ? dec.score : null
-        }], 'workspace_id,client_id');
+      if (data().cloudReady && data().cloudReady() && global.AAA_CLOUD) {
+        await global.AAA_CLOUD.upsertEntity('agent_decisions', dec.id, dec);
       }
     } catch (_) {}
   }

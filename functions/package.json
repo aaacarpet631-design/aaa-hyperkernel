@@ -1,0 +1,10 @@
+{
+  "name": "aaa-hyperkernel-functions",
+  "description": "Cloud Functions for AAA HyperKernel (Claude proxy)",
+  "engines": { "node": "20" },
+  "main": "index.js",
+  "private": true,
+  "dependencies": {
+    "firebase-functions": "^5.0.0"
+  }
+}

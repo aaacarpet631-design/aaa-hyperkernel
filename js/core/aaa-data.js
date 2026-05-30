@@ -16,6 +16,7 @@
   function store() { return global.AAA_LOCAL_FIRST_STORAGE; }
   function cfg() { return global.AAA_CONFIG || {}; }
   function sb() { return global.AAA_SUPABASE; }
+  function cloud() { return global.AAA_CLOUD; }
   function ids() { return global.AAA_ID_FACTORY; }
   function clock() { return global.AAA_RUNTIME_CLOCK; }
 
@@ -61,7 +62,7 @@
       const rec = { id: id, period: period || 'day', metrics: metrics || {}, createdAt: clock() ? clock().now() : Date.now() };
       await store().put('kpi_snapshots', id, rec);
       if (this.cloudReady()) {
-        try { await sb().insert('kpi_snapshots', [{ workspace_id: cfg().workspaceId, period: rec.period, metrics: rec.metrics }]); } catch (_) {}
+        try { await cloud().insertEvent('kpi_snapshots', { period: rec.period, metrics: rec.metrics }); } catch (_) {}
       }
       return rec;
     },
@@ -77,23 +78,42 @@
     // ---- the single AI funnel -------------------------------------------
     /** Call Claude through the server-side proxy. { ok, text, content, usage }. */
     async callAgent(payload) {
-      if (!sb() || !cfg().isProxyConfigured || !cfg().isProxyConfigured()) {
+      if (!cloud() || !cfg().isProxyConfigured || !cfg().isProxyConfigured()) {
         return { ok: false, error: 'PROXY_NOT_CONFIGURED' };
       }
-      return sb().callProxy(payload);
+      return cloud().callProxy(payload);
     },
 
-    // ---- cloud mirror (idempotent upsert on workspace_id, client_id) -----
+    // ---- cloud mirror (backend-agnostic, idempotent per client id) -------
     cloudReady() {
-      return !!(sb() && sb().isConfigured() && cfg().isSupabaseConfigured && cfg().isSupabaseConfigured());
+      return !!(cloud() && cloud().isConfigured() && cfg().workspaceId);
     },
 
-    /** Push local customers → jobs → estimates to Supabase. Best-effort. */
+    /** Push local customers → jobs → estimates to the active cloud backend. */
     async mirrorToCloud() {
       if (!this.cloudReady()) return { ok: false, error: 'NOT_CONFIGURED' };
-      const ws = cfg().workspaceId;
       const customers = await this.listCustomers();
       const jobs = await this.listJobs();
+      // Supabase uses relational FKs (uuid) and keeps its dedicated path;
+      // Firebase (and any per-document backend) upserts docs keyed by client id.
+      if (cloud().provider() !== 'supabase') {
+        for (const c of customers) await cloud().upsertEntity('customers', c.id, c);
+        for (const j of jobs) await cloud().upsertEntity('jobs', j.id, j);
+        let est = 0;
+        for (const j of jobs) {
+          for (const e of (Array.isArray(j.estimates) ? j.estimates : [])) {
+            await cloud().upsertEntity('estimates', e.estimateId || (j.id + ':' + (e.type || '')), Object.assign({ jobId: j.id }, e));
+            est++;
+          }
+        }
+        return { ok: true, provider: cloud().provider(), customers: customers.length, jobs: jobs.length, estimates: est };
+      }
+      return this._mirrorSupabase(customers, jobs);
+    },
+
+    /** Supabase-specific mirror with uuid FK resolution. */
+    async _mirrorSupabase(customers, jobs) {
+      const ws = cfg().workspaceId;
 
       // 1) customers
       const custRows = customers.map((c) => ({
@@ -138,22 +158,11 @@
 
     async _mirrorOutcome(rec) {
       if (!this.cloudReady()) return;
-      try {
-        await sb().upsert('outcomes', [{
-          workspace_id: cfg().workspaceId, client_id: rec.id, result: rec.result,
-          final_amount: rec.finalAmount != null ? rec.finalAmount : null, notes: rec.notes || null
-        }], 'workspace_id,client_id');
-      } catch (_) {}
+      try { await cloud().upsertEntity('outcomes', rec.id, rec); } catch (_) {}
     },
     async _mirrorDecision(rec) {
       if (!this.cloudReady()) return;
-      try {
-        await sb().upsert('agent_decisions', [{
-          workspace_id: cfg().workspaceId, client_id: rec.id, agent: rec.agent || 'unknown',
-          decision: rec.decision || '', rationale: rec.rationale || null,
-          confidence: rec.confidence != null ? rec.confidence : null, inputs: rec.inputs || {}
-        }], 'workspace_id,client_id');
-      } catch (_) {}
+      try { await cloud().upsertEntity('agent_decisions', rec.id, rec); } catch (_) {}
     }
   };
 
