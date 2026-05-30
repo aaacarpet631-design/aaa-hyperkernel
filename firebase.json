@@ -1,0 +1,16 @@
+{
+  "functions": { "source": "functions" },
+  "firestore": { "rules": "firestore.rules", "indexes": "firestore.indexes.json" },
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "functions/**",
+      "supabase/**",
+      "quote-os/**",
+      "*.md"
+    ]
+  }
+}

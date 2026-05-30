@@ -95,6 +95,13 @@
           );
           await storage.setMutations(updated);
         }
+
+        // Also mirror to Supabase shared memory when configured (best-effort,
+        // never blocks the Blobs sync from succeeding).
+        if (global.AAA_DATA && global.AAA_DATA.cloudReady && global.AAA_DATA.cloudReady()) {
+          try { await global.AAA_DATA.mirrorToCloud(); } catch (e) { console.warn('Supabase mirror skipped', e); }
+        }
+
         this.lastSyncAt = Date.now();
         this._retry = 0;
         return { ok: true, pushed: pending.length };

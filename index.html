@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AAA HyperKernel</title>
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#050505">
+    <meta name="theme-color" content="#09090B">
     
     <link rel="stylesheet" href="/css/job-list.css">
     <link rel="stylesheet" href="/css/customer-job-flow.css">
@@ -20,10 +20,25 @@
     <script src="/js/core/runtime-clock.js"></script>
     <script src="/js/core/id-factory.js"></script>
     <script src="/js/core/local-first-storage.js"></script>
+    <script src="/js/core/aaa-config.js"></script>
+    <script src="/js/core/aaa-events.js"></script>
+    <script src="/js/core/aaa-firebase.js"></script>
+    <script src="/js/core/aaa-supabase.js"></script>
+    <script src="/js/core/aaa-cloud.js"></script>
+    <script src="/js/core/aaa-data.js"></script>
     <script src="/js/core/sync-engine.js"></script>
 
     <script src="/js/customers/customer-store.js"></script>
-    
+
+    <script src="/js/ui/ui-kit.js"></script>
+
+    <script src="/js/agents/agent-registry.js"></script>
+    <script src="/js/agents/agent-os.js"></script>
+    <script src="/js/agents/supervisor.js"></script>
+    <script src="/js/agents/agent-automation.js"></script>
+    <script src="/js/agents/review-request-engine.js"></script>
+    <script src="/js/agents/marketing-intel.js"></script>
+
     <script src="/js/ai/sidekick-context-engine.js"></script>
     <script src="/js/ai/sidekick-voice-engine.js"></script>
     <script src="/js/ai/sidekick-vision-engine.js"></script>
@@ -34,6 +49,7 @@
     <script src="/js/ui/voice-hud-ui.js"></script>
     <script src="/js/ui/vision-hud-ui.js"></script>
     <script src="/js/ui/closure-hud-ui.js"></script>
+    <script src="/js/ui/command-center-ui.js"></script>
     <script src="/js/ui/job-list-ui.js"></script>
     
     <script src="/js/core/app-lifecycle.js"></script>
@@ -62,6 +78,9 @@
             }
             if (window.AAA_SYNC_ENGINE && typeof window.AAA_SYNC_ENGINE.init === 'function') {
               window.AAA_SYNC_ENGINE.init();
+            }
+            if (window.AAA_AUTOMATION && typeof window.AAA_AUTOMATION.init === 'function') {
+              window.AAA_AUTOMATION.init();
             }
         }
         

@@ -89,6 +89,8 @@
         phoneInput.placeholder = 'Phone';
         const gateInput = el('input', 'aaa-input');
         gateInput.placeholder = 'Gate / access code';
+        const sourceInput = el('input', 'aaa-input');
+        sourceInput.placeholder = 'Lead source (e.g. Google, referral)';
 
         const addBtn = el('button', 'aaa-btn aaa-btn-primary', 'Add & Select');
         addBtn.type = 'button';
@@ -104,7 +106,8 @@
             name,
             address: addrInput.value.trim(),
             phone: phoneInput.value.trim(),
-            gateCode: gateInput.value.trim()
+            gateCode: gateInput.value.trim(),
+            source: sourceInput.value.trim() || null
           });
           close(customer);
         });
@@ -118,7 +121,7 @@
         actions.appendChild(addBtn);
 
         const addForm = el('div', 'aaa-form');
-        [nameInput, addrInput, phoneInput, gateInput].forEach((i) => addForm.appendChild(i));
+        [nameInput, addrInput, phoneInput, gateInput, sourceInput].forEach((i) => addForm.appendChild(i));
 
         modal.appendChild(title);
         modal.appendChild(search);

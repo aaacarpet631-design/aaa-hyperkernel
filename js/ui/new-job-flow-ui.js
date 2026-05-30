@@ -77,6 +77,7 @@
         syncStatus: 'PENDING'
       });
     }
+    if (global.AAA_EVENTS) global.AAA_EVENTS.emit('job.created', { jobId: job.id });
     return job;
   }
 

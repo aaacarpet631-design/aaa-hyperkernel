@@ -1,319 +1,238 @@
 /*
- * Vision HUD UI for AAA On‑Site Sidekick
+ * Vision HUD UI — capture/upload a photo and review an AI repair estimate.
  *
- * This module manages the user interface for capturing photos and
- * presenting AI-generated draft estimates. It provides a bootable HUD
- * that attaches to the DOM and stays hidden until activated. The HUD
- * supports both immediate analysis (when online) and offline fallback
- * manual entry. Estimates are not applied automatically; the user must
- * approve them via the UI.
+ * Full-width mobile sheet with: a chooser (Capture or Upload / Take Photo /
+ * Upload from Gallery), a loading state during analysis, and a result card
+ * (service type, severity, confidence, quote range, recommended next step)
+ * that always requires human review before applying. Estimates are never
+ * applied automatically. Falls back to manual entry when offline.
  */
-
 ;(function (global) {
   'use strict';
 
+  const SEVERITY_COLOR = { LOW: '#10B981', MEDIUM: '#F59E0B', HIGH: '#EF4444' };
+
   function createVisionHUD() {
-    const state = {
-      jobId: null,
-      initialized: false
-    };
+    const state = { jobId: null, initialized: false };
     const els = {};
 
-    /**
-     * Inject minimal CSS to support the HUD. This is done only once.
-     */
     function injectStyles() {
       if (document.getElementById('vision-hud-styles')) return;
       const style = document.createElement('style');
       style.id = 'vision-hud-styles';
       style.textContent = `
-        /* Vision HUD container */
-        #vision-hud { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; justify-content: center; align-items: center; z-index: 10002; backdrop-filter: blur(6px); background: rgba(20,20,25,0.85); }
+        #vision-hud { position: fixed; inset: 0; z-index: 10042; display: none; align-items: flex-end; justify-content: center; background: rgba(0,0,0,0.62); backdrop-filter: blur(5px); }
         #vision-hud.visible { display: flex; }
-        #vision-hud .vision-card { background: rgba(30,30,35,0.9); border-radius: 20px; padding: 1.5rem; max-width: 90%; color: #ffffff; box-shadow: 0 4px 32px rgba(0,0,0,0.4); }
-        #vision-hud h2 { margin-top: 0; margin-bottom: 1rem; font-size: 1.75rem; }
-        #vision-hud .vision-actions { margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end; }
-        #vision-hud .vision-actions button { padding: 0.75rem 1.25rem; font-size: 1rem; font-weight: 600; border-radius: 12px; border: none; cursor: pointer; }
-        #vision-hud .primary { background-color: #00FF9D; color: #141419; }
-        #vision-hud .secondary { background: transparent; color: #00FF9D; border: 2px solid #00FF9D; }
-        #vision-hud .status-badge { margin-top: 1rem; color: #00FF9D; font-size: 1rem; }
-        /* File input hidden */
-        #vision-file-input { display: none; }
-        /* Manual input form */
-        #vision-hud .manual-form { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
-        #vision-hud .manual-form input, #vision-hud .manual-form textarea { padding: 0.5rem; border-radius: 8px; border: 1px solid #00FF9D; background: rgba(40,40,45,0.7); color: #ffffff; font-size: 1rem; }
-        #vision-hud .manual-form button { padding: 0.75rem; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer; }
+        #vision-hud .vision-card { width: 100%; max-width: 560px; max-height: 92vh; overflow-y: auto; background: var(--surface,#141418); border: 1px solid var(--border,#2A2A33); border-radius: 22px 22px 0 0; padding: 0.5rem 1.1rem calc(1.2rem + env(safe-area-inset-bottom,0px)); color: var(--text,#F8FAFC); box-shadow: 0 -14px 50px rgba(0,0,0,0.6); }
+        @media (min-width: 600px) { #vision-hud { align-items: center; } #vision-hud .vision-card { border-radius: 22px; } }
+        #vision-hud .vision-grip { width: 38px; height: 4px; border-radius: 2px; background: var(--border,#2A2A33); margin: 0.35rem auto 0.7rem; }
+        #vision-hud .vision-title { margin: 0; font-size: 1.35rem; font-weight: 800; }
+        #vision-hud .vision-help { margin: 0.3rem 0 1rem; color: var(--muted,#A1A1AA); font-size: 0.9rem; line-height: 1.45; }
+        #vision-hud .vision-actions { display: flex; flex-direction: column; gap: 0.6rem; }
+        #vision-hud .vision-input { display: none; }
+        #vision-hud .vision-result { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
+        #vision-hud .vision-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; background: var(--surface-2,#1C1C22); border: 1px solid var(--border,#2A2A33); border-radius: 12px; padding: 0.7rem 0.85rem; }
+        #vision-hud .vision-row__k { color: var(--muted,#A1A1AA); font-size: 0.85rem; }
+        #vision-hud .vision-row__v { font-weight: 700; font-size: 0.95rem; text-align: right; }
+        #vision-hud .vision-summary { margin: 0.25rem 0 0; color: var(--text,#F8FAFC); font-size: 0.95rem; line-height: 1.45; }
+        #vision-hud .vision-notice { display: flex; gap: 0.5rem; align-items: flex-start; margin: 1rem 0; padding: 0.7rem 0.8rem; font-size: 0.85rem; color: var(--warning,#F59E0B); background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.25); border-radius: 10px; }
+        #vision-hud .vision-status { margin: 0.75rem 0; text-align: center; color: var(--muted,#A1A1AA); font-size: 0.95rem; }
+        #vision-hud .manual-form { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1rem; }
       `;
       document.head.appendChild(style);
     }
 
-    /**
-     * Build the HUD DOM elements and append to the document body.
-     */
     function buildHUD() {
       injectStyles();
-      // Container
       const hud = document.createElement('div');
       hud.id = 'vision-hud';
-      // Card
       const card = document.createElement('div');
       card.className = 'vision-card';
-      // Heading and upload button
-      const header = document.createElement('h2');
-      header.textContent = 'Vision Estimate';
-      const uploadBtn = document.createElement('button');
-      uploadBtn.className = 'primary';
-      uploadBtn.textContent = 'Capture / Upload Photo';
-      // Hidden file input
-      const fileInput = document.createElement('input');
-      fileInput.type = 'file';
-      fileInput.accept = 'image/*';
-      fileInput.id = 'vision-file-input';
-      // Status badge
-      const statusBadge = document.createElement('div');
-      statusBadge.className = 'status-badge';
-      statusBadge.textContent = '';
-      // Proposal container
-      const proposalContainer = document.createElement('div');
-      proposalContainer.id = 'vision-proposal';
-      // Assemble card
-      card.appendChild(header);
-      card.appendChild(uploadBtn);
-      card.appendChild(fileInput);
-      card.appendChild(statusBadge);
-      card.appendChild(proposalContainer);
       hud.appendChild(card);
       document.body.appendChild(hud);
-      // Save references
       els.hud = hud;
-      els.uploadBtn = uploadBtn;
-      els.fileInput = fileInput;
-      els.statusBadge = statusBadge;
-      els.proposalContainer = proposalContainer;
-      // Event listeners
-      uploadBtn.addEventListener('click', () => fileInput.click());
-      fileInput.addEventListener('change', handleFileSelect);
+      els.card = card;
     }
 
-    /**
-     * Handle file selection and start analysis.
-     * @param {Event} evt
-     */
-    async function handleFileSelect(evt) {
+    function U() { return global.AAA_UI; }
+
+    function clear() { els.card.innerHTML = ''; }
+
+    function headerEls() {
+      const frag = document.createDocumentFragment();
+      frag.appendChild(U().el('div', { className: 'vision-grip' }));
+      frag.appendChild(U().el('h2', { className: 'vision-title', text: 'Vision Estimate' }));
+      return frag;
+    }
+
+    /** Initial chooser screen. */
+    function showChooser() {
+      clear();
+      els.card.appendChild(headerEls());
+      els.card.appendChild(U().el('p', { className: 'vision-help', text: 'Upload a room or damage photo. AI will estimate the service type, severity, and a rough quote range. You review before anything is sent to the customer.' }));
+
+      // hidden inputs
+      const camera = U().el('input', { className: 'vision-input', attrs: { type: 'file', accept: 'image/*', capture: 'environment' } });
+      const gallery = U().el('input', { className: 'vision-input', attrs: { type: 'file', accept: 'image/*' } });
+      camera.addEventListener('change', (e) => onFile(e));
+      gallery.addEventListener('change', (e) => onFile(e));
+
+      const actions = U().el('div', { className: 'vision-actions' }, [
+        U().button({ label: 'Capture or Upload Photo', icon: '📷', variant: 'primary', full: true, onClick: () => gallery.click() }),
+        U().button({ label: 'Take Photo', variant: 'secondary', full: true, onClick: () => camera.click() }),
+        U().button({ label: 'Upload from Gallery', variant: 'secondary', full: true, onClick: () => gallery.click() }),
+        U().button({ label: 'Cancel', variant: 'ghost', full: true, onClick: hideHUD })
+      ]);
+      els.card.appendChild(actions);
+      els.card.appendChild(camera);
+      els.card.appendChild(gallery);
+    }
+
+    async function onFile(evt) {
       const files = evt.target.files;
-      if (!files || files.length === 0) return;
+      if (!files || !files.length) return;
       const file = files[0];
-      // Clear previous proposal and status
-      els.proposalContainer.innerHTML = '';
-      els.statusBadge.textContent = '';
-      // Show loading
-      els.statusBadge.textContent = 'Analyzing…';
+      evt.target.value = '';
+      showLoading();
       const vision = global.AAA_SIDEKICK_VISION;
       if (!vision || typeof vision.captureAndAnalyze !== 'function') {
-        els.statusBadge.textContent = 'Vision engine unavailable';
+        showError('Vision engine unavailable.');
         return;
       }
       const result = await vision.captureAndAnalyze(state.jobId, file);
-      if (result.ok) {
-        // Online analysis succeeded
-        els.statusBadge.textContent = '';
-        showDraftProposal(result.analysis);
+      if (result && result.ok) {
+        showResult(result.analysis);
+      } else if (result && result.status === 'QUEUED_FOR_NETWORK') {
+        showManualInput('Saved offline — AI analysis will run when you’re back online. Enter an estimate now if you like.');
       } else {
-        // Offline: queued for network
-        if (result.status === 'QUEUED_FOR_NETWORK') {
-          els.statusBadge.textContent = 'Analysis pending network';
-          showManualInput();
-        } else {
-          els.statusBadge.textContent = result.error || 'Analysis failed';
-        }
+        showError((result && result.error) || 'Analysis failed. Please try again.');
       }
-      // Reset file input for next capture
-      evt.target.value = '';
     }
 
-    /**
-     * Render the draft proposal card with AI analysis and approval controls.
-     * @param {Object} analysis - The structured estimate from AI.
-     */
-    function showDraftProposal(analysis) {
-      els.proposalContainer.innerHTML = '';
-      if (!analysis || typeof analysis !== 'object') return;
-      const card = document.createElement('div');
-      card.className = 'proposal-card';
-      const summary = document.createElement('div');
-      summary.innerHTML = `
-        <p><strong>Type:</strong> ${analysis.type || ''}</p>
-        <p><strong>Estimated Time:</strong> ${analysis.estimatedTimeMins || ''} mins</p>
-        <p><strong>Materials:</strong> ${Array.isArray(analysis.materials) ? analysis.materials.join(', ') : ''}</p>
-      `;
-      // Actions
-      const actions = document.createElement('div');
-      actions.className = 'vision-actions';
-      const approveBtn = document.createElement('button');
-      approveBtn.className = 'primary';
-      approveBtn.textContent = 'Approve & Apply';
-      const discardBtn = document.createElement('button');
-      discardBtn.className = 'secondary';
-      discardBtn.textContent = 'Discard';
-      actions.appendChild(discardBtn);
-      actions.appendChild(approveBtn);
-      card.appendChild(summary);
-      card.appendChild(actions);
-      els.proposalContainer.appendChild(card);
-      // Discard handler
-      discardBtn.addEventListener('click', () => {
-        els.proposalContainer.innerHTML = '';
-        els.statusBadge.textContent = '';
-      });
-      // Approve handler
-      approveBtn.addEventListener('click', async () => {
-        await applyEstimate(analysis);
-        els.proposalContainer.innerHTML = '';
-        els.statusBadge.textContent = 'Estimate applied';
-        // Hide after 2 seconds
-        setTimeout(() => {
-          hideHUD();
-        }, 2000);
-      });
+    function showLoading() {
+      clear();
+      els.card.appendChild(headerEls());
+      els.card.appendChild(U().spinner('Analyzing photo…'));
     }
 
-    /**
-     * Show manual input form for offline entry. Allows user to enter type,
-     * estimated time, and materials, then save to job.
-     */
-    function showManualInput() {
-      els.proposalContainer.innerHTML = '';
-      const form = document.createElement('div');
-      form.className = 'manual-form';
-      const typeInput = document.createElement('input');
-      typeInput.type = 'text';
-      typeInput.placeholder = 'Type (e.g., SEAM_REPAIR)';
-      const timeInput = document.createElement('input');
-      timeInput.type = 'number';
-      timeInput.placeholder = 'Estimated time (mins)';
-      const materialsInput = document.createElement('input');
-      materialsInput.type = 'text';
-      materialsInput.placeholder = 'Materials (comma separated)';
-      const actions = document.createElement('div');
-      actions.className = 'vision-actions';
-      const saveBtn = document.createElement('button');
-      saveBtn.className = 'primary';
-      saveBtn.textContent = 'Save';
-      const cancelBtn = document.createElement('button');
-      cancelBtn.className = 'secondary';
-      cancelBtn.textContent = 'Cancel';
-      actions.appendChild(cancelBtn);
-      actions.appendChild(saveBtn);
-      form.appendChild(typeInput);
-      form.appendChild(timeInput);
-      form.appendChild(materialsInput);
-      form.appendChild(actions);
-      els.proposalContainer.appendChild(form);
-      cancelBtn.addEventListener('click', () => {
-        els.proposalContainer.innerHTML = '';
-        els.statusBadge.textContent = '';
-      });
-      saveBtn.addEventListener('click', async () => {
+    function showError(msg) {
+      clear();
+      els.card.appendChild(headerEls());
+      els.card.appendChild(U().el('p', { className: 'vision-status', text: msg }));
+      els.card.appendChild(U().el('div', { className: 'vision-actions' }, [
+        U().button({ label: 'Try Again', variant: 'primary', full: true, onClick: showChooser }),
+        U().button({ label: 'Close', variant: 'ghost', full: true, onClick: hideHUD })
+      ]));
+    }
+
+    function row(k, v) {
+      return U().el('div', { className: 'vision-row' }, [
+        U().el('span', { className: 'vision-row__k', text: k }),
+        typeof v === 'string'
+          ? U().el('span', { className: 'vision-row__v', text: v })
+          : U().el('span', { className: 'vision-row__v' }, [v])
+      ]);
+    }
+
+    function showResult(analysis) {
+      clear();
+      els.card.appendChild(headerEls());
+      if (!analysis || typeof analysis !== 'object') return showError('No analysis returned.');
+
+      const sev = String(analysis.severity || '').toUpperCase();
+      const result = U().el('div', { className: 'vision-result' });
+      result.appendChild(row('Service type', analysis.type || '—'));
+      if (sev) result.appendChild(row('Severity', U().statusBadge(sev, SEVERITY_COLOR[sev] || '#A1A1AA')));
+      if (analysis.confidence != null && analysis.confidence !== '') result.appendChild(row('Confidence', Math.round(Number(analysis.confidence)) + '%'));
+      if (analysis.estimatedQuoteRange) result.appendChild(row('Quote range', String(analysis.estimatedQuoteRange)));
+      if (analysis.estimatedTimeMins) result.appendChild(row('Est. labor', analysis.estimatedTimeMins + ' mins'));
+      if (Array.isArray(analysis.materials) && analysis.materials.length) result.appendChild(row('Materials', analysis.materials.join(', ')));
+      if (analysis.recommendedNextStep) result.appendChild(row('Next step', String(analysis.recommendedNextStep)));
+      els.card.appendChild(result);
+
+      if (analysis.summary) els.card.appendChild(U().el('p', { className: 'vision-summary', text: analysis.summary }));
+
+      els.card.appendChild(U().el('div', { className: 'vision-notice' }, [
+        U().el('span', { attrs: { 'aria-hidden': 'true' }, text: '⚠️' }),
+        U().el('span', { text: 'Human review required — confirm before sending this quote to the customer.' })
+      ]));
+
+      els.card.appendChild(U().el('div', { className: 'vision-actions' }, [
+        U().button({ label: 'Approve & Apply', icon: '✓', variant: 'primary', full: true, onClick: async () => {
+          await applyEstimate(analysis);
+          showSaved('Estimate applied to job.');
+        } }),
+        U().button({ label: 'Discard', variant: 'ghost', full: true, onClick: showChooser })
+      ]));
+    }
+
+    function showSaved(msg) {
+      clear();
+      els.card.appendChild(headerEls());
+      els.card.appendChild(U().el('p', { className: 'vision-status', text: '✓ ' + msg }));
+      setTimeout(hideHUD, 1400);
+    }
+
+    function showManualInput(note) {
+      clear();
+      els.card.appendChild(headerEls());
+      if (note) els.card.appendChild(U().el('p', { className: 'vision-help', text: note }));
+      const typeInput = U().el('input', { className: 'aaa-input', attrs: { type: 'text', placeholder: 'Service type (e.g. Seam repair)' } });
+      const timeInput = U().el('input', { className: 'aaa-input', attrs: { type: 'number', placeholder: 'Estimated time (mins)' } });
+      const materialsInput = U().el('input', { className: 'aaa-input', attrs: { type: 'text', placeholder: 'Materials (comma separated)' } });
+      const quoteInput = U().el('input', { className: 'aaa-input', attrs: { type: 'text', placeholder: 'Quote range (optional, e.g. $150–$300)' } });
+      const status = U().el('p', { className: 'vision-status', text: '' });
+      els.card.appendChild(U().el('div', { className: 'manual-form' }, [typeInput, timeInput, materialsInput, quoteInput]));
+      els.card.appendChild(status);
+      els.card.appendChild(U().el('div', { className: 'vision-actions' }, [
+        U().button({ label: 'Save Estimate', variant: 'primary', full: true, onClick: async () => {
           const type = typeInput.value.trim();
           const time = parseInt(timeInput.value, 10);
-          const materialsStr = materialsInput.value.trim();
-          if (!type || isNaN(time)) {
-            els.statusBadge.textContent = 'Please fill in type and time';
-            return;
-          }
-          const materials = materialsStr ? materialsStr.split(',').map((m) => m.trim()).filter(Boolean) : [];
-          const manualEstimate = { type: type, estimatedTimeMins: time, materials: materials };
-          await applyEstimate(manualEstimate);
-          els.proposalContainer.innerHTML = '';
-          els.statusBadge.textContent = 'Estimate saved';
-          setTimeout(() => { hideHUD(); }, 2000);
-      });
+          if (!type || isNaN(time)) { status.textContent = 'Please enter a service type and time.'; return; }
+          const materials = materialsInput.value.trim() ? materialsInput.value.split(',').map((m) => m.trim()).filter(Boolean) : [];
+          await applyEstimate({ type: type, estimatedTimeMins: time, materials: materials, estimatedQuoteRange: quoteInput.value.trim() || null, source: 'MANUAL' });
+          showSaved('Estimate saved.');
+        } }),
+        U().button({ label: 'Cancel', variant: 'ghost', full: true, onClick: hideHUD })
+      ]));
     }
 
-    /**
-     * Apply an estimate to the job: update the job record and queue a mutation.
-     * @param {Object} estimate - The estimate to apply.
-     */
     async function applyEstimate(estimate) {
       if (!state.jobId || !estimate) return;
       const storage = global.AAA_LOCAL_FIRST_STORAGE;
       const idFactory = global.AAA_ID_FACTORY;
       const clock = global.AAA_RUNTIME_CLOCK;
       try {
-        // Retrieve current job
         let job = storage.get('jobs', state.jobId);
         job = typeof job?.then === 'function' ? await job : job;
         if (!job || typeof job !== 'object') return;
-        // Create estimate ID
-        const estimateId = idFactory && typeof idFactory.newId === 'function' ? idFactory.newId() : Date.now().toString();
+        const estimateId = idFactory && idFactory.newId ? idFactory.newId() : Date.now().toString();
         const estimateEntry = Object.assign({ estimateId: estimateId }, estimate);
-        // Append estimate to job
         const updatedJob = Object.assign({}, job, {
           estimates: Array.isArray(job.estimates) ? job.estimates.concat(estimateEntry) : [estimateEntry]
         });
-        // Persist job locally
-        if (typeof storage.put === 'function') {
-          await storage.put('jobs', state.jobId, updatedJob);
+        if (typeof storage.put === 'function') await storage.put('jobs', state.jobId, updatedJob);
+        if (typeof storage.queueMutation === 'function') {
+          storage.queueMutation({
+            mutationId: idFactory ? idFactory.createId('mut') : String(Date.now()),
+            entityId: state.jobId, entityType: 'job', operation: 'ADD_ESTIMATE', payload: estimateEntry,
+            timestamp: clock && clock.nowISO ? clock.nowISO() : new Date().toISOString(), syncStatus: 'PENDING'
+          });
         }
-        // Queue mutation
-        if (
-          typeof storage.queueMutation === 'function' &&
-          idFactory &&
-          ((typeof idFactory.createId === 'function') || (typeof idFactory.newId === 'function'))
-        ) {
-          const mutationId = idFactory && typeof idFactory.createId === 'function' ? idFactory.createId('mut', []) : idFactory.newId();
-          const timestampISO = clock && typeof clock.nowISO === 'function' ? clock.nowISO() : new Date().toISOString();
-          const mutation = {
-            mutationId: mutationId,
-            entityId: state.jobId,
-            entityType: 'job',
-            operation: 'ADD_ESTIMATE',
-            payload: estimateEntry,
-            timestamp: timestampISO,
-            syncStatus: 'PENDING'
-          };
-          storage.queueMutation(mutation);
-        }
-      } catch (err) {
-        console.error('Vision HUD: failed to apply estimate', err);
-      }
+        if (global.AAA_EVENTS) global.AAA_EVENTS.emit('estimate.added', { jobId: state.jobId });
+      } catch (err) { console.error('Vision HUD: failed to apply estimate', err); }
     }
 
-    /**
-     * Hide the HUD.
-     */
-    function hideHUD() {
-      if (els.hud) {
-        els.hud.classList.remove('visible');
-        els.statusBadge.textContent = '';
-        els.proposalContainer.innerHTML = '';
-      }
-    }
+    function hideHUD() { if (els.hud) els.hud.classList.remove('visible'); }
 
     return {
-      /**
-       * Boot the Vision HUD with a job context. Initializes DOM elements on
-       * first call.
-       * @param {Object} config
-       * @param {string} config.jobId
-       */
       boot({ jobId }) {
         state.jobId = jobId;
-        if (!state.initialized) {
-          buildHUD();
-          state.initialized = true;
-        }
-        // Show HUD when booted; the capture action is triggered by user
-        if (els.hud) {
-          els.hud.classList.add('visible');
-        }
+        if (!state.initialized) { buildHUD(); state.initialized = true; }
+        showChooser();
+        if (els.hud) els.hud.classList.add('visible');
       },
-      /**
-       * Hide the Vision HUD.
-       */
-      hide() {
-        hideHUD();
-      }
+      hide() { hideHUD(); }
     };
   }
 

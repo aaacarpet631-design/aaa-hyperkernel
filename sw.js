@@ -6,7 +6,7 @@
  * app fully usable offline. Old caches are purged on activate, and the worker
  * takes control immediately to avoid serving a stale shell after an update.
  */
-const CACHE_NAME = 'hyperkernel-v2';
+const CACHE_NAME = 'hyperkernel-v9';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -20,14 +20,28 @@ const PRECACHE = [
   '/js/core/runtime-clock.js',
   '/js/core/id-factory.js',
   '/js/core/local-first-storage.js',
+  '/js/core/aaa-config.js',
+  '/js/core/aaa-events.js',
+  '/js/core/aaa-firebase.js',
+  '/js/core/aaa-supabase.js',
+  '/js/core/aaa-cloud.js',
+  '/js/core/aaa-data.js',
   '/js/core/sync-engine.js',
   '/js/core/app-lifecycle.js',
   '/js/customers/customer-store.js',
+  '/js/ui/ui-kit.js',
+  '/js/agents/agent-registry.js',
+  '/js/agents/agent-os.js',
+  '/js/agents/supervisor.js',
+  '/js/agents/agent-automation.js',
+  '/js/agents/review-request-engine.js',
+  '/js/agents/marketing-intel.js',
   '/js/ui/customer-picker-ui.js',
   '/js/ui/new-job-flow-ui.js',
   '/js/ui/voice-hud-ui.js',
   '/js/ui/vision-hud-ui.js',
   '/js/ui/closure-hud-ui.js',
+  '/js/ui/command-center-ui.js',
   '/js/ui/job-list-ui.js',
   '/js/ai/sidekick-context-engine.js',
   '/js/ai/sidekick-voice-engine.js',

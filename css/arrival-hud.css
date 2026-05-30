@@ -1,94 +1,42 @@
-/* Arrival HUD overlay styles for AAA On-Site Sidekick.
- *
- * This stylesheet defines a dark, glassmorphism-inspired overlay that
- * appears when the user arrives at a job site.  Emerald (#00FF9D) accents
- * communicate a safe/ready state.  Typography is large and easy to read.
+/* Arrival HUD overlay — red/black/white theme.
+ * Appears when the tech arrives at a job site. Red accents communicate the
+ * primary "start job" action; large, legible typography for field use.
  */
 
 #arrival-hud {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   backdrop-filter: blur(8px);
-  background: rgba(20, 20, 25, 0.85);
+  background: rgba(0, 0, 0, 0.7);
   z-index: 10000;
 }
 
-#arrival-hud.hidden {
-  display: none;
-}
+#arrival-hud.hidden { display: none; }
 
 #arrival-hud .hud-card {
-  background: rgba(30, 30, 35, 0.85);
-  border: 2px solid #00FF9D;
-  border-radius: 24px;
+  background: var(--surface, #141418);
+  border: 1px solid var(--border, #2A2A33);
+  border-top: 3px solid var(--red, #DC2626);
+  border-radius: 22px;
   padding: 2rem;
   max-width: 90%;
   text-align: center;
-  color: #ffffff;
-  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.4);
+  color: var(--text, #F8FAFC);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
 }
 
-#arrival-hud .hud-card h1 {
-  margin-top: 0;
-  margin-bottom: 0.5rem;
-  font-size: 2.5rem;
-  line-height: 1.2;
-}
+#arrival-hud .hud-card h1 { margin: 0 0 0.5rem; font-size: 2.3rem; line-height: 1.2; }
+#arrival-hud .hud-card h2 { margin: 0 0 1.5rem; font-size: 1.4rem; font-weight: 400; color: var(--muted, #A1A1AA); }
+#arrival-hud .hud-card h3 { margin: 0 0 1rem; font-size: 1.2rem; font-weight: 400; color: var(--muted, #A1A1AA); }
+#arrival-hud .hud-card .hud-access { font-size: 1rem; color: var(--red, #DC2626); margin-bottom: 1.5rem; word-wrap: break-word; font-weight: 700; }
 
-#arrival-hud .hud-card h2 {
-  margin: 0 0 1.5rem 0;
-  font-size: 1.5rem;
-  font-weight: 400;
-  opacity: 0.85;
-}
-
-/* Customer name line */
-#arrival-hud .hud-card h3 {
-  margin: 0 0 1rem 0;
-  font-size: 1.25rem;
-  font-weight: 400;
-  opacity: 0.75;
-}
-
-/* Access information (gate code, etc.) */
-#arrival-hud .hud-card .hud-access {
-  font-size: 1rem;
-  color: #00FF9D;
-  margin-bottom: 1.5rem;
-  word-wrap: break-word;
-}
-
-#arrival-hud .hud-card .hud-actions {
-  margin-top: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
+#arrival-hud .hud-card .hud-actions { margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.85rem; }
 #arrival-hud .hud-card .hud-button {
-  padding: 1rem;
-  font-size: 1.25rem;
-  font-weight: 700;
-  border-radius: 12px;
-  cursor: pointer;
-  border: none;
+  min-height: 52px; padding: 0 1rem; font-size: 1.15rem; font-weight: 700;
+  border-radius: 14px; cursor: pointer; border: 1px solid transparent;
 }
-
-/* Primary action: Start Job / Log Arrival */
-#arrival-hud .hud-card .hud-button.primary {
-  background-color: #00FF9D;
-  color: #141419;
-}
-
-/* Secondary action: Dismiss */
-#arrival-hud .hud-card .hud-button.secondary {
-  background: transparent;
-  color: #00FF9D;
-  border: 2px solid #00FF9D;
-}
+#arrival-hud .hud-card .hud-button.primary { background: linear-gradient(135deg, #DC2626, #B91C1C); color: #fff; box-shadow: 0 6px 18px rgba(220, 38, 38, 0.3); }
+#arrival-hud .hud-card .hud-button.secondary { background: transparent; color: var(--text, #F8FAFC); border-color: var(--border, #2A2A33); }

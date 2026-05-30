@@ -1,0 +1,36 @@
+rules_version = '2';
+
+// AAA HyperKernel — Firestore security rules.
+// All app data lives under workspaces/{ws}/**. Only signed-in users who have a
+// membership doc (workspaces/{ws}/members/{uid}) can read or write that
+// workspace's data. This is the Firestore equivalent of the Supabase RLS.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isMember(ws) {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/workspaces/$(ws)/members/$(request.auth.uid));
+    }
+
+    // The workspace doc + membership list: a member can read; writes to
+    // membership should be done by an admin/console (kept locked here).
+    match /workspaces/{ws} {
+      allow read: if isMember(ws);
+      allow write: if false;
+
+      match /members/{uid} {
+        allow read: if isMember(ws);
+        allow write: if false; // manage members from the console / a trusted backend
+      }
+
+      // All other workspace-scoped collections (customers, jobs, estimates,
+      // outcomes, agent_decisions, agent_logs, kpi_snapshots, …).
+      match /{collection}/{docId} {
+        allow read, write: if isMember(ws);
+      }
+      match /{collection}/{docId}/{sub=**} {
+        allow read, write: if isMember(ws);
+      }
+    }
+  }
+}

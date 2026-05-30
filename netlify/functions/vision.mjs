@@ -19,7 +19,10 @@ Rules:
 - Base your assessment only on what is visible in the photo.
 - "estimatedTimeMins" is hands-on technician labor minutes for the repair itself (not travel or drying time).
 - "materials" lists the physical supplies the tech would load on the truck (e.g. "Seam tape", "Carpet patch", "Pet stain enzyme", "Stretching tools").
-- If the image is unclear, dark, or not carpet/flooring, say so in "summary" and return conservative values.
+- "confidence" (0-100) is how sure you are given the photo quality and clarity. Lower it for dark, blurry, or ambiguous images.
+- "estimatedQuoteRange" is a rough customer-facing price range as a short string (e.g. "$150-$300"). It is an estimate to verify, not a final quote.
+- "recommendedNextStep" is one short, actionable instruction for the technician (e.g. "Measure the affected area and confirm pad condition").
+- If the image is unclear, dark, or not carpet/flooring, say so in "summary", lower "confidence", and return conservative values.
 - Keep "summary" to one or two plain-language sentences a customer could understand.`;
 
 const ESTIMATE_SCHEMA = {
@@ -30,11 +33,14 @@ const ESTIMATE_SCHEMA = {
       description: "Short label for the primary issue, e.g. 'Seam separation', 'Pet damage', 'Water stain', 'Burn / melt', 'Heavy soiling', 'Fraying edge'."
     },
     severity: { type: 'string', enum: ['LOW', 'MEDIUM', 'HIGH'] },
+    confidence: { type: 'integer', description: 'Confidence 0-100 based on photo quality and clarity.' },
     estimatedTimeMins: { type: 'integer', description: 'Technician labor minutes for the repair.' },
+    estimatedQuoteRange: { type: 'string', description: 'Rough customer-facing price range, e.g. "$150-$300".' },
     materials: { type: 'array', items: { type: 'string' } },
+    recommendedNextStep: { type: 'string', description: 'One short actionable instruction for the technician.' },
     summary: { type: 'string', description: 'One or two sentence plain-language assessment.' }
   },
-  required: ['type', 'severity', 'estimatedTimeMins', 'materials', 'summary'],
+  required: ['type', 'severity', 'confidence', 'estimatedTimeMins', 'estimatedQuoteRange', 'materials', 'recommendedNextStep', 'summary'],
   additionalProperties: false
 };
 
