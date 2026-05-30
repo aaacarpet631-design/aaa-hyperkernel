@@ -95,6 +95,15 @@
           (p ? '<div class="aaa-list-sub">' + p.decisions + ' decisions · conf ' + (p.avgConfidence != null ? p.avgConfidence + '%' : '—') +
             (p.avgScore != null ? ' · accuracy ' + Math.round(p.avgScore * 100) + '%' : '') + '</div>' : '') }));
       });
+      // Custom agents created by the Prompt Architect.
+      (reg.customIds ? reg.customIds() : []).forEach((id) => {
+        const a = reg.get(id); if (!a) return;
+        const p = per[id];
+        body.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+          '<strong>✨ ' + esc(a.title) + '</strong> <span class="aaa-list-sub">custom · ' + (aiReady ? 'online' : 'standby') + '</span>' +
+          '<div class="aaa-list-sub">' + esc((a.spec && a.spec.mission) || '') + '</div>' +
+          (p ? '<div class="aaa-list-sub">' + p.decisions + ' decisions</div>' : '') }));
+      });
     }
 
     // ---- Learning / performance ----
@@ -122,6 +131,9 @@
 
     // ---- Actions ----
     const actions = ui.el('div', { className: 'closure-actions' });
+    if (global.AAA_PROMPT_ARCHITECT) {
+      actions.appendChild(ui.button({ label: 'Create Agent (describe it)', icon: '✨', variant: 'primary', full: true, onClick: () => architectFlow(body) }));
+    }
     actions.appendChild(ui.button({ label: 'Cloud Settings', icon: '⚙️', variant: 'secondary', full: true, onClick: () => settingsFlow(body) }));
     actions.appendChild(ui.button({ label: 'Run Company Standup', icon: '🧭', variant: 'primary', full: true, disabled: !aiReady, onClick: () => runStandup(body) }));
     if (provider === 'firebase' && global.AAA_CLOUD) {
@@ -298,6 +310,66 @@
     status.textContent = (cfg.isFirebaseConfigured && cfg.isFirebaseConfigured())
       ? 'Connected to Firebase. Sign in to sync.'
       : 'Enter your Firebase Project ID + Web API key + a Workspace ID to connect.';
+  }
+
+  function metricBadge(label, val, kind) {
+    let color = '#94A3B8';
+    if (kind === 'health') { const n = parseInt(val, 10); color = n >= 80 ? '#10B981' : n >= 50 ? '#F59E0B' : '#EF4444'; }
+    else if (kind === 'risk') { color = val === 'HIGH' ? '#EF4444' : val === 'MEDIUM' ? '#F59E0B' : '#10B981'; }
+    else { color = val === 'HIGH' ? '#10B981' : val === 'MEDIUM' ? '#F59E0B' : '#94A3B8'; }
+    return U().statusBadge(label + ': ' + val, color);
+  }
+
+  function renderSpec(container, spec, parentBody, sheet) {
+    const ui = U(); const a = spec.analysis || {};
+    container.innerHTML = '';
+    container.appendChild(ui.el('h2', { className: 'aaa-section-title', text: spec.name || 'Agent' }));
+    if (spec.mission) container.appendChild(ui.el('p', { className: 'aaa-detail-notes', text: spec.mission }));
+    container.appendChild(ui.el('div', { style: { display: 'flex', flexWrap: 'wrap', gap: '0.4rem', margin: '0.5rem 0' } }, [
+      metricBadge('Health', (a.healthScore != null ? a.healthScore + '%' : '—'), 'health'),
+      metricBadge('Value', a.businessValue || '—', 'good'),
+      metricBadge('Automation', a.automationPotential || '—', 'good'),
+      metricBadge('Risk', a.risk || '—', 'risk')
+    ]));
+    const list = (t, arr) => {
+      if (Array.isArray(arr) && arr.length) {
+        container.appendChild(ui.el('h2', { className: 'aaa-section-title', text: t }));
+        arr.forEach((x) => container.appendChild(ui.el('div', { className: 'aaa-list-row', text: x })));
+      }
+    };
+    list('Goals', spec.goals); list('Workflow', spec.workflow); list('Guardrails', spec.constraints);
+    list('Escalation', spec.escalationRules); list('Integrations', spec.integrations); list('Success metrics', spec.successMetrics);
+    container.appendChild(ui.el('div', { className: 'aaa-dialog__actions' }, [
+      ui.button({ label: 'Discard', variant: 'ghost', full: true, onClick: () => { container.innerHTML = ''; } }),
+      ui.button({ label: 'Save as Agent', variant: 'primary', full: true, onClick: async () => {
+        await global.AAA_PROMPT_ARCHITECT.saveAgent(spec);
+        sheet.close();
+        await renderInto(parentBody);
+      } })
+    ]));
+  }
+
+  function architectFlow(parentBody) {
+    const ui = U();
+    const arch = global.AAA_PROMPT_ARCHITECT;
+    const s = ui.sheet({ title: 'Create an Agent', subtitle: 'Describe what you want in plain English' });
+    document.body.appendChild(s.overlay);
+    if (!arch.isReady || !arch.isReady()) {
+      s.body.appendChild(ui.el('p', { className: 'aaa-dialog__message', text:
+        'Connect the AI proxy first (Cloud Settings → Cloud Function URL = /api/claude). Then the Architect can design agents from a description.' }));
+      return;
+    }
+    s.body.appendChild(ui.el('label', { className: 'aaa-field-label', text: 'Describe the agent or process' }));
+    const ta = ui.el('textarea', { className: 'aaa-input aaa-textarea', attrs: { placeholder: 'e.g. An agent that follows up on a lead 24 hours after an estimate is sent and books a callback.' } });
+    s.body.appendChild(ta);
+    const out = ui.el('div', {});
+    s.body.appendChild(ui.button({ label: 'Generate', icon: '✨', variant: 'primary', full: true, onClick: async () => {
+      out.innerHTML = ''; out.appendChild(ui.spinner('Designing your agent…'));
+      const r = await arch.design(ta.value);
+      if (!r.ok) { out.innerHTML = ''; out.appendChild(ui.el('p', { className: 'aaa-dialog__message', text: 'Could not design (' + (r.error || 'unknown') + ').' })); return; }
+      renderSpec(out, r.spec, parentBody, s);
+    } }));
+    s.body.appendChild(out);
   }
 
   function section(title) { return U().el('h2', { className: 'aaa-section-title', text: title }); }

@@ -35,6 +35,7 @@
     <script src="/js/agents/agent-registry.js"></script>
     <script src="/js/agents/agent-os.js"></script>
     <script src="/js/agents/supervisor.js"></script>
+    <script src="/js/agents/prompt-architect.js"></script>
     <script src="/js/agents/agent-automation.js"></script>
     <script src="/js/agents/review-request-engine.js"></script>
     <script src="/js/agents/marketing-intel.js"></script>
@@ -82,6 +83,9 @@
             }
             if (window.AAA_AUTOMATION && typeof window.AAA_AUTOMATION.init === 'function') {
               window.AAA_AUTOMATION.init();
+            }
+            if (window.AAA_PROMPT_ARCHITECT && typeof window.AAA_PROMPT_ARCHITECT.loadSaved === 'function') {
+              window.AAA_PROMPT_ARCHITECT.loadSaved();
             }
         }
         
