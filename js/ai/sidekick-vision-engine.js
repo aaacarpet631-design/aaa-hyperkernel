@@ -36,24 +36,45 @@
     });
   }
 
+  // Endpoint of the Claude-backed vision function (overridable via AAA_CONFIG).
+  function visionEndpoint() {
+    return (global.AAA_CONFIG && global.AAA_CONFIG.visionEndpoint) || '/api/vision';
+  }
+
   /**
-   * Mock function that simulates sending the image to a remote AI service
-   * and receiving a structured estimate. In a production environment,
-   * this would be replaced with a fetch() to the AI endpoint.
+   * Send the image to the serverless vision function, which runs Claude vision
+   * and returns a structured estimate. Falls back to a conservative local
+   * estimate if the backend is unreachable or errors, so the tech is never
+   * left without something to act on.
    * @param {string} base64Image
-   * @returns {Promise<Object>}
+   * @param {string} mediaType - e.g. "image/jpeg"
+   * @returns {Promise<Object>} { type, severity?, estimatedTimeMins, materials, summary? }
    */
-  function analyzeCarpetDamage(base64Image) {
-    // Simulate network latency and return a predictable structure
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          type: 'SEAM_REPAIR',
-          estimatedTimeMins: 45,
-          materials: ['Seam Tape']
-        });
-      }, 1000);
-    });
+  async function analyzeCarpetDamage(base64Image, mediaType) {
+    try {
+      const res = await fetch(visionEndpoint(), {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ image: base64Image, mediaType: mediaType || 'image/jpeg' })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.ok && data.analysis) {
+          return data.analysis;
+        }
+      }
+      console.warn('Vision endpoint returned an error status', res.status);
+    } catch (err) {
+      console.warn('Vision endpoint unreachable, using local fallback', err);
+    }
+    // Fallback estimate (offline or backend unavailable).
+    return {
+      type: 'GENERAL_INSPECTION',
+      severity: 'MEDIUM',
+      estimatedTimeMins: 45,
+      materials: ['Seam Tape'],
+      summary: 'Backend unavailable — enter details manually or retry on a connection.'
+    };
   }
 
   /**
@@ -99,7 +120,7 @@
       // Check connectivity
       if (typeof navigator !== 'undefined' && navigator.onLine) {
         // Online: perform analysis immediately
-        const analysis = await analyzeCarpetDamage(base64);
+        const analysis = await analyzeCarpetDamage(base64, imageFile.type);
         return { ok: true, analysis: analysis, mediaId: mediaId };
       } else {
         // Offline: queue mutation for later analysis

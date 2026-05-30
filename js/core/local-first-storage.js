@@ -112,6 +112,13 @@
     /** Read the pending mutation queue (newest last). */
     async getMutations() {
       return Array.isArray(this.data[MUTATIONS_KEY]) ? this.data[MUTATIONS_KEY].slice() : [];
+    },
+
+    /** Replace the entire mutation queue (used by the sync engine to mark items synced). */
+    async setMutations(mutations) {
+      this.data[MUTATIONS_KEY] = Array.isArray(mutations) ? mutations : [];
+      this._flush(MUTATIONS_KEY);
+      return this.data[MUTATIONS_KEY];
     }
   };
 

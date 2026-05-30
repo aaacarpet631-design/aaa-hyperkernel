@@ -20,6 +20,7 @@ const PRECACHE = [
   '/js/core/runtime-clock.js',
   '/js/core/id-factory.js',
   '/js/core/local-first-storage.js',
+  '/js/core/sync-engine.js',
   '/js/core/app-lifecycle.js',
   '/js/customers/customer-store.js',
   '/js/ui/customer-picker-ui.js',
