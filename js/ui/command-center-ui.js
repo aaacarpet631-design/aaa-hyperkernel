@@ -14,6 +14,20 @@
   function U() { return global.AAA_UI; }
   function data() { return global.AAA_DATA; }
 
+  // One-line description of what each agent does (for the roster view).
+  const ROLE_BLURB = {
+    ceo: 'Sets strategy and makes the final call.',
+    sales: 'Qualifies leads and judges deal value & close odds.',
+    operations: 'Scheduling, crew capacity, and job feasibility.',
+    marketing: 'Lead gen and channel ROI (ads, referrals, reviews).',
+    accounting: 'Margins, pricing floors, and profitability checks.',
+    customer_success: 'Retention, follow-ups, and review generation.',
+    kpi: 'Surfaces the few numbers that matter and trends.',
+    data_scientist: 'Finds patterns in jobs/estimates/outcomes.',
+    compliance: 'Flags legal, safety, and contract risk.',
+    supervisor: 'Scores the team against real outcomes so it learns.'
+  };
+
   function fmtPct(n) { return n == null ? '—' : Math.round(n * 100) + '%'; }
   function fmtDate(ms) {
     if (!ms) return '';
@@ -63,6 +77,24 @@
     healthRows.filter(Boolean).forEach((r) => body.appendChild(kv(r[0], r[1], r[2])));
     if (!aiReady) {
       body.appendChild(ui.el('p', { className: 'aaa-dialog__message', text: 'Connect Supabase + the Claude proxy (see SETUP.md) to bring the AI team online.' }));
+    }
+
+    // ---- AI Team roster (what each agent does + its track record) ----
+    body.appendChild(section('Your AI Team'));
+    const reg = global.AAA_AGENTS;
+    if (reg) {
+      const order = ['ceo'].concat(reg.subAgents(), ['supervisor']);
+      const per = (metrics && metrics.perAgent) || {};
+      order.forEach((id) => {
+        const a = reg.get(id); if (!a) return;
+        const p = per[id];
+        const statusDot = aiReady ? '🟢' : '⚪';
+        body.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+          '<strong>' + statusDot + ' ' + esc(a.title) + '</strong> <span class="aaa-list-sub">' + (aiReady ? 'online' : 'standby') + '</span>' +
+          '<div class="aaa-list-sub">' + esc(ROLE_BLURB[id] || '') + '</div>' +
+          (p ? '<div class="aaa-list-sub">' + p.decisions + ' decisions · conf ' + (p.avgConfidence != null ? p.avgConfidence + '%' : '—') +
+            (p.avgScore != null ? ' · accuracy ' + Math.round(p.avgScore * 100) + '%' : '') + '</div>' : '') }));
+      });
     }
 
     // ---- Learning / performance ----
@@ -277,5 +309,5 @@
     ]);
   }
 
-  global.AAA_COMMAND_CENTER = { open: open };
+  global.AAA_COMMAND_CENTER = { open: open, render: renderInto };
 })(typeof window !== 'undefined' ? window : this);

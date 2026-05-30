@@ -45,7 +45,27 @@ html, body {
   min-height: 100vh;
   max-width: 720px;
   margin: 0 auto;
-  padding-bottom: 7rem; /* room for the mic FAB */
+  padding-bottom: calc(78px + env(safe-area-inset-bottom, 0px)); /* clear the bottom tab bar */
+}
+
+/* ---- Bottom tab bar ---- */
+.aaa-tabbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+  display: flex; max-width: 720px; margin: 0 auto;
+  background: rgba(18, 18, 22, 0.98); backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.aaa-tab {
+  flex: 1; min-height: 60px; position: relative;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  background: none; border: none; color: var(--muted); font-size: 0.7rem; font-weight: 700; cursor: pointer;
+}
+.aaa-tab__icon { font-size: 1.3rem; line-height: 1; }
+.aaa-tab.is-active { color: var(--text); }
+.aaa-tab.is-active::before {
+  content: ""; position: absolute; top: 0; left: 22%; right: 22%; height: 3px;
+  background: var(--red); border-radius: 0 0 3px 3px;
 }
 
 /* ---------------- Header ---------------- */

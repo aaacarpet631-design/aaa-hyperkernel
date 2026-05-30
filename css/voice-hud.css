@@ -5,7 +5,7 @@
 
 #voice-hud {
   position: fixed;
-  bottom: calc(1.1rem + env(safe-area-inset-bottom, 0px));
+  bottom: calc(76px + env(safe-area-inset-bottom, 0px)); /* float above the bottom tab bar */
   right: 1.1rem;
   z-index: 10001;
   display: flex;
