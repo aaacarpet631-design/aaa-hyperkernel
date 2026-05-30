@@ -177,6 +177,9 @@
       actions.appendChild(ui.button({ label: 'Agent Marketplace', icon: '🏪', variant: 'secondary', full: true, onClick: () => marketplaceFlow(body) }));
     }
     actions.appendChild(ui.button({ label: 'Cloud Settings', icon: '⚙️', variant: 'secondary', full: true, onClick: () => settingsFlow(body) }));
+    if (global.AAA_MEASUREMENT_QUOTE) {
+      actions.appendChild(ui.button({ label: 'Pricing / Rate Card', icon: '💲', variant: 'secondary', full: true, onClick: () => rateCardFlow(body) }));
+    }
     actions.appendChild(ui.button({ label: 'Run Company Standup', icon: '🧭', variant: 'primary', full: true, disabled: !aiReady, onClick: () => runStandup(body) }));
     if (provider === 'firebase' && global.AAA_CLOUD) {
       if (user) {
@@ -429,6 +432,68 @@
     status.textContent = (cfg.isFirebaseConfigured && cfg.isFirebaseConfigured())
       ? 'Connected to Firebase. Save, then Test AI connection.'
       : 'Enter Project ID + Web API key + Workspace ID + Cloud Function URL (/api/claude), Save, then Test.';
+  }
+
+  // Owner-facing rate card editor. Reads the live rates from the measurement
+  // quote module, lets the owner set their real prices, and persists them via
+  // AAA_CONFIG.set({ rateCard }) — the same override the quote engine reads.
+  function rateCardFlow(parentBody) {
+    const ui = U();
+    const Q = global.AAA_MEASUREMENT_QUOTE;
+    if (!Q) return;
+    const cfg = global.AAA_CONFIG || {};
+    const defaults = Q.defaultRates();
+    const current = Q.currentRates();
+    const s = ui.sheet({ title: 'Pricing / Rate Card', subtitle: 'Your rates feed every measurement quote. Saved on this device.' });
+    document.body.appendChild(s.overlay);
+
+    // [key, label, unit-hint]. Order groups labor, materials, then tuning knobs.
+    const FIELDS = [
+      ['install_per_sqft', 'Carpet install (labor)', '$ / ft²'],
+      ['material_per_sqft', 'Carpet material', '$ / ft²'],
+      ['pad_per_sqft', 'Padding', '$ / ft²'],
+      ['stretch_per_sqft', 'Carpet stretching', '$ / ft²'],
+      ['repair_per_linear_ft', 'Carpet repair', '$ / linear ft'],
+      ['shampoo_per_sqft', 'Carpet cleaning', '$ / ft²'],
+      ['stairs_each', 'Stairs', '$ / stair'],
+      ['hallway_per_sqft', 'Hallway', '$ / ft²'],
+      ['apartment_turn_flat', 'Apartment turn', '$ / unit (flat)'],
+      ['commercial_per_sqft', 'Commercial install', '$ / ft²'],
+      ['waste_factor', 'Material waste factor', '0.10 = +10%'],
+      ['min_job', 'Minimum job charge', '$'],
+      ['range_spread', 'Quote range spread', '0.12 = ±12%']
+    ];
+    const inputs = {};
+    FIELDS.forEach(([key, label, hint]) => {
+      const input = ui.el('input', { className: 'aaa-input', attrs: { type: 'number', step: '0.01', inputmode: 'decimal', placeholder: String(defaults[key]) } });
+      input.value = current[key] != null ? String(current[key]) : '';
+      inputs[key] = input;
+      s.body.appendChild(ui.el('div', { className: 'aaa-form' }, [
+        ui.el('label', { className: 'aaa-field-label', text: label + ' (' + hint + ')' }), input
+      ]));
+    });
+
+    const status = ui.el('p', { className: 'aaa-empty', text: 'Blank fields use the default shown in grey.' });
+    s.body.appendChild(status);
+    s.body.appendChild(ui.el('div', { className: 'aaa-dialog__actions' }, [
+      ui.button({ label: 'Save rates', variant: 'primary', full: true, onClick: () => {
+        const card = {};
+        FIELDS.forEach(([key]) => {
+          const raw = inputs[key].value.trim();
+          if (raw === '') return;                 // leave unset → default applies
+          const n = Number(raw);
+          if (isFinite(n) && n >= 0) card[key] = n;
+        });
+        if (cfg.set) cfg.set({ rateCard: card });
+        status.textContent = 'Saved ' + Object.keys(card).length + ' rate(s). New quotes use these immediately.';
+      } }),
+      ui.button({ label: 'Reset to defaults', variant: 'ghost', full: true, onClick: () => {
+        if (cfg.set) cfg.set({ rateCard: {} });
+        FIELDS.forEach(([key]) => { inputs[key].value = ''; });
+        status.textContent = 'Reset — all rates back to defaults.';
+      } })
+    ]));
+    s.body.appendChild(ui.button({ label: 'Done', variant: 'ghost', full: true, onClick: () => s.close() }));
   }
 
   function metricBadge(label, val, kind) {
