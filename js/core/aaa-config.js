@@ -45,6 +45,10 @@
     get visionEndpoint() { return read('visionEndpoint', '/api/vision'); },
     /** Sync endpoint (Netlify Blobs by default). */
     get syncEndpoint() { return read('syncEndpoint', '/api/sync'); },
+    /** Auto-pilot: let agents act on domain events. Off by default. */
+    get autoAgents() { return !!read('autoAgents', false); },
+    /** Generic feature-flag / config accessor. */
+    flag(key, fallback) { return read(key, fallback); },
 
     isSupabaseConfigured() { return !!(this.supabaseUrl && this.supabaseAnonKey && this.workspaceId); },
     isProxyConfigured() { return !!this.proxyUrl && !!this.supabaseAnonKey; },

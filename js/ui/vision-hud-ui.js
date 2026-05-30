@@ -219,6 +219,7 @@
             timestamp: clock && clock.nowISO ? clock.nowISO() : new Date().toISOString(), syncStatus: 'PENDING'
           });
         }
+        if (global.AAA_EVENTS) global.AAA_EVENTS.emit('estimate.added', { jobId: state.jobId });
       } catch (err) { console.error('Vision HUD: failed to apply estimate', err); }
     }
 

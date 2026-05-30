@@ -88,6 +88,15 @@
     // ---- Actions ----
     const actions = ui.el('div', { className: 'closure-actions' });
     actions.appendChild(ui.button({ label: 'Run Company Standup', icon: '🧭', variant: 'primary', full: true, disabled: !aiReady, onClick: () => runStandup(body) }));
+    if (global.AAA_AUTOMATION) {
+      const autoOn = global.AAA_AUTOMATION.enabled();
+      actions.appendChild(ui.button({
+        label: 'Auto-pilot: ' + (autoOn ? 'On' : 'Off'), icon: autoOn ? '✅' : '⏸',
+        variant: autoOn ? 'success' : 'secondary', full: true,
+        onClick: async () => { global.AAA_AUTOMATION.setEnabled(!autoOn); await renderInto(body); }
+      }));
+      if (autoOn && !aiReady) body.appendChild(ui.el('p', { className: 'aaa-empty', text: 'Auto-pilot is on but idle until the AI proxy is configured.' }));
+    }
     actions.appendChild(ui.button({ label: 'Snapshot KPIs', icon: '📸', variant: 'secondary', full: true, onClick: async () => {
       const m = global.AAA_SUPERVISOR ? await global.AAA_SUPERVISOR.metrics() : {};
       await data().saveKpiSnapshot('day', m);

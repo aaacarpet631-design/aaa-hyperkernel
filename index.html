@@ -21,6 +21,7 @@
     <script src="/js/core/id-factory.js"></script>
     <script src="/js/core/local-first-storage.js"></script>
     <script src="/js/core/aaa-config.js"></script>
+    <script src="/js/core/aaa-events.js"></script>
     <script src="/js/core/aaa-supabase.js"></script>
     <script src="/js/core/aaa-data.js"></script>
     <script src="/js/core/sync-engine.js"></script>
@@ -32,6 +33,7 @@
     <script src="/js/agents/agent-registry.js"></script>
     <script src="/js/agents/agent-os.js"></script>
     <script src="/js/agents/supervisor.js"></script>
+    <script src="/js/agents/agent-automation.js"></script>
 
     <script src="/js/ai/sidekick-context-engine.js"></script>
     <script src="/js/ai/sidekick-voice-engine.js"></script>
@@ -72,6 +74,9 @@
             }
             if (window.AAA_SYNC_ENGINE && typeof window.AAA_SYNC_ENGINE.init === 'function') {
               window.AAA_SYNC_ENGINE.init();
+            }
+            if (window.AAA_AUTOMATION && typeof window.AAA_AUTOMATION.init === 'function') {
+              window.AAA_AUTOMATION.init();
             }
         }
         

@@ -190,6 +190,7 @@
         }
       }
     } catch (e) { console.warn('Closure HUD: outcome capture skipped', e); }
+    if (global.AAA_EVENTS) global.AAA_EVENTS.emit('job.closed', { jobId: jobId });
   }
 
   async function handleSafeClose() {
