@@ -260,6 +260,11 @@
       // AI Team review (real Claude meeting through the proxy when configured).
       main.appendChild(ui.button({ label: 'Ask AI Team', icon: '🧠', variant: 'secondary', full: true, onClick: () => this._askAITeam(job) }));
 
+      // Review request (closed jobs) — send from the tech's own phone.
+      if (job.currentState === 'CLOSED' && global.AAA_REVIEW_REQUEST_ENGINE) {
+        main.appendChild(ui.button({ label: 'Send Review Request', icon: '⭐', variant: 'secondary', full: true, onClick: () => this._sendReview(job) }));
+      }
+
       // Sales outcome capture (won is captured automatically at closeout).
       if (job.currentState !== 'CLOSED') {
         main.appendChild(ui.el('div', { className: 'aaa-detail-actions' }, [
@@ -302,6 +307,36 @@
       if (onBack) left.appendChild(ui.el('button', { className: 'aaa-back', attrs: { 'aria-label': 'Back', type: 'button' }, text: '‹', on: { click: onBack } }));
       left.appendChild(ui.el('h1', { className: 'aaa-title', html: titleHtml }));
       return ui.el('header', { className: 'aaa-header' }, [left, ui.el('div', { className: 'aaa-header-actions' })]);
+    },
+
+    async _sendReview(job) {
+      const ui = UI();
+      const engine = global.AAA_REVIEW_REQUEST_ENGINE;
+      const s = ui.sheet({ title: 'Review Request', subtitle: (job.customerName || 'Customer') + ' — sent from your phone' });
+      document.body.appendChild(s.overlay);
+      s.body.appendChild(ui.spinner('Preparing message…'));
+      const res = await engine.requestReview(job.id);
+      s.body.innerHTML = '';
+      if (!res || !res.ok) { s.body.appendChild(ui.el('p', { className: 'aaa-dialog__message', text: 'Could not prepare a review request.' })); return; }
+      const rec = res.review;
+      const msg = ui.el('textarea', { className: 'aaa-input aaa-textarea' });
+      msg.value = rec.message || '';
+      s.body.appendChild(ui.el('label', { className: 'aaa-field-label', text: 'Message (edit if you like)' }));
+      s.body.appendChild(msg);
+
+      function links() { return engine.links(Object.assign({}, rec, { message: msg.value })); }
+      const smsA = ui.el('a', { className: 'aaa-btn aaa-btn--primary aaa-btn--full', text: '✉ Send via SMS', attrs: { role: 'button' } });
+      const mailA = ui.el('a', { className: 'aaa-btn aaa-btn--secondary aaa-btn--full', text: '✉ Send via Email', attrs: { role: 'button' } });
+      const sync = () => { const l = links(); smsA.setAttribute('href', l.sms); mailA.setAttribute('href', l.email); };
+      sync(); msg.addEventListener('input', sync);
+      smsA.addEventListener('click', () => engine.markSent(rec.id, 'sms'));
+      mailA.addEventListener('click', () => engine.markSent(rec.id, 'email'));
+      const copyBtn = ui.button({ label: 'Copy message', variant: 'ghost', full: true, onClick: async () => {
+        try { await (global.navigator.clipboard && global.navigator.clipboard.writeText(msg.value)); } catch (_) {}
+        await engine.markSent(rec.id, 'copied');
+      } });
+      s.body.appendChild(smsA); s.body.appendChild(mailA); s.body.appendChild(copyBtn);
+      if (!rec.phone) s.body.appendChild(ui.el('p', { className: 'aaa-empty', text: 'No phone on file — add one to the customer for one-tap SMS.' }));
     },
 
     async _recordOutcome(jobId, result) {

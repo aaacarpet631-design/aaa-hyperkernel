@@ -54,6 +54,7 @@
         address: (data && data.address) || '',
         phone: (data && data.phone) || '',
         gateCode: (data && data.gateCode) || '',
+        source: (data && data.source) || null,
         createdAt: clock ? clock.now() : Date.now()
       };
       await s.put(COLLECTION, customer.id, customer);

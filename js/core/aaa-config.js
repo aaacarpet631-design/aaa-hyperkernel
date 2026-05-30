@@ -62,6 +62,9 @@
     get syncEndpoint() { return read('syncEndpoint', '/api/sync'); },
     /** Auto-pilot: let agents act on domain events. Off by default. */
     get autoAgents() { return !!read('autoAgents', false); },
+    /** Business name + Google review link used in review-request messages. */
+    get businessName() { return read('businessName', 'AAA Carpet'); },
+    get reviewUrl() { return read('reviewUrl', null); },
     /** Generic feature-flag / config accessor. */
     flag(key, fallback) { return read(key, fallback); },
 

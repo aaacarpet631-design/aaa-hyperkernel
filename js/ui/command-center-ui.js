@@ -114,6 +114,28 @@
     } }));
     body.appendChild(actions);
 
+    // ---- Marketing (real channel ROI) ----
+    if (global.AAA_MARKETING) {
+      body.appendChild(section('Marketing — Channel Performance'));
+      const channels = await global.AAA_MARKETING.channelStats();
+      if (!channels.length) body.appendChild(empty('No lead-source data yet. Add a “Lead source” when creating customers.'));
+      channels.forEach((c) => body.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+        '<strong>' + esc(c.source) + '</strong>' +
+        '<div class="aaa-list-sub">' + c.jobs + ' jobs · ' + c.customers + ' customers · close ' +
+        (c.closeRate != null ? Math.round(c.closeRate * 100) + '%' : 'n/a') + '</div>' })));
+      body.appendChild(ui.button({ label: 'Run Marketing Review', icon: '📈', variant: 'secondary', full: true, disabled: !aiReady, onClick: () => runMarketing(body) }));
+    }
+
+    // ---- Reviews ----
+    if (global.AAA_REVIEW_REQUEST_ENGINE) {
+      body.appendChild(section('Review Requests'));
+      const reqs = await global.AAA_REVIEW_REQUEST_ENGINE.list();
+      const sent = reqs.filter((r) => r.status === 'sent').length;
+      body.appendChild(kv('Prepared', String(reqs.length)));
+      body.appendChild(kv('Sent', String(sent), sent ? '#10B981' : '#A1A1AA'));
+      if (!reqs.length) body.appendChild(empty('Review requests are prepared automatically when a job is closed.'));
+    }
+
     // ---- Agent meetings ----
     body.appendChild(section('Agent Meetings'));
     const meetings = logs.filter((l) => l.agent === 'meeting').slice(0, 5);
@@ -184,6 +206,26 @@
       ui.button({ label: 'Create account', variant: 'ghost', full: true, onClick: () => attempt(global.AAA_CLOUD.signUp.bind(global.AAA_CLOUD)) }),
       ui.button({ label: 'Sign in', variant: 'primary', full: true, onClick: () => attempt(global.AAA_CLOUD.signIn.bind(global.AAA_CLOUD)) })
     ]));
+  }
+
+  async function runMarketing(body) {
+    const ui = U();
+    body.innerHTML = '';
+    body.appendChild(ui.spinner('Marketing agent reviewing channels…'));
+    const res = await global.AAA_MARKETING.review();
+    body.innerHTML = '';
+    if (!res || !res.ok) {
+      body.appendChild(ui.el('p', { className: 'aaa-dialog__message', text: 'Marketing review unavailable (' + ((res && res.error) || 'unknown') + ').' }));
+      body.appendChild(ui.button({ label: 'Back', variant: 'ghost', full: true, onClick: () => renderInto(body) }));
+      return;
+    }
+    body.appendChild(ui.el('p', { className: 'aaa-dialog__message', html: '<strong>' + esc(res.recommendation) + '</strong>' }));
+    if (res.rationale) body.appendChild(ui.el('p', { className: 'aaa-detail-notes', text: res.rationale }));
+    if (Array.isArray(res.next_actions) && res.next_actions.length) {
+      body.appendChild(ui.el('h2', { className: 'aaa-section-title', text: 'Next actions' }));
+      res.next_actions.forEach((a) => body.appendChild(ui.el('div', { className: 'aaa-list-row', text: a })));
+    }
+    body.appendChild(ui.button({ label: 'Back to overview', variant: 'ghost', full: true, onClick: () => renderInto(body) }));
   }
 
   function section(title) { return U().el('h2', { className: 'aaa-section-title', text: title }); }
