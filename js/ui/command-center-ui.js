@@ -14,6 +14,20 @@
   function U() { return global.AAA_UI; }
   function data() { return global.AAA_DATA; }
 
+  // One-line description of what each agent does (for the roster view).
+  const ROLE_BLURB = {
+    ceo: 'Sets strategy and makes the final call.',
+    sales: 'Qualifies leads and judges deal value & close odds.',
+    operations: 'Scheduling, crew capacity, and job feasibility.',
+    marketing: 'Lead gen and channel ROI (ads, referrals, reviews).',
+    accounting: 'Margins, pricing floors, and profitability checks.',
+    customer_success: 'Retention, follow-ups, and review generation.',
+    kpi: 'Surfaces the few numbers that matter and trends.',
+    data_scientist: 'Finds patterns in jobs/estimates/outcomes.',
+    compliance: 'Flags legal, safety, and contract risk.',
+    supervisor: 'Scores the team against real outcomes so it learns.'
+  };
+
   function fmtPct(n) { return n == null ? '—' : Math.round(n * 100) + '%'; }
   function fmtDate(ms) {
     if (!ms) return '';
@@ -46,6 +60,8 @@
     const outcomes = await data().list('outcomes');
     const metrics = global.AAA_SUPERVISOR ? await global.AAA_SUPERVISOR.metrics() : { ok: false };
     const aiReady = global.AAA_AGENT_OS && global.AAA_AGENT_OS.isReady && global.AAA_AGENT_OS.isReady();
+    const customRecs = global.AAA_PROMPT_ARCHITECT ? await global.AAA_PROMPT_ARCHITECT.list() : [];
+    const customMap = {}; customRecs.forEach((r) => { customMap[r.id] = r; });
 
     body.innerHTML = '';
 
@@ -63,6 +79,45 @@
     healthRows.filter(Boolean).forEach((r) => body.appendChild(kv(r[0], r[1], r[2])));
     if (!aiReady) {
       body.appendChild(ui.el('p', { className: 'aaa-dialog__message', text: 'Connect Supabase + the Claude proxy (see SETUP.md) to bring the AI team online.' }));
+    }
+
+    // ---- AI Team roster (what each agent does + its track record) ----
+    body.appendChild(section('Your AI Team'));
+    const reg = global.AAA_AGENTS;
+    if (reg) {
+      const order = ['ceo'].concat(reg.subAgents(), ['supervisor']);
+      const per = (metrics && metrics.perAgent) || {};
+      order.forEach((id) => {
+        const a = reg.get(id); if (!a) return;
+        const p = per[id];
+        const statusDot = aiReady ? '🟢' : '⚪';
+        body.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+          '<strong>' + statusDot + ' ' + esc(a.title) + '</strong> <span class="aaa-list-sub">' + (aiReady ? 'online' : 'standby') + '</span>' +
+          '<div class="aaa-list-sub">' + esc(ROLE_BLURB[id] || '') + '</div>' +
+          (p ? '<div class="aaa-list-sub">' + p.decisions + ' decisions · conf ' + (p.avgConfidence != null ? p.avgConfidence + '%' : '—') +
+            (p.avgScore != null ? ' · accuracy ' + Math.round(p.avgScore * 100) + '%' : '') + '</div>' : '') }));
+      });
+      // Custom agents (Prompt Architect / Marketplace) — with auto-run toggle.
+      (reg.customIds ? reg.customIds() : []).forEach((id) => {
+        const a = reg.get(id); if (!a) return;
+        const rec = customMap[id];
+        const trig = (rec && rec.trigger) || (a.spec && a.spec.trigger) || {};
+        const p = per[id];
+        const row = ui.el('div', { className: 'aaa-list-row' });
+        row.innerHTML =
+          '<strong>✨ ' + esc(a.title) + '</strong> <span class="aaa-list-sub">custom · ' + (aiReady ? 'online' : 'standby') + '</span>' +
+          '<div class="aaa-list-sub">' + esc((a.spec && a.spec.mission) || '') + '</div>' +
+          (trig.event && trig.event !== 'none' ? '<div class="aaa-list-sub">auto-run on ' + esc(trig.event) + '</div>' : '') +
+          (p ? '<div class="aaa-list-sub">' + p.decisions + ' decisions</div>' : '');
+        if (rec && trig.event && trig.event !== 'none' && global.AAA_PROMPT_ARCHITECT) {
+          row.appendChild(ui.button({
+            label: 'Auto-run: ' + (rec.triggerEnabled ? 'On' : 'Off'), size: 'sm',
+            variant: rec.triggerEnabled ? 'success' : 'ghost',
+            onClick: async () => { await global.AAA_PROMPT_ARCHITECT.setTriggerEnabled(id, !rec.triggerEnabled); await renderInto(body); }
+          }));
+        }
+        body.appendChild(row);
+      });
     }
 
     // ---- Learning / performance ----
@@ -90,6 +145,12 @@
 
     // ---- Actions ----
     const actions = ui.el('div', { className: 'closure-actions' });
+    if (global.AAA_PROMPT_ARCHITECT) {
+      actions.appendChild(ui.button({ label: 'Create Agent (describe it)', icon: '✨', variant: 'primary', full: true, onClick: () => architectFlow(body) }));
+    }
+    if (global.AAA_MARKETPLACE) {
+      actions.appendChild(ui.button({ label: 'Agent Marketplace', icon: '🏪', variant: 'secondary', full: true, onClick: () => marketplaceFlow(body) }));
+    }
     actions.appendChild(ui.button({ label: 'Cloud Settings', icon: '⚙️', variant: 'secondary', full: true, onClick: () => settingsFlow(body) }));
     actions.appendChild(ui.button({ label: 'Run Company Standup', icon: '🧭', variant: 'primary', full: true, disabled: !aiReady, onClick: () => runStandup(body) }));
     if (provider === 'firebase' && global.AAA_CLOUD) {
@@ -253,19 +314,149 @@
     const status = ui.el('p', { className: 'aaa-empty', text: '' });
     s.body.appendChild(status);
 
+    const diag = ui.el('div', {});
+    function kvRow(k, v, color) {
+      return ui.el('div', { className: 'vision-row' }, [
+        ui.el('span', { className: 'vision-row__k', text: k }),
+        ui.el('span', { className: 'vision-row__v', text: v, style: color ? { color: color } : null })
+      ]);
+    }
+    async function runTest() {
+      diag.innerHTML = ''; diag.appendChild(ui.spinner('Testing AI connection…'));
+      const provider = global.AAA_CLOUD ? global.AAA_CLOUD.provider() : null;
+      const ready = !!(global.AAA_AGENT_OS && global.AAA_AGENT_OS.isReady && global.AAA_AGENT_OS.isReady());
+      let ping;
+      if (global.AAA_DATA && global.AAA_DATA.callAgent) {
+        const r = await global.AAA_DATA.callAgent({ agent: 'diagnostic', model: 'claude-haiku-4-5', max_tokens: 16, messages: [{ role: 'user', content: 'Reply with exactly: OK' }] });
+        if (r && r.ok) ping = { text: '✓ reachable — "' + String(r.text || '').slice(0, 40) + '"', color: '#10B981' };
+        else {
+          const det = r && r.detail; const dmsg = det && (det.error || det.message) ? (' (' + (det.error || det.message) + ')') : '';
+          ping = { text: '✗ ' + ((r && r.error) || 'failed') + dmsg, color: '#EF4444' };
+        }
+      } else ping = { text: '✗ data layer missing', color: '#EF4444' };
+
+      // Second probe: run a real agent (structured output + JSON parse), which
+      // is the path the AI Agents actually use. A green ping with a red agent
+      // run means the proxy is fine but the model output isn't parsing.
+      let agentProbe = null;
+      if (ping.color === '#10B981' && global.AAA_AGENT_OS && global.AAA_AGENT_OS.runAgent) {
+        const a = await global.AAA_AGENT_OS.runAgent('kpi', 'Reply that the connection test succeeded.', { test: true });
+        if (a && a.ok) agentProbe = { text: '✓ decision parsed — "' + String(a.recommendation || '').slice(0, 40) + '"', color: '#10B981' };
+        else agentProbe = { text: '✗ ' + ((a && a.error) || 'failed') + (a && a.raw ? ' — model said: "' + String(a.raw).slice(0, 50) + '"' : ''), color: '#EF4444' };
+      }
+
+      diag.innerHTML = '';
+      diag.appendChild(kvRow('Cloud provider', provider || 'none', provider ? '#10B981' : '#F59E0B'));
+      diag.appendChild(kvRow('Proxy URL', cfg.proxyUrl || '(none)'));
+      diag.appendChild(kvRow('Proxy configured', (cfg.isProxyConfigured && cfg.isProxyConfigured()) ? 'yes' : 'no', (cfg.isProxyConfigured && cfg.isProxyConfigured()) ? '#10B981' : '#F59E0B'));
+      diag.appendChild(kvRow('Agents ready', ready ? 'yes' : 'no', ready ? '#10B981' : '#F59E0B'));
+      diag.appendChild(kvRow('AI ping', ping.text, ping.color));
+      if (agentProbe) diag.appendChild(kvRow('Agent run', agentProbe.text, agentProbe.color));
+    }
+
     s.body.appendChild(ui.el('div', { className: 'aaa-dialog__actions' }, [
-      ui.button({ label: 'Cancel', variant: 'ghost', full: true, onClick: () => s.close() }),
       ui.button({ label: 'Save', variant: 'primary', full: true, onClick: async () => {
         const patch = {};
         fields.forEach((f) => { patch[f.input._key] = f.input.value.trim() || null; });
         if (cfg.set) cfg.set(patch);
-        s.close();
+        status.textContent = 'Saved. Now tap “Test AI connection”.';
+      } }),
+      ui.button({ label: 'Test AI connection', variant: 'secondary', full: true, onClick: runTest })
+    ]));
+    s.body.appendChild(diag);
+    s.body.appendChild(ui.button({ label: 'Done', variant: 'ghost', full: true, onClick: async () => { s.close(); await renderInto(parentBody); } }));
+    status.textContent = (cfg.isFirebaseConfigured && cfg.isFirebaseConfigured())
+      ? 'Connected to Firebase. Save, then Test AI connection.'
+      : 'Enter Project ID + Web API key + Workspace ID + Cloud Function URL (/api/claude), Save, then Test.';
+  }
+
+  function metricBadge(label, val, kind) {
+    let color = '#94A3B8';
+    if (kind === 'health') { const n = parseInt(val, 10); color = n >= 80 ? '#10B981' : n >= 50 ? '#F59E0B' : '#EF4444'; }
+    else if (kind === 'risk') { color = val === 'HIGH' ? '#EF4444' : val === 'MEDIUM' ? '#F59E0B' : '#10B981'; }
+    else { color = val === 'HIGH' ? '#10B981' : val === 'MEDIUM' ? '#F59E0B' : '#94A3B8'; }
+    return U().statusBadge(label + ': ' + val, color);
+  }
+
+  function renderSpec(container, spec, parentBody, sheet) {
+    const ui = U(); const a = spec.analysis || {};
+    container.innerHTML = '';
+    container.appendChild(ui.el('h2', { className: 'aaa-section-title', text: spec.name || 'Agent' }));
+    if (spec.mission) container.appendChild(ui.el('p', { className: 'aaa-detail-notes', text: spec.mission }));
+    container.appendChild(ui.el('div', { style: { display: 'flex', flexWrap: 'wrap', gap: '0.4rem', margin: '0.5rem 0' } }, [
+      metricBadge('Health', (a.healthScore != null ? a.healthScore + '%' : '—'), 'health'),
+      metricBadge('Value', a.businessValue || '—', 'good'),
+      metricBadge('Automation', a.automationPotential || '—', 'good'),
+      metricBadge('Risk', a.risk || '—', 'risk')
+    ]));
+    const list = (t, arr) => {
+      if (Array.isArray(arr) && arr.length) {
+        container.appendChild(ui.el('h2', { className: 'aaa-section-title', text: t }));
+        arr.forEach((x) => container.appendChild(ui.el('div', { className: 'aaa-list-row', text: x })));
+      }
+    };
+    list('Goals', spec.goals); list('Workflow', spec.workflow); list('Guardrails', spec.constraints);
+    list('Escalation', spec.escalationRules); list('Integrations', spec.integrations); list('Success metrics', spec.successMetrics);
+    if (spec.trigger && spec.trigger.event && spec.trigger.event !== 'none') {
+      container.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+        '<strong>Auto-run</strong><div class="aaa-list-sub">on ' + esc(spec.trigger.event) +
+        (spec.trigger.delayHours ? ' (after ~' + spec.trigger.delayHours + 'h)' : '') +
+        ' — ' + esc(spec.trigger.task || '') + '</div>' }));
+    }
+    container.appendChild(ui.el('div', { className: 'aaa-dialog__actions' }, [
+      ui.button({ label: 'Discard', variant: 'ghost', full: true, onClick: () => { container.innerHTML = ''; } }),
+      ui.button({ label: 'Save as Agent', variant: 'primary', full: true, onClick: async () => {
+        await global.AAA_PROMPT_ARCHITECT.saveAgent(spec);
+        sheet.close();
         await renderInto(parentBody);
       } })
     ]));
-    status.textContent = (cfg.isFirebaseConfigured && cfg.isFirebaseConfigured())
-      ? 'Connected to Firebase. Sign in to sync.'
-      : 'Enter your Firebase Project ID + Web API key + a Workspace ID to connect.';
+  }
+
+  function architectFlow(parentBody) {
+    const ui = U();
+    const arch = global.AAA_PROMPT_ARCHITECT;
+    const s = ui.sheet({ title: 'Create an Agent', subtitle: 'Describe what you want in plain English' });
+    document.body.appendChild(s.overlay);
+    if (!arch.isReady || !arch.isReady()) {
+      s.body.appendChild(ui.el('p', { className: 'aaa-dialog__message', text:
+        'Connect the AI proxy first (Cloud Settings → Cloud Function URL = /api/claude). Then the Architect can design agents from a description.' }));
+      return;
+    }
+    s.body.appendChild(ui.el('label', { className: 'aaa-field-label', text: 'Describe the agent or process' }));
+    const ta = ui.el('textarea', { className: 'aaa-input aaa-textarea', attrs: { placeholder: 'e.g. An agent that follows up on a lead 24 hours after an estimate is sent and books a callback.' } });
+    s.body.appendChild(ta);
+    const out = ui.el('div', {});
+    s.body.appendChild(ui.button({ label: 'Generate', icon: '✨', variant: 'primary', full: true, onClick: async () => {
+      out.innerHTML = ''; out.appendChild(ui.spinner('Designing your agent…'));
+      const r = await arch.design(ta.value);
+      if (!r.ok) { out.innerHTML = ''; out.appendChild(ui.el('p', { className: 'aaa-dialog__message', text: 'Could not design (' + (r.error || 'unknown') + ').' })); return; }
+      renderSpec(out, r.spec, parentBody, s);
+    } }));
+    s.body.appendChild(out);
+  }
+
+  async function marketplaceFlow(parentBody) {
+    const ui = U();
+    const m = global.AAA_MARKETPLACE;
+    const s = ui.sheet({ title: 'Agent Marketplace', subtitle: 'Prebuilt AAA Carpet agents — install in one tap' });
+    document.body.appendChild(s.overlay);
+    const items = m.catalog();
+    for (const cat of m.categories()) {
+      s.body.appendChild(ui.el('h2', { className: 'aaa-section-title', text: cat }));
+      const inCat = items.filter((x) => x.category === cat);
+      for (const it of inCat) {
+        const installed = await m.isInstalled(it.id);
+        const row = ui.el('div', { className: 'aaa-list-row' });
+        row.innerHTML = '<strong>' + esc(it.name) + '</strong><div class="aaa-list-sub">' + esc(it.mission) + '</div>' +
+          (it.trigger && it.trigger.event !== 'none' ? '<div class="aaa-list-sub">auto-run on ' + esc(it.trigger.event) + '</div>' : '');
+        row.appendChild(ui.button({
+          label: installed ? 'Installed ✓' : 'Install', size: 'sm', variant: installed ? 'ghost' : 'primary', disabled: installed,
+          onClick: async () => { await m.install(it.id); s.close(); await renderInto(parentBody); }
+        }));
+        s.body.appendChild(row);
+      }
+    }
   }
 
   function section(title) { return U().el('h2', { className: 'aaa-section-title', text: title }); }
@@ -277,5 +468,5 @@
     ]);
   }
 
-  global.AAA_COMMAND_CENTER = { open: open };
+  global.AAA_COMMAND_CENTER = { open: open, render: renderInto };
 })(typeof window !== 'undefined' ? window : this);

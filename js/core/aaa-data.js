@@ -76,12 +76,25 @@
     },
 
     // ---- the single AI funnel -------------------------------------------
-    /** Call Claude through the server-side proxy. { ok, text, content, usage }. */
+    /** Call Claude through the server-side proxy. { ok, text, content, usage }.
+     *  Structured-output fallback: if the proxy/endpoint rejects the request
+     *  and the payload carried output_config, retry once without it and nudge
+     *  the model toward JSON in the system prompt. This keeps agents working
+     *  even against a proxy that doesn't forward output_config — the parser is
+     *  already tolerant of fenced/prefixed JSON. */
     async callAgent(payload) {
       if (!cloud() || !cfg().isProxyConfigured || !cfg().isProxyConfigured()) {
         return { ok: false, error: 'PROXY_NOT_CONFIGURED' };
       }
-      return cloud().callProxy(payload);
+      const res = await cloud().callProxy(payload);
+      if ((res && res.ok) || !payload || !payload.output_config) return res;
+      const retry = Object.assign({}, payload);
+      delete retry.output_config;
+      retry.system = (payload.system ? payload.system + '\n\n' : '') +
+        'Respond with ONLY a single valid JSON object matching the required fields. No prose, no markdown code fences.';
+      const res2 = await cloud().callProxy(retry);
+      // Surface the original error if the fallback also failed (more diagnostic).
+      return (res2 && res2.ok) ? res2 : res;
     },
 
     // ---- cloud mirror (backend-agnostic, idempotent per client id) -------

@@ -61,11 +61,25 @@
       'You audit the other agents. You synthesize their inputs into one decision with a calibrated confidence, and after outcomes are known you score whether their recommendations were right so the team improves.')
   };
 
+  // Custom agents created by the Prompt Architect (registered at runtime).
+  const CUSTOM = {};
+
   global.AAA_AGENTS = {
     DECISION_SCHEMA: DECISION_SCHEMA,
     all: AGENTS,
-    get: function (id) { return AGENTS[id] || null; },
+    get: function (id) { return AGENTS[id] || CUSTOM[id] || null; },
     ids: function () { return Object.keys(AGENTS); },
-    subAgents: function () { return ['sales', 'operations', 'marketing', 'accounting', 'customer_success', 'kpi', 'data_scientist', 'compliance']; }
+    subAgents: function () { return ['sales', 'operations', 'marketing', 'accounting', 'customer_success', 'kpi', 'data_scientist', 'compliance']; },
+    /** Register a saved custom-agent record so the orchestrator can run it. */
+    registerCustom: function (rec) {
+      if (!rec || !rec.id) return;
+      const spec = rec.spec || {};
+      CUSTOM[rec.id] = {
+        id: rec.id, title: rec.title || spec.name || rec.id, reportsTo: 'ceo',
+        model: spec.model || WORKER, system: spec.systemPrompt || ('You are the ' + (spec.name || rec.id) + ' agent for ' + COMPANY),
+        custom: true, spec: spec
+      };
+    },
+    customIds: function () { return Object.keys(CUSTOM); }
   };
 })(typeof window !== 'undefined' ? window : this);

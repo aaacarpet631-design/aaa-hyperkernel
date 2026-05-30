@@ -6,7 +6,7 @@
  * app fully usable offline. Old caches are purged on activate, and the worker
  * takes control immediately to avoid serving a stale shell after an update.
  */
-const CACHE_NAME = 'hyperkernel-v9';
+const CACHE_NAME = 'hyperkernel-v15';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -26,6 +26,7 @@ const PRECACHE = [
   '/js/core/aaa-supabase.js',
   '/js/core/aaa-cloud.js',
   '/js/core/aaa-data.js',
+  '/js/core/knowledge-graph.js',
   '/js/core/sync-engine.js',
   '/js/core/app-lifecycle.js',
   '/js/customers/customer-store.js',
@@ -33,6 +34,8 @@ const PRECACHE = [
   '/js/agents/agent-registry.js',
   '/js/agents/agent-os.js',
   '/js/agents/supervisor.js',
+  '/js/agents/prompt-architect.js',
+  '/js/agents/agent-marketplace.js',
   '/js/agents/agent-automation.js',
   '/js/agents/review-request-engine.js',
   '/js/agents/marketing-intel.js',
@@ -42,6 +45,7 @@ const PRECACHE = [
   '/js/ui/vision-hud-ui.js',
   '/js/ui/closure-hud-ui.js',
   '/js/ui/command-center-ui.js',
+  '/js/ui/business-ui.js',
   '/js/ui/job-list-ui.js',
   '/js/ai/sidekick-context-engine.js',
   '/js/ai/sidekick-voice-engine.js',

@@ -20,6 +20,7 @@
 
   const APP = {
     containerId: 'app-root',
+    tab: 'jobs',
     view: { name: 'list', jobId: null },
     _hudPoll: null,
 
@@ -132,11 +133,57 @@
       if (v && v.updateJobId) v.updateJobId(jobId);
     },
 
+    // ---- bottom tab bar ---------------------------------------------------
+    _mountTabBar() {
+      if (document.getElementById('aaa-tabbar')) return;
+      const ui = UI();
+      const mk = (tab, icon, label) => ui.el('button', {
+        className: 'aaa-tab', attrs: { type: 'button', 'data-tab': tab, 'aria-label': label },
+        on: { click: () => this._switchTab(tab) }
+      }, [ui.el('span', { className: 'aaa-tab__icon', text: icon }), ui.el('span', { text: label })]);
+      const bar = ui.el('nav', { id: 'aaa-tabbar', className: 'aaa-tabbar' }, [
+        mk('jobs', '🗂', 'Jobs'), mk('agents', '🧠', 'AI Agents'), mk('business', '📊', 'Business')
+      ]);
+      document.body.appendChild(bar);
+    },
+    _switchTab(tab) {
+      this.tab = tab;
+      if (tab === 'jobs') this.view = { name: 'list', jobId: null };
+      this.render();
+    },
+    _highlightTab() {
+      const bar = document.getElementById('aaa-tabbar');
+      if (!bar) return;
+      bar.querySelectorAll('.aaa-tab').forEach((b) => b.classList.toggle('is-active', b.getAttribute('data-tab') === this.tab));
+    },
+
     // ---- rendering --------------------------------------------------------
     async render(containerId) {
       if (containerId) this.containerId = containerId;
       const root = document.getElementById(this.containerId);
       if (!root) return;
+      this._mountTabBar();
+      this._highlightTab();
+
+      if (this.tab === 'agents') {
+        this._setActiveVoiceJob(null);
+        root.innerHTML = '';
+        root.appendChild(this._header('<span class="aaa-title-mark">AAA</span> AI Team', null));
+        const main = UI().el('main', { className: 'aaa-main' });
+        root.appendChild(main);
+        if (global.AAA_COMMAND_CENTER && global.AAA_COMMAND_CENTER.render) await global.AAA_COMMAND_CENTER.render(main);
+        return;
+      }
+      if (this.tab === 'business') {
+        this._setActiveVoiceJob(null);
+        root.innerHTML = '';
+        root.appendChild(this._header('<span class="aaa-title-mark">AAA</span> Business', null));
+        const main = UI().el('main', { className: 'aaa-main' });
+        root.appendChild(main);
+        if (global.AAA_BUSINESS && global.AAA_BUSINESS.render) await global.AAA_BUSINESS.render(main);
+        return;
+      }
+      // jobs tab
       if (this.view.name === 'detail' && this.view.jobId) await this._renderDetail(root);
       else await this._renderList(root);
     },
@@ -147,11 +194,7 @@
       const jobs = await this._allJobs();
 
       const header = this._header('<span class="aaa-title-mark">AAA</span> HyperKernel', null, true);
-      const headerActions = header.querySelector('.aaa-header-actions');
-      if (global.AAA_COMMAND_CENTER) {
-        headerActions.appendChild(ui.button({ label: '', icon: '🧭', variant: 'ghost', size: 'sm', ariaLabel: 'Open Command Center', onClick: () => global.AAA_COMMAND_CENTER.open() }));
-      }
-      headerActions.appendChild(
+      header.querySelector('.aaa-header-actions').appendChild(
         ui.button({ label: 'New Job', icon: '+', variant: 'primary', size: 'sm', onClick: () => this._onNewJob(), ariaLabel: 'Create a new job' })
       );
 
