@@ -85,7 +85,38 @@
       successMetrics: ['Jobs/day per crew', 'On-time arrivals'], failureMetrics: ['Overbooking', 'Late arrivals'],
       integrations: ['shared memory', 'Calendar'],
       workflow: ['Read scheduled jobs', 'Sequence by area', 'Assign crew', 'Flag conflicts'],
-      trigger: { event: 'job.created', delayHours: 0, task: 'Slot this job into the schedule and recommend a crew.' } }) }
+      trigger: { event: 'job.created', delayHours: 0, task: 'Slot this job into the schedule and recommend a crew.' } }) },
+
+    // ---- Specialist analysis agents (Phase 6) — advisory only. ----
+    { id: 'custom_photo_analyst', category: 'Quality', spec: spec({
+      name: 'Photo Analysis Agent', role: 'Install quality / damage review',
+      mission: 'Review job photos for seam quality, damage, stretching issues, and install defects.',
+      systemPrompt: 'You analyze carpet job photos for AAA Carpet. From the photo notes / vision analysis in shared memory, assess seam quality, visible damage, stretching/wrinkle issues, and installation defects. Describe what you see, rate severity, and recommend fixes. You never approve work or change pricing — a human inspector decides. Be specific and honest about uncertainty when image detail is limited.',
+      goals: ['Catch defects before the customer does', 'Consistent quality bar'],
+      successMetrics: ['Callbacks caught pre-departure', 'Defect detection rate'], failureMetrics: ['Missed defects', 'False alarms'],
+      integrations: ['shared memory', 'vision estimate', 'job photos'],
+      workflow: ['Read job photos/notes', 'Assess seams/damage/stretch/edges', 'Rate severity', 'Recommend fixes', 'Human inspector confirms'],
+      analysis: { healthScore: 86, complexity: 'MEDIUM', businessValue: 'HIGH', automationPotential: 'MEDIUM', risk: 'LOW', tokenCostEstimate: '~1.3k tokens/run', expectedRoi: 'High' } }) },
+
+    { id: 'custom_seo_strategist', category: 'Marketing', spec: spec({
+      name: 'SEO Agent', role: 'Local SEO / Google Business Profile',
+      mission: 'Recommend how to rank higher locally for carpet repair/installation in Houston.',
+      systemPrompt: 'You advise AAA Carpet on local SEO. Using the service mix, lead sources, and review activity in shared memory, recommend Google Business Profile improvements, service-page priorities, and local-ranking actions for the Houston market. Be concrete and prioritized. You do not have live ranking data unless provided — reason from the business data you have and state assumptions.',
+      goals: ['Higher local pack rankings', 'More organic service calls'],
+      successMetrics: ['GBP actions', 'Organic lead growth'], failureMetrics: ['Stale GBP', 'Thin service pages'],
+      integrations: ['shared memory'],
+      workflow: ['Read services + lead sources + reviews', 'Identify ranking gaps', 'Prioritize GBP + page actions', 'Human executes'],
+      analysis: { healthScore: 82, complexity: 'MEDIUM', businessValue: 'MEDIUM', automationPotential: 'MEDIUM', risk: 'LOW', tokenCostEstimate: '~1.2k tokens/run', expectedRoi: 'Medium' } }) },
+
+    { id: 'custom_business_intelligence', category: 'Business Intelligence', spec: spec({
+      name: 'Business Intelligence Agent', role: 'Executive analyst',
+      mission: 'Turn revenue, conversion, profitability, and service performance into an executive report.',
+      systemPrompt: 'You are the business intelligence analyst for AAA Carpet. From jobs, outcomes, accounting (P&L), lead sources, and agent performance in shared memory, produce a concise executive report: what is working, what is at risk, the few numbers that matter, and the top 3 recommended actions. Be honest about data gaps. You analyze and recommend only — you never change records or pricing.',
+      goals: ['Clear executive visibility', 'Actionable priorities'],
+      successMetrics: ['Decisions informed', 'Trend calls that proved right'], failureMetrics: ['Vague reports', 'Missed risks'],
+      integrations: ['shared memory', 'accounting', 'KPI snapshots'],
+      workflow: ['Read revenue/conversion/profit/service data', 'Find trends + anomalies', 'Summarize for the owner', 'Recommend top 3 actions'],
+      analysis: { healthScore: 90, complexity: 'HIGH', businessValue: 'HIGH', automationPotential: 'MEDIUM', risk: 'LOW', tokenCostEstimate: '~1.8k tokens/run', expectedRoi: 'High' } }) }
   ];
 
   const Marketplace = {
