@@ -252,6 +252,18 @@
         actions.appendChild(ui.button({ label: 'Reopen', icon: '↺', variant: 'ghost', onClick: async () => { await this._setJobState(job.id, 'IN_PROGRESS'); this.render(); } }));
       }
       main.appendChild(actions);
+
+      // AI Team review (real Claude meeting through the proxy when configured).
+      main.appendChild(ui.button({ label: 'Ask AI Team', icon: '🧠', variant: 'secondary', full: true, onClick: () => this._askAITeam(job) }));
+
+      // Sales outcome capture (won is captured automatically at closeout).
+      if (job.currentState !== 'CLOSED') {
+        main.appendChild(ui.el('div', { className: 'aaa-detail-actions' }, [
+          ui.button({ label: 'Mark Lost', variant: 'ghost', size: 'sm', onClick: async () => { await this._recordOutcome(job.id, 'lost'); this.render(); } }),
+          ui.button({ label: 'Callback', variant: 'ghost', size: 'sm', onClick: async () => { await this._recordOutcome(job.id, 'callback'); this.render(); } })
+        ]));
+      }
+
       main.appendChild(ui.el('p', { className: 'aaa-voice-hint', text: 'Tip: tap the 🎤 button to log a hands-free voice note.' }));
 
       if (Array.isArray(job.estimates) && job.estimates.length) {
@@ -286,6 +298,61 @@
       if (onBack) left.appendChild(ui.el('button', { className: 'aaa-back', attrs: { 'aria-label': 'Back', type: 'button' }, text: '‹', on: { click: onBack } }));
       left.appendChild(ui.el('h1', { className: 'aaa-title', html: titleHtml }));
       return ui.el('header', { className: 'aaa-header' }, [left, ui.el('div', { className: 'aaa-header-actions' })]);
+    },
+
+    async _recordOutcome(jobId, result) {
+      if (!global.AAA_DATA || !global.AAA_DATA.recordOutcome) return;
+      const outcome = await global.AAA_DATA.recordOutcome(jobId, result, { source: 'manual' });
+      if (global.AAA_SUPERVISOR && global.AAA_SUPERVISOR.scoreOutcome) {
+        try { await global.AAA_SUPERVISOR.scoreOutcome(outcome); } catch (_) {}
+      }
+    },
+
+    async _askAITeam(job) {
+      const ui = UI();
+      const os = global.AAA_AGENT_OS;
+      const s = ui.sheet({ title: 'AI Team Review', subtitle: (job.customerName || 'Job') + ' — CEO + sub-agents' });
+      document.body.appendChild(s.overlay);
+
+      if (!os || !os.isReady || !os.isReady()) {
+        s.body.appendChild(ui.el('p', { className: 'aaa-dialog__message', text:
+          'The AI team needs the server-side Claude proxy configured (Supabase URL + anon key + workspace id, and ANTHROPIC_API_KEY on the proxy). See SETUP.md, then try again.' }));
+        return;
+      }
+
+      s.body.appendChild(ui.spinner('The team is reviewing this job…'));
+      const context = {
+        jobId: job.id, customerName: job.customerName, serviceAddress: job.serviceAddress,
+        state: job.currentState, scheduledDate: job.scheduledDate, notes: job.notes,
+        estimates: Array.isArray(job.estimates) ? job.estimates : [],
+        logCount: Array.isArray(job.logs) ? job.logs.length : 0
+      };
+      const result = await os.runMeeting('How should we win this job profitably, and what should happen next?', context, ['sales', 'operations', 'accounting']);
+
+      s.body.innerHTML = '';
+      if (!result || !result.ok) {
+        s.body.appendChild(ui.el('p', { className: 'aaa-dialog__message', text: 'AI meeting could not complete (' + ((result && result.error) || 'unknown') + ').' }));
+        return;
+      }
+      const d = result.decision;
+      const conf = d.confidence != null ? d.confidence + '%' : '—';
+      s.body.appendChild(ui.el('div', { className: 'vision-row' }, [
+        ui.el('span', { className: 'vision-row__k', text: 'CEO decision' }),
+        ui.statusBadge('Confidence ' + conf, d.confidence >= 70 ? '#10B981' : d.confidence >= 40 ? '#F59E0B' : '#EF4444')
+      ]));
+      s.body.appendChild(ui.el('p', { className: 'aaa-dialog__message', html: '<strong>' + esc(d.recommendation) + '</strong>' }));
+      if (d.rationale) s.body.appendChild(ui.el('p', { className: 'aaa-detail-notes', text: d.rationale }));
+      if (Array.isArray(d.next_actions) && d.next_actions.length) {
+        s.body.appendChild(ui.el('h2', { className: 'aaa-section-title', text: 'Next actions' }));
+        d.next_actions.forEach((a) => s.body.appendChild(ui.el('div', { className: 'aaa-list-row', text: a })));
+      }
+      if (Array.isArray(result.opinions) && result.opinions.length) {
+        s.body.appendChild(ui.el('h2', { className: 'aaa-section-title', text: 'Team input' }));
+        result.opinions.forEach((o) => s.body.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+          '<strong>' + esc(o.title) + '</strong> · ' + (o.confidence != null ? o.confidence + '%' : '—') +
+          '<div class="aaa-list-sub">' + esc(o.recommendation || '') + '</div>' })));
+      }
+      this.render(); // reflect any new logged decisions
     },
 
     async _onNewJob() {

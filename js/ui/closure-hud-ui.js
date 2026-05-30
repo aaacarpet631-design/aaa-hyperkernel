@@ -177,6 +177,19 @@
     if (global.AAA_REVIEW_REQUEST_ENGINE && typeof global.AAA_REVIEW_REQUEST_ENGINE.requestReview === 'function') {
       try { global.AAA_REVIEW_REQUEST_ENGINE.requestReview(jobId); } catch (e) { console.warn('review engine error', e); }
     }
+    // Outcome capture for the learning loop: a completed close is a 'won' job.
+    // The Supervisor scores any agent decisions tied to this job against it.
+    try {
+      if (global.AAA_DATA && global.AAA_DATA.recordOutcome) {
+        const outcome = await global.AAA_DATA.recordOutcome(jobId, 'won', {
+          source: operation === 'OVERRIDE_CLOSURE' ? 'force_close' : 'safe_close',
+          override: operation === 'OVERRIDE_CLOSURE'
+        });
+        if (global.AAA_SUPERVISOR && global.AAA_SUPERVISOR.scoreOutcome) {
+          await global.AAA_SUPERVISOR.scoreOutcome(outcome);
+        }
+      }
+    } catch (e) { console.warn('Closure HUD: outcome capture skipped', e); }
   }
 
   async function handleSafeClose() {
