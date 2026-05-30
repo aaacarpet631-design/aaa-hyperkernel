@@ -314,19 +314,48 @@
     const status = ui.el('p', { className: 'aaa-empty', text: '' });
     s.body.appendChild(status);
 
+    const diag = ui.el('div', {});
+    function kvRow(k, v, color) {
+      return ui.el('div', { className: 'vision-row' }, [
+        ui.el('span', { className: 'vision-row__k', text: k }),
+        ui.el('span', { className: 'vision-row__v', text: v, style: color ? { color: color } : null })
+      ]);
+    }
+    async function runTest() {
+      diag.innerHTML = ''; diag.appendChild(ui.spinner('Testing AI connection…'));
+      const provider = global.AAA_CLOUD ? global.AAA_CLOUD.provider() : null;
+      const ready = !!(global.AAA_AGENT_OS && global.AAA_AGENT_OS.isReady && global.AAA_AGENT_OS.isReady());
+      let ping;
+      if (global.AAA_DATA && global.AAA_DATA.callAgent) {
+        const r = await global.AAA_DATA.callAgent({ agent: 'diagnostic', model: 'claude-haiku-4-5', max_tokens: 16, messages: [{ role: 'user', content: 'Reply with exactly: OK' }] });
+        if (r && r.ok) ping = { text: '✓ reachable — "' + String(r.text || '').slice(0, 40) + '"', color: '#10B981' };
+        else {
+          const det = r && r.detail; const dmsg = det && (det.error || det.message) ? (' (' + (det.error || det.message) + ')') : '';
+          ping = { text: '✗ ' + ((r && r.error) || 'failed') + dmsg, color: '#EF4444' };
+        }
+      } else ping = { text: '✗ data layer missing', color: '#EF4444' };
+      diag.innerHTML = '';
+      diag.appendChild(kvRow('Cloud provider', provider || 'none', provider ? '#10B981' : '#F59E0B'));
+      diag.appendChild(kvRow('Proxy URL', cfg.proxyUrl || '(none)'));
+      diag.appendChild(kvRow('Proxy configured', (cfg.isProxyConfigured && cfg.isProxyConfigured()) ? 'yes' : 'no', (cfg.isProxyConfigured && cfg.isProxyConfigured()) ? '#10B981' : '#F59E0B'));
+      diag.appendChild(kvRow('Agents ready', ready ? 'yes' : 'no', ready ? '#10B981' : '#F59E0B'));
+      diag.appendChild(kvRow('AI ping', ping.text, ping.color));
+    }
+
     s.body.appendChild(ui.el('div', { className: 'aaa-dialog__actions' }, [
-      ui.button({ label: 'Cancel', variant: 'ghost', full: true, onClick: () => s.close() }),
       ui.button({ label: 'Save', variant: 'primary', full: true, onClick: async () => {
         const patch = {};
         fields.forEach((f) => { patch[f.input._key] = f.input.value.trim() || null; });
         if (cfg.set) cfg.set(patch);
-        s.close();
-        await renderInto(parentBody);
-      } })
+        status.textContent = 'Saved. Now tap “Test AI connection”.';
+      } }),
+      ui.button({ label: 'Test AI connection', variant: 'secondary', full: true, onClick: runTest })
     ]));
+    s.body.appendChild(diag);
+    s.body.appendChild(ui.button({ label: 'Done', variant: 'ghost', full: true, onClick: async () => { s.close(); await renderInto(parentBody); } }));
     status.textContent = (cfg.isFirebaseConfigured && cfg.isFirebaseConfigured())
-      ? 'Connected to Firebase. Sign in to sync.'
-      : 'Enter your Firebase Project ID + Web API key + a Workspace ID to connect.';
+      ? 'Connected to Firebase. Save, then Test AI connection.'
+      : 'Enter Project ID + Web API key + Workspace ID + Cloud Function URL (/api/claude), Save, then Test.';
   }
 
   function metricBadge(label, val, kind) {
