@@ -1,16 +1,32 @@
-const CACHE_NAME = 'hyperkernel-v1';
-const ASSETS = [
+/*
+ * AAA HyperKernel Service Worker
+ *
+ * Network-first for same-origin GET requests so a fresh deploy is always
+ * picked up when the device is online, with a cache fallback that keeps the
+ * app fully usable offline. Old caches are purged on activate, and the worker
+ * takes control immediately to avoid serving a stale shell after an update.
+ */
+const CACHE_NAME = 'hyperkernel-v2';
+const PRECACHE = [
   '/',
   '/index.html',
   '/manifest.json',
   '/css/job-list.css',
   '/css/customer-job-flow.css',
+  '/css/arrival-hud.css',
+  '/css/voice-hud.css',
+  '/css/vision-hud.css',
+  '/css/closure-hud.css',
   '/js/core/runtime-clock.js',
   '/js/core/id-factory.js',
   '/js/core/local-first-storage.js',
+  '/js/core/app-lifecycle.js',
   '/js/customers/customer-store.js',
   '/js/ui/customer-picker-ui.js',
   '/js/ui/new-job-flow-ui.js',
+  '/js/ui/voice-hud-ui.js',
+  '/js/ui/vision-hud-ui.js',
+  '/js/ui/closure-hud-ui.js',
   '/js/ui/job-list-ui.js',
   '/js/ai/sidekick-context-engine.js',
   '/js/ai/sidekick-voice-engine.js',
@@ -19,15 +35,35 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE)).catch(() => {})
+  );
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys()
+      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))))
+      .then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) {
+    return;
+  }
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    })
+    fetch(req)
+      .then((response) => {
+        // Refresh the cache copy for offline use.
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(req, copy)).catch(() => {});
+        return response;
+      })
+      .catch(() =>
+        caches.match(req).then((cached) => cached || caches.match('/index.html'))
+      )
   );
 });
