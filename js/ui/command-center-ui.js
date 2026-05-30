@@ -143,6 +143,31 @@
       });
     }
 
+    // ---- Self-Improvement (Layer 13) ----
+    if (global.AAA_SELF_IMPROVEMENT) {
+      body.appendChild(section('Self-Improvement'));
+      const survey = await global.AAA_SELF_IMPROVEMENT.analyze();
+      if (survey.ok) {
+        const tuned = survey.agents.filter((a) => a.tuned);
+        body.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+          '<strong>' + survey.eligible + ' agent(s) ready to learn</strong>' +
+          '<div class="aaa-list-sub">Needs ' + survey.minScored + '+ scored decisions per agent. ' + tuned.length + ' currently tuned.</div>' }));
+        survey.agents.forEach((a) => {
+          if (!a.tuned && !a.eligible) return;
+          const t = a.tuning;
+          body.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+            '<strong>' + (a.tuned ? '🧠 ' : '○ ') + esc(a.title) + '</strong>' +
+            '<div class="aaa-list-sub">' + a.scoredCount + ' scored · win ' + fmtPct(a.winRate) + ' · conf ' + (a.avgConfidence != null ? a.avgConfidence + '%' : '—') + ' · calibration ' + fmtPct(a.avgCalibration) + '</div>' +
+            (t ? '<div class="aaa-list-sub">' + esc(t.calibration) + ' · bias ' + (t.confidenceBias >= 0 ? '+' : '') + t.confidenceBias + ' · v' + t.version + (t.summary ? ' — ' + esc(t.summary) : '') + '</div>' : '') }));
+        });
+        if (survey.eligible > 0) {
+          body.appendChild(ui.button({ label: 'Learn from outcomes', icon: '🧠', variant: 'primary', full: true, disabled: !aiReady, onClick: () => improveFlow(body) }));
+        } else {
+          body.appendChild(empty('Record more won/lost outcomes — the team starts tuning itself once any agent has ' + survey.minScored + ' scored decisions.'));
+        }
+      }
+    }
+
     // ---- Actions ----
     const actions = ui.el('div', { className: 'closure-actions' });
     if (global.AAA_PROMPT_ARCHITECT) {
@@ -247,6 +272,42 @@
     // snapshot KPIs alongside the standup
     try { await data().saveKpiSnapshot('standup', global.AAA_SUPERVISOR ? await global.AAA_SUPERVISOR.metrics() : {}); } catch (_) {}
     await renderInto(body);
+  }
+
+  // Self-Improvement: tune every eligible agent from its real track record,
+  // then show exactly what changed and why (grounded in outcomes).
+  async function improveFlow(body) {
+    const ui = U();
+    body.innerHTML = '';
+    body.appendChild(ui.spinner('Learning from real outcomes…'));
+    const result = await global.AAA_SELF_IMPROVEMENT.improveAll();
+    body.innerHTML = '';
+    if (!result || !result.ok) {
+      const why = (result && result.error) === 'INSUFFICIENT_DATA'
+        ? 'Not enough scored decisions yet (need ' + (result.need || 3) + ' per agent). Record more won/lost outcomes.'
+        : 'Could not learn (' + ((result && result.error) || 'unknown') + ').';
+      body.appendChild(ui.el('p', { className: 'aaa-dialog__message', text: why }));
+      body.appendChild(ui.button({ label: 'Back', variant: 'ghost', full: true, onClick: () => renderInto(body) }));
+      return;
+    }
+    body.appendChild(ui.el('h2', { className: 'aaa-section-title', text: 'Tuned ' + result.improved + ' agent(s) from real outcomes' }));
+    result.results.forEach((r) => {
+      if (!r.ok) {
+        body.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+          '<strong>' + esc(r.agentId) + '</strong><div class="aaa-list-sub">skipped — ' + esc(r.error || '') + '</div>' }));
+        return;
+      }
+      const t = r.tuning;
+      body.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+        '<strong>🧠 ' + esc((global.AAA_AGENTS.get(r.agentId) || {}).title || r.agentId) + '</strong>' +
+        '<div class="aaa-list-sub">' + esc(t.calibration) + ' · confidence bias ' + (t.confidenceBias >= 0 ? '+' : '') + t.confidenceBias + ' · v' + t.version + '</div>' +
+        (t.summary ? '<div class="aaa-list-sub">' + esc(t.summary) + '</div>' : '') +
+        (t.promptAddendum ? '<div class="aaa-list-sub">↳ added guidance: ' + esc(t.promptAddendum.slice(0, 140)) + (t.promptAddendum.length > 140 ? '…' : '') + '</div>' : '') }));
+      body.appendChild(ui.button({ label: 'Revert ' + ((global.AAA_AGENTS.get(r.agentId) || {}).title || r.agentId), size: 'sm', variant: 'ghost',
+        onClick: async () => { await global.AAA_SELF_IMPROVEMENT.revert(r.agentId); await renderInto(body); } }));
+    });
+    body.appendChild(ui.el('p', { className: 'aaa-empty', text: 'These tunings apply to every future decision and get re-scored against new outcomes — so the team keeps adjusting.' }));
+    body.appendChild(ui.button({ label: 'Done', variant: 'primary', full: true, onClick: () => renderInto(body) }));
   }
 
   function signInFlow(parentBody) {

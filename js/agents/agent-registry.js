@@ -64,10 +64,30 @@
   // Custom agents created by the Prompt Architect (registered at runtime).
   const CUSTOM = {};
 
+  // Live tunings from the Self-Improvement engine, keyed by agent id. Each is
+  // { confidenceBias, promptAddendum, ... }. Applied non-destructively: the
+  // base persona is never mutated — get() returns a merged view.
+  const TUNINGS = {};
+
+  function applyTuning(agent, id) {
+    const t = TUNINGS[id];
+    if (!agent || !t) return agent;
+    const addendum = t.promptAddendum ? String(t.promptAddendum).trim() : '';
+    const merged = Object.assign({}, agent, { tuning: t });
+    if (addendum) {
+      merged.system = String(agent.system || '') +
+        '\n\nLEARNED FROM YOUR TRACK RECORD (apply this):\n' + addendum;
+    }
+    return merged;
+  }
+
   global.AAA_AGENTS = {
     DECISION_SCHEMA: DECISION_SCHEMA,
     all: AGENTS,
-    get: function (id) { return AGENTS[id] || CUSTOM[id] || null; },
+    get: function (id) {
+      const base = AGENTS[id] || CUSTOM[id] || null;
+      return base ? applyTuning(base, id) : null;
+    },
     ids: function () { return Object.keys(AGENTS); },
     subAgents: function () { return ['sales', 'operations', 'marketing', 'accounting', 'customer_success', 'kpi', 'data_scientist', 'compliance']; },
     /** Register a saved custom-agent record so the orchestrator can run it. */
@@ -80,6 +100,14 @@
         custom: true, spec: spec
       };
     },
-    customIds: function () { return Object.keys(CUSTOM); }
+    customIds: function () { return Object.keys(CUSTOM); },
+    /** Install/remove a Self-Improvement tuning for an agent (null clears it). */
+    setTuning: function (id, tuning) {
+      if (!id) return;
+      if (tuning) TUNINGS[id] = tuning; else delete TUNINGS[id];
+    },
+    getTuning: function (id) { return TUNINGS[id] || null; },
+    /** The signed confidence adjustment to apply to this agent's output (0 if untuned). */
+    confidenceBias: function (id) { const t = TUNINGS[id]; return t && typeof t.confidenceBias === 'number' ? t.confidenceBias : 0; }
   };
 })(typeof window !== 'undefined' ? window : this);
