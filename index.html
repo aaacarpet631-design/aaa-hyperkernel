@@ -47,7 +47,19 @@
     <script src="/js/ai/sidekick-voice-engine.js"></script>
     <script src="/js/ai/sidekick-vision-engine.js"></script>
     <script src="/js/ai/sidekick-closure-engine.js"></script>
-    
+
+    <!-- Bluetooth laser measurement layer (models → storage → BLE → quote/AI → UI) -->
+    <script src="/js/measurements/models/measurement-models.js"></script>
+    <script src="/js/measurements/storage/measurement-store.js"></script>
+    <script src="/js/bluetooth/services/raw-reading-log.js"></script>
+    <script src="/js/bluetooth/services/measurement-parser.js"></script>
+    <script src="/js/bluetooth/services/generic-ble-adapter.js"></script>
+    <script src="/js/bluetooth/services/device-adapter-registry.js"></script>
+    <script src="/js/bluetooth/hooks/use-bluetooth-connection.js"></script>
+    <script src="/js/quotes/integrations/measurement-to-quote.js"></script>
+    <script src="/js/measurements/measurement-ai-assistant.js"></script>
+    <script src="/js/bluetooth/screens/measurement-hud-ui.js"></script>
+
     <script src="/js/ui/customer-picker-ui.js"></script>
     <script src="/js/ui/new-job-flow-ui.js"></script>
     <script src="/js/ui/voice-hud-ui.js"></script>

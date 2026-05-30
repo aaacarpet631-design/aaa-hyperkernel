@@ -291,6 +291,9 @@
       actions.appendChild(ui.button({ label: 'Vision Estimate', icon: '📷', variant: 'secondary', onClick: () => {
         if (global.AAA_VISION_HUD_UI && global.AAA_VISION_HUD_UI.boot) { global.AAA_VISION_HUD_UI.boot({ jobId: job.id }); this._reRenderWhenHudCloses('vision-hud'); }
       } }));
+      actions.appendChild(ui.button({ label: 'Measure Room', icon: '📐', variant: 'secondary', onClick: () => {
+        if (global.AAA_MEASUREMENT_HUD_UI && global.AAA_MEASUREMENT_HUD_UI.boot) { global.AAA_MEASUREMENT_HUD_UI.boot({ jobId: job.id, customerId: job.customerId }); this._reRenderWhenHudCloses('measurement-hud'); }
+      } }));
       if (job.currentState !== 'CLOSED') {
         actions.appendChild(ui.button({ label: 'Close Job', icon: '✓', variant: 'secondary', onClick: () => {
           if (global.AAA_CLOSURE_HUD_UI && global.AAA_CLOSURE_HUD_UI.boot) { global.AAA_CLOSURE_HUD_UI.boot({ jobId: job.id }); this._reRenderWhenHudCloses('closure-hud'); }
