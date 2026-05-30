@@ -17,6 +17,18 @@
   function ids() { return global.AAA_ID_FACTORY; }
   function clock() { return global.AAA_RUNTIME_CLOCK; }
 
+  // Tolerant JSON extraction: handle ```json fences or a sentence of preamble.
+  function extractJson(text) {
+    const s = String(text == null ? '' : text).trim();
+    if (!s) return null;
+    try { return JSON.parse(s); } catch (_) {}
+    const fenced = s.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+    if (fenced !== s) { try { return JSON.parse(fenced); } catch (_) {} }
+    const start = s.indexOf('{'); const end = s.lastIndexOf('}');
+    if (start !== -1 && end > start) { try { return JSON.parse(s.slice(start, end + 1)); } catch (_) {} }
+    return null;
+  }
+
   const LEVEL = { type: 'string', enum: ['LOW', 'MEDIUM', 'HIGH'] };
   const STRLIST = { type: 'array', items: { type: 'string' } };
 
@@ -91,8 +103,8 @@
         messages: [{ role: 'user', content: 'Design an AI agent for this request:\n\n' + String(description).trim() }]
       });
       if (!res || res.ok === false) return { ok: false, error: (res && res.error) || 'CALL_FAILED' };
-      try { return { ok: true, spec: JSON.parse(res.text || '{}') }; }
-      catch (_) { return { ok: false, error: 'BAD_OUTPUT', raw: res.text }; }
+      const spec = extractJson(res.text);
+      return spec ? { ok: true, spec: spec } : { ok: false, error: 'BAD_OUTPUT', raw: res.text };
     },
 
     /** Save (or version-bump) a spec as a runnable agent in shared memory. */

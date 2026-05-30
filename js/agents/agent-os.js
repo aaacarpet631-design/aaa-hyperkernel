@@ -23,19 +23,34 @@
     );
   }
 
-  function parseDecision(text) {
-    try {
-      const d = JSON.parse(text);
-      return {
-        recommendation: String(d.recommendation || ''),
-        rationale: String(d.rationale || ''),
-        confidence: Number.isFinite(+d.confidence) ? Math.max(0, Math.min(100, Math.round(+d.confidence))) : null,
-        risks: Array.isArray(d.risks) ? d.risks : [],
-        next_actions: Array.isArray(d.next_actions) ? d.next_actions : []
-      };
-    } catch (_) {
-      return null;
+  // Tolerant JSON extraction: models sometimes wrap the object in ```json
+  // fences or add a sentence of preamble even under output_config. Try a
+  // straight parse first, then strip code fences, then fall back to the first
+  // balanced {...} block. Returns null only when no object is recoverable.
+  function extractJson(text) {
+    const s = String(text == null ? '' : text).trim();
+    if (!s) return null;
+    try { return JSON.parse(s); } catch (_) {}
+    const fenced = s.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+    if (fenced !== s) { try { return JSON.parse(fenced); } catch (_) {} }
+    const start = s.indexOf('{');
+    const end = s.lastIndexOf('}');
+    if (start !== -1 && end > start) {
+      try { return JSON.parse(s.slice(start, end + 1)); } catch (_) {}
     }
+    return null;
+  }
+
+  function parseDecision(text) {
+    const d = extractJson(text);
+    if (!d || typeof d !== 'object') return null;
+    return {
+      recommendation: String(d.recommendation || ''),
+      rationale: String(d.rationale || ''),
+      confidence: Number.isFinite(+d.confidence) ? Math.max(0, Math.min(100, Math.round(+d.confidence))) : null,
+      risks: Array.isArray(d.risks) ? d.risks : [],
+      next_actions: Array.isArray(d.next_actions) ? d.next_actions : []
+    };
   }
 
   const AgentOS = {

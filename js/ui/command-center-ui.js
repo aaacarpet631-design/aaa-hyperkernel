@@ -334,12 +334,24 @@
           ping = { text: '✗ ' + ((r && r.error) || 'failed') + dmsg, color: '#EF4444' };
         }
       } else ping = { text: '✗ data layer missing', color: '#EF4444' };
+
+      // Second probe: run a real agent (structured output + JSON parse), which
+      // is the path the AI Agents actually use. A green ping with a red agent
+      // run means the proxy is fine but the model output isn't parsing.
+      let agentProbe = null;
+      if (ping.color === '#10B981' && global.AAA_AGENT_OS && global.AAA_AGENT_OS.runAgent) {
+        const a = await global.AAA_AGENT_OS.runAgent('kpi', 'Reply that the connection test succeeded.', { test: true });
+        if (a && a.ok) agentProbe = { text: '✓ decision parsed — "' + String(a.recommendation || '').slice(0, 40) + '"', color: '#10B981' };
+        else agentProbe = { text: '✗ ' + ((a && a.error) || 'failed') + (a && a.raw ? ' — model said: "' + String(a.raw).slice(0, 50) + '"' : ''), color: '#EF4444' };
+      }
+
       diag.innerHTML = '';
       diag.appendChild(kvRow('Cloud provider', provider || 'none', provider ? '#10B981' : '#F59E0B'));
       diag.appendChild(kvRow('Proxy URL', cfg.proxyUrl || '(none)'));
       diag.appendChild(kvRow('Proxy configured', (cfg.isProxyConfigured && cfg.isProxyConfigured()) ? 'yes' : 'no', (cfg.isProxyConfigured && cfg.isProxyConfigured()) ? '#10B981' : '#F59E0B'));
       diag.appendChild(kvRow('Agents ready', ready ? 'yes' : 'no', ready ? '#10B981' : '#F59E0B'));
       diag.appendChild(kvRow('AI ping', ping.text, ping.color));
+      if (agentProbe) diag.appendChild(kvRow('Agent run', agentProbe.text, agentProbe.color));
     }
 
     s.body.appendChild(ui.el('div', { className: 'aaa-dialog__actions' }, [
