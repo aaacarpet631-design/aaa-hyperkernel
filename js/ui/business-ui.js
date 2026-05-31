@@ -192,16 +192,18 @@
       if (!st.configured) {
         s.body.appendChild(ui.el('p', { className: 'aaa-voice-hint', text: 'Not configured. Add qboClientId, qboRedirectUri and a qboProxyUrl (Cloud Function) in settings to enable live sync. CSV export above works without setup.' }));
       } else if (!st.connected) {
-        s.body.appendChild(ui.el('div', { className: 'aaa-list-row', html: '<strong>' + (st.expired ? 'Connection expired' : 'Not connected') + '</strong><div class="aaa-list-sub">' + esc(st.environment) + '</div>' }));
+        s.body.appendChild(ui.el('div', { className: 'aaa-list-row', html: '<strong>Not connected</strong><div class="aaa-list-sub">' + esc(st.environment) + '</div>' }));
         s.body.appendChild(ui.button({ label: 'Connect QuickBooks', icon: '🔗', variant: 'primary', full: true, onClick: () => {
-          const a = qbo.authUrl(); if (a.ok) global.open(a.url, '_blank'); } }));
+          const a = qbo.authUrl(); if (a.ok) { global.location.href = a.url; } } }));
       } else {
         s.body.appendChild(ui.el('div', { className: 'aaa-list-row', html: '<strong>✅ Connected</strong><div class="aaa-list-sub">' + esc(st.environment) + '</div>' }));
         s.body.appendChild(ui.button({ label: 'Push invoices to QuickBooks', icon: '☁️', variant: 'primary', full: true, onClick: async () => {
-          const r = await qbo.pushAllInvoices();
+          const proceed = await ui.confirm({ title: 'Push invoices to QuickBooks?', message: 'This creates invoices in your live QuickBooks company. It never edits or deletes existing QuickBooks data.', confirmLabel: 'Push invoices' });
+          if (!proceed) return;
+          const r = await qbo.pushAllInvoices(true); // explicit approval
           s.body.appendChild(ui.el('p', { className: 'aaa-empty', text: r.ok ? (r.pushed + ' invoice(s) pushed.') : ('Sync failed: ' + r.error) }));
         } }));
-        s.body.appendChild(ui.button({ label: 'Disconnect', variant: 'ghost', full: true, onClick: () => { qbo.disconnect(); s.close(); quickbooksExport(); } }));
+        s.body.appendChild(ui.button({ label: 'Disconnect', variant: 'ghost', full: true, onClick: async () => { await qbo.disconnect(); s.close(); quickbooksExport(); } }));
       }
     }
 
