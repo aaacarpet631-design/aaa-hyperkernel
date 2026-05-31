@@ -66,9 +66,17 @@
     async requestDevice() {
       if (!this.isSupported()) return { ok: false, error: 'UNSUPPORTED', message: 'This browser does not support Web Bluetooth. Use manual entry, or open the app in Chrome on Android.' };
       try {
+        // Declare battery + every registered brand adapter's services up front,
+        // so that when the registry resolves a brand adapter for the picked
+        // device it can still reach that service (Web Bluetooth gates this).
+        const optional = [BATTERY_SERVICE];
+        try {
+          const reg = global.AAA_DEVICE_ADAPTER_REGISTRY;
+          if (reg && reg.optionalServices) reg.optionalServices().forEach((s) => { if (optional.indexOf(s) === -1) optional.push(s); });
+        } catch (_) {}
         const device = await global.navigator.bluetooth.requestDevice({
           acceptAllDevices: true,
-          optionalServices: [BATTERY_SERVICE]
+          optionalServices: optional
         });
         this._device = device;
         return { ok: true, device: { id: device.id, name: device.name || 'Unknown device' } };

@@ -173,6 +173,16 @@ Design choices that keep this honest:
   and are never emitted as room measurements.
 - **The checksum is recorded but never gated on** (`checksumOk: null`) because
   the upstream algorithm is unverified.
+- **Remote shutter.** The adapter exposes `measure()`, surfaced through
+  `AAA_BLUETOOTH.canMeasure()` / `measure()` and a **“Trigger laser
+  measurement”** button on the capture screen — so a tech can fire a reading
+  from the phone instead of reaching for the meter's button. Devices without a
+  remote trigger return a clear "press the button on the laser" result.
+- **Picker reachability seam.** Brand adapters declare the GATT services they
+  need via `optionalServices` at registration; the registry aggregates them and
+  the generic OS picker declares them up front. Without this, Web Bluetooth
+  blocks `getPrimaryService(ae30)` after a device is picked through the generic
+  picker, and the write characteristic (so `measure()`) would be unreachable.
 
 Golden fixtures in `test/unit/huepar-s60.test.js` lock the decode in place;
 swap them for real device captures once lab validation is done.

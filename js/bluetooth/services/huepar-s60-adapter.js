@@ -289,6 +289,7 @@
       label: 'Huepar S-series (BT)',
       priority: 50,
       match: matchHuepar,
+      optionalServices: [HUEPAR_SERVICE],
       factory: () => createHueparS60Adapter()
     });
   }

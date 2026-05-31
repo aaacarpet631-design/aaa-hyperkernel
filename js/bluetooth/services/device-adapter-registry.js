@@ -27,13 +27,25 @@
       const entry = {
         id: def.id, label: def.label || def.id,
         match: typeof def.match === 'function' ? def.match : () => false,
-        factory: def.factory, priority: def.priority || 0
+        factory: def.factory, priority: def.priority || 0,
+        // Brand service UUIDs this adapter needs reachable post-connect. They
+        // MUST be declared to the OS picker up front (Web Bluetooth blocks
+        // getPrimaryService for services not requested), so the generic picker
+        // folds these in — registering a brand adapter is all it takes.
+        optionalServices: Array.isArray(def.optionalServices) ? def.optionalServices.slice() : []
       };
       if (existing !== -1) adapters[existing] = entry; else adapters.push(entry);
       return true;
     },
 
     list() { return adapters.map((a) => ({ id: a.id, label: a.label, priority: a.priority })); },
+
+    /** Union of every registered adapter's optional service UUIDs, deduped. */
+    optionalServices() {
+      const out = [];
+      adapters.forEach((a) => (a.optionalServices || []).forEach((s) => { if (s && out.indexOf(s) === -1) out.push(s); }));
+      return out;
+    },
 
     /** Pick the best adapter for a device, or the generic fallback. */
     resolve(deviceInfo) {

@@ -185,6 +185,16 @@
         '<strong>Last reading: ' + (r ? r.feet + ' ft' : '—') + '</strong>' +
         '<div class="aaa-list-sub">' + (r ? 'unit ' + esc(r.unit) + ' · confidence ' + Math.round((r.confidence || 0) * 100) + '%' : 'Pull the trigger on your laser to send a reading.') + '</div>' });
       body.appendChild(banner);
+
+      // If the device supports a remote shutter (e.g. Huepar BLE), let the tech
+      // fire it from the app; otherwise they use the button on the laser.
+      if (ble().canMeasure && ble().canMeasure()) {
+        body.appendChild(ui.button({ label: 'Trigger laser measurement', icon: '📡', variant: 'secondary', full: true, onClick: async () => {
+          const res = await ble().measure();
+          if (!res || !res.ok) toast(body, (res && res.message) || 'Could not trigger the laser.', '#F59E0B');
+          else toast(body, 'Measuring… the reading will appear above.', '#10B981');
+        } }));
+      }
     }
 
     const fields = [

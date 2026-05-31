@@ -155,6 +155,25 @@
       return b;
     },
 
+    /** Can the connected device be triggered from the app (vs. its own button)? */
+    canMeasure() {
+      return !!(this._adapter && typeof this._adapter.measure === 'function' && this.isConnected());
+    },
+
+    /**
+     * Trigger a single measurement remotely (e.g. Huepar's BLE shutter). The
+     * reading arrives async via onReading and lands in lastReading. Devices
+     * without a remote trigger return a clear "press the button" result.
+     */
+    async measure() {
+      if (!this._adapter) return { ok: false, error: 'NO_DEVICE', message: 'Connect a device first.' };
+      if (!this.isConnected()) return { ok: false, error: 'NOT_CONNECTED', message: 'Connect the device first.' };
+      if (typeof this._adapter.measure !== 'function') {
+        return { ok: false, error: 'NO_REMOTE_TRIGGER', message: 'This device can’t be triggered from the app — press the measure button on the laser.' };
+      }
+      return this._adapter.measure();
+    },
+
     /** Consume the latest reading exactly once (so a screen field grabs it). */
     takeReading() {
       const r = this._state.lastReading;
