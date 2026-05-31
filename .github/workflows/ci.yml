@@ -34,6 +34,19 @@ jobs:
       - name: Install rules test deps
         working-directory: test/rules
         run: npm install
+      # Cache the downloaded emulator JAR so reruns don't re-fetch it (and so a
+      # network hiccup on the download is less likely to fail the job).
+      - name: Cache Firebase emulator
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/firebase/emulators
+          key: firebase-emulators-${{ runner.os }}
+      # Pre-fetch the emulator in its own step. If the download is blocked by a
+      # network policy, THIS step fails with a clear name — instead of the
+      # failure hiding inside emulators:exec. (No-op when the cache is warm.)
+      - name: Pre-download Firestore emulator
+        working-directory: test/rules
+        run: npx firebase setup:emulators:firestore
       # Use a 'demo-' project so the emulator runs fully offline (no real
       # Firebase project / credentials). --project is required or the CLI errors
       # with "No currently active project".
