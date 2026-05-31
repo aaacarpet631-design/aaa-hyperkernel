@@ -16,6 +16,7 @@
   function cfg() { return global.AAA_CONFIG; }
   function os() { return global.AAA_AGENT_OS; }
   function data() { return global.AAA_DATA; }
+  function esc() { return global.AAA_ESCALATION; }
 
   const Automation = {
     _bound: false,
@@ -74,17 +75,30 @@
     async _onJobCreated(p) {
       if (!this.active() || !p || !p.jobId) return;
       const job = await this._job(p.jobId);
-      if (job) await this._runWorkflow('new_job_intake', 'job.created', () => os().runMeeting('New job intake: qualify the lead and plan the first steps.', this._ctx(job), ['sales', 'operations']), p);
+      if (job) { const ctx = this._ctx(job); await this._runWorkflow('new_job_intake', 'job.created', () => this._escalate(() => os().runMeeting('New job intake: qualify the lead and plan the first steps.', ctx, ['sales', 'operations']), ctx), p); }
     },
     async _onEstimate(p) {
       if (!this.active() || !p || !p.jobId) return;
       const job = await this._job(p.jobId);
-      if (job) await this._runWorkflow('estimate_margin_review', 'estimate.added', () => os().runAgent('accounting', 'Review this estimate for margin, pricing floor, and profitability risk.', this._ctx(job)), p);
+      if (job) { const ctx = this._ctx(job); await this._runWorkflow('estimate_margin_review', 'estimate.added', () => this._escalate(() => os().runAgent('accounting', 'Review this estimate for margin, pricing floor, and profitability risk.', ctx), ctx), p); }
     },
     async _onClosed(p) {
       if (!this.active() || !p || !p.jobId) return;
       const job = await this._job(p.jobId);
-      if (job) await this._runWorkflow('post_close_followup', 'job.closed', () => os().runAgent('customer_success', 'The job just closed. Recommend follow-up and review-request actions to drive retention and repeat business.', this._ctx(job)), p);
+      if (job) { const ctx = this._ctx(job); await this._runWorkflow('post_close_followup', 'job.closed', () => this._escalate(() => os().runAgent('customer_success', 'The job just closed. Recommend follow-up and review-request actions to drive retention and repeat business.', ctx), ctx), p); }
+    },
+
+    /**
+     * Run a proposal, then route it through the Escalation Policy: high-stakes
+     * proposals are challenged (Critic → Risk → Counterargument → Supervisor)
+     * before they count; everything else passes through unchanged. Degrades to
+     * the raw proposal if the policy module is absent — never blocks a workflow.
+     */
+    async _escalate(proposalFn, ctx) {
+      const proposal = await proposalFn();
+      if (!proposal || proposal.ok === false || !esc() || !esc().review) return proposal;
+      const reviewed = await esc().review(proposal, ctx);
+      return reviewed && reviewed.escalated ? reviewed : proposal;
     },
 
     /**
