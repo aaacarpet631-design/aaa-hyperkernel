@@ -31,6 +31,14 @@ service cloud.firestore {
     function isServerOnlyCollection(c) {
       return c == 'integrations';
     }
+    // Collections that have their OWN dedicated match block below and must NOT
+    // also be granted by the generic wildcard. Firestore allows a request if
+    // ANY matching rule allows it, so without this guard the wildcard would
+    // silently override the stricter rules for members + audit_log (any member
+    // could read/edit/delete the audit_log and write member docs).
+    function isSpecialCollection(c) {
+      return c == 'members' || c == 'audit_log' || isServerOnlyCollection(c);
+    }
 
     match /workspaces/{ws} {
       allow read: if isMember(ws);
@@ -52,11 +60,11 @@ service cloud.firestore {
       // All other workspace-scoped collections. Financial collections are
       // owner-only; everything else is any member.
       match /{collection}/{docId} {
-        allow read, write: if isMember(ws) && !isServerOnlyCollection(collection)
+        allow read, write: if isMember(ws) && !isSpecialCollection(collection)
           && (!isFinancialCollection(collection) || isOwner(ws));
       }
       match /{collection}/{docId}/{sub=**} {
-        allow read, write: if isMember(ws) && !isServerOnlyCollection(collection)
+        allow read, write: if isMember(ws) && !isSpecialCollection(collection)
           && (!isFinancialCollection(collection) || isOwner(ws));
       }
     }

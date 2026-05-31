@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    name: Unit + integrity + boot smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # The core suite is zero-dependency: no install needed.
+      - name: Run test suite
+        run: npm test
+
+  rules:
+    name: Firestore rules (emulator)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install rules test deps
+        working-directory: test/rules
+        run: npm install
+      - name: Run Firestore rules tests (emulator)
+        working-directory: test/rules
+        run: npx firebase emulators:exec --only firestore "npm test"
