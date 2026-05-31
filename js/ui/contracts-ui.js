@@ -39,6 +39,9 @@
         '<strong style="color:' + (color[c.status] || '#F8FAFC') + '">' + esc(c.customerName) + ' — $' + Number(c.total).toFixed(2) + '</strong>' +
         '<div class="aaa-list-sub">' + esc(c.status) + (c.signature ? ' · signed by ' + esc(c.signature.name) : '') + '</div>' });
       row.appendChild(ui.button({ label: c.status === 'signed' ? 'View' : 'Open', size: 'sm', variant: 'secondary', onClick: () => openContract(c.id) }));
+      if (global.AAA_PORTAL_LINKS && c.status !== 'void') {
+        row.appendChild(ui.button({ label: 'Share', size: 'sm', variant: 'ghost', onClick: () => shareContract(c) }));
+      }
       body.appendChild(row);
     });
 
@@ -152,6 +155,36 @@
       clear: () => { ctx.clearRect(0, 0, canvas.width, canvas.height); dirty = false; },
       toDataUrl: () => canvas.toDataURL('image/png')
     };
+  }
+
+  // Generate (or reuse) a customer share link and present it to copy/send.
+  async function shareContract(contract) {
+    const ui = U();
+    const links = global.AAA_PORTAL_LINKS;
+    const s = ui.sheet({ title: 'Share with customer', subtitle: contract.customerName, size: 'sm' });
+    document.body.appendChild(s.overlay);
+
+    const cloudReady = !!(data() && data().cloudReady && data().cloudReady());
+    if (!cloudReady) {
+      s.body.appendChild(ui.el('p', { className: 'aaa-voice-hint', text: 'Cloud is not connected yet. You can still create the link, but the customer page only works once Firestore + the portal function are set up (see functions/portal-proxy).' }));
+    }
+
+    const existing = (await links.forContract(contract.id)).filter((l) => links.isLive(l));
+    const res = existing.length ? { ok: true, link: existing[0], url: links.urlFor(existing[0].id) } : await links.create(contract, { expiresInDays: 30, allowSign: true });
+    if (!res.ok) { s.body.appendChild(ui.el('p', { className: 'aaa-empty', text: 'Could not create link: ' + res.error })); return; }
+
+    const urlField = ui.el('input', { className: 'aaa-input', attrs: { type: 'text', readonly: 'readonly', value: res.url } });
+    s.body.appendChild(ui.el('div', { className: 'aaa-form' }, [ui.el('label', { className: 'aaa-field-label', text: 'Customer link (expires in 30 days)' }), urlField]));
+
+    s.body.appendChild(ui.button({ label: 'Copy link', icon: '📋', variant: 'primary', full: true, onClick: async () => {
+      try { await navigator.clipboard.writeText(res.url); } catch (_) { urlField.select(); }
+      urlField.select();
+    } }));
+    if (navigator.share) {
+      s.body.appendChild(ui.button({ label: 'Send…', icon: '📤', variant: 'secondary', full: true, onClick: () => navigator.share({ title: 'Your work agreement', url: res.url }).catch(function () {}) }));
+    }
+    s.body.appendChild(ui.button({ label: 'Revoke link', variant: 'ghost', full: true, onClick: async () => { await links.revoke(res.link.id); s.close(); } }));
+    s.body.appendChild(ui.button({ label: 'Done', variant: 'ghost', full: true, onClick: () => s.close() }));
   }
 
   global.AAA_CONTRACTS_UI = { open: open };
