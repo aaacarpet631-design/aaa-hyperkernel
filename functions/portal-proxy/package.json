@@ -1,0 +1,15 @@
+{
+  "name": "aaa-portal-proxy",
+  "version": "1.0.0",
+  "description": "Public token-authenticated customer portal proxy for AAA HyperKernel. Resolves share tokens server-side and returns a redacted (whitelist) customer view; allows the customer to sign their own contract.",
+  "main": "index.js",
+  "engines": { "node": "20" },
+  "scripts": {
+    "deploy": "firebase deploy --only functions:portalProxy",
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.6.0",
+    "firebase-functions": "^5.1.0"
+  }
+}
