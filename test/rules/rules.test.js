@@ -3,6 +3,18 @@
  *   cd test/rules && npm install
  *   npx firebase emulators:exec --only firestore "npm test"
  *
+ * NOTE on firebase.json: its "firestore" config is intentionally EMPTY ({}).
+ * The canonical rules live at the repo root (../../firestore.rules), which is
+ * OUTSIDE this emulator project directory, and firebase-tools refuses a rules
+ * path outside the project root ("... is outside of project directory"), which
+ * fails the emulator at startup. We do NOT need the emulator to load the rules
+ * itself: this test deploys the real rules into the test environment directly,
+ * by reading ../../firestore.rules and passing it to initializeTestEnvironment
+ * below. That is the source of truth the assertions run against (the 19 checks,
+ * including every assertFails() denial, pass precisely because THESE rules are
+ * in force — not the emulator's default). Do not add a "rules" path back to
+ * firebase.json or the emulator will fail to start in CI.
+ *
  * Proves the guarantees the app relies on:
  *   - workspace isolation (non-members blocked),
  *   - crew CANNOT read financial collections; owner CAN,
