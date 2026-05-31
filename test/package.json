@@ -1,0 +1,6 @@
+{
+  "name": "aaa-hyperkernel-tests",
+  "private": true,
+  "type": "commonjs",
+  "description": "Zero-dependency CommonJS test harness. The repo root is an ESM package; this nested package.json forces the test tree to CommonJS so the suites can require() the browser-global app sources."
+}
