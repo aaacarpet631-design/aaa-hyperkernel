@@ -78,6 +78,9 @@
       ]));
       container.appendChild(ui.button({ label: 'Record expense', icon: '🧾', variant: 'secondary', full: true, onClick: () => expenseForm(container) }));
       container.appendChild(ui.button({ label: 'Record payment', icon: '💵', variant: 'secondary', full: true, onClick: () => paymentForm(container) }));
+      if (global.AAA_QUICKBOOKS_EXPORT) {
+        container.appendChild(ui.button({ label: 'Export to QuickBooks (CSV)', icon: '📤', variant: 'secondary', full: true, onClick: () => quickbooksExport() }));
+      }
     }
 
     // Upcoming schedule (real)
@@ -162,6 +165,25 @@
     const gw = global.AAA_RUNTIME_GATEWAY;
     if (!gw) return mutate();
     return gw.run({ action: action, origin: 'human', mutate: mutate });
+  }
+
+  // QuickBooks export: pick a dataset, preview the count, download the CSV.
+  async function quickbooksExport() {
+    const ui = U();
+    const qb = global.AAA_QUICKBOOKS_EXPORT;
+    const s = ui.sheet({ title: 'Export to QuickBooks', subtitle: 'Download CSV files to import into QuickBooks' });
+    document.body.appendChild(s.overlay);
+    const all = await qb.exportAll();
+    const mk = (label, bundle) => {
+      const row = ui.el('div', { className: 'aaa-list-row', html: '<strong>' + label + '</strong><div class="aaa-list-sub">' + bundle.count + ' record(s) · ' + bundle.filename + '</div>' });
+      row.appendChild(ui.button({ label: 'Download', size: 'sm', variant: 'primary', onClick: () => qb.download(bundle) }));
+      s.body.appendChild(row);
+    };
+    mk('Invoices', all.invoices);
+    mk('Expenses', all.expenses);
+    mk('Payments', all.payments);
+    s.body.appendChild(ui.el('p', { className: 'aaa-voice-hint', text: 'In QuickBooks: Settings → Import Data → choose Invoices / Expenses, then upload the matching CSV.' }));
+    s.body.appendChild(ui.button({ label: 'Done', variant: 'ghost', full: true, onClick: () => s.close() }));
   }
 
   // Customer-centric graph explorer: pick a customer → see everything linked.
