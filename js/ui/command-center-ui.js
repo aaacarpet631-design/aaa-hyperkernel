@@ -238,6 +238,11 @@
       if (!reqs.length) body.appendChild(empty('Review requests are prepared automatically when a job is closed.'));
     }
 
+    // ---- Decision challenges (Internal Challenge Protocol) ----
+    if (global.AAA_CHALLENGE_UI && global.AAA_CHALLENGE_UI.renderSection) {
+      try { await global.AAA_CHALLENGE_UI.renderSection(body); } catch (_) {}
+    }
+
     // ---- Agent meetings ----
     body.appendChild(section('Agent Meetings'));
     const meetings = logs.filter((l) => l.agent === 'meeting').slice(0, 5);
