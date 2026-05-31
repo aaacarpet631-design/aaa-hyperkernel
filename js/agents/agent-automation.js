@@ -74,17 +74,46 @@
     async _onJobCreated(p) {
       if (!this.active() || !p || !p.jobId) return;
       const job = await this._job(p.jobId);
-      if (job) await os().runMeeting('New job intake: qualify the lead and plan the first steps.', this._ctx(job), ['sales', 'operations']);
+      if (job) await this._runWorkflow('new_job_intake', 'job.created', () => os().runMeeting('New job intake: qualify the lead and plan the first steps.', this._ctx(job), ['sales', 'operations']), p);
     },
     async _onEstimate(p) {
       if (!this.active() || !p || !p.jobId) return;
       const job = await this._job(p.jobId);
-      if (job) await os().runAgent('accounting', 'Review this estimate for margin, pricing floor, and profitability risk.', this._ctx(job));
+      if (job) await this._runWorkflow('estimate_margin_review', 'estimate.added', () => os().runAgent('accounting', 'Review this estimate for margin, pricing floor, and profitability risk.', this._ctx(job)), p);
     },
     async _onClosed(p) {
       if (!this.active() || !p || !p.jobId) return;
       const job = await this._job(p.jobId);
-      if (job) await os().runAgent('customer_success', 'The job just closed. Recommend follow-up and review-request actions to drive retention and repeat business.', this._ctx(job));
+      if (job) await this._runWorkflow('post_close_followup', 'job.closed', () => os().runAgent('customer_success', 'The job just closed. Recommend follow-up and review-request actions to drive retention and repeat business.', this._ctx(job)), p);
+    },
+
+    /**
+     * Run one automation workflow with an auditable activity log entry: a
+     * "started" then a "completed"/"failed" record in agent_logs (shared
+     * memory). Failures are caught and logged rather than thrown, so one bad
+     * workflow never breaks the event bus; the log makes every run visible.
+     */
+    async _runWorkflow(workflow, event, fn, payload) {
+      const log = (status, extra) => {
+        try { if (data() && data().logAgent) data().logAgent('automation', 'Workflow ' + workflow + ' ' + status, Object.assign({ workflow: workflow, event: event, status: status, jobId: payload && payload.jobId }, extra || {})); } catch (_) {}
+      };
+      log('started');
+      try {
+        const res = await fn();
+        log(res && res.ok === false ? 'failed' : 'completed', { error: res && res.error });
+        return res;
+      } catch (err) {
+        log('failed', { error: String((err && err.message) || err) });
+        return { ok: false, error: 'WORKFLOW_ERROR' };
+      }
+    },
+
+    /** Recent automation activity (auditable). Newest first. */
+    async recentActivity(limit) {
+      if (!data()) return [];
+      const logs = await data().list('agent_logs');
+      return logs.filter((l) => l && l.agent === 'automation')
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).slice(0, limit || 50);
     }
   };
 

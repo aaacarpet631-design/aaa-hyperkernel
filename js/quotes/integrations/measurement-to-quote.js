@@ -36,6 +36,14 @@
     range_spread: 0.12             // +/-12% shown as the quote range
   };
 
+  // HARD BUSINESS RULES — enforced in code, NOT part of the editable rate card,
+  // so neither AI nor a rate-card edit can violate them. (Owner can raise the
+  // shampoo floor via shampoo_min_per_room, but never below the $45 hard floor.)
+  const RULES = {
+    SHAMPOO_HARD_FLOOR_PER_ROOM: 45.00,  // carpet shampoo: never less than $45/room
+    STAIR_LABOR_MULTIPLIER: 1.5          // stairs are higher labor + risk
+  };
+
   // Service catalog: which rate keys + which measurement fields each uses.
   const SERVICES = {
     carpet_install:   { label: 'Carpet Installation',  kind: 'area',   labor: 'install_per_sqft',    material: ['material_per_sqft', 'pad_per_sqft'], waste: true },
@@ -72,6 +80,7 @@
       const list = Array.isArray(sessions) ? sessions : [sessions];
 
       let area = 0, linear = 0, stairs = 0, units = list.length;
+      const rooms = list.filter((s) => s).length;   // # of rooms this service covers
       list.forEach((s) => {
         if (!s) return;
         if (s.squareFeet != null) area += s.squareFeet;
@@ -80,6 +89,7 @@
       });
 
       let labor = 0, material = 0, basis = '';
+      const ruleNotes = [];   // internal trace of which hard rules fired
       if (svc.kind === 'area') {
         labor = area * (r[svc.labor] || 0);
         basis = round(area, 1) + ' ft²';
@@ -92,14 +102,29 @@
         labor = linear * (r[svc.labor] || 0);
         basis = round(linear, 1) + ' linear ft';
       } else if (svc.kind === 'stairs') {
-        labor = stairs * (r[svc.labor] || 0);
+        // HARD RULE: stairs are higher labor + risk → multiplier applied.
+        labor = stairs * (r[svc.labor] || 0) * RULES.STAIR_LABOR_MULTIPLIER;
         basis = stairs + ' stairs';
+        if (stairs > 0) ruleNotes.push('stair labor ×' + RULES.STAIR_LABOR_MULTIPLIER);
       } else if (svc.kind === 'flat') {
         labor = units * (r[svc.labor] || 0);
         basis = units + ' unit' + (units === 1 ? '' : 's');
       }
 
       let subtotal = labor + material;
+
+      // HARD RULE: carpet shampoo has a per-room floor that nothing can drop
+      // below — not AI, not a rate-card edit. Owner may raise it via
+      // shampoo_min_per_room, but never below the $45 hard floor.
+      if (serviceId === 'carpet_shampoo' && rooms > 0) {
+        const perRoom = Math.max(RULES.SHAMPOO_HARD_FLOOR_PER_ROOM, Number(r.shampoo_min_per_room) || 0);
+        const shampooFloor = perRoom * rooms;
+        if (subtotal < shampooFloor) {
+          subtotal = shampooFloor;
+          ruleNotes.push('shampoo floor $' + perRoom + '/room × ' + rooms);
+        }
+      }
+
       const belowMin = subtotal < (r.min_job || 0);
       if (belowMin) subtotal = r.min_job || 0;
 
@@ -118,6 +143,8 @@
         _labor: round(labor, 2),
         _material: round(material, 2),
         _belowMin: belowMin,
+        _rooms: rooms,
+        _ruleNotes: ruleNotes,            // which hard rules fired (internal)
         // Customer-safe:
         subtotal: round(subtotal, 2),
         range: '$' + low + '–$' + high,
@@ -125,6 +152,9 @@
         area: round(area, 1), linear: round(linear, 1), stairs: stairs
       };
     },
+
+    /** The hard, non-overridable business rules (for display/verification). */
+    rules: function () { return Object.assign({}, RULES); },
 
     /**
      * Build a full quote draft from selected services over the given sessions.

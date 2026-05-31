@@ -27,6 +27,18 @@
   async function render(container) {
     const ui = U();
     container.innerHTML = '';
+
+    // RBAC: the Business tab exposes revenue, close rate, channel ROI and the
+    // knowledge graph — owner-only financials. Crew/managers are stopped here
+    // with an honest message rather than being shown the numbers.
+    const rbac = global.AAA_RBAC;
+    if (rbac && !rbac.can('VIEW_FINANCIALS')) {
+      container.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+        '<strong>🔒 Financials are owner-only</strong>' +
+        '<div class="aaa-list-sub">Signed in as ' + esc(rbac.label()) + '. Revenue, margins, and business analytics are restricted to the owner.</div>' }));
+      return;
+    }
+
     container.appendChild(ui.spinner('Loading business overview…'));
 
     const jobs = await data().listJobs();
@@ -49,6 +61,24 @@
       chip(closeRate, 'Close Rate', '#DC2626'),
       chip(customers.length, 'Customers', '#A1A1AA')
     ]));
+
+    // Accounting / P&L (owner-only — this whole tab is already VIEW_FINANCIALS).
+    if (global.AAA_ACCOUNTING) {
+      const acct = await global.AAA_ACCOUNTING.summary();
+      container.appendChild(title('Accounting — Profit & Loss'));
+      container.appendChild(ui.el('section', { className: 'aaa-summary' }, [
+        chip('$' + acct.collected, 'Collected', '#10B981'),
+        chip('$' + acct.expensed, 'Expenses', '#F59E0B'),
+        chip('$' + acct.profit, 'Profit', acct.profit >= 0 ? '#10B981' : '#EF4444')
+      ]));
+      container.appendChild(ui.el('section', { className: 'aaa-summary' }, [
+        chip('$' + acct.billed, 'Billed', '#94A3B8'),
+        chip('$' + acct.outstanding, 'Outstanding', '#DC2626'),
+        chip(acct.marginPct != null ? acct.marginPct + '%' : '—', 'Margin', '#A1A1AA')
+      ]));
+      container.appendChild(ui.button({ label: 'Record expense', icon: '🧾', variant: 'secondary', full: true, onClick: () => expenseForm(container) }));
+      container.appendChild(ui.button({ label: 'Record payment', icon: '💵', variant: 'secondary', full: true, onClick: () => paymentForm(container) }));
+    }
 
     // Upcoming schedule (real)
     container.appendChild(title('Upcoming Schedule'));
@@ -92,6 +122,46 @@
       const sent = reqs.filter((r) => r.status === 'sent').length;
       container.appendChild(row('<strong>' + reqs.length + ' prepared</strong><div class="aaa-list-sub">' + sent + ' sent</div>'));
     }
+  }
+
+  // Expense entry — routed through the Runtime Gateway (MODIFY_ACCOUNTING),
+  // so it's RBAC-checked (owner) and audited.
+  function expenseForm(container) {
+    const ui = U();
+    const s = ui.sheet({ title: 'Record expense', size: 'sm' });
+    document.body.appendChild(s.overlay);
+    const cat = ui.el('input', { className: 'aaa-input', attrs: { type: 'text', placeholder: 'Category (materials, fuel, labor…)' } });
+    const desc = ui.el('input', { className: 'aaa-input', attrs: { type: 'text', placeholder: 'Description' } });
+    const amt = ui.el('input', { className: 'aaa-input', attrs: { type: 'number', step: '0.01', inputmode: 'decimal', placeholder: 'Amount ($)' } });
+    s.body.appendChild(ui.el('div', { className: 'aaa-form' }, [cat, desc, amt]));
+    s.body.appendChild(ui.button({ label: 'Save expense', variant: 'primary', full: true, onClick: async () => {
+      const amount = parseFloat(amt.value); if (!isFinite(amount) || amount <= 0) return;
+      await gatedWrite('MODIFY_ACCOUNTING', () => global.AAA_ACCOUNTING.addExpense({ category: cat.value.trim(), description: desc.value.trim(), amount: amount }));
+      s.close(); await render(container);
+    } }));
+    s.body.appendChild(ui.button({ label: 'Cancel', variant: 'ghost', full: true, onClick: () => s.close() }));
+  }
+
+  // Payment entry — routed through the gateway (APPROVE_PAYMENT).
+  function paymentForm(container) {
+    const ui = U();
+    const s = ui.sheet({ title: 'Record payment', size: 'sm' });
+    document.body.appendChild(s.overlay);
+    const amt = ui.el('input', { className: 'aaa-input', attrs: { type: 'number', step: '0.01', inputmode: 'decimal', placeholder: 'Amount ($)' } });
+    const method = ui.el('select', { className: 'aaa-input' }, ['cash', 'card', 'check', 'transfer'].map((m) => ui.el('option', { text: m, attrs: { value: m } })));
+    s.body.appendChild(ui.el('div', { className: 'aaa-form' }, [amt, method]));
+    s.body.appendChild(ui.button({ label: 'Save payment', variant: 'primary', full: true, onClick: async () => {
+      const amount = parseFloat(amt.value); if (!isFinite(amount) || amount <= 0) return;
+      await gatedWrite('APPROVE_PAYMENT', () => global.AAA_ACCOUNTING.recordPayment({ amount: amount, method: method.value }));
+      s.close(); await render(container);
+    } }));
+    s.body.appendChild(ui.button({ label: 'Cancel', variant: 'ghost', full: true, onClick: () => s.close() }));
+  }
+
+  async function gatedWrite(action, mutate) {
+    const gw = global.AAA_RUNTIME_GATEWAY;
+    if (!gw) return mutate();
+    return gw.run({ action: action, origin: 'human', mutate: mutate });
   }
 
   // Customer-centric graph explorer: pick a customer → see everything linked.

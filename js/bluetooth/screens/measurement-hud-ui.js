@@ -324,12 +324,15 @@
       if (!selections.length) { toast(body, 'Pick at least one service.', '#F59E0B'); return; }
       const q = quote().buildQuote(selections);
       state._lastQuote = q; state._lastSessions = sessions;
+      // RBAC: only roles that may see margins get the labor/material breakdown.
+      const rbac = global.AAA_RBAC;
+      const showMargins = !rbac || rbac.can('VIEW_MARGINS');
       out.innerHTML = '';
-      out.appendChild(title('Draft (internal) — needs your review'));
+      out.appendChild(title(showMargins ? 'Draft (internal) — needs your review' : 'Draft quote — needs owner review'));
       q.lines.forEach((l) => out.appendChild(ui.el('div', { className: 'aaa-list-row', html:
         '<strong>' + esc(l.label) + ' · ' + l.range + '</strong>' +
-        '<div class="aaa-list-sub">' + esc(l.basis) + ' · labor $' + l._labor + ' · material $' + l._material + '</div>' })));
-      out.appendChild(ui.el('div', { className: 'aaa-list-row', html: '<strong>Total ' + q.totalRange + '</strong><div class="aaa-list-sub">internal labor $' + q._laborTotal + ' · material $' + q._materialTotal + '</div>' }));
+        '<div class="aaa-list-sub">' + esc(l.basis) + (showMargins ? ' · labor $' + l._labor + ' · material $' + l._material : '') + '</div>' })));
+      out.appendChild(ui.el('div', { className: 'aaa-list-row', html: '<strong>Total ' + q.totalRange + '</strong>' + (showMargins ? '<div class="aaa-list-sub">internal labor $' + q._laborTotal + ' · material $' + q._materialTotal + '</div>' : '') }));
       out.appendChild(ui.button({ label: 'Preview customer receipt', icon: '🧾', variant: 'secondary', full: true, onClick: () => showReceipt(q) }));
       out.appendChild(ui.button({ label: 'Apply to job (for review)', icon: '✅', variant: 'primary', full: true, onClick: () => applyToJob(body, q, sessions) }));
     } }));
@@ -350,14 +353,28 @@
   async function applyToJob(body, q, sessions) {
     if (!state.jobId) { toast(body, 'Open this from a job to apply estimates.', '#F59E0B'); return; }
     const entries = quote().toEstimateEntries(q, { sessionIds: sessions.map((s) => s.id) });
-    const storage = global.AAA_LOCAL_FIRST_STORAGE;
-    let job = await storage.get('jobs', state.jobId);
-    if (!job) { toast(body, 'Job not found.', '#EF4444'); return; }
-    const updated = Object.assign({}, job, { estimates: (Array.isArray(job.estimates) ? job.estimates : []).concat(entries) });
-    await storage.put('jobs', state.jobId, updated);
-    // Mirror via the unified data layer so it syncs like every other estimate.
-    try { if (global.AAA_DATA && global.AAA_DATA.put) await global.AAA_DATA.put('jobs', state.jobId, updated); } catch (_) {}
-    if (events()) events().emit('estimate.added', { jobId: state.jobId, count: entries.length, source: 'measurement' });
+
+    // Route through the Runtime Gateway: human-origin ADD_ESTIMATE, RBAC-checked
+    // and audited. (These estimates stay needsReview — finalizing the customer
+    // price is a separate FINALIZE_PRICE action a person approves.)
+    const gw = global.AAA_RUNTIME_GATEWAY;
+    const doMutate = async () => {
+      const storage = global.AAA_LOCAL_FIRST_STORAGE;
+      const job = await storage.get('jobs', state.jobId);
+      if (!job) throw new Error('Job not found.');
+      const updated = Object.assign({}, job, { estimates: (Array.isArray(job.estimates) ? job.estimates : []).concat(entries) });
+      await storage.put('jobs', state.jobId, updated);
+      try { if (global.AAA_DATA && global.AAA_DATA.put) await global.AAA_DATA.put('jobs', state.jobId, updated); } catch (_) {}
+      if (events()) events().emit('estimate.added', { jobId: state.jobId, count: entries.length, source: 'measurement' });
+      return updated;
+    };
+
+    if (gw) {
+      const res = await gw.run({ action: 'ADD_ESTIMATE', origin: 'human', target: { type: 'job', id: state.jobId }, detail: { count: entries.length, source: 'measurement' }, mutate: doMutate });
+      if (!res.ok) { toast(body, res.message || res.error, '#EF4444'); return; }
+    } else {
+      await doMutate();
+    }
     toast(body, entries.length + ' estimate(s) added to the job for your review.', '#10B981');
   }
 

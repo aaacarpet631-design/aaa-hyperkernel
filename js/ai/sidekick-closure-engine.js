@@ -20,22 +20,28 @@
    * @returns {boolean}
    */
   function verifyPhotos(mediaEntries) {
-    if (!Array.isArray(mediaEntries) || mediaEntries.length === 0) return false;
-    // Look for explicit types
-    let hasBefore = false;
-    let hasAfter = false;
+    const d = photoEvidence(mediaEntries);
+    return d.before && d.after;
+  }
+
+  /**
+   * Break photo evidence into explicit before/after so the 9-point closure can
+   * gate items 7 & 8 independently. When media carry no BEFORE/AFTER tag we
+   * fall back to count: 1 photo satisfies "before", 2+ satisfies both.
+   * @returns {{ before: boolean, after: boolean, count: number }}
+   */
+  function photoEvidence(mediaEntries) {
+    if (!Array.isArray(mediaEntries) || mediaEntries.length === 0) return { before: false, after: false, count: 0 };
+    let hasBefore = false, hasAfter = false;
     for (const m of mediaEntries) {
       if (!m) continue;
-      const type = m.type || m.tag || '';
-      if (typeof type === 'string') {
-        const t = type.toUpperCase();
-        if (t.includes('BEFORE')) hasBefore = true;
-        if (t.includes('AFTER')) hasAfter = true;
-      }
+      const t = String(m.type || m.tag || '').toUpperCase();
+      if (t.includes('BEFORE')) hasBefore = true;
+      if (t.includes('AFTER')) hasAfter = true;
     }
-    if (hasBefore && hasAfter) return true;
-    // Fallback: if at least two photos exist, assume before/after present
-    return mediaEntries.length >= 2;
+    if (hasBefore || hasAfter) return { before: hasBefore, after: hasAfter, count: mediaEntries.length };
+    // Untagged fallback by count.
+    return { before: mediaEntries.length >= 1, after: mediaEntries.length >= 2, count: mediaEntries.length };
   }
 
   /**
@@ -91,8 +97,12 @@
       const notesStringOk = typeof job.notes === 'string' && job.notes.trim().length > 0;
       const notesOk = notesArrayOk || notesStringOk;
       const syncOk = verifySyncStatus();
+      const photoDetail = photoEvidence(mediaForJob);
       const autoVerified = {
         photos: photosOk,
+        beforePhotos: photoDetail.before,
+        afterPhotos: photoDetail.after,
+        photoCount: photoDetail.count,
         estimate: estimateOk,
         notes: notesOk,
         sync: syncOk
