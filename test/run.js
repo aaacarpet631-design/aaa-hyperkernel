@@ -13,6 +13,7 @@ const SUITES = [
   'unit/rbac.test.js',
   'unit/gateway.test.js',
   'unit/pricing.test.js',
+  'unit/huepar-s60.test.js',
   'unit/closure.test.js',
   'unit/accounting.test.js',
   'unit/crew-tools.test.js',
