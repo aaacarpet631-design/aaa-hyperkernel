@@ -186,6 +186,9 @@
     if (global.AAA_RUNTIME_GATEWAY && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_AUDIT_LOG'))) {
       actions.appendChild(ui.button({ label: 'Audit Log', icon: '🛡', variant: 'secondary', full: true, onClick: () => auditFlow(body) }));
     }
+    if (global.AAA_LEGAL_WAR_ROOM && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_LEGAL'))) {
+      actions.appendChild(ui.button({ label: 'Legal War Room', icon: '⚖️', variant: 'secondary', full: true, onClick: () => global.AAA_LEGAL_WAR_ROOM.open() }));
+    }
     if (global.AAA_CREW_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('MANAGE_CREW'))) {
       actions.appendChild(ui.button({ label: 'Crew & Tools', icon: '👷', variant: 'secondary', full: true, onClick: () => global.AAA_CREW_UI.open() }));
     }

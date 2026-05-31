@@ -45,7 +45,13 @@
     EDIT_RATE_CARD:    { permission: 'VIEW_PRICING_RATES', aiAllowed: false },
     // Lower-risk mutations a manager/crew may do; still audited.
     ADD_ESTIMATE:      { permission: 'CREATE_QUOTE',    aiAllowed: false },
-    EDIT_JOB:          { permission: 'EDIT_JOB',        aiAllowed: false }
+    EDIT_JOB:          { permission: 'EDIT_JOB',        aiAllowed: false },
+    // Legal Intelligence Division. Agents advise; humans record. The one
+    // AI-allowed action is preparing a fact package for human attorney review.
+    ADD_LEGAL_RECORD:     { permission: 'MANAGE_LEGAL', aiAllowed: false },
+    FILE_INCIDENT:        { permission: null,           aiAllowed: false },
+    PREPARE_LEGAL_REVIEW: { permission: null,           aiAllowed: true  },
+    RESOLVE_LEGAL_REVIEW: { permission: 'MANAGE_LEGAL', aiAllowed: false }
   };
 
   const Gateway = {
