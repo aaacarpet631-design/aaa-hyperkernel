@@ -35,7 +35,7 @@ Firebase emulator (Java) and a one-time install:
 ```bash
 cd test/rules
 npm install
-npx firebase emulators:exec --only firestore "npm test"
+npx firebase emulators:exec --only firestore --project demo-aaa-rules "npm test"
 ```
 Or from the repo root: `npm run test:rules` (after the install above).
 

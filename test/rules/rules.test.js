@@ -1,7 +1,7 @@
 /*
  * Firestore security-rules tests — run against the emulator via:
  *   cd test/rules && npm install
- *   npx firebase emulators:exec --only firestore "npm test"
+ *   npx firebase emulators:exec --only firestore --project demo-aaa-rules "npm test"
  *
  * Proves the guarantees the app relies on:
  *   - workspace isolation (non-members blocked),
@@ -18,16 +18,29 @@ const path = require('path');
 const { initializeTestEnvironment, assertSucceeds, assertFails } = require('@firebase/rules-unit-testing');
 const { setDoc, getDoc, updateDoc, deleteDoc, doc } = require('firebase/firestore');
 
-const PROJECT_ID = 'aaa-rules-test';
+const PROJECT_ID = 'demo-aaa-rules';   // 'demo-' prefix => emulator runs fully offline, no real project/credentials
 const WS = 'ws1';
 
 let pass = 0, fail = 0;
 async function check(label, p) { try { await p; pass++; } catch (e) { fail++; console.log('   FAIL: ' + label + ' -> ' + (e && e.message || e)); } }
 
+// "127.0.0.1:8080" -> { host, port } for initializeTestEnvironment; {} if unset.
+function parseEmulatorHost(v) {
+  if (!v) return {};
+  const m = String(v).match(/^(.*):(\d+)$/);
+  return m ? { host: m[1], port: Number(m[2]) } : {};
+}
+
 async function main() {
+  // Honor the emulator host the Firebase CLI advertises to child processes.
+  // Default to the firebase.json port so a bare `node rules.test.js` also works
+  // when the emulator is already running.
   const env = await initializeTestEnvironment({
     projectId: PROJECT_ID,
-    firestore: { rules: fs.readFileSync(path.join(__dirname, '..', '..', 'firestore.rules'), 'utf8') }
+    firestore: Object.assign(
+      { rules: fs.readFileSync(path.join(__dirname, '..', '..', 'firestore.rules'), 'utf8') },
+      parseEmulatorHost(process.env.FIRESTORE_EMULATOR_HOST)
+    )
   });
 
   // Seed with rules bypassed (members are not client-writable).

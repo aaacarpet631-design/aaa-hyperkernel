@@ -26,9 +26,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      # The Firestore emulator is a Java process — the runner needs a JDK.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
       - name: Install rules test deps
         working-directory: test/rules
         run: npm install
+      # Use a 'demo-' project so the emulator runs fully offline (no real
+      # Firebase project / credentials). --project is required or the CLI errors
+      # with "No currently active project".
       - name: Run Firestore rules tests (emulator)
         working-directory: test/rules
-        run: npx firebase emulators:exec --only firestore "npm test"
+        run: npx firebase emulators:exec --only firestore --project demo-aaa-rules "npm test"
