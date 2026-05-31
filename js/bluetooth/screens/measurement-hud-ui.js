@@ -35,7 +35,7 @@
     document.body.appendChild(sheet.overlay);
     if (ble() && ble().installLifecycleHandlers) ble().installLifecycleHandlers();
     // Re-render on connection state changes so status/battery stay live.
-    if (ble()) state.unsub = ble().subscribe(() => { if (state.view === 'scanner' || state.view === 'details' || state.view === 'capture') render(); });
+    if (ble()) state.unsub = ble().subscribe(() => { if (state.view === 'scanner' || state.view === 'details' || state.view === 'capture' || state.view === 'debug') render(); });
     const origClose = sheet.close;
     sheet.close = function () { if (state.unsub) { state.unsub(); state.unsub = null; } origClose(); if (events()) events().emit('hud:closed', { hud: 'measurement-hud' }); };
     go('setup');
@@ -55,6 +55,7 @@
       case 'quote': return renderSendToQuote(body);
       case 'history': return renderHistory(body);
       case 'manual': return renderTroubleshooting(body);
+      case 'debug': return renderFieldDebug(body);
       default: return renderSetup(body);
     }
   }
@@ -89,6 +90,9 @@
     body.appendChild(ui.button({ label: 'Enter measurements manually', icon: '✍️', variant: supported ? 'secondary' : 'primary', full: true, onClick: () => { startManualCapture(); } }));
     body.appendChild(ui.button({ label: 'Measurement history', icon: '📋', variant: 'ghost', full: true, onClick: () => go('history') }));
     body.appendChild(ui.button({ label: 'Troubleshooting / Manual mode', icon: '🛟', variant: 'ghost', full: true, onClick: () => go('manual') }));
+    if (supported) {
+      body.appendChild(ui.button({ label: 'Field debug (laser frames)', icon: '🐞', variant: 'ghost', full: true, onClick: () => go('debug') }));
+    }
     body.appendChild(ui.el('p', { className: 'aaa-voice-hint', text: 'Tip: measurements save on this device first, then sync to the cloud automatically when you have signal.' }));
   }
 
@@ -412,6 +416,79 @@
     body.appendChild(ui.el('p', { className: 'aaa-voice-hint', text: 'Manual entry always works and never blocks a quote — use it any time Bluetooth gives you trouble.' }));
     body.appendChild(ui.button({ label: 'Enter measurements manually', icon: '✍️', variant: 'primary', full: true, onClick: startManualCapture }));
     body.appendChild(navRow([{ label: 'Back', onClick: () => go('setup') }]));
+  }
+
+  // ---- Field Debug (laser frames) --------------------------------------
+  // Shows exactly what the laser sends so an unknown frame format can be mapped
+  // from REAL captures: device name, service UUID, characteristic UUID, raw hex,
+  // ASCII, parsed feet, confidence + unit source. No fabricated data — empty
+  // until the device actually sends frames.
+  function renderFieldDebug(body) {
+    const ui = U();
+    body.appendChild(title('Field Debug — Laser Frames'));
+    body.appendChild(statusPill());
+
+    const b = ble();
+    if (!(b && b.isSupported && b.isSupported())) {
+      body.appendChild(ui.el('p', { className: 'aaa-empty', text: b ? b.unsupportedReason() : 'Bluetooth unavailable.' }));
+      body.appendChild(navRow([{ label: 'Back', onClick: () => go('setup') }]));
+      return;
+    }
+
+    body.appendChild(ui.el('p', { className: 'aaa-voice-hint', text: 'Connect your Huepar S60-G-BT, then pull the trigger a few times. Every frame the device sends is shown below — use it to verify (or map) the reading format. Nothing here is sent to a quote.' }));
+
+    if (!b.isConnected()) {
+      body.appendChild(ui.el('div', { className: 'aaa-list-row', html: '<strong>Not connected</strong><div class="aaa-list-sub">Scan and connect a device to capture frames.</div>' }));
+      body.appendChild(ui.button({ label: 'Scan / connect', icon: '🔍', variant: 'primary', full: true, onClick: () => go('scanner') }));
+      body.appendChild(navRow([{ label: 'Back', onClick: () => go('setup') }]));
+      return;
+    }
+
+    const usingHuepar = b.adapterId && b.adapterId() === 'huepar-s60-g-bt';
+    const rich = b.supportsDebug && b.supportsDebug();
+    if (rich && b.setDebug) b.setDebug(true);   // ensure capture is on while viewing
+
+    body.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+      '<strong>' + (usingHuepar ? '🟢 Huepar adapter active' : '⚪ Generic adapter active') + '</strong>' +
+      '<div class="aaa-list-sub">' + (usingHuepar ? 'Huepar-aware parsing + de-dupe enabled.' : 'No brand match — generic parsing. Frames still captured for mapping.') + '</div>' }));
+
+    // Prefer the adapter's rich debug ring; fall back to the global raw log so
+    // even the generic adapter shows frames here.
+    const frames = (rich ? b.debugFrames(40) : null) || [];
+    const rawFallback = (!rich && global.AAA_BLE_RAW_LOG) ? global.AAA_BLE_RAW_LOG.recent(40) : [];
+
+    if (!frames.length && !rawFallback.length) {
+      body.appendChild(ui.el('p', { className: 'aaa-empty', text: 'No frames yet. Pull the laser trigger to send a reading.' }));
+    }
+
+    frames.forEach((f) => {
+      const feet = f.feet != null ? (f.feet + ' ft') : '— (unparsed)';
+      const conf = Math.round((f.confidence || 0) * 100) + '%';
+      body.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+        '<strong>' + esc(feet) + ' · conf ' + conf + (f.via ? ' · ' + esc(f.via) : '') + '</strong>' +
+        '<div class="aaa-list-sub">' + esc(f.deviceName || '') + (f.unit ? ' · unit ' + esc(f.unit) : '') + (f.unitSource ? ' (' + esc(f.unitSource) + ')' : '') + '</div>' +
+        '<div class="aaa-list-sub">svc ' + esc(shortUuid(f.serviceUuid)) + ' · char ' + esc(shortUuid(f.characteristicUuid)) + '</div>' +
+        '<div class="aaa-list-sub" style="font-family:monospace">hex ' + esc(f.hex || '') + '</div>' +
+        '<div class="aaa-list-sub" style="font-family:monospace">ascii "' + esc(f.ascii || '') + '"</div>' }));
+    });
+    rawFallback.forEach((f) => {
+      body.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+        '<strong>raw frame</strong>' +
+        '<div class="aaa-list-sub">svc ' + esc(shortUuid(f.serviceUuid)) + ' · char ' + esc(shortUuid(f.characteristicUuid)) + ' · ' + (f.byteLength || 0) + ' bytes</div>' +
+        '<div class="aaa-list-sub" style="font-family:monospace">hex ' + esc(f.hex || '') + '</div>' +
+        '<div class="aaa-list-sub" style="font-family:monospace">ascii "' + esc(f.ascii || '') + '"</div>' }));
+    });
+
+    body.appendChild(navRow([
+      { label: 'Refresh', icon: '🔄', onClick: () => render() },
+      { label: 'Clear', onClick: () => { if (rich && ble()._adapter && ble()._adapter.clearDebug) ble()._adapter.clearDebug(); if (global.AAA_BLE_RAW_LOG) global.AAA_BLE_RAW_LOG.clear(); render(); } },
+      { label: 'Back', onClick: () => go('setup') }
+    ]));
+  }
+  function shortUuid(u) {
+    if (!u) return '—';
+    const s = String(u);
+    return s.length > 8 ? s.slice(0, 8) + '…' : s;
   }
 
   // ---- helpers ----------------------------------------------------------

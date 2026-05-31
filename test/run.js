@@ -20,6 +20,7 @@ const SUITES = [
   'unit/contracts.test.js',
   'unit/quickbooks-online.test.js',
   'unit/portal-links.test.js',
+  'unit/huepar-adapter.test.js',
   'static/integrity.test.js',
   'smoke/boot.test.js'
 ];

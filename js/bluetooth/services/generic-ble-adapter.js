@@ -21,6 +21,20 @@
   const BATTERY_LEVEL_CHAR = 'battery_level';           // 0x2A19
   const DEFAULT_CONNECT_TIMEOUT = 15000;                // ms
 
+  // Web Bluetooth quirk: getPrimaryServices() only ever exposes services that
+  // were declared in `optionalServices` at requestDevice() time. The picker
+  // always runs through this generic adapter, so brand adapters (e.g. Huepar)
+  // register their custom service UUIDs here at load — otherwise their data
+  // service would be invisible after connecting. Battery is always included.
+  // This is additive: with no brand adapter loaded the list is just [battery].
+  const OPTIONAL_SERVICES = [BATTERY_SERVICE];
+  function registerOptionalServices(uuids) {
+    (uuids || []).forEach((u) => {
+      const v = (typeof u === 'string') ? u.toLowerCase() : u;
+      if (v != null && OPTIONAL_SERVICES.indexOf(v) === -1) OPTIONAL_SERVICES.push(v);
+    });
+  }
+
   function rawLog() { return global.AAA_BLE_RAW_LOG; }
   function parser() { return global.AAA_MEASUREMENT_PARSER; }
 
@@ -68,7 +82,7 @@
       try {
         const device = await global.navigator.bluetooth.requestDevice({
           acceptAllDevices: true,
-          optionalServices: [BATTERY_SERVICE]
+          optionalServices: OPTIONAL_SERVICES.slice()
         });
         this._device = device;
         return { ok: true, device: { id: device.id, name: device.name || 'Unknown device' } };
@@ -189,6 +203,12 @@
     if (name === 'NetworkError') return 'Lost connection to the device. Re-select it and reconnect.';
     return msg;
   }
+
+  // Let brand adapters contribute custom service UUIDs to the picker request
+  // (see OPTIONAL_SERVICES note above). Static so it's callable before any
+  // instance exists.
+  GenericBleMeasurementAdapter.registerOptionalServices = registerOptionalServices;
+  GenericBleMeasurementAdapter.optionalServices = function () { return OPTIONAL_SERVICES.slice(); };
 
   // Export the class + a shared singleton instance.
   global.AAA_GENERIC_BLE_ADAPTER = GenericBleMeasurementAdapter;

@@ -6,7 +6,7 @@
  * app fully usable offline. Old caches are purged on activate, and the worker
  * takes control immediately to avoid serving a stale shell after an update.
  */
-const CACHE_NAME = 'hyperkernel-v29';
+const CACHE_NAME = 'hyperkernel-v30';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -81,6 +81,7 @@ const PRECACHE = [
   '/js/bluetooth/services/measurement-parser.js',
   '/js/bluetooth/services/generic-ble-adapter.js',
   '/js/bluetooth/services/device-adapter-registry.js',
+  '/js/bluetooth/services/huepar-s60-g-bt-adapter.js',
   '/js/bluetooth/hooks/use-bluetooth-connection.js',
   '/js/bluetooth/screens/measurement-hud-ui.js',
   '/js/quotes/integrations/measurement-to-quote.js'

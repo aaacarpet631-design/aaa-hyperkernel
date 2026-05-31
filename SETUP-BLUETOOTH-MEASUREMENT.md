@@ -134,6 +134,102 @@ the exact frames you need to parse.
 
 ---
 
+## Huepar S60-G-BT (first-class adapter)
+
+`js/bluetooth/services/huepar-s60-g-bt-adapter.js` adds dedicated support for
+the **Huepar S60-G-BT** laser distance meter. It is a thin subclass of the
+generic adapter — it inherits all the real Web Bluetooth work (picker, GATT
+connect, subscribe-to-everything, battery, reconnect, timeouts, raw logging) and
+overrides only:
+
+- `parse()` — Huepar-aware: tries ASCII text with an explicit unit first
+  (`"1.234 m"`, `10ft 6in`, `40 1/2"`), reassembles ASCII that arrives split
+  across frames, then falls back to the shared binary heuristics. Adds a
+  **confidence** score and a **unit source** (`device-text` vs `inferred-binary`).
+- `_onValue()` — logs every raw frame, captures a rich **field-debug** frame,
+  and **de-dupes** identical readings within ~600 ms / ~1 mm so the HUD field
+  doesn't flicker while the trigger is held.
+
+It auto-registers in two places at load:
+1. With the **device registry** (`priority 50`) matching device names containing
+   *Huepar / S60 / S60-G-BT / Mileseey / laser / ldm / distance*, **or** the
+   Nordic UART service UUID.
+2. It contributes the **Nordic UART service UUID** to the generic adapter's
+   `optionalServices`, so the data service is actually visible after connect
+   (Web Bluetooth only exposes services declared at pick time).
+
+The generic adapter is **not otherwise modified** and still works for every
+other device.
+
+> ### Honest note on the frame format
+> The exact S60-G-BT wire format is not publicly documented. Huepar BT meters
+> are commonly Mileseey-family modules that stream the distance as **ASCII text
+> over Nordic UART** — which this adapter handles — but your specific unit may
+> differ. The adapter is built to **capture raw frames first**: nothing is ever
+> fabricated, `parse()` returns `null` for anything it can't confidently read,
+> and the **Field Debug** screen shows the exact bytes so we can finish the
+> mapping from your real device. If your unit's frames don't parse, send a few
+> captured rows (below) and we'll extend `parse()` precisely.
+
+### Field Debug mode
+
+Open a job → **Measure Room** → **Field debug (laser frames)**. Connect the
+S60-G-BT, then pull the trigger. Each frame shows:
+
+- **device name**
+- **service UUID** and **characteristic UUID**
+- **raw hex**
+- **ASCII value**
+- **parsed feet** (or "— (unparsed)")
+- **confidence** + **unit source**
+
+Nothing on this screen is sent to a quote — it's for verification/mapping only.
+Use **Clear** to reset, **Refresh** to re-read. The same raw frames are also in
+`AAA_BLE_RAW_LOG.all()` from the console.
+
+---
+
+## Testing on Android Chrome with the Huepar S60-G-BT
+
+**Prerequisites**
+- Android phone, **Chrome** (not Firefox/Samsung Internet — Web Bluetooth is
+  Chrome/Edge only on Android).
+- App opened over **https** (Netlify URL or the deployed PWA).
+- Phone **Bluetooth ON**; on Android 12+ allow Chrome's **Nearby devices**
+  prompt; if no devices appear, also enable **Location**.
+- S60-G-BT charged and powered on with **Bluetooth enabled** on the meter
+  (consult the unit; usually a BT button/icon until the indicator is solid).
+
+**Steps**
+1. Open a job → **Measure Room** → **Scan for a device** → **Scan (open picker)**.
+2. In the OS dialog pick the Huepar (it may show as `Huepar…`, `S60…`,
+   `Mileseey…`, or an unlabeled address — any is fine; select it).
+3. **Connect**. The status pill should read *connected*; battery shows if the
+   meter exposes it.
+4. Go to **Field debug (laser frames)** and pull the trigger 3–5 times.
+   - **Expected (happy path):** rows show parsed **feet** with `via ascii`,
+     `unit m (device-text)`, confidence ~90%, and a clean ASCII like `1.234 m`.
+   - **If rows show "— (unparsed)"** with hex/ASCII populated: the device speaks
+     a format we haven't mapped yet — capture a few rows (hex + ASCII + the real
+     distance you measured) and we'll extend `parse()`. **This is expected to be
+     possible and is not a failure** — the capture-first design is deliberate.
+5. Back to **Capture** → arm **Length** (or Width/Linear/Stairs) → pull the
+   trigger → confirm the value lands and **square feet** auto-computes from L×W.
+6. **Save room** → **Review Rooms** → **Send to quote** → **Build draft quote**.
+   Confirm nothing finalizes automatically (estimates are `needsReview`).
+7. **De-dupe check:** hold/repeat the trigger quickly — the field should take
+   one stable value, not flicker through duplicates.
+8. **Fallback check:** turn the meter off mid-session — the app should show a
+   clear disconnect/timeout message and **Manual Entry** must still work.
+
+**What to send us if mapping is needed** (from Field Debug or
+`AAA_BLE_RAW_LOG.all()`): for each trigger pull, the **hex**, the **ASCII**, and
+the **actual distance** you pointed at (measured with a tape). A handful of rows
+across short/long distances and unit settings (m vs ft) is enough to finish the
+adapter.
+
+---
+
 ## Testing checklist
 
 **Logic (verified with Node — parser/models/quote/store/AI all pass):**
@@ -145,6 +241,7 @@ the exact frames you need to parse.
 - [x] Registry: brand match wins, generic fallback otherwise.
 
 **Field (manual, on devices):**
+- [ ] **Huepar S60-G-BT, Android Chrome:** scan → connect → Field Debug shows frames → trigger lands in armed field → de-dupe stable → fallback to manual works. (Full procedure above.)
 - [ ] Android Chrome: scan → connect → trigger laser → value lands in armed field.
 - [ ] Battery shows when device exposes 0x180F.
 - [ ] Background the app, return → reconnect attempt fires.

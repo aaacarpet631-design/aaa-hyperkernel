@@ -161,6 +161,16 @@
       return r ? Object.assign({ at: this._state.lastReadingAt }, r) : null;
     },
 
+    // ---- field-debug passthrough ---------------------------------------
+    /** True when the active adapter supports rich field-debug frames. */
+    supportsDebug() { return !!(this._adapter && typeof this._adapter.debugFrames === 'function'); },
+    /** Toggle the adapter's debug capture (if supported). */
+    setDebug(on) { if (this._adapter && this._adapter.setDebug) this._adapter.setDebug(on); },
+    /** Active adapter's parsed debug frames (newest first), or []. */
+    debugFrames(n) { return this.supportsDebug() ? this._adapter.debugFrames(n) : []; },
+    /** Which adapter is live (e.g. 'huepar-s60-g-bt' | 'generic-ble'). */
+    adapterId() { return this._deviceRec ? this._deviceRec.adapterId : (this._adapter ? this._adapter.id : null); },
+
     // ---- background/foreground reconnect -------------------------------
     installLifecycleHandlers() {
       if (this._foregroundBound || typeof global.document === 'undefined') return;
