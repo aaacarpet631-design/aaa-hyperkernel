@@ -183,6 +183,28 @@
     mk('Expenses', all.expenses);
     mk('Payments', all.payments);
     s.body.appendChild(ui.el('p', { className: 'aaa-voice-hint', text: 'In QuickBooks: Settings → Import Data → choose Invoices / Expenses, then upload the matching CSV.' }));
+
+    // Live QuickBooks Online sync (OAuth) — shown with honest connection state.
+    const qbo = global.AAA_QUICKBOOKS_ONLINE;
+    if (qbo) {
+      const st = qbo.status();
+      s.body.appendChild(ui.el('h2', { className: 'aaa-section-title', text: 'QuickBooks Online (live sync)' }));
+      if (!st.configured) {
+        s.body.appendChild(ui.el('p', { className: 'aaa-voice-hint', text: 'Not configured. Add qboClientId, qboRedirectUri and a qboProxyUrl (Cloud Function) in settings to enable live sync. CSV export above works without setup.' }));
+      } else if (!st.connected) {
+        s.body.appendChild(ui.el('div', { className: 'aaa-list-row', html: '<strong>' + (st.expired ? 'Connection expired' : 'Not connected') + '</strong><div class="aaa-list-sub">' + esc(st.environment) + '</div>' }));
+        s.body.appendChild(ui.button({ label: 'Connect QuickBooks', icon: '🔗', variant: 'primary', full: true, onClick: () => {
+          const a = qbo.authUrl(); if (a.ok) global.open(a.url, '_blank'); } }));
+      } else {
+        s.body.appendChild(ui.el('div', { className: 'aaa-list-row', html: '<strong>✅ Connected</strong><div class="aaa-list-sub">' + esc(st.environment) + '</div>' }));
+        s.body.appendChild(ui.button({ label: 'Push invoices to QuickBooks', icon: '☁️', variant: 'primary', full: true, onClick: async () => {
+          const r = await qbo.pushAllInvoices();
+          s.body.appendChild(ui.el('p', { className: 'aaa-empty', text: r.ok ? (r.pushed + ' invoice(s) pushed.') : ('Sync failed: ' + r.error) }));
+        } }));
+        s.body.appendChild(ui.button({ label: 'Disconnect', variant: 'ghost', full: true, onClick: () => { qbo.disconnect(); s.close(); quickbooksExport(); } }));
+      }
+    }
+
     s.body.appendChild(ui.button({ label: 'Done', variant: 'ghost', full: true, onClick: () => s.close() }));
   }
 

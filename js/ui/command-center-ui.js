@@ -189,6 +189,9 @@
     if (global.AAA_CONTRACTS_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('CREATE_QUOTE'))) {
       actions.appendChild(ui.button({ label: 'Contracts', icon: '✍️', variant: 'secondary', full: true, onClick: () => global.AAA_CONTRACTS_UI.open() }));
     }
+    if (global.AAA_SCHEDULE_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('EDIT_JOB'))) {
+      actions.appendChild(ui.button({ label: 'Schedule & Dispatch', icon: '🗓', variant: 'secondary', full: true, onClick: () => global.AAA_SCHEDULE_UI.open() }));
+    }
     actions.appendChild(ui.button({ label: 'Run Company Standup', icon: '🧭', variant: 'primary', full: true, disabled: !aiReady, onClick: () => runStandup(body) }));
     if (provider === 'firebase' && global.AAA_CLOUD) {
       if (user) {
