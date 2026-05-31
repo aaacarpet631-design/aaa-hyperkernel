@@ -170,6 +170,9 @@
 
     // ---- Actions ----
     const actions = ui.el('div', { className: 'closure-actions' });
+    if (global.AAA_INTEL_DASHBOARD) {
+      actions.appendChild(ui.button({ label: 'Executive Intelligence', icon: '🧠', variant: 'primary', full: true, onClick: () => global.AAA_INTEL_DASHBOARD.open() }));
+    }
     if (global.AAA_PROMPT_ARCHITECT) {
       actions.appendChild(ui.button({ label: 'Create Agent (describe it)', icon: '✨', variant: 'primary', full: true, onClick: () => architectFlow(body) }));
     }
