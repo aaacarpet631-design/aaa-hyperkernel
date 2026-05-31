@@ -26,6 +26,11 @@ service cloud.firestore {
       return c == 'accounting' || c == 'invoices' || c == 'payments'
           || c == 'expenses' || c == 'kpi_snapshots' || c == 'rate_cards';
     }
+    // Collections only a trusted backend (Admin SDK) may touch. Notably
+    // 'integrations' holds QuickBooks OAuth tokens — clients must never read it.
+    function isServerOnlyCollection(c) {
+      return c == 'integrations';
+    }
 
     match /workspaces/{ws} {
       allow read: if isMember(ws);
@@ -47,10 +52,12 @@ service cloud.firestore {
       // All other workspace-scoped collections. Financial collections are
       // owner-only; everything else is any member.
       match /{collection}/{docId} {
-        allow read, write: if isMember(ws) && (!isFinancialCollection(collection) || isOwner(ws));
+        allow read, write: if isMember(ws) && !isServerOnlyCollection(collection)
+          && (!isFinancialCollection(collection) || isOwner(ws));
       }
       match /{collection}/{docId}/{sub=**} {
-        allow read, write: if isMember(ws) && (!isFinancialCollection(collection) || isOwner(ws));
+        allow read, write: if isMember(ws) && !isServerOnlyCollection(collection)
+          && (!isFinancialCollection(collection) || isOwner(ws));
       }
     }
   }
