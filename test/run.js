@@ -32,7 +32,8 @@ const SUITES = [
 // "N passed, M failed" and exit non-zero on failure.
 const EXTERNAL = [
   'functions/qbo-proxy/test.js',
-  'functions/portal-proxy/test.js'
+  'functions/portal-proxy/test.js',
+  'functions/nemotron-translate.test.js'
 ];
 
 function runSuite(rel) {
