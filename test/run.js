@@ -22,6 +22,7 @@ const SUITES = [
   'unit/quickbooks-online.test.js',
   'unit/portal-links.test.js',
   'unit/voice.test.js',
+  'unit/transcribe.test.js',
   'static/integrity.test.js',
   'smoke/boot.test.js'
 ];
