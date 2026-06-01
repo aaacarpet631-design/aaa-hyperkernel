@@ -29,7 +29,8 @@
     this.label = 'Generic Bluetooth (BLE)';
     this._device = null;       // BluetoothDevice (Web API)
     this._server = null;       // BluetoothRemoteGATTServer
-    this._chars = [];          // subscribed characteristics
+    this._chars = [];          // subscribed (notify/indicate) characteristics
+    this._writableChars = [];  // characteristics that accept writes (brand control)
     this._readingCbs = [];
     this._statusCbs = [];
     this._onDisconnectBound = this._onDisconnect.bind(this);
@@ -119,6 +120,7 @@
 
     async _subscribeAll() {
       this._chars = [];
+      this._writableChars = [];   // characteristics that accept writes (brand control)
       this._supportedServices = [];
       const services = await this._server.getPrimaryServices();
       for (const service of services) {
@@ -126,12 +128,19 @@
         let chars = [];
         try { chars = await service.getCharacteristics(); } catch (_) { continue; }
         for (const ch of chars) {
-          if (ch.properties && (ch.properties.notify || ch.properties.indicate)) {
+          const p = ch.properties || {};
+          if (p.notify || p.indicate) {
             try {
               await ch.startNotifications();
               ch.addEventListener('characteristicvaluechanged', (ev) => this._onValue(service.uuid, ev.target));
               this._chars.push(ch);
             } catch (_) { /* some chars refuse notifications; skip */ }
+          }
+          // Track writable characteristics by CAPABILITY (not a hardcoded UUID)
+          // so a brand adapter can trigger a measurement regardless of which
+          // service/UUID this particular firmware exposes.
+          if (p.write || p.writeWithoutResponse) {
+            this._writableChars.push(ch);
           }
         }
       }
