@@ -60,6 +60,8 @@
     get visionEndpoint() { return read('visionEndpoint', '/api/vision'); },
     /** Sync endpoint (Netlify Blobs by default). */
     get syncEndpoint() { return read('syncEndpoint', '/api/sync'); },
+    /** Audio transcription endpoint (Netlify Whisper proxy by default). */
+    get transcriptionEndpoint() { return read('transcriptionEndpoint', '/api/transcribe'); },
     /** Auto-pilot: let agents act on domain events. Off by default. */
     get autoAgents() { return !!read('autoAgents', false); },
     /** Business name + Google review link used in review-request messages. */

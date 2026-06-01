@@ -13,6 +13,7 @@ const SUITES = [
   'unit/rbac.test.js',
   'unit/gateway.test.js',
   'unit/pricing.test.js',
+  'unit/huepar-s60.test.js',
   'unit/closure.test.js',
   'unit/accounting.test.js',
   'unit/expense-classifier.test.js',
@@ -22,6 +23,8 @@ const SUITES = [
   'unit/contracts.test.js',
   'unit/quickbooks-online.test.js',
   'unit/portal-links.test.js',
+  'unit/voice.test.js',
+  'unit/transcribe.test.js',
   'static/integrity.test.js',
   'smoke/boot.test.js'
 ];
