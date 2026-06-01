@@ -28,7 +28,8 @@
       battery: null,
       lastReading: null,       // ParsedReading
       lastReadingAt: null,
-      error: null
+      error: null,
+      errorDetail: null        // { errorName, rawMessage, deviceName, discoveredServices }
     },
     _subs: [],
     _foregroundBound: null,
@@ -73,15 +74,22 @@
     /** Open the OS picker, resolve the right adapter, persist the device. */
     async scanAndPick() {
       if (!this.isSupported()) return { ok: false, error: 'UNSUPPORTED', message: this.unsupportedReason() };
-      const generic = registry().generic();
-      const picked = await generic.requestDevice();
+      const reg = registry();
+      const generic = reg.generic();
+      // Open the picker ONCE, declaring every registered brand's optional
+      // services up front. Without this the picked handle can only access the
+      // battery service, so a brand adapter's getPrimaryService() throws
+      // SecurityError on connect — the "error" users were seeing.
+      const optionalServices = reg.allOptionalServices ? reg.allOptionalServices() : [];
+      const picked = await generic.requestDevice({ optionalServices: optionalServices });
       if (!picked.ok) return picked;
 
       // Resolve a brand-specific adapter if one matches; else keep generic.
-      const resolved = registry().resolve({ name: picked.device.name });
+      const resolved = reg.resolve({ name: picked.device.name });
       this._adapter = resolved ? resolved.adapter : generic;
-      // The resolved adapter needs the picked device; generic already holds it.
-      if (this._adapter !== generic && this._adapter._device === null) this._adapter._device = generic._device;
+      // Hand the SAME picked BluetoothDevice handle to whichever adapter we use.
+      // (Web Bluetooth ties service access to this exact handle from the picker.)
+      if (this._adapter !== generic) this._adapter._device = generic._device;
 
       this._wireAdapter(resolved ? resolved.id : 'generic-ble');
 
@@ -99,7 +107,13 @@
       const a = this._adapter;
       if (!a) return;
       a.onStatus(async (status, detail) => {
-        this._set({ status: status, error: status === 'error' ? (detail && detail.message) : null });
+        this._set({
+          status: status,
+          error: status === 'error' ? (detail && detail.message) : null,
+          // Keep the full diagnostic on error so the screen can show the real
+          // cause + the device's advertised services (not just "error").
+          errorDetail: status === 'error' ? (detail || null) : null
+        });
         if (status === 'connected') {
           const battery = a.readBattery ? await a.readBattery() : null;
           this._set({ battery: battery });
