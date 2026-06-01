@@ -1,10 +1,11 @@
 /*
  * Transcription function — pure-logic unit tests (no network, no OpenAI).
  *
- * Exercises netlify/functions/transcribe-lib.mjs: audio validation (missing /
- * empty / oversize / content-type), Whisper confidence derivation from segment
- * logprobs, response normalization to the client shape, and provider-error
- * mapping. The .mjs lib is loaded via dynamic import (the suite runner awaits us).
+ * Exercises the pure helpers exported from netlify/functions/transcribe.mjs:
+ * audio validation (missing / empty / oversize / content-type), Whisper
+ * confidence derivation from segment logprobs, response normalization to the
+ * client shape, and provider-error mapping. The .mjs is loaded via dynamic
+ * import (the suite runner awaits us); Netlify ignores these non-default exports.
  */
 'use strict';
 const path = require('path');
@@ -12,7 +13,7 @@ const { makeRunner, ROOT } = require('../helpers/harness');
 
 module.exports = async function run() {
   const t = makeRunner('transcribe');
-  const lib = await import(path.join(ROOT, 'netlify/functions/transcribe-lib.mjs'));
+  const lib = await import(path.join(ROOT, 'netlify/functions/transcribe.mjs'));
 
   // ---- validateAudio -----------------------------------------------------
   t.eq('missing file → NO_AUDIO', lib.validateAudio(null).code, 'NO_AUDIO');

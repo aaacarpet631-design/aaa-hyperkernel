@@ -44,7 +44,7 @@ OPENAI_API_KEY = sk-...
 Without it the function returns `MISSING_API_KEY` and the client keeps the audio
 note for a later retry (transcription is additive, never required).
 
-Limits: 25 MB max upload (Whisper's limit), 60s function duration. To use a
-different provider, swap `WHISPER_URL`/`MODEL` and adjust
-`normalizeWhisperResponse` in `transcribe-lib.mjs` (kept pure + unit-tested in
-`test/unit/transcribe.test.js`).
+Limits: 25 MB max upload (Whisper's limit). To use a different provider, swap
+`WHISPER_URL`/`MODEL` and adjust `normalizeWhisperResponse` in `transcribe.mjs`
+— the pure helpers are exported from that file and unit-tested in
+`test/unit/transcribe.test.js`.
