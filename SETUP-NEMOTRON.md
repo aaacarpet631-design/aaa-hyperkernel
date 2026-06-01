@@ -82,6 +82,23 @@ The same "honest by construction" rule still holds: with no proxy configured,
 agents return `AI_NOT_CONFIGURED` and fall back to real data — they never
 fabricate.
 
+## Enabling "thinking" (reasoning mode)
+Nemotron is a reasoning model. Thinking is **off by default** so normal agent
+calls stay cheap; opt in per call by passing the same params NVIDIA's own
+example uses — the proxy forwards them through:
+```js
+await AAA_DATA.callAgent({
+  max_tokens: 4096,
+  messages: [{ role: 'user', content: 'Walk through the math, then answer.' }],
+  reasoning_budget: 16384,
+  chat_template_kwargs: { enable_thinking: true }
+});
+// → { ok:true, text:'<final answer>', reasoning:'<chain-of-thought>', usage, ... }
+```
+`top_p` defaults to NVIDIA's recommended `0.95` (override per call). The
+chain-of-thought is returned as `result.reasoning`; `result.text` always holds
+just the final answer so existing JSON parsers are unaffected.
+
 ## Notes & honest limits
 - **Vision estimating** (`/api/vision`) and **voice transcription**
   (`/api/transcribe`) still run on their existing functions. Nemotron-Omni

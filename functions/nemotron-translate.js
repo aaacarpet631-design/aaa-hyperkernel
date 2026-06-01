@@ -68,12 +68,23 @@ function toRequest(body, opts) {
     const role = m.role === 'assistant' ? 'assistant' : (m.role === 'system' ? 'system' : 'user');
     messages.push({ role: role, content: toOpenAIContent(m.content) });
   }
-  return {
+  const req = {
     model: resolveModel(body.model, opts.defaultModel),
     messages: messages,
     max_tokens: body.max_tokens || 1024,
     temperature: typeof body.temperature === 'number' ? body.temperature : 0.6,
+    // NVIDIA's recommended sampling for this model; override per-call if needed.
+    top_p: typeof body.top_p === 'number' ? body.top_p : 0.95,
   };
+  // Reasoning-model controls — forwarded only when a caller opts in, so default
+  // agent calls stay cheap and unchanged. Set chat_template_kwargs:
+  // { enable_thinking: true } (+ optional reasoning_budget) to turn on thinking;
+  // the chain-of-thought comes back as result.reasoning (see fromResponse).
+  if (typeof body.reasoning_budget === 'number') req.reasoning_budget = body.reasoning_budget;
+  if (body.chat_template_kwargs && typeof body.chat_template_kwargs === 'object') {
+    req.chat_template_kwargs = body.chat_template_kwargs;
+  }
+  return req;
 }
 
 /**

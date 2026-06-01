@@ -72,12 +72,21 @@ function toRequest(body: any): Record<string, unknown> {
     const role = m.role === "assistant" ? "assistant" : (m.role === "system" ? "system" : "user");
     messages.push({ role, content: toOpenAIContent(m.content) });
   }
-  return {
+  const req: Record<string, unknown> = {
     model: resolveModel(body.model),
     messages,
     max_tokens: body.max_tokens || 1024,
     temperature: typeof body.temperature === "number" ? body.temperature : 0.6,
+    top_p: typeof body.top_p === "number" ? body.top_p : 0.95,
   };
+  // Reasoning controls — forwarded only when the caller opts in (keeps default
+  // agent calls cheap). Set chat_template_kwargs:{ enable_thinking:true } to
+  // enable thinking; chain-of-thought returns as result.reasoning.
+  if (typeof body.reasoning_budget === "number") req.reasoning_budget = body.reasoning_budget;
+  if (body.chat_template_kwargs && typeof body.chat_template_kwargs === "object") {
+    req.chat_template_kwargs = body.chat_template_kwargs;
+  }
+  return req;
 }
 
 function fromResponse(data: any) {

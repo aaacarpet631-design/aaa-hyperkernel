@@ -33,6 +33,16 @@ ok('opts.defaultModel wins', toRequest({ messages: [{ role: 'user', content: 'x'
 ok('default max_tokens 1024', toRequest({ messages: [{ role: 'user', content: 'x' }] }).max_tokens === 1024);
 ok('unknown role coerced to user', toRequest({ messages: [{ role: 'tool', content: 'x' }] }).messages[0].role === 'user');
 
+// toRequest — reasoning controls (top_p default + opt-in thinking pass-through)
+const base = toRequest({ messages: [{ role: 'user', content: 'x' }] });
+ok('top_p defaults to 0.95', base.top_p === 0.95);
+ok('reasoning params absent by default', !('reasoning_budget' in base) && !('chat_template_kwargs' in base));
+const think = toRequest({ messages: [{ role: 'user', content: 'x' }], top_p: 0.8, reasoning_budget: 16384, chat_template_kwargs: { enable_thinking: true } });
+ok('top_p override honored', think.top_p === 0.8);
+ok('reasoning_budget forwarded when set', think.reasoning_budget === 16384);
+ok('chat_template_kwargs forwarded when set', think.chat_template_kwargs.enable_thinking === true);
+ok('non-number reasoning_budget ignored', !('reasoning_budget' in toRequest({ messages: [{ role: 'user', content: 'x' }], reasoning_budget: 'big' })));
+
 // fromResponse — OpenAI shape -> app shape
 const resp = fromResponse({ choices: [{ message: { content: 'hello', reasoning_content: 'because' }, finish_reason: 'stop' }], usage: { prompt_tokens: 7, completion_tokens: 3 } });
 ok('text extracted', resp.ok === true && resp.text === 'hello');
