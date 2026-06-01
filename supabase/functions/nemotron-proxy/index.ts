@@ -75,7 +75,8 @@ function toRequest(body: any): Record<string, unknown> {
   const req: Record<string, unknown> = {
     model: resolveModel(body.model),
     messages,
-    max_tokens: body.max_tokens || 1024,
+    // Middle-ground default (see nemotron-translate.js); override per call.
+    max_tokens: body.max_tokens || 8192,
     temperature: typeof body.temperature === "number" ? body.temperature : 0.6,
     top_p: typeof body.top_p === "number" ? body.top_p : 0.95,
   };

@@ -30,7 +30,8 @@ ok('user/assistant roles preserved', req.messages[1].role === 'user' && req.mess
 ok('max_tokens carried', req.max_tokens === 50);
 ok('claude model resolved to nemotron default', req.model === DEFAULT_MODEL);
 ok('opts.defaultModel wins', toRequest({ messages: [{ role: 'user', content: 'x' }] }, { defaultModel: 'nvidia/z' }).model === 'nvidia/z');
-ok('default max_tokens 1024', toRequest({ messages: [{ role: 'user', content: 'x' }] }).max_tokens === 1024);
+ok('default max_tokens 8192', toRequest({ messages: [{ role: 'user', content: 'x' }] }).max_tokens === 8192);
+ok('explicit max_tokens wins', toRequest({ messages: [{ role: 'user', content: 'x' }], max_tokens: 200 }).max_tokens === 200);
 ok('unknown role coerced to user', toRequest({ messages: [{ role: 'tool', content: 'x' }] }).messages[0].role === 'user');
 
 // toRequest — reasoning controls (top_p default + opt-in thinking pass-through)

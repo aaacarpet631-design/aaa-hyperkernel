@@ -71,7 +71,9 @@ function toRequest(body, opts) {
   const req = {
     model: resolveModel(body.model, opts.defaultModel),
     messages: messages,
-    max_tokens: body.max_tokens || 1024,
+    // Middle-ground default: room for a reasoning answer without risking a
+    // runaway near NVIDIA's 65536 ceiling. Override per call as needed.
+    max_tokens: body.max_tokens || 8192,
     temperature: typeof body.temperature === 'number' ? body.temperature : 0.6,
     // NVIDIA's recommended sampling for this model; override per-call if needed.
     top_p: typeof body.top_p === 'number' ? body.top_p : 0.95,
