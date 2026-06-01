@@ -106,6 +106,7 @@
     const meetingList = meetings() ? (await meetings().list()).slice(0, 4) : [];
     const evoList = evolution() ? (await evolution().list()).slice(0, 1) : [];
     const supMetrics = global.AAA_SUPERVISOR ? await global.AAA_SUPERVISOR.metrics() : { ok: false };
+    const govMetrics = global.AAA_GOVERNANCE ? await global.AAA_GOVERNANCE.metrics() : null;
 
     body.innerHTML = '';
 
@@ -130,6 +131,20 @@
     });
     const risk = riskLevel(reports);
     body.appendChild(kv('Risk Level', risk.label, risk.color));
+
+    // ---- AI Governance (override / audit analytics across all guardrails) ----
+    if (govMetrics) {
+      body.appendChild(section('AI Governance'));
+      const orPct = Math.round((govMetrics.overrideRate || 0) * 100) + '%';
+      body.appendChild(kv('Safety Checks', govMetrics.safetyChecks));
+      body.appendChild(kv('Blocked', govMetrics.blocked, govMetrics.blocked ? RED : GREY));
+      body.appendChild(kv('Queued', govMetrics.queued, govMetrics.queued ? AMBER : GREY));
+      body.appendChild(kv('Overrides', govMetrics.overrides, govMetrics.overrides ? AMBER : GREY));
+      body.appendChild(kv('Override Rate', orPct, (govMetrics.overrideRate || 0) > 0.5 ? RED : GREY));
+      body.appendChild(kv('False-Positive Candidates', govMetrics.falsePositiveCandidates, govMetrics.falsePositiveCandidates ? AMBER : GREY));
+      if (govMetrics.reviewQueue) body.appendChild(kv('Supervisor Review Queue', govMetrics.reviewQueue, AMBER));
+      if (govMetrics.alerts) body.appendChild(kv('Drift Alerts', govMetrics.alerts, RED));
+    }
     body.appendChild(kv('Prediction Accuracy (calibration)', supMetrics.ok && supMetrics.avgCalibration != null ? String(supMetrics.avgCalibration) : '—', BLUE));
     body.appendChild(kv('Close Rate', supMetrics.ok ? pct(supMetrics.closeRate) : '—'));
 

@@ -26,6 +26,9 @@ const SUITES = [
   'unit/transcribe.test.js',
   'unit/content-safety.test.js',
   'unit/review-safety.test.js',
+  'unit/audit-ledger.test.js',
+  'unit/governance.test.js',
+  'unit/review-governance.test.js',
   'static/integrity.test.js',
   'smoke/boot.test.js'
 ];

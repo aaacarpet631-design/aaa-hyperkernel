@@ -116,6 +116,23 @@
       const safety = await screen(gen, id);
       const status = statusForDecision(safety.decision);
 
+      // Register the decision with the Governance Engine (content-safety is its
+      // first consumer). Held drafts become overridable cases; the returned
+      // case id is stored so the UI can open the review/override flow.
+      if (safety.source === 'ai') {
+        try {
+          if (global.AAA_GOVERNANCE && global.AAA_GOVERNANCE.record) {
+            const gc = await global.AAA_GOVERNANCE.record({
+              domain: 'content_safety', guardrail: SAFETY_MODEL, model: safety.model,
+              subjectType: 'review_request', subjectId: id, messageContextId: id,
+              decision: safety.decision, verdict: safety.verdict,
+              categories: safety.categories, raw: safety.raw, draft: gen.text
+            });
+            if (gc && gc.ok) safety.governanceCaseId = gc.case.id;
+          }
+        } catch (_) { /* governance is additive; never blocks preparing the record */ }
+      }
+
       const rec = {
         id: id,
         jobId: jobId, customerId: job.customerId || null,
