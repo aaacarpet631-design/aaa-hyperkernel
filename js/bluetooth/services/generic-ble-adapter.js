@@ -102,8 +102,18 @@
           }
         };
       } catch (err) {
-        this._emitStatus('error', { message: humanError(err) });
-        return { ok: false, error: (err && err.message) || 'CONNECT_FAILED', message: humanError(err) };
+        // Capture the real cause + whatever services we did discover, so the UI
+        // can show a self-diagnosing panel instead of a bare "error".
+        const detail = {
+          message: humanError(err),
+          errorName: (err && err.name) || null,
+          rawMessage: (err && err.message) || String(err),
+          deviceName: this._device ? this._device.name : null,
+          discoveredServices: this._supportedServices.slice()
+        };
+        this._lastErrorDetail = detail;
+        this._emitStatus('error', detail);
+        return { ok: false, error: (err && err.name) || 'CONNECT_FAILED', message: humanError(err), detail: detail };
       }
     },
 

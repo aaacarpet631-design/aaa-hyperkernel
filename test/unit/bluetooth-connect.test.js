@@ -151,6 +151,10 @@ module.exports = async function run() {
   const bad = await huepar.connect({ timeout: 1000 });
   t.ok('old path fails to connect (reproduces the bug)', bad.ok === false);
   t.ok('old failure message is human, not blank', !!(bad.message && /secure|https|connection|service|allow/i.test(bad.message)) );
+  // Self-diagnosing detail is captured so the UI can show the real cause.
+  t.ok('failure carries a structured detail', !!(bad.detail && typeof bad.detail === 'object'));
+  t.ok('detail names the error type', !!(bad.detail.errorName));
+  t.ok('detail includes the device name', bad.detail.deviceName === 'LDM-S60-BT');
 
   // ---- a generic (non-brand) device still connects fine --------------------
   setNavigator(makeFakeBluetooth('Some Random Laser', ['battery_service']));

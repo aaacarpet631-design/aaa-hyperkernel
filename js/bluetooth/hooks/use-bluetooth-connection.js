@@ -28,7 +28,8 @@
       battery: null,
       lastReading: null,       // ParsedReading
       lastReadingAt: null,
-      error: null
+      error: null,
+      errorDetail: null        // { errorName, rawMessage, deviceName, discoveredServices }
     },
     _subs: [],
     _foregroundBound: null,
@@ -106,7 +107,13 @@
       const a = this._adapter;
       if (!a) return;
       a.onStatus(async (status, detail) => {
-        this._set({ status: status, error: status === 'error' ? (detail && detail.message) : null });
+        this._set({
+          status: status,
+          error: status === 'error' ? (detail && detail.message) : null,
+          // Keep the full diagnostic on error so the screen can show the real
+          // cause + the device's advertised services (not just "error").
+          errorDetail: status === 'error' ? (detail || null) : null
+        });
         if (status === 'connected') {
           const battery = a.readBattery ? await a.readBattery() : null;
           this._set({ battery: battery });
