@@ -208,7 +208,7 @@
    * The recording is never lost — callers save audio before calling this.
    */
   async function transcribeAudio(blob, jobId) {
-    const endpoint = cfg().flag ? cfg().flag('transcriptionEndpoint', null) : (cfg().transcriptionEndpoint || null);
+    const endpoint = cfg().transcriptionEndpoint || (cfg().flag ? cfg().flag('transcriptionEndpoint', null) : null);
     if (!endpoint) { await logErr('TRANSCRIPTION_FAILED', jobId, 'audio_recording', 'no transcriptionEndpoint configured'); return { ok: false, code: 'TRANSCRIPTION_FAILED', error: 'TRANSCRIPTION_NOT_CONFIGURED' }; }
     if (diag() && !diag().isOnline()) { await logErr('NETWORK_OFFLINE', jobId, 'audio_recording'); return { ok: false, code: 'NETWORK_OFFLINE' }; }
     try {
