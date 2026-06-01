@@ -289,6 +289,9 @@
       label: 'Huepar S-series (BT)',
       priority: 50,
       match: matchHuepar,
+      // Declared at scan time so getPrimaryService(HUEPAR_SERVICE) is allowed
+      // post-connect — without this the connect throws SecurityError ("error").
+      optionalServices: [HUEPAR_SERVICE, BATTERY_SERVICE],
       factory: () => createHueparS60Adapter()
     });
   }
