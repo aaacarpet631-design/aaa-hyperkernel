@@ -270,15 +270,23 @@
       };
       await data().put(QUEUE, queueEntry.id, queueEntry);
 
-      // Drift detection across the queue's categories.
-      let alert = null;
+      // Drift detection across the queue's categories. The dashboard alert
+      // (detectPatterns) stays as-is; the escalation layer decides whether to
+      // actually notify the owner/admin (with windowing + cooldown).
+      let alert = null, escalation = null;
       for (const cat of (Array.isArray(c.categories) ? c.categories : [])) {
         const a = await detectPatterns(cat);
         if (a) alert = a;
+        if (global.AAA_GOVERNANCE_ESCALATION && global.AAA_GOVERNANCE_ESCALATION.evaluateDrift) {
+          try {
+            const e = await global.AAA_GOVERNANCE_ESCALATION.evaluateDrift({ domain: c.domain, category: cat, threshold: PATTERN_THRESHOLD });
+            if (e && e.escalation && e.escalated) escalation = e.escalation;
+          } catch (_) { /* escalation is additive; never blocks the override */ }
+        }
       }
       if (events()) events().emit('governance.override', { caseId: caseId, domain: c.domain, actorId: who.id });
 
-      return { ok: true, case: updated, unlocked: true, queued: queueEntry.id, alert: alert };
+      return { ok: true, case: updated, unlocked: true, queued: queueEntry.id, alert: alert, escalation: escalation };
     },
 
     /**
@@ -323,6 +331,9 @@
       const openAlerts = (await this.alerts()).filter(function (a) { return a.status !== 'resolved'; });
       m.alerts = openAlerts.length;
       m.reviewQueue = (await this.reviewQueue()).filter(function (q) { return q.status === 'pending_review'; }).length;
+      if (global.AAA_GOVERNANCE_ESCALATION && global.AAA_GOVERNANCE_ESCALATION.open) {
+        try { m.escalations = (await global.AAA_GOVERNANCE_ESCALATION.open()).length; } catch (_) { m.escalations = 0; }
+      }
       return m;
     }
   };

@@ -54,6 +54,37 @@ guardrail verdict → record() → CASE ──(held)──► Review Safety Deci
    Override Rate, False-Positive Candidates, Review-Queue depth, and Drift
    Alerts — surfaced on the Executive Intelligence dashboard.
 
+## Escalation & notification (`AAA_GOVERNANCE_ESCALATION`)
+
+The dashboard signal is passive. The escalation layer decides when to actively
+**alert the owner/admin** — without spamming. It is generic (drift is the first
+trigger; legal/accounting/contract/ad-copy/SMS/email/agent risks use the same
+`escalate({ kind, domain, category, count, threshold, … })`).
+
+- **Threshold windowing** — an escalation is keyed by `(kind, domain, category,
+  windowIndex = floor(count / threshold))`. One escalation per window, so it does
+  **not** fire on every override — only on a crossing.
+- **Cooldown** — while an escalation is `open` and its count keeps climbing in the
+  same window, re-notification is rate-limited (`governanceEscalationCooldownMs`,
+  default 6h). No spam.
+- **Duplicate suppression** — re-evaluating the same window updates the count/cases
+  in place; it does not raise or re-notify (unless cooldown elapsed while open).
+- **Status lifecycle** — `open → acknowledged → resolved`. Acknowledging silences
+  re-notification; resolving closes the window. A **resolved window never
+  re-opens** — only a *new* window (another threshold's worth of overrides) raises
+  a fresh escalation.
+- **Payload** — every escalation carries domain, category, override count,
+  threshold, affected case IDs, and a recommended action.
+- **Audited** — `escalation_raised`, `escalation_notified`, `escalation_acknowledged`,
+  and `escalation_resolved` are all written to the immutable audit ledger.
+- **Surfaced** — open escalations appear on the dashboard ("Open Escalations"),
+  alongside the unchanged "Drift Alerts" signal, and emit a `governance.escalation`
+  event for any notifier to consume.
+
+`AAA_GOVERNANCE.requestOverride()` calls `evaluateDrift()` per category after an
+override, so escalation is automatic — but additive: if the module is absent the
+override path is unaffected.
+
 ## Adding the next guardrail
 
 A new high-risk guardrail (say contract-clause review) needs only to:

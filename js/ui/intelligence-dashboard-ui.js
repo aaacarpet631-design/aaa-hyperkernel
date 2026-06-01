@@ -144,6 +144,7 @@
       body.appendChild(kv('False-Positive Candidates', govMetrics.falsePositiveCandidates, govMetrics.falsePositiveCandidates ? AMBER : GREY));
       if (govMetrics.reviewQueue) body.appendChild(kv('Supervisor Review Queue', govMetrics.reviewQueue, AMBER));
       if (govMetrics.alerts) body.appendChild(kv('Drift Alerts', govMetrics.alerts, RED));
+      if (govMetrics.escalations) body.appendChild(kv('Open Escalations', govMetrics.escalations, RED));
     }
     body.appendChild(kv('Prediction Accuracy (calibration)', supMetrics.ok && supMetrics.avgCalibration != null ? String(supMetrics.avgCalibration) : '—', BLUE));
     body.appendChild(kv('Close Rate', supMetrics.ok ? pct(supMetrics.closeRate) : '—'));

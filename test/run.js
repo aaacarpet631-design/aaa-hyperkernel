@@ -28,6 +28,7 @@ const SUITES = [
   'unit/review-safety.test.js',
   'unit/audit-ledger.test.js',
   'unit/governance.test.js',
+  'unit/governance-escalation.test.js',
   'unit/review-governance.test.js',
   'static/integrity.test.js',
   'smoke/boot.test.js'
