@@ -37,10 +37,10 @@
     },
     isConfigured() { return this.provider() != null; },
 
-    async callProxy(payload) {
+    async callProxy(payload, url) {
       const p = this.provider();
-      if (p === 'firebase') return global.AAA_FIREBASE.callProxy(payload);
-      if (p === 'supabase') return global.AAA_SUPABASE.callProxy(payload);
+      if (p === 'firebase') return global.AAA_FIREBASE.callProxy(payload, url);
+      if (p === 'supabase') return global.AAA_SUPABASE.callProxy(payload, url);
       return { ok: false, error: 'PROXY_NOT_CONFIGURED' };
     },
 

@@ -63,12 +63,15 @@
       return rest('/' + table + (query ? '?' + query : ''), { method: 'GET', headers: headers() });
     },
 
-    /** Call the server-side Claude proxy edge function. */
-    async callProxy(payload) {
+    /** Call a server-side AI proxy edge function. Defaults to the active
+     *  proxyUrl; pass an explicit url to target a specific function (e.g. the
+     *  Nemotron content-safety proxy, regardless of aiProvider). */
+    async callProxy(payload, url) {
       const c = cfg();
-      if (!c.proxyUrl || !c.supabaseAnonKey) return { ok: false, error: 'PROXY_NOT_CONFIGURED' };
+      const target = url || c.proxyUrl;
+      if (!target || !c.supabaseAnonKey) return { ok: false, error: 'PROXY_NOT_CONFIGURED' };
       try {
-        const res = await fetch(c.proxyUrl, {
+        const res = await fetch(target, {
           method: 'POST',
           headers: headers(),
           body: JSON.stringify(Object.assign({ workspace_id: c.workspaceId || null }, payload || {}))

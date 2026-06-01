@@ -24,6 +24,7 @@ const SUITES = [
   'unit/portal-links.test.js',
   'unit/voice.test.js',
   'unit/transcribe.test.js',
+  'unit/content-safety.test.js',
   'static/integrity.test.js',
   'smoke/boot.test.js'
 ];

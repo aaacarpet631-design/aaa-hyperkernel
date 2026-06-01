@@ -75,12 +75,14 @@
       return fbFetch(url, { method: 'POST', headers: authHeaders(), body: JSON.stringify({ fields: encodeFields(fields) }) });
     },
 
-    /** Call the server-side Claude proxy Cloud Function. */
-    async callProxy(payload) {
-      const url = cfg().proxyUrl;
-      if (!url) return { ok: false, error: 'PROXY_NOT_CONFIGURED' };
+    /** Call a server-side AI proxy Cloud Function. Defaults to the active
+     *  proxyUrl; pass an explicit url to target a specific function (e.g. the
+     *  Nemotron content-safety proxy, regardless of aiProvider). */
+    async callProxy(payload, url) {
+      const target = url || cfg().proxyUrl;
+      if (!target) return { ok: false, error: 'PROXY_NOT_CONFIGURED' };
       try {
-        const res = await fetch(url, { method: 'POST', headers: authHeaders(), body: JSON.stringify(Object.assign({ workspace_id: cfg().workspaceId || null }, payload || {})) });
+        const res = await fetch(target, { method: 'POST', headers: authHeaders(), body: JSON.stringify(Object.assign({ workspace_id: cfg().workspaceId || null }, payload || {})) });
         const data = await res.json();
         if (!res.ok || data.ok === false) return { ok: false, error: 'PROXY_ERROR', detail: data };
         return data;

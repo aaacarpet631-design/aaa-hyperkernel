@@ -68,6 +68,20 @@
       const url = this.supabaseUrl;
       return url ? url.replace(/\/$/, '') + '/functions/v1/' + (nemotron ? 'nemotron-proxy' : 'claude-proxy') : null;
     },
+    /** Nemotron proxy endpoint, resolved independently of aiProvider — the
+     *  content-safety guardrail must always reach NVIDIA even when the agents
+     *  run on Claude. Overridable via nemotronProxyUrl (e.g. /api/nemotron on
+     *  Netlify). Null when no cloud backend is configured. */
+    get nemotronProxyUrl() {
+      const explicit = read('nemotronProxyUrl', null);
+      if (explicit) return explicit;
+      if (this.aiProvider === 'nemotron') return this.proxyUrl;
+      if (this.firebaseProjectId) {
+        return 'https://' + this.firebaseRegion + '-' + this.firebaseProjectId + '.cloudfunctions.net/nemotronProxy';
+      }
+      const url = this.supabaseUrl;
+      return url ? url.replace(/\/$/, '') + '/functions/v1/nemotron-proxy' : null;
+    },
     /** Vision endpoint (Netlify function by default). */
     get visionEndpoint() { return read('visionEndpoint', '/api/vision'); },
     /** Sync endpoint (Netlify Blobs by default). */

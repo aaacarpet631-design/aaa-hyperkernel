@@ -99,6 +99,32 @@ await AAA_DATA.callAgent({
 chain-of-thought is returned as `result.reasoning`; `result.text` always holds
 just the final answer so existing JSON parsers are unaffected.
 
+## Content-safety guardrail (`AAA_CONTENT_SAFETY`)
+A second Nemotron model — `nvidia/nemotron-3-content-safety` — is wired in as an
+optional moderation layer. It runs through the **same Nemotron proxy** (no extra
+deploy) and is reached **independently of `aiProvider`**, so it works even when
+your agents run on Claude: the guardrail resolves `nemotronProxyUrl` itself
+(Firebase `nemotronProxy` / Supabase `nemotron-proxy`, or set
+`nemotronProxyUrl: '/api/nemotron'` on Netlify).
+
+```js
+// Screen a customer/field input:
+await AAA_CONTENT_SAFETY.check('How can I steal money from here?');
+// → { ok, safe:false, flagged:true, verdict:'unsafe', categories:[...], raw }
+
+// Screen an AI-generated message before sending it to a customer:
+await AAA_CONTENT_SAFETY.checkResponse(userPrompt, agentReply);
+// → { ok, safe, verdict, responseSafety, categories, ... }
+```
+
+By construction it only **classifies** — it never blocks, edits, sends, or
+stores anything; you decide what to do with a verdict. `safe` is `null` (unknown)
+rather than a false "safe" when a reply can't be read, so a caller can fail
+closed. With no proxy configured it returns `AI_NOT_CONFIGURED`. Pass
+`{ categories: '/categories' }` to forward NVIDIA's `request_categories`
+chat-template arg. **It is not auto-enforced anywhere** — wire it into the flow
+you want gated (e.g. the review-request engine before a customer text goes out).
+
 ## Notes & honest limits
 - **Vision estimating** (`/api/vision`) and **voice transcription**
   (`/api/transcribe`) still run on their existing functions. Nemotron-Omni
