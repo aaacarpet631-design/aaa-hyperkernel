@@ -25,6 +25,7 @@ const SUITES = [
   'unit/voice.test.js',
   'unit/transcribe.test.js',
   'unit/content-safety.test.js',
+  'unit/review-safety.test.js',
   'static/integrity.test.js',
   'smoke/boot.test.js'
 ];

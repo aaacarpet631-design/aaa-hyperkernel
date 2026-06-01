@@ -122,8 +122,27 @@ stores anything; you decide what to do with a verdict. `safe` is `null` (unknown
 rather than a false "safe" when a reply can't be read, so a caller can fail
 closed. With no proxy configured it returns `AI_NOT_CONFIGURED`. Pass
 `{ categories: '/categories' }` to forward NVIDIA's `request_categories`
-chat-template arg. **It is not auto-enforced anywhere** — wire it into the flow
-you want gated (e.g. the review-request engine before a customer text goes out).
+chat-template arg.
+
+### Where it is enforced: AI-drafted review requests (fail-closed)
+The one place the guardrail is wired in today is the **review-request engine**
+(`AAA_REVIEW_REQUEST_ENGINE.requestReview`). Only **AI-drafted** outbound
+customer text is screened; the deterministic template fallback is not (it is
+human-authored). The mapping is fail-closed — a clean `safe` verdict is the only
+path to a normal send:
+
+| Verdict | Review status | Send flow |
+|--------|---------------|-----------|
+| `safe` | `pending` | normal one-tap send |
+| `unsafe` | `blocked` | send disabled; admin banner; human reviews |
+| `unknown` / unreadable / proxy error / guardrail unavailable | `queued` | send disabled; admin banner; human reviews |
+
+The full verdict (decision, verdict, categories, raw response, model, timestamp,
+and message-context id) is stored on the review record's `safety` field **and**
+written to the agent log. Messages are never silently edited. Blocked/queued
+drafts show a visible admin banner in the send sheet and do **not** expose the
+one-tap SMS/email buttons. This is intentionally scoped to AI-drafted review
+texts — it is not applied globally.
 
 ## Notes & honest limits
 - **Vision estimating** (`/api/vision`) and **voice transcription**

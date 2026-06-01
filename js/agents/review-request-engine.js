@@ -17,6 +17,10 @@
 
   function firstName(name) { return String(name || 'there').trim().split(/\s+/)[0] || 'there'; }
 
+  // The content-safety classifier this engine screens AI drafts against. Only
+  // used for logging/provenance — the actual call is made by AAA_CONTENT_SAFETY.
+  const SAFETY_MODEL = 'nvidia/nemotron-3-content-safety';
+
   function template(job) {
     const biz = cfg().businessName || 'AAA Carpet';
     const url = cfg().reviewUrl;
@@ -25,8 +29,15 @@
       (url ? ': ' + url : '.');
   }
 
+  // Returns { text, source: 'ai'|'template', prompt }. `source` drives whether
+  // the content-safety guardrail screens it: only AI-drafted text is screened
+  // (templates are deterministic and human-authored). `prompt` is the context
+  // the AI saw, passed to the guardrail's response check.
   async function generateMessage(job) {
-    // AI-personalized when the proxy is configured; otherwise a clean template.
+    const prompt =
+      'Customer first name: ' + firstName(job.customerName) +
+      '. Work done: ' + (job.notes || 'carpet service') + '. ' +
+      (cfg().reviewUrl ? 'Include this review link: ' + cfg().reviewUrl : 'No review link available — invite them to leave a review.');
     try {
       if (data() && data().callAgent) {
         const biz = cfg().businessName || 'AAA Carpet';
@@ -34,15 +45,49 @@
           agent: 'customer_success', model: 'claude-sonnet-4-6', max_tokens: 200,
           system: 'You write short, warm, professional review-request SMS messages for ' + biz +
             ', a carpet cleaning & repair company. One or two sentences with a clear, friendly ask for a review. Output ONLY the message text — no quotes, no preamble.',
-          messages: [{ role: 'user', content:
-            'Customer first name: ' + firstName(job.customerName) +
-            '. Work done: ' + (job.notes || 'carpet service') + '. ' +
-            (cfg().reviewUrl ? 'Include this review link: ' + cfg().reviewUrl : 'No review link available — invite them to leave a review.') }]
+          messages: [{ role: 'user', content: prompt }]
         });
-        if (res && res.ok && res.text && res.text.trim()) return res.text.trim();
+        if (res && res.ok && res.text && res.text.trim()) return { text: res.text.trim(), source: 'ai', prompt: prompt };
       }
     } catch (_) { /* fall through to template */ }
-    return template(job);
+    return { text: template(job), source: 'template', prompt: prompt };
+  }
+
+  // Screen an AI draft through the content-safety guardrail. Fail-closed: a
+  // clean "safe" verdict is the ONLY path to a normal send; anything else
+  // (unsafe → block; unknown / unreadable / proxy error / guardrail
+  // unavailable → queue) keeps the message out of the auto-send flow for a
+  // human to review. Templates (source !== 'ai') are passed through unscreened.
+  async function screen(gen, contextId) {
+    const at = clock() ? clock().now() : Date.now();
+    const base = { screened: false, decision: 'allow', source: gen.source, model: SAFETY_MODEL, messageContextId: contextId, checkedAt: at };
+    if (gen.source !== 'ai') return Object.assign(base, { reason: 'not_ai_drafted' });
+
+    const guard = global.AAA_CONTENT_SAFETY;
+    if (!guard || !guard.isReady || !guard.isReady()) {
+      return Object.assign(base, { decision: 'queue', verdict: 'unknown', safe: null, categories: [], error: 'SAFETY_UNAVAILABLE' });
+    }
+    let res;
+    try { res = await guard.checkResponse(gen.prompt, gen.text); }
+    catch (e) { res = { ok: false, error: 'SAFETY_EXCEPTION', message: String((e && e.message) || e) }; }
+
+    if (!res || res.ok === false) {
+      return Object.assign(base, { screened: true, decision: 'queue', verdict: 'unknown', safe: null, categories: [], error: (res && res.error) || 'SAFETY_FAILED' });
+    }
+    const out = Object.assign(base, {
+      screened: true, verdict: res.verdict, safe: res.safe,
+      categories: Array.isArray(res.categories) ? res.categories : [],
+      raw: res.raw, usage: res.usage
+    });
+    out.decision = res.safe === true ? 'allow' : (res.safe === false ? 'block' : 'queue');
+    return out;
+  }
+
+  // Map a safety decision to the persisted review-request status.
+  function statusForDecision(decision) {
+    if (decision === 'block') return 'blocked';
+    if (decision === 'queue') return 'queued';
+    return 'pending'; // allow / unscreened template
   }
 
   async function cloudUpsert(rec) {
@@ -64,21 +109,40 @@
       if (existing) return { ok: true, review: existing, reused: true };
 
       const customer = job.customerId ? await data().get('customers', job.customerId) : null;
-      const message = await generateMessage(job);
+      const gen = await generateMessage(job);
+      const id = ids() ? ids().createId('rev') : String(Date.now());
+
+      // Gate AI-drafted outbound text through the content-safety guardrail.
+      const safety = await screen(gen, id);
+      const status = statusForDecision(safety.decision);
+
       const rec = {
-        id: ids() ? ids().createId('rev') : String(Date.now()),
+        id: id,
         jobId: jobId, customerId: job.customerId || null,
         customerName: job.customerName || null,
         phone: (customer && customer.phone) || null,
         email: (customer && customer.email) || null,
-        message: message, link: cfg().reviewUrl || null,
-        channel: null, status: 'pending',
+        message: gen.text, link: cfg().reviewUrl || null,
+        channel: null, status: status,
+        safety: safety,            // verdict, category, raw, model, timestamp, contextId
         createdAt: clock() ? clock().now() : Date.now()
       };
       await data().put('review_requests', rec.id, rec);
       await cloudUpsert(rec);
-      try { if (data().logAgent) data().logAgent('customer_success', 'Review request prepared for ' + (job.customerName || 'customer'), { jobId: jobId }); } catch (_) {}
-      return { ok: true, review: rec };
+      // Log the verdict, category, raw response, model, timestamp, and the
+      // message context id (policy: full audit trail for every screened draft).
+      try {
+        if (data().logAgent) {
+          data().logAgent('customer_success', 'Review request ' + status + ' for ' + (job.customerName || 'customer'), {
+            jobId: jobId, reviewId: id,
+            decision: safety.decision, verdict: safety.verdict || null,
+            categories: safety.categories || [], error: safety.error || null,
+            raw: safety.raw != null ? safety.raw : null,
+            model: safety.model, checkedAt: safety.checkedAt, messageContextId: safety.messageContextId
+          });
+        }
+      } catch (_) {}
+      return { ok: true, review: rec, blocked: status === 'blocked', queued: status === 'queued' };
     },
 
     /** Device-native send links (work on the tech's phone, no provider). */

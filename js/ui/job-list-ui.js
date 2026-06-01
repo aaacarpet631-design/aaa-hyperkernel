@@ -365,6 +365,18 @@
       s.body.innerHTML = '';
       if (!res || !res.ok) { s.body.appendChild(ui.el('p', { className: 'aaa-dialog__message', text: 'Could not prepare a review request.' })); return; }
       const rec = res.review;
+
+      // Content-safety gate (fail-closed): an AI-drafted message that was
+      // blocked (flagged unsafe) or queued (couldn't be verified) does NOT get
+      // one-tap send. Show an admin banner explaining why; a human reviews it.
+      if (rec.status === 'blocked' || rec.status === 'queued') {
+        s.body.appendChild(this._safetyBanner(rec));
+        s.body.appendChild(ui.el('label', { className: 'aaa-field-label', text: 'Drafted message (held for review — not sent)' }));
+        s.body.appendChild(ui.el('div', { className: 'aaa-input aaa-textarea', style: { whiteSpace: 'pre-wrap', opacity: '0.85' }, text: rec.message || '' }));
+        s.body.appendChild(ui.el('p', { className: 'aaa-empty', text: 'To send, an admin must review this message. Sending is disabled here until it is cleared.' }));
+        return;
+      }
+
       const msg = ui.el('textarea', { className: 'aaa-input aaa-textarea' });
       msg.value = rec.message || '';
       s.body.appendChild(ui.el('label', { className: 'aaa-field-label', text: 'Message (edit if you like)' }));
@@ -383,6 +395,33 @@
       } });
       s.body.appendChild(smsA); s.body.appendChild(mailA); s.body.appendChild(copyBtn);
       if (!rec.phone) s.body.appendChild(ui.el('p', { className: 'aaa-empty', text: 'No phone on file — add one to the customer for one-tap SMS.' }));
+    },
+
+    /** Admin banner explaining why an AI-drafted review message was held. */
+    _safetyBanner(rec) {
+      const ui = UI();
+      const sf = rec.safety || {};
+      const blocked = rec.status === 'blocked';
+      const color = blocked ? 'var(--red)' : 'var(--warning)';
+      const title = blocked
+        ? '⛔ Blocked by content safety'
+        : '⏳ Held for review — safety could not be verified';
+      const reason = blocked
+        ? ('Flagged unsafe' + (sf.categories && sf.categories.length ? ' (' + sf.categories.join(', ') + ')' : '') + '.')
+        : ('Verdict: ' + (sf.verdict || 'unknown') + (sf.error ? ' — ' + sf.error : '') + '. Not auto-sent.');
+      const when = sf.checkedAt ? new Date(sf.checkedAt).toLocaleString() : '';
+      return ui.el('div', {
+        attrs: { role: 'alert' },
+        style: {
+          border: '1px solid ' + color, borderLeft: '4px solid ' + color,
+          background: 'rgba(0,0,0,0.03)', borderRadius: '8px',
+          padding: '10px 12px', margin: '0 0 12px 0'
+        }
+      }, [
+        ui.el('strong', { text: title, style: { color: color, display: 'block', marginBottom: '4px' } }),
+        ui.el('p', { className: 'aaa-dialog__message', text: reason, style: { margin: '0 0 4px 0' } }),
+        ui.el('p', { className: 'aaa-empty', text: 'Model: ' + (sf.model || 'content-safety') + (when ? ' · ' + when : '') + ' · ref ' + (sf.messageContextId || rec.id), style: { margin: '0', fontSize: '11px' } })
+      ]);
     },
 
     async _recordOutcome(jobId, result) {
