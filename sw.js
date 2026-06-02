@@ -6,7 +6,7 @@
  * app fully usable offline. Old caches are purged on activate, and the worker
  * takes control immediately to avoid serving a stale shell after an update.
  */
-const CACHE_NAME = 'hyperkernel-v32';
+const CACHE_NAME = 'hyperkernel-v35';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -48,6 +48,8 @@ const PRECACHE = [
   '/js/ui/contracts-ui.js',
   '/js/ui/schedule-ui.js',
   '/js/ui/ui-kit.js',
+  '/js/agents/model-router.js',
+  '/js/agents/action-safety-gate.js',
   '/js/agents/agent-registry.js',
   '/js/agents/agent-os.js',
   '/js/agents/supervisor.js',
@@ -85,6 +87,7 @@ const PRECACHE = [
   '/js/ai/sidekick-closure-engine.js',
   '/js/measurements/models/measurement-models.js',
   '/js/measurements/storage/measurement-store.js',
+  '/js/measurements/capture-sequencer.js',
   '/js/measurements/measurement-ai-assistant.js',
   '/js/bluetooth/services/raw-reading-log.js',
   '/js/bluetooth/services/measurement-parser.js',
