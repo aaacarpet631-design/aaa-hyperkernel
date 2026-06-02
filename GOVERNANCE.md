@@ -226,6 +226,45 @@ Audit (immutable ledger): `training_reviewed`, `recommendation_accepted`,
 `recommendation_rejected`, `improvement_task_created`, `task_status_changed`,
 and `training_exported` (ids + count only — never PII).
 
+## Business-event completion + prompt-change pipeline (Phase 4)
+
+**Part A — complete business-event wiring.** The bridge now subscribes to every
+outcome event and credits only the agents each result actually validates:
+
+| Event | Validates |
+|-------|-----------|
+| `quote.accepted` / `quote.rejected` | quote + estimator |
+| `payment.completed` | quote + accounting + pos |
+| `ad.lead.converted` | ads + seo |
+| `review.received` (+ `outcome.recorded:review`) | review_request |
+| `contract.signed` | contract + quote + estimator |
+
+Attachment is idempotent at the decision level — a decision is validated by the
+**first** real outcome only, so duplicate/late events can never double-count.
+Missing agent types attach nothing and never throw. Every attachment is audited.
+
+**Part B — human-approved prompt change pipeline** (`AAA_PROMPT_PIPELINE`).
+A safe path from an accepted improvement task to a reviewed change — **no
+autonomy**:
+
+- Lifecycle: `draft → submitted → approved → implemented (→ rolled_back) | rejected`.
+- A proposal carries proposalId, taskId, agentId, current prompt/version,
+  proposed change, reason, evidence cases, expected KPI impact, risk level, and
+  rollback notes.
+- **Approval is Admin(owner)-only** and requires a written note (≥10 chars), a
+  test-checklist confirmation, and a rollback note.
+- **Implementation never auto-edits a prompt.** With no safe prompt registry it
+  emits a manual *implementation patch/task* (`applied:false`). A versioned
+  registry can be plugged in via `registerRegistry(adapter)`; then implementation
+  applies the change behind Admin approval (`applied:true`) with `rollback()`.
+- **Rollback** is tracked even when manual, linked to the proposal and task.
+- The Diff Review UI (in the Learning Command Center) shows current vs proposed,
+  linked evidence, and the approval gate; evidence export is PII-stripped.
+
+Audit (immutable ledger): `prompt_proposal_created / _submitted / _approved /
+_approval_denied / _rejected / _implemented / _rolled_back` and
+`prompt_evidence_exported`.
+
 ## Adding the next guardrail
 
 A new high-risk guardrail (say contract-clause review) needs only to:

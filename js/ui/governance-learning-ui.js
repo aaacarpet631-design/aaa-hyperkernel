@@ -116,9 +116,25 @@
           ['in_progress', 'implemented', 'rejected'].forEach(function (st) {
             r.appendChild(ui.button({ label: st.replace('_', ' '), variant: 'ghost', size: 'sm', onClick: async function () { await L().updateTaskStatus(tk.taskId, st, {}); self.render(); } }));
           });
+          if (global.AAA_PROMPT_PIPELINE) r.appendChild(ui.button({ label: '+ Prompt proposal', variant: 'ghost', size: 'sm', onClick: function () { self._newProposal(tk); } }));
         }
         s.body.appendChild(r);
       });
+
+      // ---- prompt change proposals (human-approved pipeline) ----
+      if (global.AAA_PROMPT_PIPELINE) {
+        const proposals = await global.AAA_PROMPT_PIPELINE.list();
+        s.body.appendChild(ui.el('h2', { className: 'aaa-section-title', text: 'Prompt Change Proposals' }));
+        s.body.appendChild(ui.el('p', { className: 'aaa-empty', text: 'Reviewed, human-approved changes only — never auto-applied.' }));
+        if (!proposals.length) s.body.appendChild(ui.el('p', { className: 'aaa-empty', text: 'No proposals yet.' }));
+        proposals.slice().sort(function (a, b) { return (b.createdAt || 0) - (a.createdAt || 0); }).forEach((p) => {
+          const r = ui.el('div', { className: 'aaa-list-row' });
+          r.innerHTML = '<strong>' + esc(p.agentId) + '</strong> · <span style="opacity:.7">' + esc(p.status) + '</span> · risk ' + esc(p.riskLevel) +
+            '<div class="aaa-list-sub">' + esc(truncate(p.reason, 90)) + '</div>';
+          r.appendChild(ui.button({ label: 'Review diff', variant: 'secondary', size: 'sm', onClick: function () { self._proposalDrawer(p.proposalId); } }));
+          s.body.appendChild(r);
+        });
+      }
 
       // ---- performance timeline ----
       s.body.appendChild(ui.el('h2', { className: 'aaa-section-title', text: 'Agent Performance Timeline' }));
@@ -138,6 +154,71 @@
       }
 
       s.body.appendChild(ui.button({ label: 'Done', variant: 'ghost', full: true, onClick: function () { s.close(); } }));
+    },
+
+    // Create a prompt-change proposal from an accepted improvement task.
+    _newProposal(task) {
+      const ui = U(); const self = this; const P = global.AAA_PROMPT_PIPELINE;
+      const s = ui.sheet({ title: 'New Prompt Proposal', subtitle: task.agentId + ' · ' + truncate(task.issue, 40) });
+      document.body.appendChild(s.overlay);
+      s.body.appendChild(ui.el('p', { className: 'aaa-list-sub', text: 'Recommended change: ' + truncate(task.recommendedChange, 160) }));
+      const change = ui.el('textarea', { className: 'aaa-input aaa-textarea', attrs: { placeholder: 'Write the exact proposed prompt/process change…' } });
+      change.value = task.recommendedChange || '';
+      const kpi = ui.el('input', { className: 'aaa-input', attrs: { placeholder: 'Expected KPI impact (optional)' } });
+      const rollback = ui.el('input', { className: 'aaa-input', attrs: { placeholder: 'Rollback notes (optional at draft)' } });
+      s.body.appendChild(field('Proposed change', change));
+      s.body.appendChild(field('Expected KPI impact', kpi));
+      s.body.appendChild(field('Rollback notes', rollback));
+      s.body.appendChild(ui.button({ label: 'Create draft', variant: 'primary', full: true, onClick: async function () {
+        await P.createProposal({ taskId: task.taskId, agentId: task.agentId, proposedChange: change.value, reason: task.issue, evidenceCases: task.sourceTrainingCases || [], expectedKpiImpact: kpi.value || null, rollbackNotes: rollback.value || null });
+        s.close(); self.render();
+      } }));
+    },
+
+    // Diff review + human-approval workflow for one proposal.
+    async _proposalDrawer(proposalId) {
+      const ui = U(); const self = this; const P = global.AAA_PROMPT_PIPELINE;
+      const s = ui.sheet({ title: 'Prompt Change Review', subtitle: 'Human-approved — no auto-apply' });
+      document.body.appendChild(s.overlay);
+      const p = await P.get(proposalId);
+      s.body.innerHTML = '';
+      if (!p) { s.body.appendChild(ui.el('p', { className: 'aaa-empty', text: 'Proposal not found.' })); return; }
+      const row = function (k, v) { return ui.el('div', { className: 'aaa-list-sub', html: '<strong>' + esc(k) + ':</strong> ' + esc(v == null || v === '' ? '—' : v) }); };
+      s.body.appendChild(row('Agent', p.agentId));
+      s.body.appendChild(row('Status', p.status));
+      s.body.appendChild(row('Risk', p.riskLevel));
+      s.body.appendChild(row('Reason', p.reason));
+      s.body.appendChild(row('Expected KPI impact', p.expectedKpiImpact));
+      s.body.appendChild(ui.el('label', { className: 'aaa-field-label', text: 'Current (registry version)' }));
+      s.body.appendChild(ui.el('div', { className: 'aaa-input aaa-textarea', style: { whiteSpace: 'pre-wrap', opacity: '0.8' }, text: p.currentPrompt || '(no prompt registry — current version unknown)' }));
+      s.body.appendChild(ui.el('label', { className: 'aaa-field-label', text: 'Proposed change' }));
+      s.body.appendChild(ui.el('div', { className: 'aaa-input aaa-textarea', style: { whiteSpace: 'pre-wrap' }, text: p.proposedChange || '' }));
+      s.body.appendChild(row('Evidence cases', (p.evidenceCases || []).length + ' training case(s)'));
+      s.body.appendChild(ui.button({ label: '⬇ Export evidence (PII-stripped)', variant: 'ghost', size: 'sm', onClick: async function () { const r = await P.exportEvidence(proposalId, {}); downloadText('proposal-evidence.jsonl', r.jsonl); } }));
+      if (p.implementationPatch) s.body.appendChild(row('Implementation patch', 'Manual — no safe registry; apply and record version.'));
+      const msg = ui.el('p', { className: 'aaa-dialog__message' });
+
+      const refresh = function () { s.close(); self._proposalDrawer(proposalId); };
+      if (p.status === 'draft') s.body.appendChild(ui.button({ label: 'Submit for approval', variant: 'primary', full: true, onClick: async function () { await P.submit(proposalId, {}); refresh(); } }));
+
+      if (p.status === 'submitted') {
+        if (!canAct()) { s.body.appendChild(ui.el('p', { className: 'aaa-empty', text: 'Only an Admin (Owner) can approve.' })); }
+        else {
+          const note = ui.el('textarea', { className: 'aaa-input aaa-textarea', attrs: { placeholder: 'Approval note (required, ≥10 chars)' } });
+          const rb = ui.el('input', { className: 'aaa-input', attrs: { placeholder: 'Rollback note (required)' } });
+          const chkWrap = ui.el('label', { className: 'aaa-list-sub' }); const chk = ui.el('input', { attrs: { type: 'checkbox' } }); chkWrap.appendChild(chk); chkWrap.appendChild(document.createTextNode(' I confirm the test checklist passed'));
+          s.body.appendChild(field('Approval note', note)); s.body.appendChild(field('Rollback note', rb)); s.body.appendChild(chkWrap);
+          s.body.appendChild(ui.button({ label: 'Approve', variant: 'danger', full: true, onClick: async function () {
+            const r = await P.approve(proposalId, { note: note.value, rollbackNote: rb.value, checklistConfirmed: chk.checked });
+            if (!r.ok) { msg.textContent = 'Cannot approve: ' + r.error; return; } refresh();
+          } }));
+          s.body.appendChild(ui.button({ label: 'Reject', variant: 'ghost', full: true, onClick: async function () { await P.reject(proposalId, { reason: note.value || 'rejected' }); refresh(); } }));
+        }
+      }
+      if (p.status === 'approved' && canAct()) s.body.appendChild(ui.button({ label: 'Implement (patch/apply)', variant: 'primary', full: true, onClick: async function () { await P.implement(proposalId, {}); refresh(); } }));
+      if (p.status === 'implemented' && canAct()) s.body.appendChild(ui.button({ label: 'Roll back', variant: 'ghost', full: true, onClick: async function () { await P.rollback(proposalId, { reason: 'manual rollback' }); refresh(); } }));
+      s.body.appendChild(msg);
+      s.body.appendChild(ui.button({ label: 'Close', variant: 'ghost', full: true, onClick: function () { s.close(); } }));
     }
   };
 

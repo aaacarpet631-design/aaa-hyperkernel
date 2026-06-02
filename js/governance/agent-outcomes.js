@@ -27,8 +27,8 @@
   const STATUS = ['pending', 'successful', 'unsuccessful', 'overridden', 'abandoned'];
 
   // Real-world results → outcome status.
-  const SUCCESS_RESULTS = ['won_job', 'contract_signed', 'review_received', 'ad_conversion'];
-  const FAILURE_RESULTS = ['lost_job', 'refund', 'complaint', 'chargeback'];
+  const SUCCESS_RESULTS = ['won_job', 'contract_signed', 'review_received', 'ad_conversion', 'quote_accepted', 'payment_completed'];
+  const FAILURE_RESULTS = ['lost_job', 'refund', 'complaint', 'chargeback', 'quote_rejected'];
 
   // ---- pure helpers (exported for tests) ------------------------------------
 
@@ -148,6 +148,10 @@
     async attachOutcome(decisionId, outcome) {
       const dec = await this.getDecision(decisionId);
       if (!dec) return { ok: false, error: 'DECISION_NOT_FOUND' };
+      // Idempotency: a decision is validated by the FIRST real outcome only.
+      // A duplicate/late business event for an already-resolved decision is a
+      // no-op — it can never double-count.
+      if (dec.outcomeStatus !== 'pending') return { ok: true, decision: dec, reused: true };
       outcome = outcome || {};
       const mapped = resultToStatus(outcome.result);
       const status = outcome.status || mapped;

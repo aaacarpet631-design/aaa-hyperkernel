@@ -18,18 +18,25 @@
   function events() { return global.AAA_EVENTS; }
 
   // Map the app's outcome vocabulary → the registry's real-world result names.
+  // The specific result name is preserved (informative training signal) rather
+  // than collapsed to won/lost.
   const RESULT_MAP = {
     won: 'won_job', won_job: 'won_job',
     lost: 'lost_job', lost_job: 'lost_job',
     review: 'review_received', review_received: 'review_received',
     refund: 'refund', complaint: 'complaint', chargeback: 'chargeback',
-    contract_signed: 'contract_signed', quote_accepted: 'won_job', quote_rejected: 'lost_job',
-    payment_completed: 'won_job', ad_conversion: 'ad_conversion', ad_lead_converted: 'ad_conversion'
+    contract_signed: 'contract_signed',
+    quote_accepted: 'quote_accepted', quote_rejected: 'quote_rejected',
+    payment_completed: 'payment_completed',
+    ad_conversion: 'ad_conversion', ad_lead_converted: 'ad_conversion'
   };
 
-  // Which agent types a given real result validates (null = all pending on the job).
+  // Which agent types a given real result validates — agent credit stays tied to
+  // the decision it actually influenced (null = all pending on the job).
   const RESULT_AGENTS = {
     won_job: ['estimator', 'quote'], lost_job: ['estimator', 'quote'],
+    quote_accepted: ['quote', 'estimator'], quote_rejected: ['quote', 'estimator'],
+    payment_completed: ['quote', 'accounting', 'pos'],
     review_received: ['review_request'],
     contract_signed: ['contract', 'quote', 'estimator'],
     ad_conversion: ['ads', 'seo'],
@@ -78,6 +85,13 @@
         if (!rec) return;
         self.attach('contract_signed', { jobId: rec.jobId, subjectType: 'contract', subjectId: rec.contractId, value: rec.total });
       });
+      // Phase 4: complete the business-event wiring. Each routes to the agent
+      // types it actually validates (see RESULT_AGENTS). Idempotent + crash-safe.
+      events().on('quote.accepted', function (rec) { if (rec) self.attach('quote_accepted', { jobId: rec.jobId, subjectType: 'quote', subjectId: rec.quoteId, value: rec.value != null ? rec.value : rec.total }); });
+      events().on('quote.rejected', function (rec) { if (rec) self.attach('quote_rejected', { jobId: rec.jobId, subjectType: 'quote', subjectId: rec.quoteId }); });
+      events().on('payment.completed', function (rec) { if (rec) self.attach('payment_completed', { jobId: rec.jobId, value: rec.amount != null ? rec.amount : rec.total }); });
+      events().on('ad.lead.converted', function (rec) { if (rec) self.attach('ad_conversion', { jobId: rec.jobId, subjectType: 'lead', subjectId: rec.leadId, value: rec.value }); });
+      events().on('review.received', function (rec) { if (rec) self.attach('review_received', { jobId: rec.jobId }); });
       this._wired = true;
       return this;
     }
