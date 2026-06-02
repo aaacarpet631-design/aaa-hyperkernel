@@ -78,7 +78,8 @@
       const proposedChange = input.proposedChange != null ? input.proposedChange : (task && task.recommendedChange) || null;
       if (!proposedChange) return { ok: false, error: 'PROPOSED_CHANGE_REQUIRED' };
 
-      const currentVersion = (this._registry && this._registry.getPrompt) ? this._registry.getPrompt(agentId) : null;
+      const currentVersion = (this._registry && this._registry.getPromptAsync) ? await this._registry.getPromptAsync(agentId)
+        : ((this._registry && this._registry.getPrompt) ? this._registry.getPrompt(agentId) : null);
       const who = actor(input);
       const p = {
         proposalId: newId('prop'), taskId: input.taskId || (task && task.taskId) || null, agentId: agentId,
@@ -155,7 +156,7 @@
 
       let applied = false, appliedVersion = null, patch = null;
       if (this._registry && this._registry.apply) {
-        const r = await this._registry.apply(p.agentId, p.proposedChange);
+        const r = await this._registry.apply(p.agentId, p.proposedChange, p);
         if (!r || r.ok === false) return { ok: false, error: 'REGISTRY_APPLY_FAILED', detail: r && r.error };
         applied = true; appliedVersion = r.version != null ? r.version : null;
       } else {
@@ -178,7 +179,7 @@
       const who = actor(opts);
       let registryRolledBack = false;
       if (p.applied && this._registry && this._registry.rollback) {
-        try { const r = await this._registry.rollback(p.agentId, p.currentPromptVersion); registryRolledBack = !!(r && r.ok); } catch (_) {}
+        try { const r = await this._registry.rollback(p.agentId, p.currentPromptVersion, p); registryRolledBack = !!(r && r.ok); } catch (_) {}
       }
       const upd = Object.assign({}, p, { status: 'rolled_back', rolledBackBy: who.id, rolledBackAt: now(), rollbackReason: opts.reason || null, rollbackManual: !registryRolledBack, updatedAt: now() });
       await put(upd);

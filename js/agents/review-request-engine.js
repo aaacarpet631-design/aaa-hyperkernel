@@ -41,10 +41,13 @@
     try {
       if (data() && data().callAgent) {
         const biz = cfg().businessName || 'AAA Carpet';
+        const sys = 'You write short, warm, professional review-request SMS messages for ' + biz +
+          ', a carpet cleaning & repair company. One or two sentences with a clear, friendly ask for a review. Output ONLY the message text — no quotes, no preamble.';
+        // Governed prompt with safe fallback to the hardcoded default.
+        const system = global.AAA_PROMPT_REGISTRY ? await global.AAA_PROMPT_REGISTRY.resolve('review_request', sys) : sys;
         const res = await data().callAgent({
           agent: 'customer_success', model: 'claude-sonnet-4-6', max_tokens: 200,
-          system: 'You write short, warm, professional review-request SMS messages for ' + biz +
-            ', a carpet cleaning & repair company. One or two sentences with a clear, friendly ask for a review. Output ONLY the message text — no quotes, no preamble.',
+          system: system,
           messages: [{ role: 'user', content: prompt }]
         });
         if (res && res.ok && res.text && res.text.trim()) return { text: res.text.trim(), source: 'ai', prompt: prompt };

@@ -153,7 +153,45 @@
         s.body.appendChild(r);
       }
 
+      // ---- governed prompt registry ----
+      if (global.AAA_PROMPT_REGISTRY) {
+        const entries = await global.AAA_PROMPT_REGISTRY.list();
+        s.body.appendChild(ui.el('h2', { className: 'aaa-section-title', text: 'Prompt Registry' }));
+        if (!entries.length) s.body.appendChild(ui.el('p', { className: 'aaa-empty', text: 'No governed prompt versions yet — agents use their built-in prompts.' }));
+        entries.forEach((e) => {
+          const r = ui.el('div', { className: 'aaa-list-row' });
+          r.innerHTML = '<strong>' + esc(e.agentId) + '</strong> · v' + e.currentVersion + ' · <span style="opacity:.7">' + esc(e.status) + '</span>' +
+            '<div class="aaa-list-sub">' + (e.versions || []).length + ' version(s) · ' + esc(e.name || 'system') + '</div>';
+          r.appendChild(ui.button({ label: 'History / rollback', variant: 'secondary', size: 'sm', onClick: function () { self._registryDrawer(e.agentId); } }));
+          s.body.appendChild(r);
+        });
+      }
+
       s.body.appendChild(ui.button({ label: 'Done', variant: 'ghost', full: true, onClick: function () { s.close(); } }));
+    },
+
+    // Active version, full history, diffs, rollback (Admin), and audit refs.
+    async _registryDrawer(agentId) {
+      const ui = U(); const self = this; const R = global.AAA_PROMPT_REGISTRY;
+      const s = ui.sheet({ title: 'Prompt Registry — ' + agentId, subtitle: 'Versioned · hash-verified · reversible' });
+      document.body.appendChild(s.overlay);
+      const e = await R.entry(agentId); const verify = await R.verify(agentId);
+      s.body.innerHTML = '';
+      if (!e) { s.body.appendChild(ui.el('p', { className: 'aaa-empty', text: 'No registry entry.' })); return; }
+      s.body.appendChild(ui.el('div', { className: 'aaa-list-sub', html: '<strong>Active:</strong> v' + e.currentVersion + ' · <strong>Integrity:</strong> ' + (verify.ok ? '✅ verified' : '⛔ ' + esc(verify.reason)) }));
+      const history = await R.history(agentId);
+      history.slice().reverse().forEach((v) => {
+        const r = ui.el('div', { className: 'aaa-list-row' });
+        r.innerHTML = '<strong>v' + v.version + '</strong> · ' + esc(v.status) + (v.rollbackOf ? ' (rollback of v' + v.rollbackOf + ')' : '') +
+          '<div class="aaa-list-sub" style="white-space:pre-wrap;opacity:.85">' + esc(truncate(v.text, 200)) + '</div>' +
+          '<div class="aaa-list-sub">checksum ' + esc((v.checksum || '').slice(0, 10)) + '… · audit ' + esc(v.auditRef || '—') + '</div>';
+        if (canAct() && v.version !== e.currentVersion) {
+          r.appendChild(ui.button({ label: 'Roll back to v' + v.version, variant: 'ghost', size: 'sm', onClick: async function () { await R.rollback(agentId, v.version, { reason: 'manual rollback from UI' }); s.close(); self._registryDrawer(agentId); } }));
+        }
+        s.body.appendChild(r);
+      });
+      s.body.appendChild(ui.button({ label: '⬇ Export history (PII-stripped)', variant: 'ghost', size: 'sm', onClick: async function () { const r = await R.export(agentId, {}); downloadText('prompt-registry-' + agentId + '.json', JSON.stringify(r.json, null, 2)); } }));
+      s.body.appendChild(ui.button({ label: 'Close', variant: 'ghost', full: true, onClick: function () { s.close(); } }));
     },
 
     // Create a prompt-change proposal from an accepted improvement task.

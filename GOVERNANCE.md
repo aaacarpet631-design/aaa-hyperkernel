@@ -265,6 +265,40 @@ Audit (immutable ledger): `prompt_proposal_created / _submitted / _approved /
 _approval_denied / _rejected / _implemented / _rolled_back` and
 `prompt_evidence_exported`.
 
+## Governed versioned prompt registry (Phase 5)
+
+The safe registry that lets approved prompt/process changes apply **for real** —
+only through governance, fully reversible, fully audited. (`AAA_PROMPT_REGISTRY`,
+auto-wired as the Phase-4 pipeline's registry.)
+
+- **Versioned + hash-chained** — each agent has an entry (agentId, agentType,
+  name, currentVersion, status active/archived/rollback, createdBy/approvedBy,
+  timestamps) with an append-only `versions[]`, every version carrying a
+  checksum chained to the previous one.
+- **Safe API** — `getCurrent`, `getVersion`, `proposeVersion`, `approveVersion`,
+  `applyVersion`, `rollback`. Approve/apply/rollback are **Admin(owner)-only**;
+  apply requires an approved proposal + checklist confirmation + rollback note,
+  and records the ledger audit ref on the version.
+- **Governance integration** — the Phase-4 pipeline applies through this registry
+  (an approved Phase-4 proposal → propose→approve→apply, carrying its approval
+  context and source proposal id). Unapproved proposals cannot apply.
+- **Runtime** — agents call `resolve(agentId, fallback)` and get the active
+  version when one exists, else their built-in prompt. Nothing changes until an
+  Admin approves and applies — verified for the estimator and review-request
+  agents.
+- **Rollback** appends a NEW version carrying the target's text; history is never
+  deleted.
+- **Tamper resistance** — `verify(agentId)` recomputes the checksum chain;
+  `verifyAgainstLedger(agentId)` recomputes from stored text and compares to the
+  immutable ledger checksum — a direct mutation is detected either way.
+- **Export** — prompt history + approved proposals as JSON, with PII stripped
+  from evidence/reason fields.
+- **Diff + Rollback UI** — active version, full history with diffs, checksums,
+  audit refs, and an Admin-only rollback, in the Learning Command Center.
+
+Audit (immutable ledger): `prompt_version_proposed / _approved / _applied /
+_rolled_back` and `prompt_registry_exported`.
+
 ## Adding the next guardrail
 
 A new high-risk guardrail (say contract-clause review) needs only to:
