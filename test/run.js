@@ -19,6 +19,8 @@ const SUITES = [
   'unit/accounting.test.js',
   'unit/expense-classifier.test.js',
   'unit/receipt-intake.test.js',
+  'unit/controller-agent.test.js',
+  'unit/financial-intelligence-ui.test.js',
   'unit/crew-tools.test.js',
   'unit/scheduling.test.js',
   'unit/contracts.test.js',
