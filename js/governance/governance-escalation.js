@@ -64,6 +64,21 @@
       'and re-check its threshold before it suppresses legitimate output.';
   }
 
+  // Domains whose escalations are always critical (legal/financial exposure).
+  const HIGH_RISK_DOMAINS = ['legal', 'compliance', 'accounting', 'contract'];
+
+  /**
+   * Priority of an escalation — drives whether the notifier alerts a human.
+   * 'critical' for high-exposure domains or sustained drift (≥2× threshold);
+   * 'high' otherwise. Pure, so the notifier and tests share one definition.
+   */
+  function computePriority(e) {
+    if (!e) return 'normal';
+    if (HIGH_RISK_DOMAINS.indexOf(e.domain) !== -1) return 'critical';
+    if ((+e.overrideCount || 0) >= 2 * (+e.threshold || Infinity)) return 'critical';
+    return 'high';
+  }
+
   // ---- internals ------------------------------------------------------------
 
   function actor(partial) {
@@ -93,7 +108,7 @@
   }
 
   function notify(e) {
-    if (events()) events().emit('governance.escalation', { escalationId: e.id, kind: e.kind, domain: e.domain, category: e.category, status: e.status, overrideCount: e.overrideCount, threshold: e.threshold });
+    if (events()) events().emit('governance.escalation', { escalationId: e.id, kind: e.kind, domain: e.domain, category: e.category, status: e.status, priority: e.priority, overrideCount: e.overrideCount, threshold: e.threshold });
     try { if (data() && data().logAgent) data().logAgent('governance', 'Escalation: ' + e.category + ' (' + e.domain + ') — ' + e.overrideCount + ' ≥ ' + e.threshold, auditPayload(e)); } catch (_) {}
   }
 
@@ -105,6 +120,7 @@
     cooldownElapsed: cooldownElapsed,
     escalationId: escalationId,
     recommendDrift: recommendDrift,
+    computePriority: computePriority,
 
     /**
      * Generic escalation entry. Decides — based on count vs threshold, the
@@ -136,6 +152,7 @@
         const upd = Object.assign({}, existing, {
           overrideCount: count, affectedCaseIds: affected, recommendedAction: recommended, updatedAt: tnow
         });
+        upd.priority = computePriority(upd);
         // Re-notify only while OPEN (acknowledged silences) and past cooldown.
         let renotified = false;
         if (existing.status === 'open' && cooldownElapsed(existing.lastNotifiedAt, tnow, cooldownMs())) {
@@ -157,6 +174,7 @@
         overrideCount: count, threshold: threshold, windowIndex: widx,
         affectedCaseIds: affected, recommendedAction: recommended,
         guardrail: input.guardrail || null, model: input.model || null,
+        priority: computePriority({ domain: domain, overrideCount: count, threshold: threshold }),
         status: 'open', raisedAt: tnow, at: nowISO(),
         lastNotifiedAt: tnow, notifyCount: 1,
         acknowledgedAt: null, acknowledgedBy: null, resolvedAt: null, resolvedBy: null,

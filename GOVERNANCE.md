@@ -85,6 +85,40 @@ trigger; legal/accounting/contract/ad-copy/SMS/email/agent risks use the same
 override, so escalation is automatic — but additive: if the module is absent the
 override path is unaffected.
 
+## Delivery channels (`AAA_GOVERNANCE_NOTIFIER` + `/api/governance-alert`)
+
+Escalation *events* become real notifications through a pluggable channel
+registry. **Email is the only channel today**; SMS/push register later via
+`registerChannel('sms', …)` with no change to the escalation engine.
+
+- **Subscribe + gate** — the notifier subscribes once to `governance.escalation`
+  and only delivers events whose `priority` meets `governanceAlertMinPriority`
+  (default `high`). Because the engine emits *after* window/cooldown suppression,
+  cooldown is honored for free — no spam.
+- **PII-free by allowlist** — the payload forwarded to a channel is built from an
+  explicit allowlist (domain, category, count, threshold, affected case IDs,
+  recommended action, dashboard link, priority). Customer name/phone/email and
+  the drafted message can never be included.
+- **Audited** — every delivery writes `alert_attempt` then `alert_delivered` (with
+  provider response + timestamp) or `alert_failed` to the immutable ledger.
+- **Safe** — a channel error is caught; delivery failure never throws into the app.
+
+The email channel POSTs to the Netlify function **`/api/governance-alert`**
+(`netlify/functions/governance-alert.mjs`), which renders a PII-free email and
+sends it via the configured provider (`resend` | `postmark` | `sendgrid`).
+
+```bash
+# Netlify site env:
+GOVERNANCE_ALERT_EMAIL_TO=owner@yourco.com
+GOVERNANCE_ALERT_EMAIL_FROM=alerts@yourco.com      # verified sender
+GOVERNANCE_ALERT_EMAIL_PROVIDER=resend             # resend | postmark | sendgrid
+GOVERNANCE_ALERT_EMAIL_API_KEY=...                 # provider key
+```
+Optional client config: `dashboardUrl` (deep-link in the email),
+`governanceAlertEndpoint` (default `/api/governance-alert`),
+`governanceAlertMinPriority` (default `high`). With env missing, the function
+returns `MISSING_CONFIG` (500) and the app keeps running.
+
 ## Adding the next guardrail
 
 A new high-risk guardrail (say contract-clause review) needs only to:
