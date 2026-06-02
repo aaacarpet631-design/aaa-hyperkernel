@@ -97,6 +97,7 @@
     return Object.assign({
       escalationId: e.id, kind: e.kind, domain: e.domain, category: e.category,
       overrideCount: e.overrideCount, threshold: e.threshold,
+      metric: e.metric, value: e.value, detail: e.detail, severity: e.severity,
       affectedCaseIds: e.affectedCaseIds || [], recommendedAction: e.recommendedAction,
       status: e.status, windowIndex: e.windowIndex
     }, extra || {});
@@ -107,9 +108,14 @@
     return null;
   }
 
+  function measureOf(e) {
+    if (e.metric) return e.metric + '=' + (e.value != null ? e.value : '?');
+    return (e.overrideCount != null ? e.overrideCount : '?') + ' ≥ ' + e.threshold;
+  }
+
   function notify(e) {
-    if (events()) events().emit('governance.escalation', { escalationId: e.id, kind: e.kind, domain: e.domain, category: e.category, status: e.status, priority: e.priority, overrideCount: e.overrideCount, threshold: e.threshold });
-    try { if (data() && data().logAgent) data().logAgent('governance', 'Escalation: ' + e.category + ' (' + e.domain + ') — ' + e.overrideCount + ' ≥ ' + e.threshold, auditPayload(e)); } catch (_) {}
+    if (events()) events().emit('governance.escalation', { escalationId: e.id, kind: e.kind, domain: e.domain, category: e.category, status: e.status, priority: e.priority, overrideCount: e.overrideCount, threshold: e.threshold, metric: e.metric, value: e.value, detail: e.detail });
+    try { if (data() && data().logAgent) data().logAgent('governance', 'Escalation: ' + e.category + ' (' + e.domain + ') — ' + measureOf(e), auditPayload(e)); } catch (_) {}
   }
 
   const Escalation = {
@@ -204,6 +210,69 @@
         guardrail: matches.length ? matches[0].guardrail : null,
         model: matches.length ? matches[0].model : null
       });
+    },
+
+    /**
+     * Condition-based escalation for sustained breaches (e.g. an agent's
+     * accuracy/calibration/ROI crossing a line) — as opposed to count-windowed
+     * drift. One open breach per (kind, domain, category). Re-notify while open
+     * is cooldown-gated; a resolved breach that RECURS re-opens (also cooldown-
+     * gated and audited as escalation_reopened), since the condition came back.
+     * Caller passes the metric/value/threshold + recommended action.
+     */
+    async escalateBreach(input) {
+      input = input || {};
+      const kind = input.kind || 'agent_performance';
+      const domain = input.domain || 'agent';
+      const category = input.category || 'unknown';
+      const id = 'gesc_' + slug(kind) + '_' + slug(domain) + '_' + slug(category) + '_breach';
+      const tnow = now();
+      const prio = input.severity === 'critical' ? 'critical' : 'high';
+      const fields = {
+        metric: input.metric || null, value: input.value != null ? input.value : null,
+        threshold: input.threshold != null ? input.threshold : null,
+        detail: input.detail || null, severity: input.severity || 'high',
+        affectedCaseIds: Array.isArray(input.affectedCaseIds) ? input.affectedCaseIds : [],
+        recommendedAction: input.recommendedAction || null, priority: prio
+      };
+      const existing = await get(id);
+
+      if (existing) {
+        if (existing.status === 'resolved') {
+          if (!cooldownElapsed(existing.lastNotifiedAt, tnow, cooldownMs())) {
+            const held = Object.assign({}, existing, fields, { updatedAt: tnow });
+            await put(id, held);
+            return { ok: true, escalated: false, suppressed: true, reason: 'COOLDOWN', escalation: held };
+          }
+          const re = Object.assign({}, existing, fields, {
+            status: 'open', reopenedAt: tnow, lastNotifiedAt: tnow,
+            notifyCount: (existing.notifyCount || 0) + 1, resolvedAt: null, resolvedBy: null, updatedAt: tnow
+          });
+          await put(id, re);
+          await audit('escalation_reopened', auditPayload(re));
+          notify(re);
+          return { ok: true, escalated: true, reopened: true, escalation: re };
+        }
+        const upd = Object.assign({}, existing, fields, { updatedAt: tnow });
+        let renotified = false;
+        if (existing.status === 'open' && cooldownElapsed(existing.lastNotifiedAt, tnow, cooldownMs())) {
+          upd.lastNotifiedAt = tnow; upd.notifyCount = (existing.notifyCount || 0) + 1;
+          await put(id, upd); await audit('escalation_notified', auditPayload(upd)); notify(upd); renotified = true;
+        } else {
+          await put(id, upd);
+        }
+        return { ok: true, escalated: false, suppressed: !renotified, renotified: renotified, escalation: upd };
+      }
+
+      const esc = Object.assign({
+        id: id, kind: kind, domain: domain, category: category,
+        status: 'open', raisedAt: tnow, at: nowISO(), lastNotifiedAt: tnow, notifyCount: 1,
+        acknowledgedAt: null, acknowledgedBy: null, resolvedAt: null, resolvedBy: null, updatedAt: tnow
+      }, fields);
+      await put(id, esc);
+      await audit('escalation_raised', auditPayload(esc));
+      notify(esc);
+      return { ok: true, escalated: true, escalation: esc };
     },
 
     /** Owner/admin acknowledges they are on it — silences re-notification. */

@@ -29,8 +29,12 @@ const SUITES = [
   'unit/audit-ledger.test.js',
   'unit/governance.test.js',
   'unit/governance-escalation.test.js',
+  'unit/governance-escalation-breach.test.js',
   'unit/governance-notifier.test.js',
   'unit/governance-alert.test.js',
+  'unit/agent-outcomes.test.js',
+  'unit/agent-scorecards.test.js',
+  'unit/governance-supervisor.test.js',
   'unit/review-governance.test.js',
   'static/integrity.test.js',
   'smoke/boot.test.js'

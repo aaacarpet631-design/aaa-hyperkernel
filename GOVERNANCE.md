@@ -119,6 +119,48 @@ Optional client config: `dashboardUrl` (deep-link in the email),
 `governanceAlertMinPriority` (default `high`). With env missing, the function
 returns `MISSING_CONFIG` (500) and the app keeps running.
 
+## Governance Intelligence Layer (Phase 1 — measurement infrastructure)
+
+Governance no longer only reacts to safety events; it **supervises AI
+performance**. Every measurable agent decision (quote, accounting, estimator,
+contract, SEO, ads, review, scheduling, BI …) is registered, linked to its
+real-world outcome, scored, and — when a line is crossed — escalated. This phase
+builds the measurement infrastructure only. **No autonomous prompt
+modification.**
+
+- **Agent Outcome Registry** (`AAA_AGENT_OUTCOMES`) — `recordDecision({ agentId,
+  agentType, confidence, recommendation, … })` → a record with `outcomeStatus`
+  (`pending → successful | unsuccessful | overridden | abandoned`).
+  `attachOutcome(decisionId, { result, value })` links a real result
+  (won_job, lost_job, refund, complaint, chargeback, review_received,
+  contract_signed, ad_conversion) and is written to the immutable ledger.
+- **Training Queue** — every unsuccessful or overridden decision is queued
+  (`gov_training_queue`) with decision, outcome, override reason, human
+  correction, and final result. Labeled data for the future supervisor.
+- **Agent Scorecards** (`AAA_AGENT_SCORECARDS`) — per agent: accuracy, override
+  rate, success rate, average confidence, confidence calibration (Brier),
+  ROI impact, revenue influenced, false-positive/negative rates. Metrics are
+  `null` when the sample is thin (unproven, never falsely "bad"). `recompute()`
+  persists the card, audits a **material score change** (`score_changed`), and
+  raises **breach escalations** for low accuracy / override spike / broken
+  calibration / ROI drop / accuracy drift.
+- **Escalation integration** — breaches use `AAA_GOVERNANCE_ESCALATION.escalateBreach()`
+  (condition-based sibling of count-windowed drift): one open breach per
+  (kind, domain, agent), cooldown-gated re-notify, status lifecycle, and a
+  resolved breach **re-opens on recurrence**. These flow through the same
+  notifier → email channel as every other escalation.
+- **Governance Supervisor foundation** (`AAA_GOVERNANCE_SUPERVISOR`) —
+  `review(agentType)` turns a scorecard into retraining **recommendations**
+  (logged as `retraining_recommendation`, flagged `autonomous:false`).
+  `registerAnalyzer(fn)` is the hook for future supervisor agents. `applyChange()`
+  is deliberately disabled — measurement first, no autonomous changes.
+- **Dashboard** — Executive Intelligence shows top/worst agents, drifting agents,
+  excessive-override agents, and agents needing retraining.
+
+Audit (immutable ledger): every `outcome_attached`, `score_changed`,
+`retraining_recommendation`, and escalation transition is recorded and
+hash-chain verified.
+
 ## Adding the next guardrail
 
 A new high-risk guardrail (say contract-clause review) needs only to:

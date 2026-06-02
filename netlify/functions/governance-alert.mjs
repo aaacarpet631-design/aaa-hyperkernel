@@ -25,7 +25,7 @@
 
 // Only these keys are ever rendered into an email. Anything else on the payload
 // (e.g. a stray customer field) is dropped by construction.
-const ALLOWED = ['domain', 'category', 'count', 'threshold', 'affectedCaseIds', 'recommendedAction', 'dashboardUrl', 'priority', 'kind', 'escalationId'];
+const ALLOWED = ['domain', 'category', 'count', 'threshold', 'affectedCaseIds', 'recommendedAction', 'dashboardUrl', 'priority', 'kind', 'escalationId', 'metric', 'value', 'detail', 'severity'];
 
 export function json(body, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -65,7 +65,9 @@ export function buildEmailContent(raw) {
     'Domain:          ' + (p.domain || '—'),
     'Category:        ' + (p.category || '—'),
     'Override count:  ' + (p.count != null ? p.count : '—'),
+    'Metric:          ' + (p.metric != null ? p.metric + ' = ' + (p.value != null ? p.value : '—') : '—'),
     'Threshold:       ' + (p.threshold != null ? p.threshold : '—'),
+    'Detail:          ' + (p.detail != null ? p.detail : '—'),
     'Affected cases:  ' + (ids.length ? ids.join(', ') : '—'),
     '',
     'Recommended action:',

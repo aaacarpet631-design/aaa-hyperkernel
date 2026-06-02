@@ -107,6 +107,7 @@
     const evoList = evolution() ? (await evolution().list()).slice(0, 1) : [];
     const supMetrics = global.AAA_SUPERVISOR ? await global.AAA_SUPERVISOR.metrics() : { ok: false };
     const govMetrics = global.AAA_GOVERNANCE ? await global.AAA_GOVERNANCE.metrics() : null;
+    const agentInsights = global.AAA_AGENT_SCORECARDS ? await global.AAA_AGENT_SCORECARDS.insights() : null;
 
     body.innerHTML = '';
 
@@ -145,6 +146,22 @@
       if (govMetrics.reviewQueue) body.appendChild(kv('Supervisor Review Queue', govMetrics.reviewQueue, AMBER));
       if (govMetrics.alerts) body.appendChild(kv('Drift Alerts', govMetrics.alerts, RED));
       if (govMetrics.escalations) body.appendChild(kv('Open Escalations', govMetrics.escalations, RED));
+    }
+
+    // ---- Agent performance (Governance Intelligence Layer) ----
+    if (agentInsights) {
+      const anyCards = (agentInsights.top.length + agentInsights.worst.length) > 0;
+      body.appendChild(section('Agent Performance'));
+      if (!anyCards) {
+        body.appendChild(note('No agent has enough scored outcomes yet — agents are unproven, not bad.'));
+      } else {
+        const fmtCard = function (c) { return c.agentType + ' · ' + pct(c.successRate) + ' success · acc ' + pct(c.accuracy) + ' · ' + (c.samples ? c.samples.considered : 0) + ' scored'; };
+        if (agentInsights.top.length) { body.appendChild(note('Top performing')); agentInsights.top.forEach(function (c) { body.appendChild(row('<strong style="color:' + GREEN + '">' + esc(c.agentType) + '</strong><div class="aaa-list-sub">' + esc(fmtCard(c)) + '</div>')); }); }
+        if (agentInsights.worst.length) { body.appendChild(note('Worst performing')); agentInsights.worst.forEach(function (c) { body.appendChild(row('<strong style="color:' + RED + '">' + esc(c.agentType) + '</strong><div class="aaa-list-sub">' + esc(fmtCard(c)) + '</div>')); }); }
+        if (agentInsights.drifting.length) body.appendChild(kv('Drifting agents', agentInsights.drifting.map(function (c) { return c.agentType; }).join(', '), AMBER));
+        if (agentInsights.excessiveOverrides.length) body.appendChild(kv('Excessive overrides', agentInsights.excessiveOverrides.map(function (c) { return c.agentType; }).join(', '), AMBER));
+        if (agentInsights.needingRetraining.length) body.appendChild(kv('Needs retraining', agentInsights.needingRetraining.map(function (c) { return c.agentType; }).join(', '), RED));
+      }
     }
     body.appendChild(kv('Prediction Accuracy (calibration)', supMetrics.ok && supMetrics.avgCalibration != null ? String(supMetrics.avgCalibration) : '—', BLUE));
     body.appendChild(kv('Close Rate', supMetrics.ok ? pct(supMetrics.closeRate) : '—'));

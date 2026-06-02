@@ -28,7 +28,7 @@
 
   const RANK = { low: 0, normal: 1, high: 2, critical: 3 };
   // Only governance metadata is ever forwarded to a channel. No customer data.
-  const ALLOWED = ['escalationId', 'kind', 'domain', 'category', 'count', 'threshold', 'affectedCaseIds', 'recommendedAction', 'dashboardUrl', 'priority'];
+  const ALLOWED = ['escalationId', 'kind', 'domain', 'category', 'count', 'threshold', 'affectedCaseIds', 'recommendedAction', 'dashboardUrl', 'priority', 'metric', 'value', 'detail', 'severity'];
 
   function minPriority() { return cfg().flag ? cfg().flag('governanceAlertMinPriority', 'high') : 'high'; }
   function endpoint() { return cfg().flag ? cfg().flag('governanceAlertEndpoint', '/api/governance-alert') : '/api/governance-alert'; }
@@ -44,6 +44,7 @@
     const out = {
       escalationId: esc.id, kind: esc.kind, domain: esc.domain, category: esc.category,
       count: esc.overrideCount, threshold: esc.threshold,
+      metric: esc.metric, value: esc.value, detail: esc.detail, severity: esc.severity,
       affectedCaseIds: Array.isArray(esc.affectedCaseIds) ? esc.affectedCaseIds.slice() : [],
       recommendedAction: esc.recommendedAction, priority: esc.priority
     };
