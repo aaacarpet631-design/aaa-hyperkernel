@@ -156,6 +156,7 @@
           category: r.category,
           description: expenseDescription(r),
           amount: amount,
+          receiptId: id,
           incurredAt: (r.ocr && r.ocr.date) || nowISO()
         })
       });
