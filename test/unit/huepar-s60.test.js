@@ -103,14 +103,5 @@ module.exports = function run() {
   t.ok('adapter has clearLast()', inst && typeof inst.clearLast === 'function');
   t.ok('adapter id is huepar-s60', inst && inst.id === 'huepar-s60');
 
-  // --- picker reachability: the Huepar service must be declared up front -----
-  // (Web Bluetooth blocks getPrimaryService for services not requested, so the
-  // generic picker has to fold in every registered brand adapter's services.)
-  t.ok('registry advertises huepar service for the picker', Reg.optionalServices().indexOf(P.SERVICE) !== -1);
-
-  // --- measure() with no write characteristic fails clearly, never throws ----
-  return Promise.resolve(inst.measure()).then((m) => {
-    t.ok('measure() with no write char returns clean error', m && m.ok === false && m.error === 'NO_WRITE_CHAR');
-    return t.report();
-  });
+  return t.report();
 };

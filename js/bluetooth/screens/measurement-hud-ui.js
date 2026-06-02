@@ -151,6 +151,18 @@
       body.appendChild(ui.button({ label: 'Start measuring', icon: '📐', variant: 'primary', full: true, onClick: () => startBluetoothCapture() }));
       body.appendChild(ui.button({ label: 'Disconnect', icon: '⏏', variant: 'danger', full: true, onClick: async () => { await ble().disconnect(); render(); } }));
     } else {
+      // Self-diagnosing panel: when the last connect failed, show the REAL cause
+      // and the device's advertised services instead of a bare "error" pill.
+      if (s.status === 'error' && s.errorDetail) {
+        const d = s.errorDetail;
+        const svcs = (d.discoveredServices && d.discoveredServices.length) ? d.discoveredServices.join(', ') : 'none discovered';
+        body.appendChild(ui.el('div', { className: 'aaa-list-row', style: { borderColor: '#EF4444' }, html:
+          '<strong style="color:#EF4444">Connection failed</strong>' +
+          '<div class="aaa-list-sub">' + esc(d.message || s.error || 'Unknown error') + '</div>' +
+          (d.errorName ? '<div class="aaa-list-sub">Type: ' + esc(d.errorName) + '</div>' : '') +
+          (d.deviceName ? '<div class="aaa-list-sub">Device: ' + esc(d.deviceName) + '</div>' : '') +
+          '<div class="aaa-list-sub">Services seen: ' + esc(svcs) + '</div>' }));
+      }
       body.appendChild(ui.button({ label: s.status === 'connecting' ? 'Connecting…' : 'Connect', icon: '🔗', variant: 'primary', full: true, disabled: s.status === 'connecting', onClick: async () => {
         const res = await ble().connect();
         if (!res.ok) toast(body, res.message || res.error, '#EF4444');

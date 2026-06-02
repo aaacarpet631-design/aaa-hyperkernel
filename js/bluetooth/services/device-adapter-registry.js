@@ -28,10 +28,8 @@
         id: def.id, label: def.label || def.id,
         match: typeof def.match === 'function' ? def.match : () => false,
         factory: def.factory, priority: def.priority || 0,
-        // Brand service UUIDs this adapter needs reachable post-connect. They
-        // MUST be declared to the OS picker up front (Web Bluetooth blocks
-        // getPrimaryService for services not requested), so the generic picker
-        // folds these in — registering a brand adapter is all it takes.
+        // Optional GATT services this brand needs declared at requestDevice time
+        // so getPrimaryService() is permitted post-connect (Web Bluetooth rule).
         optionalServices: Array.isArray(def.optionalServices) ? def.optionalServices.slice() : []
       };
       if (existing !== -1) adapters[existing] = entry; else adapters.push(entry);
@@ -40,10 +38,19 @@
 
     list() { return adapters.map((a) => ({ id: a.id, label: a.label, priority: a.priority })); },
 
-    /** Union of every registered adapter's optional service UUIDs, deduped. */
-    optionalServices() {
+    /**
+     * Union of every registered adapter's optional services. scanAndPick declares
+     * these up front so that whichever brand the user picks, its service is
+     * already accessible — fixing the SecurityError on getPrimaryService() that
+     * occurred when only the generic (battery-only) filter was used.
+     */
+    allOptionalServices() {
+      const seen = {};
       const out = [];
-      adapters.forEach((a) => (a.optionalServices || []).forEach((s) => { if (s && out.indexOf(s) === -1) out.push(s); }));
+      adapters.forEach((a) => (a.optionalServices || []).forEach((s) => {
+        const key = String(s).toLowerCase();
+        if (!seen[key]) { seen[key] = true; out.push(s); }
+      }));
       return out;
     },
 
@@ -72,6 +79,7 @@
       label: 'Generic Bluetooth (BLE)',
       priority: -100,                 // always lowest — pure fallback
       match: () => true,
+      optionalServices: ['battery_service'],
       factory: () => new global.AAA_GENERIC_BLE_ADAPTER()
     });
   }

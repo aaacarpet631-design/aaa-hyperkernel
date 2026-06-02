@@ -44,22 +44,36 @@
     get firebaseRegion() { return read('firebaseRegion', 'us-central1'); },
     get firebaseFunctionUrl() { return read('firebaseFunctionUrl', null); },
 
-    /** Claude proxy endpoint. Firebase Cloud Function if Firebase is the
-     *  backend, else the Supabase edge function. Overridable via proxyUrl. */
+    /** Which AI backend the proxy funnel targets: 'claude' (default) or
+     *  'nemotron' (NVIDIA-hosted Nemotron). Flip with AAA_CONFIG.set; every
+     *  agent call follows automatically — agent-pinned Claude model ids are
+     *  mapped server-side, so no callsite changes are needed. */
+    get aiProvider() { return read('aiProvider', 'claude'); },
+    /** Served Nemotron model name (only the server uses this; here for refs). */
+    get nemotronModel() { return read('nemotronModel', 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning'); },
+
+    /** AI proxy endpoint. Firebase Cloud Function if Firebase is the backend,
+     *  else the Supabase edge function. The function name follows aiProvider
+     *  (claudeProxy/claude-proxy vs nemotronProxy/nemotron-proxy). Overridable
+     *  via proxyUrl (e.g. /api/claude or /api/nemotron on Netlify). */
     get proxyUrl() {
       const explicit = read('proxyUrl', null);
       if (explicit) return explicit;
+      const nemotron = this.aiProvider === 'nemotron';
       if (this.firebaseProjectId) {
         return this.firebaseFunctionUrl ||
-          ('https://' + this.firebaseRegion + '-' + this.firebaseProjectId + '.cloudfunctions.net/claudeProxy');
+          ('https://' + this.firebaseRegion + '-' + this.firebaseProjectId + '.cloudfunctions.net/' +
+            (nemotron ? 'nemotronProxy' : 'claudeProxy'));
       }
       const url = this.supabaseUrl;
-      return url ? url.replace(/\/$/, '') + '/functions/v1/claude-proxy' : null;
+      return url ? url.replace(/\/$/, '') + '/functions/v1/' + (nemotron ? 'nemotron-proxy' : 'claude-proxy') : null;
     },
     /** Vision endpoint (Netlify function by default). */
     get visionEndpoint() { return read('visionEndpoint', '/api/vision'); },
     /** Sync endpoint (Netlify Blobs by default). */
     get syncEndpoint() { return read('syncEndpoint', '/api/sync'); },
+    /** Audio transcription endpoint (Netlify Whisper proxy by default). */
+    get transcriptionEndpoint() { return read('transcriptionEndpoint', '/api/transcribe'); },
     /** Auto-pilot: let agents act on domain events. Off by default. */
     get autoAgents() { return !!read('autoAgents', false); },
     /** Business name + Google review link used in review-request messages. */

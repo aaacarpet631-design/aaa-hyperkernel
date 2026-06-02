@@ -12,7 +12,10 @@
 const { onRequest } = require('firebase-functions/v2/https');
 const { defineSecret } = require('firebase-functions/params');
 
+const nemo = require('./nemotron-translate');
+
 const ANTHROPIC_API_KEY = defineSecret('ANTHROPIC_API_KEY');
+const NVIDIA_API_KEY = defineSecret('NVIDIA_API_KEY');
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
 const DEFAULT_MODEL = 'claude-opus-4-8';
 
@@ -45,6 +48,48 @@ exports.claudeProxy = onRequest(
         ? data.content.filter((b) => b.type === 'text').map((b) => b.text).join('')
         : '';
       return res.json({ ok: true, text, content: data.content, usage: data.usage, stop_reason: data.stop_reason });
+    } catch (e) {
+      return res.status(502).json({ ok: false, error: 'PROXY_FAILED', message: String((e && e.message) || e) });
+    }
+  }
+);
+
+/*
+ * nemotronProxy — same funnel, NVIDIA-hosted Nemotron backend.
+ *
+ * A drop-in alternative to claudeProxy that routes agent / reasoning / vision
+ * calls to NVIDIA's OpenAI-compatible Nemotron endpoint. The app's request and
+ * response shapes are unchanged (see nemotron-translate), so switching is just
+ * a config flip (AAA_CONFIG.set({ aiProvider: 'nemotron' })) — no agent code
+ * changes. Claude model ids in agent payloads transparently map to Nemotron.
+ *
+ * Deploy:  firebase deploy --only functions:nemotronProxy
+ * Secret:  firebase functions:secrets:set NVIDIA_API_KEY
+ */
+exports.nemotronProxy = onRequest(
+  { secrets: [NVIDIA_API_KEY], cors: true, region: 'us-central1' },
+  async (req, res) => {
+    if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'METHOD_NOT_ALLOWED' });
+
+    const key = NVIDIA_API_KEY.value() || process.env.NVIDIA_API_KEY;
+    if (!key) return res.status(500).json({ ok: false, error: 'MISSING_API_KEY' });
+
+    const body = req.body || {};
+    if (!Array.isArray(body.messages) || body.messages.length === 0) {
+      return res.status(400).json({ ok: false, error: 'NO_MESSAGES' });
+    }
+
+    const payload = nemo.toRequest(body, { defaultModel: process.env.NEMOTRON_MODEL });
+
+    try {
+      const r = await fetch(nemo.NVIDIA_URL, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', authorization: 'Bearer ' + key },
+        body: JSON.stringify(payload),
+      });
+      const data = await r.json();
+      if (!r.ok) return res.status(r.status).json({ ok: false, error: 'NVIDIA_ERROR', detail: data });
+      return res.json(nemo.fromResponse(data));
     } catch (e) {
       return res.status(502).json({ ok: false, error: 'PROXY_FAILED', message: String((e && e.message) || e) });
     }
