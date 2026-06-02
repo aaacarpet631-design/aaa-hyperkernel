@@ -44,6 +44,9 @@
       }, extra || {});
       await store().put('outcomes', id, rec);
       this._mirrorOutcome(rec); // best-effort
+      // Governance instrumentation (additive, non-blocking): lets the bridge
+      // auto-attach this outcome to any pending agent decisions for the job.
+      try { if (global.AAA_EVENTS) global.AAA_EVENTS.emit('outcome.recorded', rec); } catch (_) {}
       return rec;
     },
 

@@ -46,9 +46,30 @@
     return null;
   }
 
+  /** Has a decision's content materially changed (recommendation or confidence)? */
+  function materiallyChangedDecision(a, b) {
+    if (String(a.recommendation == null ? '' : a.recommendation) !== String(b.recommendation == null ? '' : b.recommendation)) return true;
+    const ca = a.confidence == null ? null : a.confidence, cb = b.confidence == null ? null : b.confidence;
+    if (ca == null && cb == null) return false;
+    if (ca == null || cb == null) return true;
+    return Math.abs(ca - cb) >= 0.1;
+  }
+
   async function audit(type, payload) {
     try { if (ledger() && ledger().append) return await ledger().append(type, payload); } catch (_) {}
     return null;
+  }
+
+  // Ledger payload for a decision (customerId is kept here as an internal
+  // reference; the alert/email layer never includes it).
+  function auditOf(rec) {
+    return {
+      decisionId: rec.decisionId, agentId: rec.agentId, agentType: rec.agentType,
+      subjectType: rec.subjectType, subjectId: rec.subjectId,
+      jobId: rec.jobId, quoteId: rec.quoteId, customerId: rec.customerId,
+      confidence: rec.confidence, sourceModule: rec.sourceModule, agentVersion: rec.agentVersion,
+      at: rec.updatedAt || rec.createdAt
+    };
   }
 
   const Outcomes = {
@@ -57,26 +78,60 @@
     FAILURE_RESULTS: FAILURE_RESULTS,
     normConfidence: normConfidence,
     resultToStatus: resultToStatus,
+    materiallyChangedDecision: materiallyChangedDecision,
 
     /**
-     * Register an agent decision. outcomeStatus starts 'pending'.
+     * Register an agent decision (idempotent). outcomeStatus starts 'pending'.
+     * If the SAME agent (agentId) already has a PENDING decision for the SAME
+     * subject, an unchanged recommendation REUSES it; a materially-changed one
+     * UPDATES it in place (keeping decisionId). Both creation and update are
+     * written to the immutable ledger.
      * @param {object} d { agentId, agentType, confidence, recommendation,
-     *                      subjectType?, subjectId?, decisionId? }
+     *   subjectType?, subjectId?, jobId?, quoteId?, customerId?, sourceModule?,
+     *   agentVersion?, decisionId? }
      */
     async recordDecision(d) {
       if (!data() || !data().put) return { ok: false, error: 'NO_DATA' };
       d = d || {};
       if (!d.agentId || !d.agentType) return { ok: false, error: 'AGENT_REQUIRED' };
-      const id = d.decisionId || ((ids() && ids().createId) ? ids().createId('adec') : ('adec_' + Date.now()));
-      const rec = {
-        decisionId: id, agentId: d.agentId, agentType: d.agentType,
-        timestamp: now(), confidence: normConfidence(d.confidence),
+
+      const fields = {
+        agentId: d.agentId, agentType: d.agentType,
+        confidence: normConfidence(d.confidence),
         recommendation: d.recommendation != null ? d.recommendation : null,
         subjectType: d.subjectType || null, subjectId: d.subjectId || null,
+        jobId: d.jobId || null, quoteId: d.quoteId || null,
+        customerId: d.customerId || null,           // internal reference only — never emailed
+        sourceModule: d.sourceModule || null, agentVersion: d.agentVersion || null
+      };
+
+      // Idempotency: reuse/update an existing PENDING decision for the same
+      // agent instance + subject (avoids duplicate records on agent re-runs).
+      let existing = null;
+      if (d.decisionId) existing = await this.getDecision(d.decisionId);
+      if (!existing && fields.subjectId) {
+        const all = await this.listDecisions();
+        existing = all.find(function (x) {
+          return x.agentId === fields.agentId && x.agentType === fields.agentType &&
+            x.subjectType === fields.subjectType && x.subjectId === fields.subjectId && x.outcomeStatus === 'pending';
+        }) || null;
+      }
+      if (existing) {
+        if (!materiallyChangedDecision(existing, fields)) return { ok: true, decision: existing, reused: true };
+        const upd = Object.assign({}, existing, fields, { updatedAt: now() });
+        await data().put(DECISIONS, existing.decisionId, upd);
+        await audit('decision_updated', auditOf(upd));
+        if (events()) events().emit('agent.decision', { decisionId: upd.decisionId, agentType: upd.agentType, updated: true });
+        return { ok: true, decision: upd, updated: true };
+      }
+
+      const id = d.decisionId || ((ids() && ids().createId) ? ids().createId('adec') : ('adec_' + Date.now()));
+      const rec = Object.assign({ decisionId: id, timestamp: now() }, fields, {
         outcomeStatus: 'pending', outcome: null, override: null, humanCorrection: null,
         createdAt: now(), updatedAt: now()
-      };
+      });
       await data().put(DECISIONS, id, rec);
+      await audit('decision_recorded', auditOf(rec));
       if (events()) events().emit('agent.decision', { decisionId: id, agentType: rec.agentType });
       return { ok: true, decision: rec };
     },
@@ -117,8 +172,28 @@
 
     /** Find decisions by subject (e.g. a job/quote id) and attach the same outcome. */
     async attachOutcomeBySubject(subjectType, subjectId, outcome) {
+      if (!subjectId) return { ok: true, attached: 0, results: [] };
       const all = await this.listDecisions();
       const matches = all.filter(function (d) { return d.subjectType === subjectType && d.subjectId === subjectId && d.outcomeStatus === 'pending'; });
+      const results = [];
+      for (const d of matches) results.push(await this.attachOutcome(d.decisionId, outcome));
+      return { ok: true, attached: results.length, results: results };
+    },
+
+    /**
+     * Attach an outcome to all PENDING decisions linked to a job (optionally
+     * restricted to certain agentTypes). Backfill-safe: a job with no recorded
+     * decisions simply attaches nothing — it never throws.
+     * @param {object} [opts] { agentTypes?: string[] }
+     */
+    async attachOutcomeByJob(jobId, outcome, opts) {
+      opts = opts || {};
+      if (!jobId) return { ok: true, attached: 0, results: [] };
+      const types = Array.isArray(opts.agentTypes) ? opts.agentTypes : null;
+      const all = await this.listDecisions();
+      const matches = all.filter(function (d) {
+        return d.jobId === jobId && d.outcomeStatus === 'pending' && (!types || types.indexOf(d.agentType) !== -1);
+      });
       const results = [];
       for (const d of matches) results.push(await this.attachOutcome(d.decisionId, outcome));
       return { ok: true, attached: results.length, results: results };

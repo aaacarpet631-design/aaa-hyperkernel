@@ -71,7 +71,24 @@
       parsed.reviewRequired = true; // enforce, regardless of model output
       // Fold in local hard-warnings so nothing the deterministic checks caught is lost.
       parsed.unrealistic = dedupe((parsed.unrealistic || []).concat(local.unrealistic));
-      return { ok: true, mode: 'ai', review: parsed };
+
+      // Governance measurement (Phase 2): record the estimator's review as a
+      // measured decision so the job's real outcome (won/lost) can attach to it.
+      // Advisory-only and non-blocking — the human still confirms pricing.
+      let decisionId = null;
+      const ctx = context || {};
+      if (global.AAA_GOVERNANCE_BRIDGE) {
+        try {
+          const md = await global.AAA_GOVERNANCE_BRIDGE.measure('estimator', {
+            agentId: 'measurement_assistant', subjectType: 'job', subjectId: ctx.jobId || null,
+            jobId: ctx.jobId || null, customerId: ctx.customerId || null,
+            confidence: parsed.quoteConfidence, recommendation: parsed.repairVsReplace || parsed.fieldNotesSummary || 'measurement review',
+            sourceModule: 'measurement-ai-assistant'
+          });
+          if (md && md.decision) decisionId = md.decision.decisionId;
+        } catch (_) { /* additive */ }
+      }
+      return { ok: true, mode: 'ai', review: parsed, governanceDecisionId: decisionId };
     },
 
     /** Deterministic, offline checks — always run, no network needed. */

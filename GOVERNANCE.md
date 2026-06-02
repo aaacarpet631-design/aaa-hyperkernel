@@ -161,6 +161,39 @@ Audit (immutable ledger): every `outcome_attached`, `score_changed`,
 `retraining_recommendation`, and escalation transition is recorded and
 hash-chain verified.
 
+## Automatic measurement (Phase 2 — instrumentation & linkage)
+
+Governance is now active, not passive: important agent outputs and real business
+outcomes feed the registry automatically. Pure instrumentation — no behavior
+change to pricing, contracts, or customer-facing sends; every hook is wrapped so
+a failure can never break the originating flow.
+
+- **Bridge** (`AAA_GOVERNANCE_BRIDGE`) — `measure(agentType, opts)` records a
+  decision (idempotent, audited); business events auto-attach outcomes. It
+  subscribes to the app's existing `outcome.recorded` (won/lost/review/refund…)
+  and `contract.signed` events and maps the app's vocabulary to registry results.
+- **Decision linking** — every decision carries subjectType, subjectId, jobId,
+  quoteId, customerId (internal reference only — never emailed), sourceModule,
+  and agentVersion.
+- **Idempotency** — the same agent + subject with an unchanged recommendation
+  REUSES the pending decision; a materially-changed one UPDATES it in place
+  (audited `decision_updated`). No duplicate rows on re-runs.
+- **Backfill-safe** — `attachOutcomeByJob` / `attachOutcomeBySubject` simply
+  attach nothing for legacy jobs that have no recorded decision; they never throw.
+- **Wired today** — the **estimator** (`measurement-ai-assistant`) and the
+  **review-request** agent record decisions; job won/lost, review received, and
+  contract signed auto-attach. Scheduling/contract/ad/SEO agents inherit the same
+  `measure()` call when present.
+- **Visibility** — agent-drafted outputs show an unobtrusive **"Measured by
+  Governance"** chip (`AAA_GOV_BADGE.badge(decisionId)`) opening a drawer with the
+  decision id, agent, confidence, status, attached outcome, and audit ref. The
+  main job list is left uncluttered.
+- **Audit** — every auto-recorded decision (`decision_recorded`/`decision_updated`)
+  and every auto-attached outcome (`outcome_attached`) enters the immutable ledger.
+
+No autonomous retraining or prompt modification — this phase is instrumentation,
+linkage, audit, and visibility only.
+
 ## Adding the next guardrail
 
 A new high-risk guardrail (say contract-clause review) needs only to:

@@ -383,6 +383,11 @@
       msg.value = rec.message || '';
       s.body.appendChild(ui.el('label', { className: 'aaa-field-label', text: 'Message (edit if you like)' }));
       s.body.appendChild(msg);
+      // Unobtrusive governance measurement indicator on this agent-drafted output.
+      if (rec.governanceDecisionId && global.AAA_GOV_BADGE) {
+        const b = global.AAA_GOV_BADGE.badge(rec.governanceDecisionId);
+        if (b) s.body.appendChild(b);
+      }
 
       function links() { return engine.links(Object.assign({}, rec, { message: msg.value })); }
       const smsA = ui.el('a', { className: 'aaa-btn aaa-btn--primary aaa-btn--full', text: '✉ Send via SMS', attrs: { role: 'button' } });

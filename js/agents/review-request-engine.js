@@ -133,6 +133,21 @@
         } catch (_) { /* governance is additive; never blocks preparing the record */ }
       }
 
+      // Governance measurement (Phase 2): record this AI-drafted review as a
+      // measured decision so its real-world outcome (review received) can be
+      // attached later. Instrumentation only — never blocks preparing the record.
+      let decisionId = null;
+      if (gen.source === 'ai' && global.AAA_GOVERNANCE_BRIDGE) {
+        try {
+          const md = await global.AAA_GOVERNANCE_BRIDGE.measure('review_request', {
+            agentId: 'review_request', subjectType: 'review_request', subjectId: id,
+            jobId: jobId, customerId: job.customerId || null, recommendation: gen.text,
+            sourceModule: 'review-request-engine'
+          });
+          if (md && md.decision) decisionId = md.decision.decisionId;
+        } catch (_) { /* additive */ }
+      }
+
       const rec = {
         id: id,
         jobId: jobId, customerId: job.customerId || null,
@@ -142,6 +157,7 @@
         message: gen.text, link: cfg().reviewUrl || null,
         channel: null, status: status,
         safety: safety,            // verdict, category, raw, model, timestamp, contextId
+        governanceDecisionId: decisionId,
         createdAt: clock() ? clock().now() : Date.now()
       };
       await data().put('review_requests', rec.id, rec);

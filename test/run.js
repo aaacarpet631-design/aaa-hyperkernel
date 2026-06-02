@@ -35,6 +35,7 @@ const SUITES = [
   'unit/agent-outcomes.test.js',
   'unit/agent-scorecards.test.js',
   'unit/governance-supervisor.test.js',
+  'unit/governance-bridge.test.js',
   'unit/review-governance.test.js',
   'static/integrity.test.js',
   'smoke/boot.test.js'
