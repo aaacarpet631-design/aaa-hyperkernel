@@ -28,21 +28,27 @@
   // Transparent baseline analyzer: turns a scorecard into recommendations.
   function baseAnalyzer(card, th) {
     if (!card || !card.samples || card.samples.considered < th.minSample) return [];
+    // Recommendation confidence rises with sample size (transparent, bounded).
+    const n = card.samples ? card.samples.considered : 0;
+    const conf = Math.round((n / (n + 5)) * 100) / 100;
+    const ev = function (metric, value, threshold) { return { metric: metric, value: value, threshold: threshold, samples: n }; };
+    const mk = function (r) { return Object.assign({ riskLevel: r.severity, confidence: conf, evidence: ev(r.metric, r.value, r.threshold) }, r); };
+
     const recs = [];
     if (card.accuracy != null && card.accuracy < th.minAccuracy) {
-      recs.push({ type: 'review_prompt', severity: 'high', metric: 'accuracy', value: card.accuracy, reason: 'Accuracy ' + card.accuracy + ' < ' + th.minAccuracy, suggestedAction: 'Sample failed cases and revise the agent prompt/decision rules.' });
+      recs.push(mk({ type: 'review_prompt', severity: 'high', metric: 'accuracy', value: card.accuracy, threshold: th.minAccuracy, reason: 'Accuracy ' + card.accuracy + ' < ' + th.minAccuracy, suggestedAction: 'Sample failed cases and revise the agent prompt/decision rules.', expectedKpiImpact: 'Higher win/accuracy rate; fewer bad recommendations.' }));
     }
     if (card.confidenceCalibration != null && card.confidenceCalibration < th.minCalibration) {
-      recs.push({ type: 'recalibrate_confidence', severity: 'medium', metric: 'confidenceCalibration', value: card.confidenceCalibration, reason: 'Calibration ' + card.confidenceCalibration + ' < ' + th.minCalibration, suggestedAction: 'Down-weight or recalibrate the agent stated confidence.' });
+      recs.push(mk({ type: 'recalibrate_confidence', severity: 'medium', metric: 'confidenceCalibration', value: card.confidenceCalibration, threshold: th.minCalibration, reason: 'Calibration ' + card.confidenceCalibration + ' < ' + th.minCalibration, suggestedAction: 'Down-weight or recalibrate the agent stated confidence.', expectedKpiImpact: 'More trustworthy confidence; better routing/escalation decisions.' }));
     }
     if (card.overrideRate != null && card.overrideRate > th.maxOverrideRate) {
-      recs.push({ type: 'review_guardrail', severity: 'high', metric: 'overrideRate', value: card.overrideRate, reason: 'Override rate ' + card.overrideRate + ' > ' + th.maxOverrideRate, suggestedAction: 'Humans overrule this agent often — review its prompt or the guardrail threshold.' });
+      recs.push(mk({ type: 'review_guardrail', severity: 'high', metric: 'overrideRate', value: card.overrideRate, threshold: th.maxOverrideRate, reason: 'Override rate ' + card.overrideRate + ' > ' + th.maxOverrideRate, suggestedAction: 'Humans overrule this agent often — review its prompt or the guardrail threshold.', expectedKpiImpact: 'Fewer human overrides; less wasted review time.' }));
     }
     if (card.roiImpact != null && card.roiImpact < 0) {
-      recs.push({ type: 'pause_and_review', severity: 'critical', metric: 'roiImpact', value: card.roiImpact, reason: 'Negative ROI impact (' + card.roiImpact + ')', suggestedAction: 'Pause any auto-actions from this agent and review before relying on it.' });
+      recs.push(mk({ type: 'pause_and_review', severity: 'critical', metric: 'roiImpact', value: card.roiImpact, threshold: 0, reason: 'Negative ROI impact (' + card.roiImpact + ')', suggestedAction: 'Pause any auto-actions from this agent and review before relying on it.', expectedKpiImpact: 'Stops ROI bleed; protects revenue.' }));
     }
     if (card.drift && card.drift.drifting) {
-      recs.push({ type: 'investigate_drift', severity: 'high', metric: 'accuracyDrift', value: card.drift.recent, reason: 'Accuracy drifting (' + card.drift.prior + ' → ' + card.drift.recent + ')', suggestedAction: 'Investigate what changed; consider re-grounding or retraining.' });
+      recs.push(mk({ type: 'investigate_drift', severity: 'high', metric: 'accuracyDrift', value: card.drift.recent, threshold: card.drift.prior, reason: 'Accuracy drifting (' + card.drift.prior + ' → ' + card.drift.recent + ')', suggestedAction: 'Investigate what changed; consider re-grounding or retraining.', expectedKpiImpact: 'Recovers lost accuracy; catches regressions early.' }));
     }
     return recs;
   }
@@ -69,17 +75,22 @@
         try { const extra = await fn(card, th); if (Array.isArray(extra)) recs = recs.concat(extra); } catch (_) {}
       }
 
+      const stored = [];
       for (const rec of recs) {
         const entry = {
           id: (global.AAA_ID_FACTORY && global.AAA_ID_FACTORY.createId) ? global.AAA_ID_FACTORY.createId('rec') : ('rec_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6)),
           agentType: agentType, type: rec.type, severity: rec.severity, metric: rec.metric, value: rec.value,
-          reason: rec.reason, suggestedAction: rec.suggestedAction,
+          issue: rec.reason, reason: rec.reason, suggestedAction: rec.suggestedAction,
+          evidence: rec.evidence || null, expectedKpiImpact: rec.expectedKpiImpact || null,
+          riskLevel: rec.riskLevel || rec.severity, confidence: rec.confidence != null ? rec.confidence : null,
           status: 'proposed', autonomous: false, createdAt: now()
         };
         if (data() && data().put) await data().put(RECS, entry.id, entry);
-        await audit('retraining_recommendation', { agentType: agentType, type: rec.type, metric: rec.metric, value: rec.value, severity: rec.severity, reason: rec.reason, suggestedAction: rec.suggestedAction, autonomous: false, at: entry.createdAt });
+        await audit('retraining_recommendation', { recId: entry.id, agentType: agentType, type: rec.type, metric: rec.metric, value: rec.value, severity: rec.severity, riskLevel: entry.riskLevel, confidence: entry.confidence, evidence: entry.evidence, expectedKpiImpact: entry.expectedKpiImpact, reason: rec.reason, suggestedAction: rec.suggestedAction, autonomous: false, at: entry.createdAt });
+        rec.id = entry.id;
+        stored.push(entry);
       }
-      return { ok: true, agentType: agentType, scorecard: card, recommendations: recs };
+      return { ok: true, agentType: agentType, scorecard: card, recommendations: recs, stored: stored };
     },
 
     async recommendations() { return (data() && data().list) ? data().list(RECS) : []; },

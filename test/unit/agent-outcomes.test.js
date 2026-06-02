@@ -51,12 +51,13 @@ module.exports = async function run() {
   t.ok('override queued for training', (await O.trainingQueue()).some((x) => x.decisionId === d3.decisionId && x.overrideReason === 'human rewrote the ad copy'));
   t.ok('override audited as outcome_attached', (await L.chain()).some((e) => e.type === 'outcome_attached' && e.payload.outcomeStatus === 'overridden'));
 
-  // ---- markAbandoned (no training) ---------------------------------------
+  // ---- markAbandoned (queued for review visibility, Phase 3) -------------
   const d4 = (await O.recordDecision({ agentId: 'seo-1', agentType: 'seo', confidence: 0.4 })).decision;
   const beforeTQ = (await O.trainingQueue()).length;
   await O.markAbandoned(d4.decisionId);
   t.eq('abandoned status', (await O.getDecision(d4.decisionId)).outcomeStatus, 'abandoned');
-  t.ok('abandoned does not queue training', (await O.trainingQueue()).length === beforeTQ);
+  t.ok('abandoned is queued for review', (await O.trainingQueue()).length === beforeTQ + 1);
+  t.ok('abandoned training entry tagged', (await O.trainingQueue()).some((x) => x.decisionId === d4.decisionId && x.finalResult === 'abandoned'));
 
   // ---- attachOutcomeBySubject -------------------------------------------
   await O.recordDecision({ agentId: 'sched-1', agentType: 'scheduling', confidence: 0.6, subjectType: 'job', subjectId: 'jX' });

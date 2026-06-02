@@ -217,12 +217,14 @@
       return { ok: true, decision: rec };
     },
 
-    /** Mark a decision abandoned (never acted on). */
+    /** Mark a decision abandoned (never acted on). Queued for review visibility. */
     async markAbandoned(decisionId) {
       const dec = await this.getDecision(decisionId);
       if (!dec) return { ok: false, error: 'DECISION_NOT_FOUND' };
       const rec = Object.assign({}, dec, { outcomeStatus: 'abandoned', updatedAt: now() });
       await data().put(DECISIONS, decisionId, rec);
+      await this._queueTraining(rec);
+      if (events()) events().emit('agent.outcome', { decisionId: decisionId, agentType: rec.agentType, outcomeStatus: 'abandoned' });
       return { ok: true, decision: rec };
     },
 

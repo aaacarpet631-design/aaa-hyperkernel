@@ -50,6 +50,8 @@
     const successful = list.filter(function (d) { return d.outcomeStatus === 'successful'; });
     const unsuccessful = list.filter(function (d) { return d.outcomeStatus === 'unsuccessful'; });
     const overridden = list.filter(function (d) { return d.outcomeStatus === 'overridden'; });
+    const pending = list.filter(function (d) { return d.outcomeStatus === 'pending'; });        // missing outcomes
+    const abandoned = list.filter(function (d) { return d.outcomeStatus === 'abandoned'; });
     const binary = successful.concat(unsuccessful); // resolved with a clear right/wrong
     const conf = list.map(function (d) { return d.confidence; }).filter(function (c) { return c != null; });
 
@@ -76,7 +78,7 @@
 
     return {
       agentType: agentType,
-      samples: { total: list.length, considered: considered.length, resolved: binary.length, successful: successful.length, unsuccessful: unsuccessful.length, overridden: overridden.length },
+      samples: { total: list.length, considered: considered.length, resolved: binary.length, successful: successful.length, unsuccessful: unsuccessful.length, overridden: overridden.length, pending: pending.length, abandoned: abandoned.length, missingOutcomes: pending.length },
       accuracy: binary.length ? round(successful.length / binary.length) : null,
       successRate: considered.length ? round(successful.length / considered.length) : null,
       overrideRate: considered.length ? round(overridden.length / considered.length) : null,
@@ -157,8 +159,27 @@
     materiallyChanged: materiallyChanged,
     thresholds: thresholds,
 
+    HISTORY: 'gov_scorecard_history',
+
     async get(agentType) { return (data() && data().get) ? data().get(CARDS, agentType) : null; },
     async list() { return (data() && data().list) ? data().list(CARDS) : []; },
+
+    // Append a compact snapshot for the performance timeline.
+    async _snapshot(card) {
+      if (!data() || !data().put) return;
+      const id = (global.AAA_ID_FACTORY && global.AAA_ID_FACTORY.createId) ? global.AAA_ID_FACTORY.createId('snap') : ('snap_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6));
+      await data().put(this.HISTORY, id, {
+        id: id, agentType: card.agentType, at: card.computedAt,
+        accuracy: card.accuracy, overrideRate: card.overrideRate, successRate: card.successRate,
+        confidenceCalibration: card.confidenceCalibration, roiImpact: card.roiImpact, revenueInfluenced: card.revenueInfluenced
+      });
+    },
+
+    /** Time-ordered scorecard snapshots for one agent (lightweight; no charts). */
+    async timeline(agentType) {
+      const all = (data() && data().list) ? await data().list(this.HISTORY) : [];
+      return (all || []).filter(function (s) { return s.agentType === agentType; }).sort(function (a, b) { return (a.at || 0) - (b.at || 0); });
+    },
 
     /**
      * Recompute one agent's scorecard from its decisions: persist it, audit a
@@ -173,11 +194,16 @@
       const card = computeScorecard(agentType, decisions);
       const drift = computeDrift(decisions, now(), th.driftWindowMs, th.minSample, th.driftDelta);
       card.drift = drift;
+      // Data-quality guardrail: thin agents are "insufficient data", never bad.
+      // Missing outcomes (pending) are reported separately from bad outcomes.
+      const sufficient = card.samples.considered >= th.minSample;
+      card.dataQuality = { sufficient: sufficient, label: sufficient ? 'scored' : 'insufficient_data', missingOutcomes: card.samples.pending };
 
       const changed = materiallyChanged(prev, card);
       if (data() && data().put) await data().put(CARDS, agentType, card);
       if (changed) {
         await audit('score_changed', { agentType: agentType, previous: prev ? pick(prev) : null, current: pick(card), at: card.computedAt });
+        await this._snapshot(card); // lightweight history for the performance timeline
       }
 
       // Breach escalations (drop ROI uses the previous card as the baseline).
@@ -212,14 +238,19 @@
     /** Dashboard groupings: top/worst/drifting/excessive-overrides/needs-retraining. */
     async insights() {
       const th = thresholds();
-      const cards = (await this.list()).filter(function (c) { return c.samples && c.samples.considered >= th.minSample; });
+      const all = await this.list();
+      // Only sufficiently-sampled agents are ranked; thin agents are surfaced
+      // separately as "insufficient data" — never ranked harshly.
+      const cards = all.filter(function (c) { return c.samples && c.samples.considered >= th.minSample; });
       const byRate = cards.slice().sort(function (a, b) { return (b.successRate || 0) - (a.successRate || 0); });
       return {
         top: byRate.slice(0, 5),
         worst: byRate.slice().reverse().slice(0, 5),
         drifting: cards.filter(function (c) { return c.drift && c.drift.drifting; }),
         excessiveOverrides: cards.filter(function (c) { return c.overrideRate != null && c.overrideRate > th.maxOverrideRate; }),
-        needingRetraining: cards.filter(function (c) { return (c.accuracy != null && c.accuracy < th.minAccuracy) || (c.confidenceCalibration != null && c.confidenceCalibration < th.minCalibration); })
+        needingRetraining: cards.filter(function (c) { return (c.accuracy != null && c.accuracy < th.minAccuracy) || (c.confidenceCalibration != null && c.confidenceCalibration < th.minCalibration); }),
+        insufficientData: all.filter(function (c) { return !c.samples || c.samples.considered < th.minSample; }),
+        missingOutcomes: all.map(function (c) { return { agentType: c.agentType, pending: c.samples ? c.samples.pending : 0 }; }).filter(function (x) { return x.pending > 0; })
       };
     }
   };

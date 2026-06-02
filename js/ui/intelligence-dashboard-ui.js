@@ -161,6 +161,10 @@
         if (agentInsights.drifting.length) body.appendChild(kv('Drifting agents', agentInsights.drifting.map(function (c) { return c.agentType; }).join(', '), AMBER));
         if (agentInsights.excessiveOverrides.length) body.appendChild(kv('Excessive overrides', agentInsights.excessiveOverrides.map(function (c) { return c.agentType; }).join(', '), AMBER));
         if (agentInsights.needingRetraining.length) body.appendChild(kv('Needs retraining', agentInsights.needingRetraining.map(function (c) { return c.agentType; }).join(', '), RED));
+        if (agentInsights.insufficientData && agentInsights.insufficientData.length) body.appendChild(kv('Insufficient data', agentInsights.insufficientData.map(function (c) { return c.agentType; }).join(', '), GREY));
+      }
+      if (global.AAA_GOVERNANCE_LEARNING_UI) {
+        body.appendChild(ui.button({ label: '🎓 Open Learning Command Center', variant: 'secondary', full: true, onClick: function () { global.AAA_GOVERNANCE_LEARNING_UI.open(); } }));
       }
     }
     body.appendChild(kv('Prediction Accuracy (calibration)', supMetrics.ok && supMetrics.avgCalibration != null ? String(supMetrics.avgCalibration) : '—', BLUE));

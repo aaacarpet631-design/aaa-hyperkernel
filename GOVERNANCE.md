@@ -194,6 +194,38 @@ a failure can never break the originating flow.
 No autonomous retraining or prompt modification — this phase is instrumentation,
 linkage, audit, and visibility only.
 
+## Human-governed learning (Phase 3 — command center)
+
+Closes the loop **without autonomy**: a human can see what agents are learning
+from, what they get wrong, and what the supervisor recommends — but no prompt,
+price, or send ever changes automatically. (`AAA_GOVERNANCE_LEARNING` + the
+`AAA_GOVERNANCE_LEARNING_UI` screen, opened from Executive Intelligence.)
+
+- **Training Queue** — unsuccessful / overridden / abandoned / refund /
+  complaint / chargeback cases with agent, decision, recommendation, confidence,
+  outcome, human correction, override reason, final result, and date. Filters by
+  agentType, outcome type, severity, date, and status.
+- **Supervisor Recommendations** — runs the supervisor in recommendation-only
+  mode; each rec shows agent, issue, evidence, recommended change, expected KPI
+  impact, risk level, and confidence. Nothing auto-applies.
+- **Human actions (all audited)** — mark reviewed, accept (→ creates a task),
+  reject, export training sample, create improvement task.
+- **Improvement Task Ledger** — accepted recommendations create tasks (taskId,
+  agentId, issue, recommended change, priority, owner, status
+  open/in_progress/implemented/rejected, source training cases). Code/prompts are
+  never changed automatically.
+- **Performance Timeline** — per-agent accuracy/override/success/calibration/ROI
+  trend via a lightweight unicode sparkline (no chart library).
+- **Data-quality guardrails** — thin agents are labeled `insufficient_data` and
+  excluded from harsh ranking; **missing outcomes (pending) are counted and
+  flagged separately from bad outcomes** and never lower accuracy.
+- **Export** — selected training samples as PII-stripped JSONL (allowlisted
+  fields; emails/phones redacted; customer fields never included).
+
+Audit (immutable ledger): `training_reviewed`, `recommendation_accepted`,
+`recommendation_rejected`, `improvement_task_created`, `task_status_changed`,
+and `training_exported` (ids + count only — never PII).
+
 ## Adding the next guardrail
 
 A new high-risk guardrail (say contract-clause review) needs only to:
