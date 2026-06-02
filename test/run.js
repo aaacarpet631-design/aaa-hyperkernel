@@ -17,6 +17,8 @@ const SUITES = [
   'unit/bluetooth-connect.test.js',
   'unit/closure.test.js',
   'unit/accounting.test.js',
+  'unit/expense-classifier.test.js',
+  'unit/receipt-intake.test.js',
   'unit/crew-tools.test.js',
   'unit/scheduling.test.js',
   'unit/contracts.test.js',
