@@ -87,6 +87,31 @@ critical threats, the analyst leaderboard, council decisions, meeting outcomes,
 and evolution gaps — plus the buttons that drive the org (run a team, run all,
 convene the council, hold a meeting, scan for gaps, refresh rankings).
 
+## Model Router (`AAA_MODEL_ROUTER`)
+
+Task-aware Claude selection. The registry assigns each agent a static model
+(workers → Sonnet, CEO/Supervisor → Opus); the router adds the missing **Haiku**
+tier and routes by *task kind*: Opus for planning/synthesis/security-review/
+migration, Sonnet for coding/execution/refactor/review, Haiku for triage/
+classification/tagging/summarization. `forAgent(model, taskKind)` is backward
+compatible — with no task kind it returns the agent's declared model unchanged,
+so existing meetings keep using Opus and workers keep using Sonnet; only a named
+task kind reroutes (triage drops to Haiku to save cost, planning lifts to Opus).
+`route()` also returns advisory `tier`/`effort`/price metadata for cost control
+and audit. `AAA_AGENT_OS.runAgent(role, task, ctx, { taskKind })` uses it and
+records the model that actually ran on each decision.
+
+## Action Safety Gate (`AAA_ACTION_GATE`)
+
+The complement to the Escalation Policy: that escalates high-stakes *decisions*;
+this classifies proposed *actions* by reversibility and blast radius. `assess()`
+returns `allow` (local/reversible/internal), `needs_approval` (destructive /
+externally-visible / spend-bearing / irreversible), or `deny` (catastrophic,
+never auto-run — `rm -rf /`, `DROP DATABASE`). `review(next_actions)` summarizes a
+list; `runAgent` runs each decision's `next_actions` through it and attaches an
+`actionReview` when any step needs approval — so the operator sees what must be
+confirmed before execution. Pure and read-only: it judges, it never executes.
+
 ## Tests
 
 ```
