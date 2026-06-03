@@ -27,7 +27,9 @@ service cloud.firestore {
           || c == 'expenses' || c == 'kpi_snapshots' || c == 'rate_cards'
           // Receipt intake + the expense classifier's learning/accuracy stores
           // all expose spend internals — owner-only, same as the rest of the books.
-          || c == 'receipts' || c == 'expense_corrections' || c == 'expense_predictions';
+          || c == 'receipts' || c == 'expense_corrections' || c == 'expense_predictions'
+          // Quote lifecycle records carry internal cost + margin + job cost.
+          || c == 'quotes';
     }
     // Collections only a trusted backend (Admin SDK) may touch. Notably
     // 'integrations' holds QuickBooks OAuth tokens — clients must never read it.

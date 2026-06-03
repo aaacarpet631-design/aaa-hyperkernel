@@ -26,6 +26,8 @@ const SUITES = [
   'unit/financial-intelligence-ui.test.js',
   'unit/estimator-agent.test.js',
   'unit/estimator-ui.test.js',
+  'unit/quote-store.test.js',
+  'unit/quote-lifecycle-ui.test.js',
   'unit/crew-tools.test.js',
   'unit/scheduling.test.js',
   'unit/contracts.test.js',

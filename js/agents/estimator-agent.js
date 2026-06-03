@@ -137,6 +137,26 @@
     },
 
     /**
+     * Persist this estimate as a DRAFT quote in the lifecycle store (the one
+     * AI-allowed write — a draft, never a commitment). Returns the quote record.
+     * @param {Object} input { sessions, services?, customer?, jobId?, leadSource?, zip?, actor?, origin? }
+     */
+    async draftQuote(input) {
+      const est = await this.recommend(input);
+      if (!est.ok) return est;
+      if (!global.AAA_QUOTES) return Object.assign({}, est, { quoteDraft: null, quoteError: 'NO_QUOTE_STORE' });
+      const i = input || {};
+      const draft = await global.AAA_QUOTES.createDraft({
+        estimate: est, customer: i.customer, customerId: i.customerId, customerName: i.customerName,
+        jobId: i.jobId, leadSource: i.leadSource, zip: i.zip, address: i.address,
+        sessions: i.sessions, photos: i.photos, actor: i.actor, origin: i.origin
+      });
+      est.quoteId = draft.quoteId;
+      est.quoteDraft = draft;
+      return est;
+    },
+
+    /**
      * Human approval → attach the priced lines to the job as needs-review
      * estimates, through the gateway (ADD_ESTIMATE: human-only, RBAC, audited).
      * AI-origin callers are hard-blocked here.
