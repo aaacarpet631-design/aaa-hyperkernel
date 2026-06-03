@@ -40,6 +40,7 @@
     FINALIZE_PRICE:    { permission: 'APPROVE_QUOTE',   aiAllowed: false },
     APPROVE_PAYMENT:   { permission: 'VIEW_FINANCIALS', aiAllowed: false },
     MODIFY_ACCOUNTING: { permission: 'VIEW_FINANCIALS', aiAllowed: false },
+    REVIEW_RECEIPTS:   { permission: 'VIEW_FINANCIALS', aiAllowed: false },
     CLOSE_JOB:         { permission: 'CLOSE_JOB',       aiAllowed: false },
     CHANGE_CUSTOMER:   { permission: 'EDIT_CUSTOMER',   aiAllowed: false },
     EDIT_RATE_CARD:    { permission: 'VIEW_PRICING_RATES', aiAllowed: false },

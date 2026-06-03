@@ -6,7 +6,7 @@
  * app fully usable offline. Old caches are purged on activate, and the worker
  * takes control immediately to avoid serving a stale shell after an update.
  */
-const CACHE_NAME = 'hyperkernel-v32';
+const CACHE_NAME = 'hyperkernel-v37';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -35,6 +35,10 @@ const PRECACHE = [
   '/js/crew/crew-store.js',
   '/js/crew/tool-store.js',
   '/js/accounting/accounting-store.js',
+  '/js/accounting/expense-classifier.js',
+  '/js/accounting/receipt-intake-store.js',
+  '/js/accounting/receipt-intelligence-engine.js',
+  '/js/accounting/controller-agent.js',
   '/js/accounting/quickbooks-export.js',
   '/js/accounting/quickbooks-online.js',
   '/js/contracts/contract-store.js',
@@ -44,6 +48,8 @@ const PRECACHE = [
   '/js/ui/contracts-ui.js',
   '/js/ui/schedule-ui.js',
   '/js/ui/ui-kit.js',
+  '/js/agents/model-router.js',
+  '/js/agents/action-safety-gate.js',
   '/js/agents/agent-registry.js',
   '/js/agents/agent-os.js',
   '/js/agents/supervisor.js',
@@ -71,6 +77,8 @@ const PRECACHE = [
   '/js/ui/closure-hud-ui.js',
   '/js/ui/command-center-ui.js',
   '/js/ui/business-ui.js',
+  '/js/ui/receipt-intake-ui.js',
+  '/js/ui/financial-intelligence-ui.js',
   '/js/ui/job-list-ui.js',
   '/js/ai/sidekick-context-engine.js',
   '/js/ai/voice-diagnostics.js',
@@ -80,6 +88,7 @@ const PRECACHE = [
   '/js/ai/sidekick-closure-engine.js',
   '/js/measurements/models/measurement-models.js',
   '/js/measurements/storage/measurement-store.js',
+  '/js/measurements/capture-sequencer.js',
   '/js/measurements/measurement-ai-assistant.js',
   '/js/bluetooth/services/raw-reading-log.js',
   '/js/bluetooth/services/measurement-parser.js',
