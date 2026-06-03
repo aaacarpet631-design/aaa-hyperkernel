@@ -19,10 +19,14 @@
   function models() { return global.AAA_MEASUREMENT_MODELS; }
   function quote() { return global.AAA_MEASUREMENT_QUOTE; }
   function ai() { return global.AAA_MEASUREMENT_AI; }
+  function seqEngine() { return global.AAA_CAPTURE_SEQUENCER; }
   function events() { return global.AAA_EVENTS; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
-  const state = { jobId: null, customerId: null, sheet: null, view: 'setup', unsub: null, draft: null };
+  const state = { jobId: null, customerId: null, sheet: null, view: 'setup', unsub: null, draft: null, seq: null };
+
+  // Tear down any running auto-measure sequence (on save, nav away, or close).
+  function stopSeq() { if (state.seq) { try { state.seq.stop(); } catch (_) {} state.seq = null; } }
 
   function boot(opts) {
     opts = opts || {};
@@ -37,11 +41,11 @@
     // Re-render on connection state changes so status/battery stay live.
     if (ble()) state.unsub = ble().subscribe(() => { if (state.view === 'scanner' || state.view === 'details' || state.view === 'capture') render(); });
     const origClose = sheet.close;
-    sheet.close = function () { if (state.unsub) { state.unsub(); state.unsub = null; } origClose(); if (events()) events().emit('hud:closed', { hud: 'measurement-hud' }); };
+    sheet.close = function () { stopSeq(); if (state.unsub) { state.unsub(); state.unsub = null; } origClose(); if (events()) events().emit('hud:closed', { hud: 'measurement-hud' }); };
     go('setup');
   }
 
-  function go(view) { state.view = view; render(); }
+  function go(view) { if (state.view === 'capture' && view !== 'capture') stopSeq(); state.view = view; render(); }
 
   function render() {
     const body = state.sheet.body;
@@ -147,6 +151,18 @@
       body.appendChild(ui.button({ label: 'Start measuring', icon: '📐', variant: 'primary', full: true, onClick: () => startBluetoothCapture() }));
       body.appendChild(ui.button({ label: 'Disconnect', icon: '⏏', variant: 'danger', full: true, onClick: async () => { await ble().disconnect(); render(); } }));
     } else {
+      // Self-diagnosing panel: when the last connect failed, show the REAL cause
+      // and the device's advertised services instead of a bare "error" pill.
+      if (s.status === 'error' && s.errorDetail) {
+        const d = s.errorDetail;
+        const svcs = (d.discoveredServices && d.discoveredServices.length) ? d.discoveredServices.join(', ') : 'none discovered';
+        body.appendChild(ui.el('div', { className: 'aaa-list-row', style: { borderColor: '#EF4444' }, html:
+          '<strong style="color:#EF4444">Connection failed</strong>' +
+          '<div class="aaa-list-sub">' + esc(d.message || s.error || 'Unknown error') + '</div>' +
+          (d.errorName ? '<div class="aaa-list-sub">Type: ' + esc(d.errorName) + '</div>' : '') +
+          (d.deviceName ? '<div class="aaa-list-sub">Device: ' + esc(d.deviceName) + '</div>' : '') +
+          '<div class="aaa-list-sub">Services seen: ' + esc(svcs) + '</div>' }));
+      }
       body.appendChild(ui.button({ label: s.status === 'connecting' ? 'Connecting…' : 'Connect', icon: '🔗', variant: 'primary', full: true, disabled: s.status === 'connecting', onClick: async () => {
         const res = await ble().connect();
         if (!res.ok) toast(body, res.message || res.error, '#EF4444');
@@ -185,6 +201,24 @@
         '<strong>Last reading: ' + (r ? r.feet + ' ft' : '—') + '</strong>' +
         '<div class="aaa-list-sub">' + (r ? 'unit ' + esc(r.unit) + ' · confidence ' + Math.round((r.confidence || 0) * 100) + '%' : 'Pull the trigger on your laser to send a reading.') + '</div>' });
       body.appendChild(banner);
+
+      // If the device supports a remote shutter (e.g. Huepar BLE), let the tech
+      // fire it from the app; otherwise they use the button on the laser.
+      if (ble().canMeasure && ble().canMeasure()) {
+        body.appendChild(ui.button({ label: 'Trigger laser measurement', icon: '📡', variant: 'secondary', full: true, onClick: async () => {
+          const res = await ble().measure();
+          if (!res || !res.ok) toast(body, (res && res.message) || 'Could not trigger the laser.', '#F59E0B');
+          else toast(body, 'Measuring… the reading will appear above.', '#10B981');
+        } }));
+      }
+
+      // Guided auto-measure: walk length → width, auto-advancing on confident
+      // readings. Available whenever the sequencer is loaded; works with a
+      // remote shutter (auto-fires) or a manual laser (tech pulls the trigger).
+      if (seqEngine() && !state.seq) {
+        body.appendChild(ui.button({ label: 'Auto-measure room', icon: '▶️', variant: 'primary', full: true, onClick: () => startAutoMeasure(d) }));
+      }
+      if (state.seq) body.appendChild(autoPanel(body));
     }
 
     const fields = [
@@ -237,7 +271,56 @@
     ]));
   }
 
+  // Start a guided auto-measure run bound to the current draft. Accepted
+  // readings flow straight into the same length/width fields the tech would
+  // otherwise type, so "Save room" works identically afterwards.
+  function startAutoMeasure(d) {
+    if (!seqEngine() || !ble()) return;
+    state.seq = seqEngine().create({
+      ble: ble(),
+      minConfidence: 0.85,
+      onUpdate: (st) => {
+        if (st.results.length && st.results.length.feet != null) d.length = String(st.results.length.feet);
+        if (st.results.width && st.results.width.feet != null) d.width = String(st.results.width.feet);
+        if (st.squareFeet != null && !d.manualOverride) d.squareFeet = String(st.squareFeet);
+        render();
+      }
+    });
+    state.seq.start();
+    render();
+  }
+
+  function fmtStep(r) { return r && r.feet != null ? r.feet + ' ft' : '—'; }
+
+  function autoPanel() {
+    const ui = U();
+    const st = state.seq.getState();
+    const wrap = ui.el('div', { className: 'aaa-form' });
+    if (st.status === 'complete') {
+      wrap.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+        '<strong>✅ Auto-measure complete</strong><div class="aaa-list-sub">L ' + fmtStep(st.results.length) +
+        ' · W ' + fmtStep(st.results.width) + (st.squareFeet != null ? ' · ' + st.squareFeet + ' sq ft' : '') + '</div>' }));
+      wrap.appendChild(ui.button({ label: 'Done', icon: '✅', variant: 'success', full: true, onClick: () => { stopSeq(); render(); } }));
+      return wrap;
+    }
+    const stepLabel = st.step ? st.step.label : '';
+    wrap.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+      '<strong>Auto-measure: ' + esc(stepLabel) + ' (' + (st.index + 1) + '/' + st.total + ')</strong>' +
+      '<div class="aaa-list-sub">' + (st.canRemoteTrigger ? 'Auto-firing the laser…' : 'Pull the laser trigger to capture ' + esc(stepLabel) + '.') + '</div>' }));
+    if (st.status === 'low-confidence' && st.pending) {
+      wrap.appendChild(ui.el('div', { className: 'aaa-list-sub', html: '⚠ Low confidence: ' + st.pending.feet + ' ft (' + Math.round((st.pending.confidence || 0) * 100) + '%). Retake, or use it anyway.' }));
+      wrap.appendChild(ui.button({ label: 'Retake', icon: '↻', variant: 'secondary', full: true, onClick: () => { state.seq.retake(); render(); } }));
+      wrap.appendChild(ui.button({ label: 'Use anyway (override)', icon: '⚠️', variant: 'ghost', full: true, onClick: () => { state.seq.accept(); render(); } }));
+    } else if (st.canRemoteTrigger) {
+      wrap.appendChild(ui.button({ label: 'Trigger now', icon: '📡', variant: 'secondary', full: true, onClick: () => { state.seq.trigger(); render(); } }));
+    }
+    wrap.appendChild(ui.button({ label: 'Skip step', icon: '⏭', variant: 'ghost', size: 'sm', onClick: () => { state.seq.skip(); render(); } }));
+    wrap.appendChild(ui.button({ label: 'Cancel auto-measure', icon: '✖', variant: 'ghost', size: 'sm', onClick: () => { stopSeq(); render(); } }));
+    return wrap;
+  }
+
   async function saveDraft(body) {
+    stopSeq();
     const d = state.draft;
     const session = models().newSession({
       jobId: state.jobId, customerId: state.customerId,

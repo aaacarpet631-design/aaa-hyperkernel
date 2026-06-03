@@ -85,6 +85,21 @@
     additionalProperties: false
   };
 
+  // Optional steelman stage (used by the Challenge Protocol path): argue the
+  // strongest case for the OPPOSITE decision so the recommendation must beat a
+  // real alternative, not a strawman.
+  const COUNTER_SCHEMA = {
+    type: 'object',
+    properties: {
+      alternative: { type: 'string', description: 'The strongest alternative decision — ideally the opposite of the recommendation.' },
+      case_for: { type: 'string', description: 'The best honest argument for that alternative, grounded in the data.' },
+      conditions: { type: 'array', items: { type: 'string' }, description: 'Conditions under which the alternative clearly beats the recommendation.' },
+      strength: { type: 'integer', description: '0-100: how strong this counterargument is on the supplied evidence.' }
+    },
+    required: ['alternative', 'case_for', 'conditions', 'strength'],
+    additionalProperties: false
+  };
+
   const VERDICT_SCHEMA = {
     type: 'object',
     properties: {
@@ -182,6 +197,11 @@
       system: persona('Risk Analyst',
         'You surface what could go wrong with a recommendation: financial, operational, reputational, legal. Rate overall severity and propose mitigations. Mark blocking=true ONLY when a risk is severe enough that the action should not proceed as-is.')
     },
+    counter: {
+      id: 'counter', model: WORKER,
+      system: persona('Counterargument Analyst',
+        'You steelman the opposite decision. Build the strongest honest case AGAINST the recommendation and FOR a credible alternative. If, after a genuine effort, no real alternative beats the recommendation, say so and set strength low.')
+    },
     supervisor: {
       id: 'supervisor', model: EXEC,
       system: persona('Review Supervisor',
@@ -220,7 +240,8 @@
     WORKER: WORKER, EXEC: EXEC, COMPANY: COMPANY,
     LAYERS: LAYERS, TEAMS: TEAMS, DEBATE: DEBATE, COUNCIL: COUNCIL,
     ANALYSIS_SCHEMA: ANALYSIS_SCHEMA, CRITIC_SCHEMA: CRITIC_SCHEMA,
-    RISK_SCHEMA: RISK_SCHEMA, VERDICT_SCHEMA: VERDICT_SCHEMA, VOTE_SCHEMA: VOTE_SCHEMA,
+    RISK_SCHEMA: RISK_SCHEMA, COUNTER_SCHEMA: COUNTER_SCHEMA,
+    VERDICT_SCHEMA: VERDICT_SCHEMA, VOTE_SCHEMA: VOTE_SCHEMA,
     parseJson: parseJson,
 
     teamIds: function () { return Object.keys(TEAMS); },

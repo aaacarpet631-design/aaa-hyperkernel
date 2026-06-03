@@ -27,13 +27,32 @@
       const entry = {
         id: def.id, label: def.label || def.id,
         match: typeof def.match === 'function' ? def.match : () => false,
-        factory: def.factory, priority: def.priority || 0
+        factory: def.factory, priority: def.priority || 0,
+        // Optional GATT services this brand needs declared at requestDevice time
+        // so getPrimaryService() is permitted post-connect (Web Bluetooth rule).
+        optionalServices: Array.isArray(def.optionalServices) ? def.optionalServices.slice() : []
       };
       if (existing !== -1) adapters[existing] = entry; else adapters.push(entry);
       return true;
     },
 
     list() { return adapters.map((a) => ({ id: a.id, label: a.label, priority: a.priority })); },
+
+    /**
+     * Union of every registered adapter's optional services. scanAndPick declares
+     * these up front so that whichever brand the user picks, its service is
+     * already accessible — fixing the SecurityError on getPrimaryService() that
+     * occurred when only the generic (battery-only) filter was used.
+     */
+    allOptionalServices() {
+      const seen = {};
+      const out = [];
+      adapters.forEach((a) => (a.optionalServices || []).forEach((s) => {
+        const key = String(s).toLowerCase();
+        if (!seen[key]) { seen[key] = true; out.push(s); }
+      }));
+      return out;
+    },
 
     /** Pick the best adapter for a device, or the generic fallback. */
     resolve(deviceInfo) {
@@ -60,6 +79,7 @@
       label: 'Generic Bluetooth (BLE)',
       priority: -100,                 // always lowest — pure fallback
       match: () => true,
+      optionalServices: ['battery_service'],
       factory: () => new global.AAA_GENERIC_BLE_ADAPTER()
     });
   }

@@ -37,12 +37,19 @@
     <script src="/js/accounting/accounting-store.js"></script>
     <script src="/js/accounting/quickbooks-export.js"></script>
     <script src="/js/accounting/quickbooks-online.js"></script>
+    <!-- Receipt Intelligence: classify → intake/review queue → capture engine -->
+    <script src="/js/accounting/expense-classifier.js"></script>
+    <script src="/js/accounting/receipt-intake-store.js"></script>
+    <script src="/js/accounting/receipt-intelligence-engine.js"></script>
+    <script src="/js/accounting/controller-agent.js"></script>
     <script src="/js/contracts/contract-store.js"></script>
     <script src="/js/portal/portal-link-store.js"></script>
     <script src="/js/scheduling/schedule-store.js"></script>
 
     <script src="/js/ui/ui-kit.js"></script>
 
+    <script src="/js/agents/model-router.js"></script>
+    <script src="/js/agents/action-safety-gate.js"></script>
     <script src="/js/agents/agent-registry.js"></script>
     <script src="/js/agents/agent-os.js"></script>
     <script src="/js/agents/supervisor.js"></script>
@@ -54,6 +61,7 @@
     <script src="/js/agents/agent-automation.js"></script>
     <script src="/js/agents/review-request-engine.js"></script>
     <script src="/js/agents/marketing-intel.js"></script>
+    <script src="/js/agents/job-notes-agent.js"></script>
 
     <!-- Analysis Division — the multi-layer autonomous intelligence org -->
     <script src="/js/intelligence/analysis-division.js"></script>
@@ -66,6 +74,8 @@
     <script src="/js/intelligence/evolution-engine.js"></script>
 
     <script src="/js/ai/sidekick-context-engine.js"></script>
+    <script src="/js/ai/voice-diagnostics.js"></script>
+    <script src="/js/ai/voice-note-store.js"></script>
     <script src="/js/ai/sidekick-voice-engine.js"></script>
     <script src="/js/ai/sidekick-vision-engine.js"></script>
     <script src="/js/ai/sidekick-closure-engine.js"></script>
@@ -77,8 +87,10 @@
     <script src="/js/bluetooth/services/measurement-parser.js"></script>
     <script src="/js/bluetooth/services/generic-ble-adapter.js"></script>
     <script src="/js/bluetooth/services/device-adapter-registry.js"></script>
+    <script src="/js/bluetooth/services/huepar-s60-adapter.js"></script>
     <script src="/js/bluetooth/hooks/use-bluetooth-connection.js"></script>
     <script src="/js/quotes/integrations/measurement-to-quote.js"></script>
+    <script src="/js/measurements/capture-sequencer.js"></script>
     <script src="/js/measurements/measurement-ai-assistant.js"></script>
     <script src="/js/bluetooth/screens/measurement-hud-ui.js"></script>
 
@@ -95,6 +107,8 @@
     <script src="/js/ui/contracts-ui.js"></script>
     <script src="/js/ui/schedule-ui.js"></script>
     <script src="/js/ui/business-ui.js"></script>
+    <script src="/js/ui/receipt-intake-ui.js"></script>
+    <script src="/js/ui/financial-intelligence-ui.js"></script>
     <script src="/js/ui/job-list-ui.js"></script>
     
     <script src="/js/core/app-lifecycle.js"></script>
