@@ -18,9 +18,9 @@ const { makeRunner, ROOT } = require('../helpers/harness');
 // ---- a fake Web Bluetooth that enforces the optionalServices security rule ---
 function makeFakeBluetooth(deviceName, presentServices) {
   // presentServices: uuids the device actually exposes over GATT.
-  function makeChar(uuid) {
+  function makeChar(uuid, props) {
     return {
-      uuid, properties: { notify: true, indicate: false },
+      uuid, properties: Object.assign({ notify: true, indicate: false, write: false, writeWithoutResponse: false }, props || {}),
       async startNotifications() { return this; },
       addEventListener() {},
       async writeValue() {},
@@ -28,7 +28,13 @@ function makeFakeBluetooth(deviceName, presentServices) {
     };
   }
   function makeService(uuid) {
-    return { uuid, async getCharacteristics() { return [makeChar(uuid + '-char')]; }, async getCharacteristic() { return makeChar(uuid + '-w'); } };
+    // Each service exposes a notify char AND a write char so the brand adapter
+    // can locate a measurement-trigger characteristic by capability.
+    return {
+      uuid,
+      async getCharacteristics() { return [makeChar(uuid + '-notify', { notify: true }), makeChar(uuid + '-write', { notify: false, write: true })]; },
+      async getCharacteristic() { return makeChar(uuid + '-w', { write: true }); }
+    };
   }
   return {
     _allowed: null,
@@ -165,6 +171,26 @@ module.exports = async function run() {
   const c3 = await BLE3.connect();
   t.ok('generic device connects', c3.ok === true);
   t.eq('generic device status connected', BLE3.getState().status, 'connected');
+
+  // ---- robustness: a Huepar that uses a DIFFERENT service still works -------
+  // S60 firmware variant exposing the FFF0 UART-like service instead of 0xae30.
+  const FFF0 = '0000fff0-0000-1000-8000-00805f9b34fb';
+  // The candidate family must be declared so this service is even visible.
+  t.ok('candidate union covers FFF0 family', Reg.allOptionalServices().map((s) => String(s).toLowerCase()).indexOf(FFF0) !== -1);
+  setNavigator(makeFakeBluetooth('S60-G-BT', [FFF0]));
+  loadStack();
+  const BLE4 = G.AAA_BLUETOOTH;
+  const p4 = await BLE4.scanAndPick();
+  t.ok('S60 on FFF0 resolves Huepar adapter', p4.ok && BLE4._adapter.id === 'huepar-s60');
+  t.ok('picker declared FFF0 up front', bt()._allowed.indexOf(FFF0) !== -1);
+  const c4 = await BLE4.connect();
+  t.ok('S60 on a different service still connects', c4.ok === true);
+  t.eq('S60-variant status connected', BLE4.getState().status, 'connected');
+  // The brand adapter found a writable characteristic by capability (not UUID),
+  // so the remote measure() trigger is available even off the known service.
+  t.ok('write char located by capability', !!BLE4._adapter._writeChar);
+  const meas = await BLE4._adapter.measure();
+  t.ok('measure() can trigger via discovered write char', meas.ok === true);
 
   return t.report();
 };
