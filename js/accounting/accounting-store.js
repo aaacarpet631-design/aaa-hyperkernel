@@ -79,6 +79,7 @@
         id: i.id || (ids() ? ids().createId('exp') : 'exp_' + Date.now()),
         jobId: i.jobId || null, category: String(i.category || 'General'),
         description: String(i.description || ''), amount: round(num(i.amount)),
+        receiptId: i.receiptId || null,
         incurredAt: i.incurredAt || nowISO(), workspaceId: ws(), createdAt: nowISO(), updatedAt: nowISO()
       };
       await put(EXPENSES, rec); return rec;

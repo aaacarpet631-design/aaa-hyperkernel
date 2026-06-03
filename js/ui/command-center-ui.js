@@ -186,6 +186,18 @@
     if (global.AAA_RUNTIME_GATEWAY && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_AUDIT_LOG'))) {
       actions.appendChild(ui.button({ label: 'Audit Log', icon: '🛡', variant: 'secondary', full: true, onClick: () => auditFlow(body) }));
     }
+    if (global.AAA_PREDICTION_LEDGER_UI) {
+      actions.appendChild(ui.button({ label: 'Prediction Ledger', icon: '🎯', variant: 'secondary', full: true, onClick: () => global.AAA_PREDICTION_LEDGER_UI.open() }));
+    }
+    if (global.AAA_RECEIPT_INTAKE_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Receipts', icon: '🧾', variant: 'secondary', full: true, onClick: () => global.AAA_RECEIPT_INTAKE_UI.open() }));
+    }
+    if (global.AAA_FINANCIAL_INTEL_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Financial Intelligence', icon: '📊', variant: 'secondary', full: true, onClick: () => global.AAA_FINANCIAL_INTEL_UI.open() }));
+    }
+    if (global.AAA_ESTIMATOR_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('CREATE_QUOTE'))) {
+      actions.appendChild(ui.button({ label: 'AI Estimator', icon: '📐', variant: 'secondary', full: true, onClick: () => global.AAA_ESTIMATOR_UI.open() }));
+    }
     if (global.AAA_CREW_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('MANAGE_CREW'))) {
       actions.appendChild(ui.button({ label: 'Crew & Tools', icon: '👷', variant: 'secondary', full: true, onClick: () => global.AAA_CREW_UI.open() }));
     }
@@ -239,6 +251,11 @@
       body.appendChild(kv('Prepared', String(reqs.length)));
       body.appendChild(kv('Sent', String(sent), sent ? '#10B981' : '#A1A1AA'));
       if (!reqs.length) body.appendChild(empty('Review requests are prepared automatically when a job is closed.'));
+    }
+
+    // ---- Decision challenges (Internal Challenge Protocol) ----
+    if (global.AAA_CHALLENGE_UI && global.AAA_CHALLENGE_UI.renderSection) {
+      try { await global.AAA_CHALLENGE_UI.renderSection(body); } catch (_) {}
     }
 
     // ---- Agent meetings ----
