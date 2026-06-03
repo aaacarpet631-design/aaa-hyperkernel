@@ -24,6 +24,7 @@
   function rankings() { return global.AAA_RANKINGS; }
   function evolution() { return global.AAA_EVOLUTION; }
   function debate() { return global.AAA_DEBATE; }
+  function research() { return global.AAA_RESEARCH; }
 
   const GREEN = '#16A34A', AMBER = '#D97706', RED = '#DC2626', GREY = '#71717A', BLUE = '#2563EB';
 
@@ -226,7 +227,26 @@
       body.innerHTML = ''; body.appendChild(ui.spinner('Re-scoring outcomes & ranking analysts…'));
       await rankings().refresh(); await render(body);
     } }));
+    if (research()) {
+      actions.appendChild(ui.button({ label: 'Research Brain (read-only)', icon: '🔭', variant: 'secondary', full: true, onClick: function () { researchFlow(body); } }));
+    }
     body.appendChild(actions);
+
+    // ---- Research Brain: recent read-only reports ----
+    if (research()) {
+      const reports = await research().list();
+      body.appendChild(section('Research Brain'));
+      body.appendChild(note('Read-only strategy research from the separate AI-Q service. Advisory only — never changes jobs, quotes, billing, or customers.'));
+      if (!reports.length) body.appendChild(empty('No research yet — tap “Research Brain (read-only)”.'));
+      reports.slice(0, 5).forEach(function (r) {
+        const row = ui.el('div', { className: 'aaa-list-row' });
+        row.innerHTML = '<strong>' + esc((r.subject ? r.subject + ' · ' : '') + (r.templateId || 'research')) + '</strong>' +
+          '<div class="aaa-list-sub">' + esc(String(r.report || '').slice(0, 160)) + (String(r.report || '').length > 160 ? '…' : '') + '</div>' +
+          '<div class="aaa-list-sub">' + fmtDate(r.createdAtMs) + ' · ' + (r.citations ? r.citations.length : 0) + ' citation(s)</div>';
+        row.appendChild(ui.button({ label: 'Open', size: 'sm', variant: 'ghost', onClick: function () { showReport(r); } }));
+        body.appendChild(row);
+      });
+    }
   }
 
   // ---- action flows -------------------------------------------------------
@@ -265,6 +285,51 @@
       const res = await runResult(body, 'Running ' + D.team(teamId).name + ' through all 6 layers…', function () { return pipeline().runTeam(teamId); });
       alertResult(res.ok ? (D.team(teamId).name + ': ' + res.status + (res.confidence != null ? ' (' + res.confidence + '%)' : '')) : ('Failed: ' + res.error));
     });
+  }
+
+  // Research Brain: pick a template, enter a subject, run through the proxy.
+  function researchFlow(body) {
+    const R = research();
+    if (!R) return;
+    const items = R.templateIds().map(function (id) { return { label: R.TEMPLATES[id].label, value: id }; });
+    items.push({ label: 'Free-form question', value: '__free' });
+    pickerSheet('Research (read-only)', items, function (templateId) {
+      if (templateId === '__free') {
+        textSheet('Research question', 'e.g. Top carpet repair competitors in Houston…', async function (q) {
+          const res = await runResult(body, 'Researching…', function () { return R.ask(q); });
+          if (res.ok) showReport(res.report); else alertResult(researchErr(res));
+        });
+        return;
+      }
+      textSheet(R.TEMPLATES[templateId].label, 'Subject — e.g. a city, competitor, or material', async function (subject) {
+        const res = await runResult(body, 'Researching ' + R.TEMPLATES[templateId].label + '…', function () { return R.research(templateId, subject); });
+        if (res.ok) showReport(res.report); else alertResult(researchErr(res));
+      });
+    });
+  }
+
+  // Turn a research error into a clear, honest message (esp. "not configured").
+  function researchErr(res) {
+    if (res && res.error === 'RESEARCH_NOT_CONFIGURED') return 'Research Brain isn’t connected yet. An admin must set AIQ_RESEARCH_URL on the server (see netlify/functions/RESEARCH.md).';
+    return 'Research failed: ' + ((res && (res.message || res.error)) || 'unknown');
+  }
+
+  // Render a stored report + its citations.
+  function showReport(r) {
+    const ui = U();
+    const s = ui.sheet({ title: (r.subject ? r.subject + ' — ' : '') + (r.templateId || 'Research'), subtitle: 'Read-only research · advisory only' });
+    s.body.appendChild(ui.el('p', { className: 'aaa-list-sub', text: r.question || '' }));
+    s.body.appendChild(ui.el('div', { className: 'aaa-card', style: { whiteSpace: 'pre-wrap', lineHeight: '1.4' }, text: r.report || '' }));
+    if (r.citations && r.citations.length) {
+      s.body.appendChild(ui.el('h2', { className: 'aaa-section-title', text: 'Citations' }));
+      r.citations.forEach(function (c) {
+        const row = ui.el('div', { className: 'aaa-list-row' });
+        row.innerHTML = '<strong>' + esc(c.title || 'Source') + '</strong>' + (c.url ? '<div class="aaa-list-sub">' + esc(c.url) + '</div>' : '');
+        s.body.appendChild(row);
+      });
+    }
+    s.body.appendChild(ui.button({ label: 'Close', variant: 'primary', full: true, onClick: function () { s.close(); } }));
+    document.body.appendChild(s.overlay);
   }
 
   function runAllFlow(body) {
