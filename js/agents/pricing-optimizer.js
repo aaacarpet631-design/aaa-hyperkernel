@@ -162,9 +162,12 @@
       const enriched = recs.map((r) => {
         const p = persisted[r.id] || {};
         const review = this.supervisorReview(r);
+        // Apply any APPROVED calibration bias from the registry (0 if none).
+        const regBias = registryBias(r);
         return Object.assign({}, r, {
           supervisorReview: review,
-          adjustedConfidence: review.adjustedConfidence,
+          registryBias: regBias,
+          adjustedConfidence: clamp(Math.round(review.adjustedConfidence + regBias), 0, 100),
           status: p.status || 'open',
           reviewedBy: p.reviewedBy || null, reviewedAt: p.reviewedAt || null,
           supervisorNote: p.supervisorNote || review.note,
@@ -306,6 +309,18 @@
     const g = (groups || []).find((x) => x.key === (dim === 'riskHigh' ? 'high' : key));
     if (!g) return { value: null, sample: 0 };
     return { value: metric === 'winRate' ? g.winRate : g.avgMarginPct, sample: g.count };
+  }
+  // Approved calibration bias for this recommendation (global + segment-specific).
+  // 0 when nothing has been approved — so default behavior is unchanged.
+  function registryBias(rec) {
+    const A = global.AAA_AGENTS; if (!A) return 0;
+    let b = A.confidenceBias ? num(A.confidenceBias('pricing_optimizer')) : 0;
+    const tun = A.getTuning ? A.getTuning('pricing_optimizer') : null;
+    if (tun && Array.isArray(tun.segmentAdjustments)) {
+      const m = tun.segmentAdjustments.find((s) => s.segmentDim === rec.segmentDim && s.segmentKey === rec.segment);
+      if (m && typeof m.confidenceBias === 'number') b += m.confidenceBias;
+    }
+    return b;
   }
   function pctStr(r) { return r == null ? '—' : Math.round(r * 100) + '%'; }
   function slug(s) { return String(s == null ? 'all' : s).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 40) || 'all'; }
