@@ -31,6 +31,8 @@ const SUITES = [
   'unit/outcome-learning.test.js',
   'unit/pricing-optimizer.test.js',
   'unit/pricing-optimizer-ui.test.js',
+  'unit/prediction-closure.test.js',
+  'unit/learning-feedback-ui.test.js',
   'unit/crew-tools.test.js',
   'unit/scheduling.test.js',
   'unit/contracts.test.js',
