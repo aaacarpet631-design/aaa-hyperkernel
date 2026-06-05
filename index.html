@@ -172,6 +172,8 @@
             if (window.AAA_AUTOMATION && window.AAA_AUTOMATION.init) window.AAA_AUTOMATION.init();
             if (window.AAA_PROMPT_ARCHITECT && window.AAA_PROMPT_ARCHITECT.loadSaved) await window.AAA_PROMPT_ARCHITECT.loadSaved();
             if (window.AAA_SELF_IMPROVEMENT && window.AAA_SELF_IMPROVEMENT.loadTunings) await window.AAA_SELF_IMPROVEMENT.loadTunings();
+            // Re-install any owner-approved AI calibration so it survives a restart.
+            try { if (window.AAA_CALIBRATION_REGISTRY && window.AAA_CALIBRATION_REGISTRY.rehydrate) await window.AAA_CALIBRATION_REGISTRY.rehydrate(); } catch (e) { console.warn('calibration rehydrate', e); }
             // If we returned from the QuickBooks OAuth consent screen, finish the
             // connection via the proxy (tokens are stored server-side, not here).
             try { if (window.AAA_QUICKBOOKS_ONLINE && window.AAA_QUICKBOOKS_ONLINE.handleRedirect) await window.AAA_QUICKBOOKS_ONLINE.handleRedirect(); } catch (e) { console.warn('qbo redirect', e); }

@@ -35,6 +35,7 @@ const SUITES = [
   'unit/learning-feedback-ui.test.js',
   'unit/calibration-registry.test.js',
   'unit/calibration-ui.test.js',
+  'unit/calibration-runtime.test.js',
   'unit/crew-tools.test.js',
   'unit/scheduling.test.js',
   'unit/contracts.test.js',
