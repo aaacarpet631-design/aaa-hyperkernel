@@ -201,6 +201,9 @@
     if (global.AAA_QUOTE_LIFECYCLE_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
       actions.appendChild(ui.button({ label: 'Quotes', icon: '📋', variant: 'secondary', full: true, onClick: () => global.AAA_QUOTE_LIFECYCLE_UI.open() }));
     }
+    if (global.AAA_PRICING_OPTIMIZER_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Pricing Optimizer', icon: '📈', variant: 'secondary', full: true, onClick: () => global.AAA_PRICING_OPTIMIZER_UI.open() }));
+    }
     if (global.AAA_CREW_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('MANAGE_CREW'))) {
       actions.appendChild(ui.button({ label: 'Crew & Tools', icon: '👷', variant: 'secondary', full: true, onClick: () => global.AAA_CREW_UI.open() }));
     }
