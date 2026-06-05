@@ -62,7 +62,10 @@
     REVIEW_LEARNING:   { permission: 'VIEW_FINANCIALS', aiAllowed: false },
     // Approving / rejecting / rolling back an AI calibration version. Human-only
     // + audited. Never touches money — it tunes agent confidence, not prices.
-    APPLY_CALIBRATION: { permission: 'VIEW_FINANCIALS', aiAllowed: false }
+    APPLY_CALIBRATION: { permission: 'VIEW_FINANCIALS', aiAllowed: false },
+    // Sending a customer-facing message (SMS/email). Human-only: AI may draft a
+    // message but a person must approve before anything leaves the building.
+    SEND_MESSAGE:      { permission: 'EDIT_CUSTOMER',   aiAllowed: false }
   };
 
   const Gateway = {
