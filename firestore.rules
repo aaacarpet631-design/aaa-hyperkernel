@@ -37,7 +37,10 @@ service cloud.firestore {
           // Calibration proposals + versions govern AI tuning from spend data.
           || c == 'calibration_proposals' || c == 'calibration_versions'
           // Supervisor Council sessions expose margin/finance deliberation.
-          || c == 'council_sessions';
+          || c == 'council_sessions'
+          // Provenance traces expose the quotes/margins/win-rates behind a
+          // recommendation — owner-only, same as the rest of the analysis.
+          || c == 'provenance';
     }
     // Collections only a trusted backend (Admin SDK) may touch. Notably
     // 'integrations' holds QuickBooks OAuth tokens — clients must never read it.
