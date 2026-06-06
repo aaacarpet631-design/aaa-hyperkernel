@@ -102,8 +102,8 @@
           'Protect ~' + agg.lowMarginWins.length + ' jobs of margin'));
       }
 
-      // 3) Strong service/zip combinations.
-      agg.byServiceType.concat(agg.byZip).forEach((g) => {
+      // 3) Strong service/zip combinations (tagged with their segment dimension).
+      const strongRec = (g, dim) => {
         if (g.key === 'unknown' || g.key === 'unspecified' || g.count < th.minSample) return;
         if (g.winRate != null && g.winRate >= th.strongWinRate && (g.avgMarginPct == null || g.avgMarginPct >= th.thinMarginPct)) {
           recs.push(mk('strong_segment', g.key,
@@ -111,9 +111,11 @@
             g.key + ' closes at ' + pctStr(g.winRate) + ' over ' + g.count + ' quotes' + (g.avgMarginPct != null ? ' at ~' + g.avgMarginPct + '% margin' : '') + '. A reliable, profitable segment to lean into.',
             confFromSample(g.count, g.winRate - 0.5), riskFor('focus_marketing', g.count),
             g.quoteIds, 'Direct more marketing/lead spend toward ' + g.key + '.',
-            'Grow volume in a proven segment'));
+            'Grow volume in a proven segment', dim));
         }
-      });
+      };
+      agg.byServiceType.forEach((g) => strongRec(g, 'serviceType'));
+      agg.byZip.forEach((g) => strongRec(g, 'zip'));
 
       // 4) Weak lead sources.
       agg.byLeadSource.forEach((g) => {
@@ -228,9 +230,15 @@
       const o = opts || {};
       if (!rec || !rec.id) return { ok: false, error: 'NO_REC' };
       const predId = ids() ? ids().createId('pred') : 'pred_' + Date.now();
+      // Capture the segment's CURRENT metric as the baseline, so a later closure
+      // can measure observed (post-prediction) movement against it.
+      let baseline = { value: null, sample: 0 };
+      try { if (learning()) baseline = baselineFor(await learning().aggregate(), rec); } catch (_) {}
       const decision = {
         id: predId, agent: SPEC.agentId, kind: 'pricing_prediction',
         recommendationId: rec.id, recommendationType: rec.type, segment: rec.segment,
+        segmentDim: rec.segmentDim, metric: rec.metric, expectedDirection: rec.expectedDirection,
+        baseline: baseline.value, baselineSample: baseline.sample,
         recommendation: rec.title, confidence: rec.adjustedConfidence != null ? rec.adjustedConfidence : rec.confidence,
         expectedKpiImpact: rec.expectedKpiImpact || null, jobId: null,
         workspaceId: ws(), createdAt: nowISO()
@@ -254,9 +262,23 @@
   };
 
   // ---- recommendation factory + scoring helpers ----
-  function mk(type, segment, title, reasoning, confidence, risk, supportingQuoteIds, recommendedAction, expectedKpiImpact) {
+  // What KPI each recommendation type expects to move, and in which segment
+  // dimension — so a later closure can measure baseline vs observed objectively.
+  const TYPE_META = {
+    price_band_losses:  { segmentDim: 'priceBand',  metric: 'winRate',      expectedDirection: 'up' },
+    low_margin_wins:    { segmentDim: 'marginAll',  metric: 'avgMarginPct', expectedDirection: 'up' },
+    strong_segment:     { segmentDim: 'serviceType', metric: 'winRate',     expectedDirection: 'maintain_high' },
+    weak_lead_source:   { segmentDim: 'leadSource', metric: 'winRate',      expectedDirection: 'up' },
+    followup_delay:     { segmentDim: 'all',        metric: 'winRate',      expectedDirection: 'up' },
+    followup_effective: { segmentDim: 'all',        metric: 'winRate',      expectedDirection: 'up' },
+    high_risk_jobs:     { segmentDim: 'riskHigh',   metric: 'avgMarginPct', expectedDirection: 'up' }
+  };
+
+  function mk(type, segment, title, reasoning, confidence, risk, supportingQuoteIds, recommendedAction, expectedKpiImpact, segmentDimOverride) {
+    const meta = TYPE_META[type] || { segmentDim: 'all', metric: 'winRate', expectedDirection: 'up' };
     return {
       id: 'rec_' + type + '_' + slug(segment), type: type, segment: segment,
+      segmentDim: segmentDimOverride || meta.segmentDim, metric: meta.metric, expectedDirection: meta.expectedDirection,
       title: title, reasoning: reasoning,
       confidence: clamp(Math.round(confidence), 0, 100), risk: clamp(Math.round(risk), 0, 100),
       supportingQuoteIds: (supportingQuoteIds || []).slice(0, 50),
@@ -273,6 +295,17 @@
     const small = n < 3 ? 20 : (n < 6 ? 10 : 0);
     const base = { raise_price: 35, cut_spend: 35, focus_marketing: 10 }[action] != null ? { raise_price: 35, cut_spend: 35, focus_marketing: 10 }[action] : 20;
     return clamp(base + small, 0, 100);
+  }
+  // Extract a recommendation's baseline metric from the current aggregate.
+  function baselineFor(agg, rec) {
+    const dim = rec.segmentDim, key = rec.segment, metric = rec.metric;
+    if (dim === 'all' || dim === 'marginAll') {
+      return { value: metric === 'winRate' ? (agg.overall ? agg.overall.winRate : null) : (agg.overall ? agg.overall.avgMarginPct : null), sample: agg.overall ? agg.overall.resolved : 0 };
+    }
+    const groups = dim === 'priceBand' ? agg.byPriceBand : dim === 'serviceType' ? agg.byServiceType : dim === 'zip' ? agg.byZip : dim === 'leadSource' ? agg.byLeadSource : dim === 'riskHigh' ? agg.byRiskBand : [];
+    const g = (groups || []).find((x) => x.key === (dim === 'riskHigh' ? 'high' : key));
+    if (!g) return { value: null, sample: 0 };
+    return { value: metric === 'winRate' ? g.winRate : g.avgMarginPct, sample: g.count };
   }
   function pctStr(r) { return r == null ? '—' : Math.round(r * 100) + '%'; }
   function slug(s) { return String(s == null ? 'all' : s).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 40) || 'all'; }

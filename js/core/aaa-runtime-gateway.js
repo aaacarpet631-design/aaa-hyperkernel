@@ -56,7 +56,10 @@
     RESOLVE_QUOTE:     { permission: 'CREATE_QUOTE',    aiAllowed: false },
     // Marking a pricing recommendation reviewed/acted-on. Audited; never changes
     // a price (the optimizer has no price-mutation path at all).
-    REVIEW_PRICING:    { permission: 'VIEW_FINANCIALS', aiAllowed: false }
+    REVIEW_PRICING:    { permission: 'VIEW_FINANCIALS', aiAllowed: false },
+    // Owner acknowledging a prediction-closure / learning-feedback record.
+    // Audited; never changes a price (closures are read-only observations).
+    REVIEW_LEARNING:   { permission: 'VIEW_FINANCIALS', aiAllowed: false }
   };
 
   const Gateway = {

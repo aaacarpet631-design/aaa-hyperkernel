@@ -31,7 +31,9 @@ service cloud.firestore {
           // Quote lifecycle records carry internal cost + margin + job cost.
           || c == 'quotes'
           // Pricing optimizer recommendations expose margin/win-rate analysis.
-          || c == 'pricing_recommendations';
+          || c == 'pricing_recommendations'
+          // Prediction-closure / learning-feedback records expose win-rate/margin.
+          || c == 'learning_feedback';
     }
     // Collections only a trusted backend (Admin SDK) may touch. Notably
     // 'integrations' holds QuickBooks OAuth tokens — clients must never read it.
