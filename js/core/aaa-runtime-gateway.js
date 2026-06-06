@@ -66,6 +66,10 @@
     // Sending a customer-facing message (SMS/email). Human-only: AI may draft a
     // message but a person must approve before anything leaves the building.
     SEND_MESSAGE:      { permission: 'EDIT_CUSTOMER',   aiAllowed: false },
+    // Recording an INBOUND customer message (a reply arriving from a network
+    // adapter/webhook). Not a customer-facing send, so AI/system ingestion is
+    // allowed — it records reality — and every receipt is audited.
+    INBOUND_MESSAGE:   { permission: null,              aiAllowed: true  },
     // Owner acting on a Supervisor Council decision. Advisory + audited; the
     // council recommends, a person decides — it never auto-acts.
     REVIEW_COUNCIL:    { permission: 'VIEW_FINANCIALS', aiAllowed: false },
