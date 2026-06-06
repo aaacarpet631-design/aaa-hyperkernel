@@ -54,6 +54,7 @@ async function main() {
     await setDoc(doc(db, `workspaces/${WS}/pricing_recommendations/pr1`), { title: 'x', confidence: 70 });
     await setDoc(doc(db, `workspaces/${WS}/learning_feedback/lf1`), { kind: 'closure', status: 'validated' });
     await setDoc(doc(db, `workspaces/${WS}/calibration_versions/cv1`), { agent: 'pricing_optimizer', confidenceBias: 5 });
+    await setDoc(doc(db, `workspaces/${WS}/council_sessions/cs1`), { decision: 'approve', disagreement: 20 });
     await setDoc(doc(db, `workspaces/${WS}/audit_log/a1`), { action: 'X' });
     await setDoc(doc(db, `workspaces/${WS}/integrations/qbo`), { accessToken: 'SECRET' });
     await setDoc(doc(db, `workspaces/${WS}/jobs/j1`), { name: 'job' });
@@ -85,6 +86,8 @@ async function main() {
   await check('crew CANNOT read learning feedback', assertFails(getDoc(doc(crew, `workspaces/${WS}/learning_feedback/lf1`))));
   await check('owner reads calibration versions', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/calibration_versions/cv1`))));
   await check('crew CANNOT read calibration versions', assertFails(getDoc(doc(crew, `workspaces/${WS}/calibration_versions/cv1`))));
+  await check('owner reads council sessions', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/council_sessions/cs1`))));
+  await check('crew CANNOT read council sessions', assertFails(getDoc(doc(crew, `workspaces/${WS}/council_sessions/cs1`))));
 
   // audit_log: append-only + owner-read (regression for the wildcard bug)
   await check('member CAN create audit entry', assertSucceeds(setDoc(doc(crew, `workspaces/${WS}/audit_log/a2`), { action: 'Y' })));

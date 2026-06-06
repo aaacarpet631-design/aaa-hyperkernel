@@ -41,6 +41,8 @@ const SUITES = [
   'unit/transport-dashboard-ui.test.js',
   'unit/transport-delivery.test.js',
   'unit/transport-scheduler.test.js',
+  'unit/agent-council.test.js',
+  'unit/agent-council-ui.test.js',
   'unit/crew-tools.test.js',
   'unit/scheduling.test.js',
   'unit/contracts.test.js',
