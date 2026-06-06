@@ -56,7 +56,10 @@ service cloud.firestore {
           || c == 'privacy_config' || c == 'privacy_vault' || c == 'deletion_requests'
           // Reliability Command Center: metric snapshots + incidents aggregate
           // conversion/margin-derived KPIs — owner-only, same as the analysis.
-          || c == 'reliability_snapshots' || c == 'incidents';
+          || c == 'reliability_snapshots' || c == 'incidents'
+          // Outcome Intelligence: outcome events, agent scores/accuracy, and
+          // learning patterns expose margins + win rates — owner-only.
+          || c == 'outcome_events' || c == 'agent_scores' || c == 'agent_accuracy' || c == 'learning_patterns';
     }
     // Collections only a trusted backend (Admin SDK) may touch. Notably
     // 'integrations' holds QuickBooks OAuth tokens — clients must never read it.
