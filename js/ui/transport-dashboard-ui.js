@@ -53,6 +53,15 @@
       chip(stats.pendingRetry, 'Pending Retry', '#3B82F6')
     ]));
 
+    // Scheduler: auto-draft due review requests (still pending approval).
+    if (global.AAA_TRANSPORT_SCHEDULER) {
+      container.appendChild(ui.button({ label: 'Run review scheduler', icon: '⏰', variant: 'secondary', full: true, onClick: async () => {
+        const r = await global.AAA_TRANSPORT_SCHEDULER.runReviewRequests({});
+        await render(container);
+        if (r && r.ok) await ui.confirm({ title: 'Scheduler ran', message: r.drafted + ' review message(s) drafted for your approval.', confirmLabel: 'OK' });
+      } }));
+    }
+
     // The review gate: pending approval queue.
     container.appendChild(title('Pending Approval'));
     if (!pending.length) container.appendChild(empty('Nothing waiting to send.'));

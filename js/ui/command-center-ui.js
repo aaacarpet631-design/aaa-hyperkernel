@@ -213,6 +213,9 @@
     if (global.AAA_TRANSPORT_DASHBOARD_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('EDIT_CUSTOMER'))) {
       actions.appendChild(ui.button({ label: 'Delivery', icon: '📨', variant: 'secondary', full: true, onClick: () => global.AAA_TRANSPORT_DASHBOARD_UI.open() }));
     }
+    if (global.AAA_AGENT_COUNCIL_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Supervisor Council', icon: '⚖️', variant: 'secondary', full: true, onClick: () => global.AAA_AGENT_COUNCIL_UI.open() }));
+    }
     if (global.AAA_CREW_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('MANAGE_CREW'))) {
       actions.appendChild(ui.button({ label: 'Crew & Tools', icon: '👷', variant: 'secondary', full: true, onClick: () => global.AAA_CREW_UI.open() }));
     }

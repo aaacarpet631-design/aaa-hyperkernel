@@ -35,7 +35,9 @@ service cloud.firestore {
           // Prediction-closure / learning-feedback records expose win-rate/margin.
           || c == 'learning_feedback'
           // Calibration proposals + versions govern AI tuning from spend data.
-          || c == 'calibration_proposals' || c == 'calibration_versions';
+          || c == 'calibration_proposals' || c == 'calibration_versions'
+          // Supervisor Council sessions expose margin/finance deliberation.
+          || c == 'council_sessions';
     }
     // Collections only a trusted backend (Admin SDK) may touch. Notably
     // 'integrations' holds QuickBooks OAuth tokens — clients must never read it.
