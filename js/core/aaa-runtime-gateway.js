@@ -81,6 +81,11 @@
     // Security hardening admin (configure step-up/MFA, toggle enforcement).
     // Owner-only (MANAGE_SETTINGS) + audited; AI can never reconfigure security.
     MANAGE_SECURITY:   { permission: 'MANAGE_SETTINGS',   aiAllowed: false },
+    // Privacy & data governance. Configuring retention/vault is owner-only +
+    // audited; executing an erasure (right to be forgotten) is its own action so
+    // the destructive step is separately gated + audited. AI can never erase data.
+    MANAGE_PRIVACY:    { permission: 'MANAGE_SETTINGS',   aiAllowed: false },
+    ERASE_DATA:        { permission: 'MANAGE_SETTINGS',   aiAllowed: false },
     // Running a Replay Sandbox simulation: re-decide a past trace under chosen
     // governed versions. Owner-only + audited; read-only by construction (it
     // writes no business record — only an optional owner-only replay snapshot).

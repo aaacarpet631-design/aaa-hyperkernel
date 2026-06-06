@@ -64,6 +64,8 @@ async function main() {
     await setDoc(doc(db, `workspaces/${WS}/security_config/config`), { enforce: true, signingKey: 'SECRET' });
     await setDoc(doc(db, `workspaces/${WS}/security_sessions/se1`), { actor: 'owner', role: 'owner' });
     await setDoc(doc(db, `workspaces/${WS}/event_log/ev1`), { type: 'quote.created', seq: 1 });
+    await setDoc(doc(db, `workspaces/${WS}/privacy_vault/vlt1`), { refType: 'customer', refId: 'c1', ct: 'CIPHER' });
+    await setDoc(doc(db, `workspaces/${WS}/deletion_requests/er1`), { subjectId: 'c1', status: 'pending' });
     await setDoc(doc(db, `workspaces/${WS}/legal_records/lr1`), { type: 'incident', summary: 'sensitive' });
     await setDoc(doc(db, `workspaces/${WS}/audit_log/a1`), { action: 'X' });
     await setDoc(doc(db, `workspaces/${WS}/integrations/qbo`), { accessToken: 'SECRET' });
@@ -126,6 +128,12 @@ async function main() {
   await check('owner reads event log', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/event_log/ev1`))));
   await check('crew CANNOT read event log', assertFails(getDoc(doc(crew, `workspaces/${WS}/event_log/ev1`))));
   await check('crew CANNOT write event log', assertFails(setDoc(doc(crew, `workspaces/${WS}/event_log/ev2`), { type: 'x' })));
+  // privacy: encrypted vault + erasure requests are owner-only; manager + crew denied.
+  await check('owner reads the privacy vault', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/privacy_vault/vlt1`))));
+  await check('crew CANNOT read the privacy vault', assertFails(getDoc(doc(crew, `workspaces/${WS}/privacy_vault/vlt1`))));
+  await check('manager CANNOT read the privacy vault', assertFails(getDoc(doc(manager, `workspaces/${WS}/privacy_vault/vlt1`))));
+  await check('crew CANNOT read erasure requests', assertFails(getDoc(doc(crew, `workspaces/${WS}/deletion_requests/er1`))));
+  await check('crew CANNOT write the privacy vault', assertFails(setDoc(doc(crew, `workspaces/${WS}/privacy_vault/vlt2`), { ct: 'x' })));
   // legal records: owner + manager (the legal roles) may read/write; crew cannot.
   await check('owner reads legal records', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/legal_records/lr1`))));
   await check('manager reads legal records', assertSucceeds(getDoc(doc(manager, `workspaces/${WS}/legal_records/lr1`))));

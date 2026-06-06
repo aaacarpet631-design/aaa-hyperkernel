@@ -49,7 +49,11 @@ service cloud.firestore {
           || c == 'replay_snapshots'
           // Native event-bus log — immutable domain events that can carry
           // business data (quotes/jobs/messages); owner-only.
-          || c == 'event_log';
+          || c == 'event_log'
+          // Privacy & data governance: vault key + retention config, the
+          // encrypted PII vault, and erasure requests — owner-only (the vault
+          // protects the most sensitive PII).
+          || c == 'privacy_config' || c == 'privacy_vault' || c == 'deletion_requests';
     }
     // Collections only a trusted backend (Admin SDK) may touch. Notably
     // 'integrations' holds QuickBooks OAuth tokens — clients must never read it.
