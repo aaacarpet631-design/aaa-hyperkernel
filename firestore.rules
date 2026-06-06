@@ -77,6 +77,12 @@ service cloud.firestore {
       return c == 'comm_threads' || c == 'comm_inbound' || c == 'comm_notifications';
     }
     function canComms(ws) { return role(ws) == 'owner' || role(ws) == 'manager'; }
+    // Security hardening: step-up/MFA secrets, signing key, and signed sessions.
+    // Owner-only (these hold the secrets that protect privileged actions); in a
+    // multi-tenant deployment these belong server-side entirely.
+    function isSecurityCollection(c) {
+      return c == 'security_config' || c == 'security_sessions';
+    }
 
     match /workspaces/{ws} {
       allow read: if isMember(ws);
@@ -101,13 +107,15 @@ service cloud.firestore {
         allow read, write: if isMember(ws) && !isSpecialCollection(collection)
           && (!isFinancialCollection(collection) || isOwner(ws))
           && (!isLegalCollection(collection) || canLegal(ws))
-          && (!isCommsCollection(collection) || canComms(ws));
+          && (!isCommsCollection(collection) || canComms(ws))
+          && (!isSecurityCollection(collection) || isOwner(ws));
       }
       match /{collection}/{docId}/{sub=**} {
         allow read, write: if isMember(ws) && !isSpecialCollection(collection)
           && (!isFinancialCollection(collection) || isOwner(ws))
           && (!isLegalCollection(collection) || canLegal(ws))
-          && (!isCommsCollection(collection) || canComms(ws));
+          && (!isCommsCollection(collection) || canComms(ws))
+          && (!isSecurityCollection(collection) || isOwner(ws));
       }
     }
   }

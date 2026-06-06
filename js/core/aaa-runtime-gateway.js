@@ -28,6 +28,7 @@
   function ids() { return global.AAA_ID_FACTORY; }
   function clock() { return global.AAA_RUNTIME_CLOCK; }
   function events() { return global.AAA_EVENTS; }
+  function security() { return global.AAA_SECURITY; }
   function nowISO() { return clock() && clock().nowISO ? clock().nowISO() : new Date().toISOString(); }
 
   /**
@@ -77,6 +78,9 @@
     // calibration): create draft / propose / approve / activate / rollback /
     // deprecate. Human-only + audited; no version goes active without this path.
     GOVERN_REGISTRY:   { permission: 'MANAGE_GOVERNANCE', aiAllowed: false },
+    // Security hardening admin (configure step-up/MFA, toggle enforcement).
+    // Owner-only (MANAGE_SETTINGS) + audited; AI can never reconfigure security.
+    MANAGE_SECURITY:   { permission: 'MANAGE_SETTINGS',   aiAllowed: false },
     // Running a Replay Sandbox simulation: re-decide a past trace under chosen
     // governed versions. Owner-only + audited; read-only by construction (it
     // writes no business record — only an optional owner-only replay snapshot).
@@ -125,6 +129,18 @@
         return { ok: false, error: 'FORBIDDEN', message: 'Your role cannot perform this action.', permission: policy.permission, auditId: a };
       }
 
+      // 2b) Security hardening gate (opt-in). When an owner has enabled
+      // enforcement, a privileged action needs a valid session + a fresh step-up
+      // (MFA). Inert until configured — absent/off behaves exactly as before.
+      if (origin === 'human' && security() && security().gateCheck) {
+        let gate = { allow: true };
+        try { gate = await security().gateCheck(r.action, origin); } catch (_) { gate = { allow: true }; }
+        if (gate && !gate.allow) {
+          const a = await this._audit({ action: r.action, origin: origin, actor: r.actor || (rbac() && rbac().role()), decision: 'denied', reason: gate.error || 'SECURITY_BLOCKED', target: r.target, detail: r.detail });
+          return { ok: false, error: gate.error || 'SECURITY_BLOCKED', message: gate.error === 'STEP_UP_REQUIRED' ? 'Verify your identity (step-up) to perform this privileged action.' : 'Your session must be re-validated.', auditId: a };
+        }
+      }
+
       // 3) Allowed — record intent, run the mutation, record outcome.
       const auditId = await this._audit({ action: r.action, origin: origin, actor: r.actor || (rbac() && rbac().role()), decision: 'allowed', target: r.target, detail: r.detail });
       let result = null;
@@ -163,9 +179,14 @@
         target: entry.target || null,
         detail: entry.detail || null
       };
-      try { if (data() && data().put) await data().put('audit_log', id, rec); } catch (_) {}
+      // Tamper-evidence: when the Security module is present, chain this entry to
+      // its predecessor (seq + prevHash + hash) and sign privileged approvals.
+      // Inert (no extra fields) when the module isn't loaded — fully backward-compatible.
+      let sealed = rec;
+      try { if (security() && security().sealAudit) sealed = await security().sealAudit(rec); } catch (_) { sealed = rec; }
+      try { if (data() && data().put) await data().put('audit_log', id, sealed); } catch (_) {}
       // Best-effort cloud mirror (rules make audit_log append-only / owner-read).
-      try { if (data() && data().cloudReady && data().cloudReady() && cloud()) await cloud().insertEvent('audit_log', rec); } catch (_) {}
+      try { if (data() && data().cloudReady && data().cloudReady() && cloud()) await cloud().insertEvent('audit_log', sealed); } catch (_) {}
       return id;
     },
 
