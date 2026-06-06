@@ -240,6 +240,9 @@
     if (global.AAA_DIGITAL_TWIN_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
       actions.appendChild(ui.button({ label: 'Digital Twin', icon: '🔮', variant: 'secondary', full: true, onClick: () => global.AAA_DIGITAL_TWIN_UI.open() }));
     }
+    if (global.AAA_FINANCIAL_INTELLIGENCE_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Financial Intelligence', icon: '💰', variant: 'secondary', full: true, onClick: () => global.AAA_FINANCIAL_INTELLIGENCE_UI.open() }));
+    }
     if (global.AAA_AGENT_COUNCIL_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
       actions.appendChild(ui.button({ label: 'Supervisor Council', icon: '⚖️', variant: 'secondary', full: true, onClick: () => global.AAA_AGENT_COUNCIL_UI.open() }));
     }
