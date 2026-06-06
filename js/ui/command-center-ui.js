@@ -219,6 +219,9 @@
     if (global.AAA_SECURITY_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('MANAGE_SETTINGS'))) {
       actions.appendChild(ui.button({ label: 'Security Center', icon: '🛡', variant: 'secondary', full: true, onClick: () => global.AAA_SECURITY_UI.open() }));
     }
+    if (global.AAA_EVENT_STREAM_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Event Stream', icon: '🔁', variant: 'secondary', full: true, onClick: () => global.AAA_EVENT_STREAM_UI.open() }));
+    }
     if (global.AAA_AGENT_COUNCIL_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
       actions.appendChild(ui.button({ label: 'Supervisor Council', icon: '⚖️', variant: 'secondary', full: true, onClick: () => global.AAA_AGENT_COUNCIL_UI.open() }));
     }

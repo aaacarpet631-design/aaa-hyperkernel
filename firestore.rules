@@ -46,7 +46,10 @@ service cloud.firestore {
           || c == 'governance_versions'
           // Replay Sandbox snapshots replay margins/win-rates/decisions under
           // alternative governed versions — owner-only, same as the analysis.
-          || c == 'replay_snapshots';
+          || c == 'replay_snapshots'
+          // Native event-bus log — immutable domain events that can carry
+          // business data (quotes/jobs/messages); owner-only.
+          || c == 'event_log';
     }
     // Collections only a trusted backend (Admin SDK) may touch. Notably
     // 'integrations' holds QuickBooks OAuth tokens — clients must never read it.
