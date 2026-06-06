@@ -68,6 +68,7 @@
   }
 
   const CONTRACTS = {};   // type -> { type, version, description, schema, bridged }
+  let TRANSPORT = null;   // optional external forwarder (dumb pipe); default in-app only
 
   function define(type, def) {
     const d = def || {};
@@ -118,7 +119,43 @@
       rec.hash = chainHash(rec, rec.prevHash);
       await put(rec);
       if (events()) events().emit('event.' + type, rec);   // typed delivery to in-app subscribers
+      // Optional external transport (NATS/MQTT/Kafka/etc.) as a DUMB PIPE — the
+      // app owns the contract, log, and chain; a transport only FORWARDS. Default
+      // none (in-app only). Best-effort: a transport failure never breaks publish
+      // and never corrupts the local log (offline-safe).
+      if (TRANSPORT && typeof TRANSPORT.publish === 'function') {
+        try { const r = TRANSPORT.publish(type, rec); if (r && typeof r.then === 'function') r.catch(function () {}); } catch (_) {}
+      }
       return { ok: true, event: rec };
+    },
+
+    /** Plug in an external transport adapter { name, publish(type, event) } that
+     *  forwards published events to a broker. Provider-neutral; pass null to
+     *  detach. The local contract/log/chain are unaffected either way. */
+    setTransport(adapter) { TRANSPORT = (adapter && typeof adapter.publish === 'function') ? adapter : null; return { ok: true, transport: TRANSPORT ? TRANSPORT.name || 'custom' : null }; },
+    transport() { return TRANSPORT ? (TRANSPORT.name || 'custom') : null; },
+
+    /**
+     * Export the contract catalog as an AsyncAPI 2.6 document (the portable,
+     * infra-free artifact). Deterministic (sorted channels) so it can be diffed
+     * and kept in sync with schemas/asyncapi/. No toolchain required.
+     */
+    asyncapi(opts) {
+      const o = opts || {};
+      const channels = {};
+      Object.keys(CONTRACTS).sort().forEach((type) => {
+        const c = CONTRACTS[type];
+        channels[type] = {
+          description: c.description || '',
+          subscribe: { operationId: 'on_' + type.replace(/[^a-z0-9]+/gi, '_'), message: { name: type, contentType: 'application/json', 'x-version': c.version, 'x-bridged': !!c.bridged, payload: c.schema || { type: 'object' } } }
+        };
+      });
+      return {
+        asyncapi: '2.6.0',
+        info: { title: o.title || 'AAA HyperKernel Events', version: o.version || '1.0.0', description: 'Native, contract-validated domain events. App-owned; transport-neutral; offline-safe.' },
+        defaultContentType: 'application/json',
+        channels: channels
+      };
     },
 
     /** Subscribe to a typed event. Returns an unsubscribe function. */

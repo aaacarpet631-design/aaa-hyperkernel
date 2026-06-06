@@ -50,6 +50,26 @@ module.exports = async function run() {
   await new Promise((r) => setTimeout(r, 0)); // let the async bridge publish settle
   t.ok('a bridged AAA_EVENTS emit is captured as a typed event', (await BUS.log({ type: 'comm.inbound' })).length === before + 1);
 
+  // ===== pluggable transport: external broker is an OPTIONAL dumb pipe =====
+  const forwarded = [];
+  BUS.setTransport({ name: 'test-pipe', publish: (type, ev) => { forwarded.push({ type: type, seq: ev.seq }); } });
+  t.eq('a transport can be plugged in (provider-neutral)', BUS.transport(), 'test-pipe');
+  const fp = await BUS.publish('job.closed', { jobId: 'j2', outcome: 'lost' });
+  t.ok('published events are forwarded to the transport', fp.ok === true && forwarded.some((f) => f.type === 'job.closed' && f.seq === fp.event.seq));
+  // a failing transport must NOT break publish or the local log (offline-safe)
+  BUS.setTransport({ name: 'broken', publish: () => { throw new Error('broker down'); } });
+  const resilient = await BUS.publish('job.closed', { jobId: 'j3', outcome: 'won' });
+  t.ok('a transport failure never breaks the local publish/log', resilient.ok === true && (await BUS.get(resilient.event.id)) !== null);
+  BUS.setTransport(null);
+  t.eq('transport detaches cleanly (default in-app only)', BUS.transport(), null);
+
+  // ===== AsyncAPI export stays in sync with the committed schema file =====
+  const fs = require('fs'); const path = require('path');
+  const doc = BUS.asyncapi();
+  t.ok('asyncapi() emits a valid AsyncAPI 2.6 doc with a channel per contract', doc.asyncapi === '2.6.0' && Object.keys(doc.channels).length === BUS.contracts().length && !!doc.channels['quote.created']);
+  const committed = JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', 'schemas', 'asyncapi', 'aaa-events.asyncapi.json'), 'utf8'));
+  t.eq('committed AsyncAPI file matches the live contracts (no drift)', JSON.stringify(committed.channels), JSON.stringify(doc.channels));
+
   // ===== determinism: identical payloads → identical chain hash position =====
   const { G: G2, data: d2 } = setupEnv();
   load('js/core/aaa-events.js'); load('js/core/aaa-event-bus.js');
