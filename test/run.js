@@ -53,6 +53,8 @@ const SUITES = [
   'unit/reliability-ui.test.js',
   'unit/outcome-intelligence.test.js',
   'unit/outcome-intelligence-ui.test.js',
+  'unit/executive-council.test.js',
+  'unit/executive-council-ui.test.js',
   'unit/agent-council.test.js',
   'unit/agent-council-ui.test.js',
   'unit/provenance.test.js',

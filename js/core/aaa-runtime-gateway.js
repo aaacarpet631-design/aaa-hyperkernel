@@ -74,6 +74,9 @@
     // Owner acting on a Supervisor Council decision. Advisory + audited; the
     // council recommends, a person decides — it never auto-acts.
     REVIEW_COUNCIL:    { permission: 'VIEW_FINANCIALS', aiAllowed: false },
+    // Owner acting on an Executive Council review of a high-impact decision
+    // (price change / ad spend / hire / large quote). Advisory + audited.
+    REVIEW_EXECUTIVE:  { permission: 'VIEW_FINANCIALS', aiAllowed: false },
     // Governing a versioned registry artifact (prompt/model/template/policy/
     // calibration): create draft / propose / approve / activate / rollback /
     // deprecate. Human-only + audited; no version goes active without this path.
