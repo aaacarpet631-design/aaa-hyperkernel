@@ -19,6 +19,7 @@ cost hidden from the customer receipt.
 - `services/measurement-parser.js` — `MeasurementParser`: ASCII + binary BLE frames → normalized **feet** (handles m/cm/mm/ft/in, `10ft 6in`, `10' 6"`).
 - `services/generic-ble-adapter.js` — `GenericBleMeasurementAdapter`: real Web Bluetooth connect/subscribe/battery/reconnect/timeout; brand-agnostic.
 - `services/device-adapter-registry.js` — `DeviceAdapterRegistry`: pluggable per-brand adapters (Bosch/Leica/DeWalt/Mileseey later) with generic fallback.
+- `services/huepar-s60-adapter.js` — `AAA_HUEPAR_S60_ADAPTER` + `AAA_HUEPAR_S60_PARSER`: **first-class Huepar S-series (S60-G-BT) support**. Subclasses the generic adapter; adds Huepar device filters, a `measure()` remote-shutter trigger, and a frame parser that decodes the distance family (canonical metres → feet, with display-unit + confidence) and the angle/tilt family (diagnostics only, never emitted as a length). Self-registers above generic. See **provisional protocol** note below.
 - `hooks/use-bluetooth-connection.js` — `AAA_BLUETOOTH`: stateful connection controller (the "hook"); support/permission gating, device persistence, last-connected memory, foreground reconnect.
 - `screens/measurement-hud-ui.js` — all 8 screens in one HUD.
 
@@ -131,6 +132,60 @@ AAA_DEVICE_ADAPTER_REGISTRY.register({
 
 Connect the device once, take readings, and read `AAA_BLE_RAW_LOG.all()` to see
 the exact frames you need to parse.
+
+The shipped **Huepar S60 adapter** (`huepar-s60-adapter.js`) is the worked
+example of this pattern.
+
+---
+
+## Huepar S60 adapter — provisional protocol (`experimental/huepar-s60-v1`)
+
+Huepar's official docs confirm the S-series Bluetooth meters sync to the Huepar
+app, but the vendor does **not** publish a public GATT profile. The contract the
+adapter ships with comes from **public reverse-engineering of the LDM-S60-BT**,
+not vendor certification — so it is deliberately marked experimental and must be
+**lab-validated against a real S60-family device before it is trusted for
+money-bearing measurements**. The `AAA_BLE_RAW_LOG` black box stays on so
+unknown firmware variants can be re-decoded from real captures.
+
+| Concern | Provisional value | Confidence |
+|---|---|---|
+| Service UUID | `0000ae30-0000-1000-8000-00805f9b34fb` | medium (reverse-engineered) |
+| Write characteristic (app→device) | `0000ae01-…` | medium |
+| Notify characteristic (device→app) | `0000ae02-…` | medium |
+| Measure trigger | `f104010106` | medium |
+| Clear last | `f104000105` | medium |
+| Distance frame | `f104010007 <unit> 013150 <dHi dMid dLo> <quality> <cs>` | medium |
+| Angle/tilt frame | `f102010004 <X2> <Y2> <Z2> <cs>` | medium |
+
+Design choices that keep this honest:
+
+- **Metres are canonical.** The 3-byte distance magnitude is read big-endian in
+  1e-5 m and stored as metres; feet are derived for the quote engine. The
+  meter's *display* unit (`unitMode`) is recorded but never changes the value.
+- **Fingerprint by name + service shape**, never by assuming `0xAE30` is a
+  globally unique, future-proof id (`match()` accepts `LDM*`/`Huepar*` names or
+  the advertised service).
+- **Implausible decodes are rejected, not guessed** (outside ~0.03–150 m return
+  no reading), and an in-band quality flag drops confidence (0.9 → 0.8) so
+  low-trust reads land in review instead of the quote total.
+- **Angle/tilt frames are decoded for diagnostics only** — they are not lengths
+  and are never emitted as room measurements.
+- **The checksum is recorded but never gated on** (`checksumOk: null`) because
+  the upstream algorithm is unverified.
+- **Remote shutter.** The adapter exposes `measure()`, surfaced through
+  `AAA_BLUETOOTH.canMeasure()` / `measure()` and a **“Trigger laser
+  measurement”** button on the capture screen — so a tech can fire a reading
+  from the phone instead of reaching for the meter's button. Devices without a
+  remote trigger return a clear "press the button on the laser" result.
+- **Picker reachability seam.** Brand adapters declare the GATT services they
+  need via `optionalServices` at registration; the registry aggregates them and
+  the generic OS picker declares them up front. Without this, Web Bluetooth
+  blocks `getPrimaryService(ae30)` after a device is picked through the generic
+  picker, and the write characteristic (so `measure()`) would be unreachable.
+
+Golden fixtures in `test/unit/huepar-s60.test.js` lock the decode in place;
+swap them for real device captures once lab validation is done.
 
 ---
 

@@ -44,6 +44,7 @@ function cannedFor(schema, payload) {
   if (has('vote')) return { vote: 'approve', rationale: 'Margin upside outweighs risk.', confidence: 70, key_concern: 'Win-rate erosion' };
   if (has('gaps')) return { summary: 'One blind spot.', gaps: [{ area: 'Customer lifetime value not tracked', evidence: 'No LTV metric in any report', severity: 'HIGH', proposalType: 'metric', proposedName: 'LTV Tracker', description: 'Track repeat revenue per customer', expectedValue: 'Better retention targeting' }] };
   if (has('action_items')) return { summary: 'Week in review.', wins: ['Win rate steady'], failures: ['Callbacks up'], decisions: ['Pilot price test'], action_items: [{ action: 'Launch 5% repair price test', owner: 'pricing', priority: 'HIGH' }], confidence: 60 };
+  if (has('alternative')) return { alternative: 'Hold prices and cut costs instead', case_for: 'Avoids win-rate risk on price-sensitive repairs', conditions: ['if churn rises after a test'], strength: 40 };
   return {};
 }
 
@@ -70,7 +71,7 @@ const sandbox = {
   console, JSON, Math, Date, Promise, Object, Array, String, Number, Boolean, isNaN, parseInt, parseFloat, setTimeout,
   AAA_ID_FACTORY: { createId: (p) => p + '_' + (idN++) },
   AAA_RUNTIME_CLOCK: { now: () => Date.now() },
-  AAA_CONFIG: { isProxyConfigured: () => proxyOn, workspaceId: null },
+  AAA_CONFIG: { isProxyConfigured: () => proxyOn, workspaceId: null, flag: (k, d) => d },
   AAA_LOCAL_FIRST_STORAGE: store,
   AAA_DATA: data
 };
@@ -86,6 +87,8 @@ load('js/agents/supervisor.js');
 load('js/intelligence/analysis-division.js');
 load('js/intelligence/intelligence-collectors.js');
 load('js/intelligence/debate-engine.js');
+load('js/agents/challenge-protocol.js'); // faithful facade over AAA_DEBATE
+load('js/agents/escalation-policy.js');  // consumer of AAA_CHALLENGE.challenge()
 load('js/intelligence/intelligence-pipeline.js');
 load('js/intelligence/supervisor-council.js');
 load('js/intelligence/intelligence-meetings.js');
@@ -186,6 +189,28 @@ async function seed() {
   const evo = await I.AAA_EVOLUTION.scan();
   ok(evo.ok && evo.gaps.length >= 1, 'evolution scan identified a gap, got ' + (evo.gaps && evo.gaps.length));
   ok(evo.gaps[0].proposalType && evo.gaps[0].severity, 'gap is a structured proposal');
+
+  section('Challenge Protocol (faithful facade over the unified AAA_DEBATE core)');
+  const proposal = { recommendation: 'Raise repair pricing 8%', rationale: 'margin', confidence: 62, agent: 'pricing' };
+  const ch = await I.AAA_CHALLENGE.challenge(proposal, { winRate: 0.667 });
+  ok(ch.ok, 'AAA_CHALLENGE.challenge() delegates to the debate core and returns ok');
+  ok(ch.verdict === 'approve', "debate 'accept' maps to legacy verdict 'approve', got " + ch.verdict);
+  ok(typeof ch.changed === 'boolean', 'legacy field `changed` is present (escalation reads it)');
+  ok(ch.transcript && ch.transcript.critic && ch.transcript.risk && ch.transcript.counter && ch.transcript.review, 'legacy transcript shape (critic/risk/counter/review) rebuilt; counterargument stage ran');
+  ok(ch.proposalConfidence === 62, 'proposalConfidence preserved for escalation logging, got ' + ch.proposalConfidence);
+  ok(ch.decisionId, 'final decision logged for scoring (single pipeline)');
+  const lastDec = (await store.getAll('agent_decisions')).slice(-1)[0];
+  ok(lastDec && lastDec.agent === 'challenge_reviewer', "decision logged under stable 'challenge_reviewer' id, got " + (lastDec && lastDec.agent));
+  proxyOn = false;
+  const chOff = await I.AAA_CHALLENGE.challenge(proposal, {});
+  ok(chOff.ok === false && chOff.error === 'AI_NOT_CONFIGURED', 'challenge facade is honestly gated on the proxy');
+  proxyOn = true;
+
+  section('Escalation Policy compatibility (consumer of AAA_CHALLENGE.challenge)');
+  ok(typeof I.AAA_CHALLENGE.challenge === 'function', 'AAA_CHALLENGE.challenge exists (escalation-policy calls it — my earlier facade broke this)');
+  const esc = await I.AAA_ESCALATION.review({ recommendation: 'Sign the $2000 install contract', confidence: 55 }, { jobId: 'j4', estimates: [{ estimatedQuoteRange: '$1800-$2200' }] });
+  ok(esc.escalated === true, 'high-stakes proposal is escalated through the challenge pipeline, got escalated=' + esc.escalated);
+  ok(['approve', 'approve_with_changes', 'reject'].indexOf(esc.verdict) !== -1, 'escalation receives the legacy verdict vocabulary, got ' + esc.verdict);
 
   console.log('\n' + (failures ? ('FAILED: ' + failures + ' assertion(s)') : 'ALL PASSED'));
   process.exit(failures ? 1 : 0);

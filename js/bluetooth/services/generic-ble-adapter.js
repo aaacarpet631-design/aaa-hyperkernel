@@ -29,7 +29,8 @@
     this.label = 'Generic Bluetooth (BLE)';
     this._device = null;       // BluetoothDevice (Web API)
     this._server = null;       // BluetoothRemoteGATTServer
-    this._chars = [];          // subscribed characteristics
+    this._chars = [];          // subscribed (notify/indicate) characteristics
+    this._writableChars = [];  // characteristics that accept writes (brand control)
     this._readingCbs = [];
     this._statusCbs = [];
     this._onDisconnectBound = this._onDisconnect.bind(this);
@@ -63,12 +64,17 @@
      * acceptAllDevices keeps us brand-agnostic; we still request optional
      * services so we can read them post-connect.
      */
-    async requestDevice() {
+    async requestDevice(opts) {
       if (!this.isSupported()) return { ok: false, error: 'UNSUPPORTED', message: 'This browser does not support Web Bluetooth. Use manual entry, or open the app in Chrome on Android.' };
+      // Declare every brand's services up front (union from the registry, passed
+      // by scanAndPick) so getPrimaryService() is permitted for whichever device
+      // the user picks — otherwise a brand connect throws SecurityError.
+      const extra = (opts && Array.isArray(opts.optionalServices)) ? opts.optionalServices : [];
+      const optionalServices = [BATTERY_SERVICE].concat(extra.filter((s) => String(s).toLowerCase() !== BATTERY_SERVICE));
       try {
         const device = await global.navigator.bluetooth.requestDevice({
           acceptAllDevices: true,
-          optionalServices: [BATTERY_SERVICE]
+          optionalServices: optionalServices
         });
         this._device = device;
         return { ok: true, device: { id: device.id, name: device.name || 'Unknown device' } };
@@ -97,13 +103,24 @@
           }
         };
       } catch (err) {
-        this._emitStatus('error', { message: humanError(err) });
-        return { ok: false, error: (err && err.message) || 'CONNECT_FAILED', message: humanError(err) };
+        // Capture the real cause + whatever services we did discover, so the UI
+        // can show a self-diagnosing panel instead of a bare "error".
+        const detail = {
+          message: humanError(err),
+          errorName: (err && err.name) || null,
+          rawMessage: (err && err.message) || String(err),
+          deviceName: this._device ? this._device.name : null,
+          discoveredServices: this._supportedServices.slice()
+        };
+        this._lastErrorDetail = detail;
+        this._emitStatus('error', detail);
+        return { ok: false, error: (err && err.name) || 'CONNECT_FAILED', message: humanError(err), detail: detail };
       }
     },
 
     async _subscribeAll() {
       this._chars = [];
+      this._writableChars = [];   // characteristics that accept writes (brand control)
       this._supportedServices = [];
       const services = await this._server.getPrimaryServices();
       for (const service of services) {
@@ -111,12 +128,19 @@
         let chars = [];
         try { chars = await service.getCharacteristics(); } catch (_) { continue; }
         for (const ch of chars) {
-          if (ch.properties && (ch.properties.notify || ch.properties.indicate)) {
+          const p = ch.properties || {};
+          if (p.notify || p.indicate) {
             try {
               await ch.startNotifications();
               ch.addEventListener('characteristicvaluechanged', (ev) => this._onValue(service.uuid, ev.target));
               this._chars.push(ch);
             } catch (_) { /* some chars refuse notifications; skip */ }
+          }
+          // Track writable characteristics by CAPABILITY (not a hardcoded UUID)
+          // so a brand adapter can trigger a measurement regardless of which
+          // service/UUID this particular firmware exposes.
+          if (p.write || p.writeWithoutResponse) {
+            this._writableChars.push(ch);
           }
         }
       }

@@ -72,13 +72,26 @@
       const riskPrompt = 'TOPIC:\n' + topic + '\n\nRECOMMENDATION (JSON):\n' + recJson +
         '\n\nREAL DATA (JSON):\n' + ctxJson + '\n\nAssess the risks. Respond ONLY as JSON matching the schema.';
 
-      const [criticR, riskR] = await Promise.all([
+      // Optional steelman stage (Challenge Protocol path): argue the opposite
+      // decision so the recommendation must beat a real alternative. Off by
+      // default, so the pipeline/council behavior is unchanged.
+      const wantCounter = !!args.counterargument && D.DEBATE.counter && D.COUNTER_SCHEMA;
+      const counterPrompt = 'TOPIC:\n' + topic + '\n\nRECOMMENDATION (JSON):\n' + recJson +
+        '\n\nREAL DATA (JSON):\n' + ctxJson + '\n\nSteelman the opposite. Respond ONLY as JSON matching the schema.';
+
+      const calls = [
         D.runRole(D.DEBATE.critic, criticPrompt, D.CRITIC_SCHEMA, { agent: 'critic' }),
         D.runRole(D.DEBATE.risk, riskPrompt, D.RISK_SCHEMA, { agent: 'risk' })
-      ]);
+      ];
+      if (wantCounter) calls.push(D.runRole(D.DEBATE.counter, counterPrompt, D.COUNTER_SCHEMA, { agent: 'counter' }));
+      const settled = await Promise.all(calls);
+      const criticR = settled[0], riskR = settled[1], counterR = wantCounter ? settled[2] : { ok: false };
+
       if (criticR.ok) transcript.push({ role: 'critic', output: criticR.data });
       if (riskR.ok) transcript.push({ role: 'risk', output: riskR.data });
-      // The debate can still conclude if one challenger fails, but not if both do.
+      if (counterR.ok) transcript.push({ role: 'counter', output: counterR.data });
+      // The debate can still conclude if one challenger fails, but not if both
+      // the critic and the risk analyst do.
       if (!criticR.ok && !riskR.ok) {
         return { ok: false, error: 'CHALLENGERS_FAILED', detail: [criticR.error, riskR.error], transcript: transcript };
       }
@@ -88,6 +101,7 @@
         '\n\nRECOMMENDATION (JSON):\n' + recJson +
         '\n\nCRITIC (JSON):\n' + JSON.stringify(criticR.ok ? criticR.data : { unavailable: true }, null, 2) +
         '\n\nRISK (JSON):\n' + JSON.stringify(riskR.ok ? riskR.data : { unavailable: true }, null, 2) +
+        (counterR.ok ? '\n\nCOUNTERARGUMENT (JSON):\n' + JSON.stringify(counterR.data, null, 2) : '') +
         '\n\nREAL DATA (JSON):\n' + ctxJson +
         '\n\nArbitrate. Set a calibrated confidence reflecting evidence strength AND unresolved objections. Respond ONLY as JSON matching the schema.';
       const verdictR = await D.runRole(D.DEBATE.supervisor, verdictPrompt, D.VERDICT_SCHEMA, { agent: 'review_supervisor', maxTokens: 800 });
@@ -127,7 +141,7 @@
       let decisionId = null;
       try {
         const logged = await data().logDecision({
-          agent: meta.teamId ? ('team_' + meta.teamId) : 'debate',
+          agent: meta.decisionAgent || (meta.teamId ? ('team_' + meta.teamId) : 'debate'),
           jobId: record.jobId,
           decision: record.finalRecommendation,
           rationale: v.rationale || '',

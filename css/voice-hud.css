@@ -61,15 +61,48 @@
 }
 #voice-hud .voice-overlay .voice-text { font-size: 0.95rem; margin: 0; color: var(--text, #F8FAFC); word-break: break-word; }
 
-#voice-hud .voice-overlay .voice-fallback { margin-top: 0.85rem; }
-#voice-hud .voice-overlay .voice-fallback textarea {
-  width: 100%; height: 110px; resize: vertical; border-radius: 10px; padding: 0.6rem;
+/* ---- diagnostic + three-layer body ------------------------------------- */
+#voice-hud .voice-overlay .voice-body { margin-top: 0.85rem; }
+
+#voice-hud .voice-overlay .voice-reason {
+  margin: 0 0 0.7rem; font-size: 0.92rem; line-height: 1.35; color: var(--text, #F8FAFC);
+}
+
+#voice-hud .voice-overlay .voice-statusgrid {
+  display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.85rem;
+  padding: 0.6rem 0.7rem; border-radius: 10px; background: var(--surface-2, #1C1C22);
+  border: 1px solid var(--border, #2A2A33);
+}
+#voice-hud .voice-overlay .voice-statusline { display: flex; justify-content: space-between; font-size: 0.85rem; }
+#voice-hud .voice-overlay .voice-statusline__k { color: var(--muted, #A1A1AA); }
+#voice-hud .voice-overlay .voice-statusline__v { font-weight: 700; }
+#voice-hud .voice-overlay .voice-tone--ok { color: #16A34A; }
+#voice-hud .voice-overlay .voice-tone--warn { color: #D97706; }
+#voice-hud .voice-overlay .voice-tone--bad { color: #DC2626; }
+
+#voice-hud .voice-overlay .voice-timer {
+  font-size: 2rem; font-weight: 800; text-align: center; letter-spacing: 0.04em;
+  color: var(--text, #F8FAFC); margin: 0.2rem 0 0.7rem; font-variant-numeric: tabular-nums;
+}
+
+#voice-hud .voice-overlay .voice-actions { display: flex; flex-direction: column; gap: 0.45rem; }
+#voice-hud .voice-overlay .voice-btn {
+  width: 100%; min-height: 44px; padding: 0.55rem 0.7rem; border-radius: 10px; cursor: pointer;
+  font-size: 0.95rem; font-weight: 700; font-family: inherit; border: 1px solid transparent;
+}
+#voice-hud .voice-overlay .voice-btn--primary { color: #fff; background: linear-gradient(135deg, #DC2626, #B91C1C); }
+#voice-hud .voice-overlay .voice-btn--secondary { color: var(--text, #F8FAFC); background: var(--surface-2, #1C1C22); border-color: var(--border, #2A2A33); }
+#voice-hud .voice-overlay .voice-btn--ghost { color: var(--muted, #A1A1AA); background: transparent; border-color: var(--border, #2A2A33); }
+#voice-hud .voice-overlay .voice-btn:active { transform: scale(0.98); }
+
+#voice-hud .voice-overlay .voice-manual-input {
+  width: 100%; height: 110px; resize: vertical; border-radius: 10px; padding: 0.6rem; margin-bottom: 0.5rem;
   font-size: 1rem; border: 1px solid var(--border, #2A2A33);
   background: var(--surface-2, #1C1C22); color: var(--text, #F8FAFC); box-sizing: border-box; font-family: inherit;
 }
-#voice-hud .voice-overlay .voice-fallback textarea:focus { border-color: var(--red, #DC2626); outline: none; }
-#voice-hud .voice-overlay .voice-fallback .save-button {
-  margin-top: 0.5rem; width: 100%; min-height: 44px; padding: 0.6rem;
-  font-size: 0.95rem; font-weight: 700; color: #fff;
-  background: linear-gradient(135deg, #DC2626, #B91C1C); border: none; border-radius: 10px; cursor: pointer;
+#voice-hud .voice-overlay .voice-manual-input:focus { border-color: var(--red, #DC2626); outline: none; }
+
+#voice-hud .voice-overlay .voice-help {
+  margin: 0 0 0.85rem; padding-left: 1.2rem; font-size: 0.85rem; line-height: 1.4; color: var(--text, #F8FAFC);
 }
+#voice-hud .voice-overlay .voice-help li { margin-bottom: 0.3rem; }

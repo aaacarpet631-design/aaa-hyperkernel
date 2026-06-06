@@ -22,3 +22,13 @@
   from = "/api/claude"
   to = "/.netlify/functions/claude"
   status = 200
+
+[[redirects]]
+  from = "/api/transcribe"
+  to = "/.netlify/functions/transcribe"
+  status = 200
+
+[[redirects]]
+  from = "/api/research"
+  to = "/.netlify/functions/research"
+  status = 200

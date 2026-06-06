@@ -12,14 +12,45 @@ const cp = require('child_process');
 const SUITES = [
   'unit/rbac.test.js',
   'unit/gateway.test.js',
+  'unit/model-router.test.js',
+  'unit/action-safety-gate.test.js',
   'unit/pricing.test.js',
+  'unit/huepar-s60.test.js',
+  'unit/capture-sequencer.test.js',
+  'unit/bluetooth-connect.test.js',
   'unit/closure.test.js',
   'unit/accounting.test.js',
+  'unit/expense-classifier.test.js',
+  'unit/receipt-intake.test.js',
+  'unit/controller-agent.test.js',
+  'unit/financial-intelligence-ui.test.js',
+  'unit/estimator-agent.test.js',
+  'unit/estimator-ui.test.js',
+  'unit/quote-store.test.js',
+  'unit/quote-lifecycle-ui.test.js',
+  'unit/outcome-learning.test.js',
+  'unit/pricing-optimizer.test.js',
+  'unit/pricing-optimizer-ui.test.js',
+  'unit/prediction-closure.test.js',
+  'unit/learning-feedback-ui.test.js',
+  'unit/calibration-registry.test.js',
+  'unit/calibration-ui.test.js',
+  'unit/calibration-runtime.test.js',
+  'unit/transport-templates.test.js',
+  'unit/transport-store.test.js',
+  'unit/transport-dashboard-ui.test.js',
+  'unit/transport-delivery.test.js',
+  'unit/transport-scheduler.test.js',
+  'unit/agent-council.test.js',
+  'unit/agent-council-ui.test.js',
   'unit/crew-tools.test.js',
   'unit/scheduling.test.js',
   'unit/contracts.test.js',
   'unit/quickbooks-online.test.js',
   'unit/portal-links.test.js',
+  'unit/voice.test.js',
+  'unit/transcribe.test.js',
+  'unit/research-brain.test.js',
   'static/integrity.test.js',
   'smoke/boot.test.js'
 ];
@@ -28,7 +59,8 @@ const SUITES = [
 // "N passed, M failed" and exit non-zero on failure.
 const EXTERNAL = [
   'functions/qbo-proxy/test.js',
-  'functions/portal-proxy/test.js'
+  'functions/portal-proxy/test.js',
+  'functions/nemotron-translate.test.js'
 ];
 
 function runSuite(rel) {

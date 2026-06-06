@@ -40,12 +40,35 @@
     FINALIZE_PRICE:    { permission: 'APPROVE_QUOTE',   aiAllowed: false },
     APPROVE_PAYMENT:   { permission: 'VIEW_FINANCIALS', aiAllowed: false },
     MODIFY_ACCOUNTING: { permission: 'VIEW_FINANCIALS', aiAllowed: false },
+    REVIEW_RECEIPTS:   { permission: 'VIEW_FINANCIALS', aiAllowed: false },
     CLOSE_JOB:         { permission: 'CLOSE_JOB',       aiAllowed: false },
     CHANGE_CUSTOMER:   { permission: 'EDIT_CUSTOMER',   aiAllowed: false },
     EDIT_RATE_CARD:    { permission: 'VIEW_PRICING_RATES', aiAllowed: false },
     // Lower-risk mutations a manager/crew may do; still audited.
     ADD_ESTIMATE:      { permission: 'CREATE_QUOTE',    aiAllowed: false },
     EDIT_JOB:          { permission: 'EDIT_JOB',        aiAllowed: false },
+    // Quote lifecycle commits — human-only + audited. Drafting a quote is NOT
+    // here (a draft is an AI-allowed recommendation); only the committing
+    // transitions are gated. Sending to a customer requires APPROVE_QUOTE so a
+    // person reviews before anything leaves the building.
+    MODIFY_QUOTE:      { permission: 'CREATE_QUOTE',    aiAllowed: false },
+    SEND_QUOTE:        { permission: 'APPROVE_QUOTE',   aiAllowed: false },
+    RESOLVE_QUOTE:     { permission: 'CREATE_QUOTE',    aiAllowed: false },
+    // Marking a pricing recommendation reviewed/acted-on. Audited; never changes
+    // a price (the optimizer has no price-mutation path at all).
+    REVIEW_PRICING:    { permission: 'VIEW_FINANCIALS', aiAllowed: false },
+    // Owner acknowledging a prediction-closure / learning-feedback record.
+    // Audited; never changes a price (closures are read-only observations).
+    REVIEW_LEARNING:   { permission: 'VIEW_FINANCIALS', aiAllowed: false },
+    // Approving / rejecting / rolling back an AI calibration version. Human-only
+    // + audited. Never touches money — it tunes agent confidence, not prices.
+    APPLY_CALIBRATION: { permission: 'VIEW_FINANCIALS', aiAllowed: false },
+    // Sending a customer-facing message (SMS/email). Human-only: AI may draft a
+    // message but a person must approve before anything leaves the building.
+    SEND_MESSAGE:      { permission: 'EDIT_CUSTOMER',   aiAllowed: false },
+    // Owner acting on a Supervisor Council decision. Advisory + audited; the
+    // council recommends, a person decides — it never auto-acts.
+    REVIEW_COUNCIL:    { permission: 'VIEW_FINANCIALS', aiAllowed: false },
     // Legal Intelligence Division. Agents advise; humans record. The one
     // AI-allowed action is preparing a fact package for human attorney review.
     ADD_LEGAL_RECORD:     { permission: 'MANAGE_LEGAL', aiAllowed: false },

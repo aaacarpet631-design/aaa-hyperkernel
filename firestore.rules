@@ -24,7 +24,20 @@ service cloud.firestore {
     // so a tampered or crew client still cannot read them.
     function isFinancialCollection(c) {
       return c == 'accounting' || c == 'invoices' || c == 'payments'
-          || c == 'expenses' || c == 'kpi_snapshots' || c == 'rate_cards';
+          || c == 'expenses' || c == 'kpi_snapshots' || c == 'rate_cards'
+          // Receipt intake + the expense classifier's learning/accuracy stores
+          // all expose spend internals — owner-only, same as the rest of the books.
+          || c == 'receipts' || c == 'expense_corrections' || c == 'expense_predictions'
+          // Quote lifecycle records carry internal cost + margin + job cost.
+          || c == 'quotes'
+          // Pricing optimizer recommendations expose margin/win-rate analysis.
+          || c == 'pricing_recommendations'
+          // Prediction-closure / learning-feedback records expose win-rate/margin.
+          || c == 'learning_feedback'
+          // Calibration proposals + versions govern AI tuning from spend data.
+          || c == 'calibration_proposals' || c == 'calibration_versions'
+          // Supervisor Council sessions expose margin/finance deliberation.
+          || c == 'council_sessions';
     }
     // Collections only a trusted backend (Admin SDK) may touch. Notably
     // 'integrations' holds QuickBooks OAuth tokens — clients must never read it.

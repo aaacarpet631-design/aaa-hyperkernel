@@ -186,6 +186,36 @@
     if (global.AAA_RUNTIME_GATEWAY && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_AUDIT_LOG'))) {
       actions.appendChild(ui.button({ label: 'Audit Log', icon: '🛡', variant: 'secondary', full: true, onClick: () => auditFlow(body) }));
     }
+    if (global.AAA_PREDICTION_LEDGER_UI) {
+      actions.appendChild(ui.button({ label: 'Prediction Ledger', icon: '🎯', variant: 'secondary', full: true, onClick: () => global.AAA_PREDICTION_LEDGER_UI.open() }));
+    }
+    if (global.AAA_RECEIPT_INTAKE_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Receipts', icon: '🧾', variant: 'secondary', full: true, onClick: () => global.AAA_RECEIPT_INTAKE_UI.open() }));
+    }
+    if (global.AAA_FINANCIAL_INTEL_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Financial Intelligence', icon: '📊', variant: 'secondary', full: true, onClick: () => global.AAA_FINANCIAL_INTEL_UI.open() }));
+    }
+    if (global.AAA_ESTIMATOR_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('CREATE_QUOTE'))) {
+      actions.appendChild(ui.button({ label: 'AI Estimator', icon: '📐', variant: 'secondary', full: true, onClick: () => global.AAA_ESTIMATOR_UI.open() }));
+    }
+    if (global.AAA_QUOTE_LIFECYCLE_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Quotes', icon: '📋', variant: 'secondary', full: true, onClick: () => global.AAA_QUOTE_LIFECYCLE_UI.open() }));
+    }
+    if (global.AAA_PRICING_OPTIMIZER_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Pricing Optimizer', icon: '📈', variant: 'secondary', full: true, onClick: () => global.AAA_PRICING_OPTIMIZER_UI.open() }));
+    }
+    if (global.AAA_LEARNING_FEEDBACK_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Learning Feedback', icon: '🔁', variant: 'secondary', full: true, onClick: () => global.AAA_LEARNING_FEEDBACK_UI.open() }));
+    }
+    if (global.AAA_CALIBRATION_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Calibration', icon: '🎛', variant: 'secondary', full: true, onClick: () => global.AAA_CALIBRATION_UI.open() }));
+    }
+    if (global.AAA_TRANSPORT_DASHBOARD_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('EDIT_CUSTOMER'))) {
+      actions.appendChild(ui.button({ label: 'Delivery', icon: '📨', variant: 'secondary', full: true, onClick: () => global.AAA_TRANSPORT_DASHBOARD_UI.open() }));
+    }
+    if (global.AAA_AGENT_COUNCIL_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Supervisor Council', icon: '⚖️', variant: 'secondary', full: true, onClick: () => global.AAA_AGENT_COUNCIL_UI.open() }));
+    }
     if (global.AAA_LEGAL_WAR_ROOM && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_LEGAL'))) {
       actions.appendChild(ui.button({ label: 'Legal War Room', icon: '⚖️', variant: 'secondary', full: true, onClick: () => global.AAA_LEGAL_WAR_ROOM.open() }));
     }
@@ -242,6 +272,11 @@
       body.appendChild(kv('Prepared', String(reqs.length)));
       body.appendChild(kv('Sent', String(sent), sent ? '#10B981' : '#A1A1AA'));
       if (!reqs.length) body.appendChild(empty('Review requests are prepared automatically when a job is closed.'));
+    }
+
+    // ---- Decision challenges (Internal Challenge Protocol) ----
+    if (global.AAA_CHALLENGE_UI && global.AAA_CHALLENGE_UI.renderSection) {
+      try { await global.AAA_CHALLENGE_UI.renderSection(body); } catch (_) {}
     }
 
     // ---- Agent meetings ----

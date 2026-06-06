@@ -3,6 +3,18 @@
  *   cd test/rules && npm install
  *   npx firebase emulators:exec --only firestore "npm test"
  *
+ * NOTE on firebase.json: its "firestore" config is intentionally EMPTY ({}).
+ * The canonical rules live at the repo root (../../firestore.rules), which is
+ * OUTSIDE this emulator project directory, and firebase-tools refuses a rules
+ * path outside the project root ("... is outside of project directory"), which
+ * fails the emulator at startup. We do NOT need the emulator to load the rules
+ * itself: this test deploys the real rules into the test environment directly,
+ * by reading ../../firestore.rules and passing it to initializeTestEnvironment
+ * below. That is the source of truth the assertions run against (the 19 checks,
+ * including every assertFails() denial, pass precisely because THESE rules are
+ * in force — not the emulator's default). Do not add a "rules" path back to
+ * firebase.json or the emulator will fail to start in CI.
+ *
  * Proves the guarantees the app relies on:
  *   - workspace isolation (non-members blocked),
  *   - crew CANNOT read financial collections; owner CAN,
@@ -37,6 +49,12 @@ async function main() {
     await setDoc(doc(db, `workspaces/${WS}/members/crew1`), { role: 'crew' });
     await setDoc(doc(db, `workspaces/${WS}/members/norole`), { name: 'x' }); // defaults to crew
     await setDoc(doc(db, `workspaces/${WS}/invoices/inv1`), { amount: 100 });
+    await setDoc(doc(db, `workspaces/${WS}/receipts/r1`), { total: 42, vendor: 'Home Depot' });
+    await setDoc(doc(db, `workspaces/${WS}/quotes/q1`), { customerTotal: 500, marginEstimate: 200 });
+    await setDoc(doc(db, `workspaces/${WS}/pricing_recommendations/pr1`), { title: 'x', confidence: 70 });
+    await setDoc(doc(db, `workspaces/${WS}/learning_feedback/lf1`), { kind: 'closure', status: 'validated' });
+    await setDoc(doc(db, `workspaces/${WS}/calibration_versions/cv1`), { agent: 'pricing_optimizer', confidenceBias: 5 });
+    await setDoc(doc(db, `workspaces/${WS}/council_sessions/cs1`), { decision: 'approve', disagreement: 20 });
     await setDoc(doc(db, `workspaces/${WS}/audit_log/a1`), { action: 'X' });
     await setDoc(doc(db, `workspaces/${WS}/integrations/qbo`), { accessToken: 'SECRET' });
     await setDoc(doc(db, `workspaces/${WS}/jobs/j1`), { name: 'job' });
@@ -57,6 +75,19 @@ async function main() {
   await check('no-role (default crew) CANNOT read invoices', assertFails(getDoc(doc(norole, `workspaces/${WS}/invoices/inv1`))));
   await check('crew CANNOT write payments', assertFails(setDoc(doc(crew, `workspaces/${WS}/payments/p1`), { amount: 5 })));
   await check('owner CAN write expenses', assertSucceeds(setDoc(doc(owner, `workspaces/${WS}/expenses/e1`), { amount: 5 })));
+  await check('owner reads receipts', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/receipts/r1`))));
+  await check('crew CANNOT read receipts', assertFails(getDoc(doc(crew, `workspaces/${WS}/receipts/r1`))));
+  await check('crew CANNOT write receipts', assertFails(setDoc(doc(crew, `workspaces/${WS}/receipts/r2`), { total: 9 })));
+  await check('owner reads quotes', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/quotes/q1`))));
+  await check('crew CANNOT read quotes (margins)', assertFails(getDoc(doc(crew, `workspaces/${WS}/quotes/q1`))));
+  await check('owner reads pricing recommendations', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/pricing_recommendations/pr1`))));
+  await check('crew CANNOT read pricing recommendations', assertFails(getDoc(doc(crew, `workspaces/${WS}/pricing_recommendations/pr1`))));
+  await check('owner reads learning feedback', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/learning_feedback/lf1`))));
+  await check('crew CANNOT read learning feedback', assertFails(getDoc(doc(crew, `workspaces/${WS}/learning_feedback/lf1`))));
+  await check('owner reads calibration versions', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/calibration_versions/cv1`))));
+  await check('crew CANNOT read calibration versions', assertFails(getDoc(doc(crew, `workspaces/${WS}/calibration_versions/cv1`))));
+  await check('owner reads council sessions', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/council_sessions/cs1`))));
+  await check('crew CANNOT read council sessions', assertFails(getDoc(doc(crew, `workspaces/${WS}/council_sessions/cs1`))));
 
   // audit_log: append-only + owner-read (regression for the wildcard bug)
   await check('member CAN create audit entry', assertSucceeds(setDoc(doc(crew, `workspaces/${WS}/audit_log/a2`), { action: 'Y' })));
