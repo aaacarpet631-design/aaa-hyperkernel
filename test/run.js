@@ -57,6 +57,8 @@ const SUITES = [
   'unit/executive-council-ui.test.js',
   'unit/learning-fabric.test.js',
   'unit/learning-fabric-ui.test.js',
+  'unit/business-digital-twin.test.js',
+  'unit/business-digital-twin-ui.test.js',
   'unit/agent-council.test.js',
   'unit/agent-council-ui.test.js',
   'unit/provenance.test.js',

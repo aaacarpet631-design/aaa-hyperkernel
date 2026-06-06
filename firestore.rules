@@ -63,7 +63,9 @@ service cloud.firestore {
           // Executive Council reviews high-impact money decisions — owner-only.
           || c == 'executive_reviews'
           // Learning Fabric job memory exposes margins + win rates — owner-only.
-          || c == 'job_memory';
+          || c == 'job_memory'
+          // Business Digital Twin saved scenarios model revenue/margin — owner-only.
+          || c == 'twin_scenarios';
     }
     // Collections only a trusted backend (Admin SDK) may touch. Notably
     // 'integrations' holds QuickBooks OAuth tokens — clients must never read it.
