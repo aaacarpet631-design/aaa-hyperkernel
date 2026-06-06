@@ -33,7 +33,9 @@ service cloud.firestore {
           // Pricing optimizer recommendations expose margin/win-rate analysis.
           || c == 'pricing_recommendations'
           // Prediction-closure / learning-feedback records expose win-rate/margin.
-          || c == 'learning_feedback';
+          || c == 'learning_feedback'
+          // Calibration proposals + versions govern AI tuning from spend data.
+          || c == 'calibration_proposals' || c == 'calibration_versions';
     }
     // Collections only a trusted backend (Admin SDK) may touch. Notably
     // 'integrations' holds QuickBooks OAuth tokens — clients must never read it.

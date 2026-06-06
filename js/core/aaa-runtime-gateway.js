@@ -59,7 +59,10 @@
     REVIEW_PRICING:    { permission: 'VIEW_FINANCIALS', aiAllowed: false },
     // Owner acknowledging a prediction-closure / learning-feedback record.
     // Audited; never changes a price (closures are read-only observations).
-    REVIEW_LEARNING:   { permission: 'VIEW_FINANCIALS', aiAllowed: false }
+    REVIEW_LEARNING:   { permission: 'VIEW_FINANCIALS', aiAllowed: false },
+    // Approving / rejecting / rolling back an AI calibration version. Human-only
+    // + audited. Never touches money — it tunes agent confidence, not prices.
+    APPLY_CALIBRATION: { permission: 'VIEW_FINANCIALS', aiAllowed: false }
   };
 
   const Gateway = {
