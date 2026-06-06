@@ -61,6 +61,8 @@ const SUITES = [
   'unit/business-digital-twin-ui.test.js',
   'unit/financial-intelligence.test.js',
   'unit/financial-intelligence-suite-ui.test.js',
+  'unit/ai-operations-center.test.js',
+  'unit/ai-operations-center-ui.test.js',
   'unit/agent-council.test.js',
   'unit/agent-council-ui.test.js',
   'unit/provenance.test.js',
