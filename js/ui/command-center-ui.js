@@ -222,6 +222,9 @@
     if (global.AAA_GOVERNANCE_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('MANAGE_GOVERNANCE'))) {
       actions.appendChild(ui.button({ label: 'Governance', icon: '🏛', variant: 'secondary', full: true, onClick: () => global.AAA_GOVERNANCE_UI.open() }));
     }
+    if (global.AAA_REPLAY_SANDBOX_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('MANAGE_GOVERNANCE'))) {
+      actions.appendChild(ui.button({ label: 'Replay Sandbox', icon: '⏵', variant: 'secondary', full: true, onClick: () => global.AAA_REPLAY_SANDBOX_UI.open() }));
+    }
     if (global.AAA_LEGAL_WAR_ROOM && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_LEGAL'))) {
       actions.appendChild(ui.button({ label: 'Legal War Room', icon: '⚖️', variant: 'secondary', full: true, onClick: () => global.AAA_LEGAL_WAR_ROOM.open() }));
     }

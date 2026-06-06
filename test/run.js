@@ -47,6 +47,8 @@ const SUITES = [
   'unit/provenance-ui.test.js',
   'unit/governance-registry.test.js',
   'unit/governance-registry-ui.test.js',
+  'unit/replay-sandbox.test.js',
+  'unit/replay-sandbox-ui.test.js',
   'unit/legal.test.js',
   'unit/legal-war-room-ui.test.js',
   'unit/crew-tools.test.js',

@@ -58,6 +58,7 @@ async function main() {
     await setDoc(doc(db, `workspaces/${WS}/council_sessions/cs1`), { decision: 'approve', disagreement: 20 });
     await setDoc(doc(db, `workspaces/${WS}/provenance/pv1`), { subjectType: 'pricing_recommendation', subjectId: 'rec1' });
     await setDoc(doc(db, `workspaces/${WS}/governance_versions/gv1`), { artifactType: 'prompt', name: 'pricing_optimizer', status: 'active', version: 1 });
+    await setDoc(doc(db, `workspaces/${WS}/replay_snapshots/rs1`), { subjectType: 'pricing_recommendation', anyChange: true });
     await setDoc(doc(db, `workspaces/${WS}/legal_records/lr1`), { type: 'incident', summary: 'sensitive' });
     await setDoc(doc(db, `workspaces/${WS}/audit_log/a1`), { action: 'X' });
     await setDoc(doc(db, `workspaces/${WS}/integrations/qbo`), { accessToken: 'SECRET' });
@@ -99,6 +100,9 @@ async function main() {
   await check('crew CANNOT read governance versions', assertFails(getDoc(doc(crew, `workspaces/${WS}/governance_versions/gv1`))));
   await check('crew CANNOT write governance versions', assertFails(setDoc(doc(crew, `workspaces/${WS}/governance_versions/gv2`), { artifactType: 'prompt', status: 'draft' })));
   await check('owner CAN write a governance version', assertSucceeds(setDoc(doc(owner, `workspaces/${WS}/governance_versions/gv3`), { artifactType: 'policy', status: 'draft' })));
+  await check('owner reads replay snapshots', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/replay_snapshots/rs1`))));
+  await check('crew CANNOT read replay snapshots', assertFails(getDoc(doc(crew, `workspaces/${WS}/replay_snapshots/rs1`))));
+  await check('crew CANNOT write replay snapshots', assertFails(setDoc(doc(crew, `workspaces/${WS}/replay_snapshots/rs2`), { anyChange: false })));
   // legal records: owner + manager (the legal roles) may read/write; crew cannot.
   await check('owner reads legal records', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/legal_records/lr1`))));
   await check('manager reads legal records', assertSucceeds(getDoc(doc(manager, `workspaces/${WS}/legal_records/lr1`))));

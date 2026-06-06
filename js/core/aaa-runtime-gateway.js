@@ -73,6 +73,10 @@
     // calibration): create draft / propose / approve / activate / rollback /
     // deprecate. Human-only + audited; no version goes active without this path.
     GOVERN_REGISTRY:   { permission: 'MANAGE_GOVERNANCE', aiAllowed: false },
+    // Running a Replay Sandbox simulation: re-decide a past trace under chosen
+    // governed versions. Owner-only + audited; read-only by construction (it
+    // writes no business record — only an optional owner-only replay snapshot).
+    REPLAY_SANDBOX:    { permission: 'MANAGE_GOVERNANCE', aiAllowed: false },
     // Legal Intelligence Division. Agents advise; humans record. The one
     // AI-allowed action is preparing a fact package for human attorney review.
     ADD_LEGAL_RECORD:     { permission: 'MANAGE_LEGAL', aiAllowed: false },
