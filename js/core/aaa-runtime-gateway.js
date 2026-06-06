@@ -69,6 +69,10 @@
     // Owner acting on a Supervisor Council decision. Advisory + audited; the
     // council recommends, a person decides — it never auto-acts.
     REVIEW_COUNCIL:    { permission: 'VIEW_FINANCIALS', aiAllowed: false },
+    // Governing a versioned registry artifact (prompt/model/template/policy/
+    // calibration): create draft / propose / approve / activate / rollback /
+    // deprecate. Human-only + audited; no version goes active without this path.
+    GOVERN_REGISTRY:   { permission: 'MANAGE_GOVERNANCE', aiAllowed: false },
     // Legal Intelligence Division. Agents advise; humans record. The one
     // AI-allowed action is preparing a fact package for human attorney review.
     ADD_LEGAL_RECORD:     { permission: 'MANAGE_LEGAL', aiAllowed: false },

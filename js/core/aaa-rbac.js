@@ -51,7 +51,9 @@
     VIEW_AUDIT_LOG: 'View the audit trail',
     // Legal Intelligence Division
     VIEW_LEGAL: 'View the Legal War Room (risk, compliance, contracts, audit)',
-    MANAGE_LEGAL: 'Add / resolve legal records (contracts, compliance, reviews)'
+    MANAGE_LEGAL: 'Add / resolve legal records (contracts, compliance, reviews)',
+    // Governance Registry — versioned prompts/models/templates/policies/calibrations.
+    MANAGE_GOVERNANCE: 'Create / approve / activate / roll back governed versions'
   };
 
   // Role → granted permissions. Owner gets everything by construction.

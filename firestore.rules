@@ -40,7 +40,10 @@ service cloud.firestore {
           || c == 'council_sessions'
           // Provenance traces expose the quotes/margins/win-rates behind a
           // recommendation — owner-only, same as the rest of the analysis.
-          || c == 'provenance';
+          || c == 'provenance'
+          // Governance Registry: versioned prompts/models/templates/policies/
+          // calibrations + approval workflow — owner-only (governs the AI org).
+          || c == 'governance_versions';
     }
     // Collections only a trusted backend (Admin SDK) may touch. Notably
     // 'integrations' holds QuickBooks OAuth tokens — clients must never read it.

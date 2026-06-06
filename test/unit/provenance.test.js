@@ -81,6 +81,23 @@ module.exports = async function run() {
   t.eq('tracing mutates no quote/price', JSON.stringify(data._store.quotes), beforeQuotes);
   t.eq('recorded trace is retrievable by subject', (await STORE.latestFor('pricing_recommendation', 'rec_pb')).id, out.record.id);
 
+  // --- P3 wiring: governed prompt/model versions flow into the trace ---
+  // With no governed versions active, the trace stays deterministic (above).
+  // Activate a governed prompt + model for the optimizer and re-trace.
+  load('js/intelligence/governance-registry.js');
+  const GOV = G.AAA_GOVERNANCE;
+  G.AAA_RBAC.setRole('owner');
+  const pv = await GOV.createDraft('prompt', 'pricing_optimizer', 'Optimizer system prompt v1', { actor: 'owner' });
+  await GOV.propose(pv.version.id, { actor: 'owner' }); await GOV.approve(pv.version.id, { actor: 'owner' }); await GOV.activate(pv.version.id, { actor: 'owner' });
+  const mv = await GOV.createDraft('model', 'pricing_optimizer', 'claude-opus-4-8', { actor: 'owner' });
+  await GOV.propose(mv.version.id, { actor: 'owner' }); await GOV.approve(mv.version.id, { actor: 'owner' }); await GOV.activate(mv.version.id, { actor: 'owner' });
+  const gGoverned = await B.build('pricing_recommendation', rec);
+  t.eq('governed prompt version flows into the trace', gGoverned.promptVersion, 1);
+  t.eq('governed prompt version id captured', gGoverned.promptVersionId, pv.version.id);
+  t.eq('governed model version replaces "deterministic"', gGoverned.modelVersion, 'claude-opus-4-8');
+  t.eq('governed model version id captured', gGoverned.modelVersionId, mv.version.id);
+  t.ok('node chain now includes a prompt node', gGoverned.nodes.some((n) => n.type === 'prompt' && /governed/.test(n.label)));
+
   // --- null-tolerance: a missing quote store degrades to empty, never throws ---
   G.AAA_QUOTES = null;
   const gNull = await B.build('pricing_recommendation', { id: 'rec_z', supportingQuoteIds: ['q9'], reasoning: 'x' });

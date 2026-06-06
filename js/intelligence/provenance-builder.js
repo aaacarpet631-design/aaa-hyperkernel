@@ -27,6 +27,8 @@
   function quotes() { return global.AAA_QUOTES; }
   function closureEngine() { return global.AAA_PREDICTION_CLOSURE; }
   function calibration() { return global.AAA_CALIBRATION_REGISTRY; }
+  function governance() { return global.AAA_GOVERNANCE; }
+  function agents() { return global.AAA_AGENTS; }
   function provenance() { return global.AAA_PROVENANCE; }
   function clock() { return global.AAA_RUNTIME_CLOCK; }
   function nowISO() { return clock() && clock().nowISO ? clock().nowISO() : new Date().toISOString(); }
@@ -79,6 +81,31 @@
     } catch (_) { return []; }
   }
 
+  /**
+   * Resolve the GOVERNED prompt + model versions in force for an agent from the
+   * Governance Registry, and overlay them onto the graph. With no governed
+   * version active (the default for the deterministic agents today), the trace
+   * stays promptVersion:null / modelVersion:'deterministic' — existing behavior
+   * is preserved; the moment an owner activates a prompt/model version it shows.
+   */
+  async function applyGovernance(g) {
+    if (!g.agent) return g;
+    try {
+      if (governance() && governance().getActive) {
+        const pv = await governance().getActive('prompt', g.agent);
+        if (pv) { g.promptVersion = pv.version; g.promptVersionId = pv.id; g.promptChecksum = pv.checksum || null; }
+        const mv = await governance().getActive('model', g.agent);
+        if (mv) { g.modelVersion = (mv.content != null && typeof mv.content !== 'object') ? String(mv.content) : ('v' + mv.version); g.modelVersionId = mv.id; }
+      }
+    } catch (_) {}
+    // No governed model version → fall back to the agent's declared model id if
+    // one exists (LLM-backed agents), otherwise the 'deterministic' default.
+    if (!g.modelVersionId && agents() && agents().get) {
+      try { const a = agents().get(g.agent); if (a && a.model) g.modelVersion = a.model; } catch (_) {}
+    }
+    return g;
+  }
+
   const Builder = {
     SUBJECT_TYPES: Object.keys(AGENT_FOR),
 
@@ -96,7 +123,8 @@
         generatedAt: nowISO(),
         sourceQuotes: [], quoteIds: [], outcomeIds: [],
         predictionIds: [], closureIds: [],
-        calibrationVersion: null, promptVersion: null, modelVersion: 'deterministic',
+        calibrationVersion: null, promptVersion: null, promptVersionId: null, promptChecksum: null,
+        modelVersion: 'deterministic', modelVersionId: null,
         evidence: [], summary: null, nodes: []
       };
       let g;
@@ -105,6 +133,7 @@
       else if (subjectType === 'prediction_closure') g = await this._closure(base, p);
       else if (subjectType === 'estimate') g = await this._estimate(base, p);
       else g = base;
+      await applyGovernance(g);
       g.nodes = buildNodes(g);
       return g;
     },
@@ -181,8 +210,8 @@
   function buildNodes(g) {
     const nodes = [];
     nodes.push({ type: 'subject', label: g.subjectLabel || g.subjectType, detail: g.summary ? JSON.stringify(g.summary) : '', ref: g.subjectId });
-    if (g.modelVersion) nodes.push({ type: 'model', label: 'Model: ' + g.modelVersion, detail: '', ref: g.modelVersion });
-    if (g.promptVersion) nodes.push({ type: 'prompt', label: 'Prompt v' + g.promptVersion, detail: '', ref: g.promptVersion });
+    if (g.modelVersion) nodes.push({ type: 'model', label: 'Model: ' + g.modelVersion + (g.modelVersionId ? ' (governed)' : ''), detail: '', ref: g.modelVersionId || g.modelVersion });
+    if (g.promptVersion) nodes.push({ type: 'prompt', label: 'Prompt v' + g.promptVersion + ' (governed)', detail: g.promptChecksum ? 'checksum ' + g.promptChecksum : '', ref: g.promptVersionId || g.promptVersion });
     if (g.calibrationVersion) nodes.push({ type: 'calibration', label: 'Calibration v' + g.calibrationVersion.version + ' (' + g.calibrationVersion.agent + ')', detail: 'confidenceBias ' + g.calibrationVersion.confidenceBias, ref: g.calibrationVersion.id });
     arr(g.evidence).forEach((e) => nodes.push({ type: 'evidence', label: e.label, detail: e.detail || '', ref: e.kind }));
     arr(g.sourceQuotes).forEach((q) => nodes.push({ type: 'quote', label: (q.customerName || q.quoteId) + (q.status ? ' · ' + q.status : ''), detail: (q.customerTotal != null ? '$' + q.customerTotal : '') + (q.marginPct != null ? ' · ' + q.marginPct + '% margin' : ''), ref: q.quoteId }));
