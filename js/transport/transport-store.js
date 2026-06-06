@@ -173,6 +173,54 @@
       await put(transition(m, S.BOUNCED, evt('bounced', { reason: reason || null }), { bounceReason: String(reason || '') }));
       return { ok: true };
     },
+    /** Carrier/provider-reported failure AFTER send (distinct from queue exhaustion). */
+    async markFailed(id, reason) {
+      const m = await this.get(id); if (!m) return { ok: false, error: 'NOT_FOUND' };
+      await put(transition(m, S.FAILED, evt('failed', { reason: reason || null, source: 'provider' }), { failureReason: String(reason || ''), nextAttemptAt: null }));
+      return { ok: true };
+    },
+
+    /**
+     * Normalize a raw provider webhook payload into a status event. Pure +
+     * null-tolerant. Unmapped/intermediate statuses return status:'ignored'.
+     * @param {'twilio'|'sendgrid'} provider
+     * @param {Object} payload
+     */
+    normalizeProviderEvent(provider, payload) {
+      const p = payload || {};
+      if (provider === 'twilio') {
+        const map = { delivered: 'delivered', undelivered: 'bounced', failed: 'failed' };
+        const status = map[String(p.MessageStatus || '').toLowerCase()] || 'ignored';
+        return { provider: 'twilio', providerId: p.MessageSid || p.SmsSid || null, status: status, reason: p.ErrorMessage || (p.ErrorCode ? 'code ' + p.ErrorCode : null) };
+      }
+      if (provider === 'sendgrid') {
+        const map = { delivered: 'delivered', bounce: 'bounced', blocked: 'bounced', dropped: 'failed' };
+        const status = map[String(p.event || '').toLowerCase()] || 'ignored';
+        return { provider: 'sendgrid', providerId: p.sg_message_id || p.smtp_id || null, status: status, reason: p.reason || p.response || null };
+      }
+      return { provider: provider || null, providerId: null, status: 'ignored', reason: null };
+    },
+
+    /**
+     * Apply a normalized status event to its message (by our id or providerId).
+     * Idempotent + null-tolerant; never throws. Records the transition in the
+     * immutable history. This is the "delivery truth" the webhook drives.
+     * @param {Object} evt { messageId?, providerId?, status, reason? }
+     */
+    async applyStatusEvent(ev) {
+      const e = ev || {};
+      if (!e.status || e.status === 'ignored') return { ok: false, error: 'IGNORED' };
+      let m = null;
+      if (e.messageId) m = await this.get(e.messageId);
+      if (!m && e.providerId) m = (await this.list()).find((x) => x.providerId && x.providerId === e.providerId) || null;
+      if (!m) return { ok: false, error: 'NO_MATCH' };
+      if (m.status === e.status) return { ok: true, message: m, noop: true };  // idempotent
+      if (e.status === 'delivered') return this.markDelivered(m.id, { reason: e.reason || null, source: 'webhook' });
+      if (e.status === 'bounced') return this.markBounced(m.id, e.reason || 'bounced');
+      if (e.status === 'failed') return this.markFailed(m.id, e.reason || 'provider failure');
+      return { ok: false, error: 'UNHANDLED_STATUS' };
+    },
+
 
     async stats() {
       const all = await this.list();
