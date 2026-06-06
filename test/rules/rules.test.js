@@ -61,6 +61,8 @@ async function main() {
     await setDoc(doc(db, `workspaces/${WS}/replay_snapshots/rs1`), { subjectType: 'pricing_recommendation', anyChange: true });
     await setDoc(doc(db, `workspaces/${WS}/comm_threads/ct1`), { channel: 'sms', peer: '+15551112222' });
     await setDoc(doc(db, `workspaces/${WS}/comm_inbound/ci1`), { channel: 'sms', from: '+15551112222', body: 'hi' });
+    await setDoc(doc(db, `workspaces/${WS}/security_config/config`), { enforce: true, signingKey: 'SECRET' });
+    await setDoc(doc(db, `workspaces/${WS}/security_sessions/se1`), { actor: 'owner', role: 'owner' });
     await setDoc(doc(db, `workspaces/${WS}/legal_records/lr1`), { type: 'incident', summary: 'sensitive' });
     await setDoc(doc(db, `workspaces/${WS}/audit_log/a1`), { action: 'X' });
     await setDoc(doc(db, `workspaces/${WS}/integrations/qbo`), { accessToken: 'SECRET' });
@@ -112,6 +114,13 @@ async function main() {
   await check('crew CANNOT read inbound replies', assertFails(getDoc(doc(crew, `workspaces/${WS}/comm_inbound/ci1`))));
   await check('manager CAN write an inbound reply', assertSucceeds(setDoc(doc(manager, `workspaces/${WS}/comm_inbound/ci2`), { channel: 'sms', from: 'x' })));
   await check('crew CANNOT write comm threads', assertFails(setDoc(doc(crew, `workspaces/${WS}/comm_threads/ct2`), { channel: 'sms' })));
+  // security hardening: owner-only (secrets + signed sessions); manager + crew denied.
+  await check('owner reads security config', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/security_config/config`))));
+  await check('crew CANNOT read security config (secrets)', assertFails(getDoc(doc(crew, `workspaces/${WS}/security_config/config`))));
+  await check('manager CANNOT read security config (secrets)', assertFails(getDoc(doc(manager, `workspaces/${WS}/security_config/config`))));
+  await check('crew CANNOT read security sessions', assertFails(getDoc(doc(crew, `workspaces/${WS}/security_sessions/se1`))));
+  await check('crew CANNOT write security config', assertFails(setDoc(doc(crew, `workspaces/${WS}/security_config/config`), { enforce: false })));
+  await check('owner CAN write a security session', assertSucceeds(setDoc(doc(owner, `workspaces/${WS}/security_sessions/se2`), { actor: 'owner', role: 'owner' })));
   // legal records: owner + manager (the legal roles) may read/write; crew cannot.
   await check('owner reads legal records', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/legal_records/lr1`))));
   await check('manager reads legal records', assertSucceeds(getDoc(doc(manager, `workspaces/${WS}/legal_records/lr1`))));
