@@ -68,7 +68,13 @@
     SEND_MESSAGE:      { permission: 'EDIT_CUSTOMER',   aiAllowed: false },
     // Owner acting on a Supervisor Council decision. Advisory + audited; the
     // council recommends, a person decides — it never auto-acts.
-    REVIEW_COUNCIL:    { permission: 'VIEW_FINANCIALS', aiAllowed: false }
+    REVIEW_COUNCIL:    { permission: 'VIEW_FINANCIALS', aiAllowed: false },
+    // Legal Intelligence Division. Agents advise; humans record. The one
+    // AI-allowed action is preparing a fact package for human attorney review.
+    ADD_LEGAL_RECORD:     { permission: 'MANAGE_LEGAL', aiAllowed: false },
+    FILE_INCIDENT:        { permission: null,           aiAllowed: false },
+    PREPARE_LEGAL_REVIEW: { permission: null,           aiAllowed: true  },
+    RESOLVE_LEGAL_REVIEW: { permission: 'MANAGE_LEGAL', aiAllowed: false }
   };
 
   const Gateway = {

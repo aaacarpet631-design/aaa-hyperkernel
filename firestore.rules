@@ -52,6 +52,14 @@ service cloud.firestore {
     function isSpecialCollection(c) {
       return c == 'members' || c == 'audit_log' || isServerOnlyCollection(c);
     }
+    // Legal records carry sensitive legal / incident detail — restricted to the
+    // legal roles. Owner + manager hold VIEW_LEGAL/MANAGE_LEGAL; crew cannot read
+    // or write them (mirrors the Legal War Room's client-side gate, enforced
+    // server-side so a tampered/crew client still can't reach legal records).
+    function isLegalCollection(c) {
+      return c == 'legal_records';
+    }
+    function canLegal(ws) { return role(ws) == 'owner' || role(ws) == 'manager'; }
 
     match /workspaces/{ws} {
       allow read: if isMember(ws);
@@ -74,11 +82,13 @@ service cloud.firestore {
       // owner-only; everything else is any member.
       match /{collection}/{docId} {
         allow read, write: if isMember(ws) && !isSpecialCollection(collection)
-          && (!isFinancialCollection(collection) || isOwner(ws));
+          && (!isFinancialCollection(collection) || isOwner(ws))
+          && (!isLegalCollection(collection) || canLegal(ws));
       }
       match /{collection}/{docId}/{sub=**} {
         allow read, write: if isMember(ws) && !isSpecialCollection(collection)
-          && (!isFinancialCollection(collection) || isOwner(ws));
+          && (!isFinancialCollection(collection) || isOwner(ws))
+          && (!isLegalCollection(collection) || canLegal(ws));
       }
     }
   }

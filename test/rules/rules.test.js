@@ -47,6 +47,7 @@ async function main() {
     const db = ctx.firestore();
     await setDoc(doc(db, `workspaces/${WS}/members/owner1`), { role: 'owner' });
     await setDoc(doc(db, `workspaces/${WS}/members/crew1`), { role: 'crew' });
+    await setDoc(doc(db, `workspaces/${WS}/members/manager1`), { role: 'manager' });
     await setDoc(doc(db, `workspaces/${WS}/members/norole`), { name: 'x' }); // defaults to crew
     await setDoc(doc(db, `workspaces/${WS}/invoices/inv1`), { amount: 100 });
     await setDoc(doc(db, `workspaces/${WS}/receipts/r1`), { total: 42, vendor: 'Home Depot' });
@@ -55,6 +56,7 @@ async function main() {
     await setDoc(doc(db, `workspaces/${WS}/learning_feedback/lf1`), { kind: 'closure', status: 'validated' });
     await setDoc(doc(db, `workspaces/${WS}/calibration_versions/cv1`), { agent: 'pricing_optimizer', confidenceBias: 5 });
     await setDoc(doc(db, `workspaces/${WS}/council_sessions/cs1`), { decision: 'approve', disagreement: 20 });
+    await setDoc(doc(db, `workspaces/${WS}/legal_records/lr1`), { type: 'incident', summary: 'sensitive' });
     await setDoc(doc(db, `workspaces/${WS}/audit_log/a1`), { action: 'X' });
     await setDoc(doc(db, `workspaces/${WS}/integrations/qbo`), { accessToken: 'SECRET' });
     await setDoc(doc(db, `workspaces/${WS}/jobs/j1`), { name: 'job' });
@@ -62,6 +64,7 @@ async function main() {
 
   const owner = env.authenticatedContext('owner1').firestore();
   const crew = env.authenticatedContext('crew1').firestore();
+  const manager = env.authenticatedContext('manager1').firestore();
   const norole = env.authenticatedContext('norole').firestore();
   const stranger = env.authenticatedContext('nobody').firestore();
 
@@ -88,6 +91,12 @@ async function main() {
   await check('crew CANNOT read calibration versions', assertFails(getDoc(doc(crew, `workspaces/${WS}/calibration_versions/cv1`))));
   await check('owner reads council sessions', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/council_sessions/cs1`))));
   await check('crew CANNOT read council sessions', assertFails(getDoc(doc(crew, `workspaces/${WS}/council_sessions/cs1`))));
+  // legal records: owner + manager (the legal roles) may read/write; crew cannot.
+  await check('owner reads legal records', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/legal_records/lr1`))));
+  await check('manager reads legal records', assertSucceeds(getDoc(doc(manager, `workspaces/${WS}/legal_records/lr1`))));
+  await check('crew CANNOT read legal records', assertFails(getDoc(doc(crew, `workspaces/${WS}/legal_records/lr1`))));
+  await check('crew CANNOT write legal records', assertFails(setDoc(doc(crew, `workspaces/${WS}/legal_records/lr2`), { type: 'incident' })));
+  await check('manager CAN write a legal record', assertSucceeds(setDoc(doc(manager, `workspaces/${WS}/legal_records/lr3`), { type: 'contract' })));
 
   // audit_log: append-only + owner-read (regression for the wildcard bug)
   await check('member CAN create audit entry', assertSucceeds(setDoc(doc(crew, `workspaces/${WS}/audit_log/a2`), { action: 'Y' })));
