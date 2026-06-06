@@ -231,6 +231,9 @@
     if (global.AAA_OUTCOME_INTELLIGENCE_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
       actions.appendChild(ui.button({ label: 'Outcome Intelligence', icon: '🧠', variant: 'secondary', full: true, onClick: () => global.AAA_OUTCOME_INTELLIGENCE_UI.open() }));
     }
+    if (global.AAA_EXECUTIVE_COUNCIL_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Executive Council', icon: '🏛', variant: 'secondary', full: true, onClick: () => global.AAA_EXECUTIVE_COUNCIL_UI.open() }));
+    }
     if (global.AAA_AGENT_COUNCIL_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
       actions.appendChild(ui.button({ label: 'Supervisor Council', icon: '⚖️', variant: 'secondary', full: true, onClick: () => global.AAA_AGENT_COUNCIL_UI.open() }));
     }

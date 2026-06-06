@@ -59,7 +59,9 @@ service cloud.firestore {
           || c == 'reliability_snapshots' || c == 'incidents'
           // Outcome Intelligence: outcome events, agent scores/accuracy, and
           // learning patterns expose margins + win rates — owner-only.
-          || c == 'outcome_events' || c == 'agent_scores' || c == 'agent_accuracy' || c == 'learning_patterns';
+          || c == 'outcome_events' || c == 'agent_scores' || c == 'agent_accuracy' || c == 'learning_patterns'
+          // Executive Council reviews high-impact money decisions — owner-only.
+          || c == 'executive_reviews';
     }
     // Collections only a trusted backend (Admin SDK) may touch. Notably
     // 'integrations' holds QuickBooks OAuth tokens — clients must never read it.
