@@ -46,7 +46,14 @@
     EDIT_RATE_CARD:    { permission: 'VIEW_PRICING_RATES', aiAllowed: false },
     // Lower-risk mutations a manager/crew may do; still audited.
     ADD_ESTIMATE:      { permission: 'CREATE_QUOTE',    aiAllowed: false },
-    EDIT_JOB:          { permission: 'EDIT_JOB',        aiAllowed: false }
+    EDIT_JOB:          { permission: 'EDIT_JOB',        aiAllowed: false },
+    // Quote lifecycle commits — human-only + audited. Drafting a quote is NOT
+    // here (a draft is an AI-allowed recommendation); only the committing
+    // transitions are gated. Sending to a customer requires APPROVE_QUOTE so a
+    // person reviews before anything leaves the building.
+    MODIFY_QUOTE:      { permission: 'CREATE_QUOTE',    aiAllowed: false },
+    SEND_QUOTE:        { permission: 'APPROVE_QUOTE',   aiAllowed: false },
+    RESOLVE_QUOTE:     { permission: 'CREATE_QUOTE',    aiAllowed: false }
   };
 
   const Gateway = {

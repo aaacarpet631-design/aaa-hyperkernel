@@ -50,6 +50,7 @@ async function main() {
     await setDoc(doc(db, `workspaces/${WS}/members/norole`), { name: 'x' }); // defaults to crew
     await setDoc(doc(db, `workspaces/${WS}/invoices/inv1`), { amount: 100 });
     await setDoc(doc(db, `workspaces/${WS}/receipts/r1`), { total: 42, vendor: 'Home Depot' });
+    await setDoc(doc(db, `workspaces/${WS}/quotes/q1`), { customerTotal: 500, marginEstimate: 200 });
     await setDoc(doc(db, `workspaces/${WS}/audit_log/a1`), { action: 'X' });
     await setDoc(doc(db, `workspaces/${WS}/integrations/qbo`), { accessToken: 'SECRET' });
     await setDoc(doc(db, `workspaces/${WS}/jobs/j1`), { name: 'job' });
@@ -73,6 +74,8 @@ async function main() {
   await check('owner reads receipts', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/receipts/r1`))));
   await check('crew CANNOT read receipts', assertFails(getDoc(doc(crew, `workspaces/${WS}/receipts/r1`))));
   await check('crew CANNOT write receipts', assertFails(setDoc(doc(crew, `workspaces/${WS}/receipts/r2`), { total: 9 })));
+  await check('owner reads quotes', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/quotes/q1`))));
+  await check('crew CANNOT read quotes (margins)', assertFails(getDoc(doc(crew, `workspaces/${WS}/quotes/q1`))));
 
   // audit_log: append-only + owner-read (regression for the wildcard bug)
   await check('member CAN create audit entry', assertSucceeds(setDoc(doc(crew, `workspaces/${WS}/audit_log/a2`), { action: 'Y' })));
