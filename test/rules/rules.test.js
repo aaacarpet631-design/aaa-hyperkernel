@@ -70,6 +70,7 @@ async function main() {
     await setDoc(doc(db, `workspaces/${WS}/agent_scores/score_estimator`), { agent: 'estimator', accuracy: 84 });
     await setDoc(doc(db, `workspaces/${WS}/learning_patterns/pat1`), { dimension: 'serviceType', key: 'carpet_install', value: 75 });
     await setDoc(doc(db, `workspaces/${WS}/executive_reviews/exr1`), { type: 'price_change', decision: 'revise' });
+    await setDoc(doc(db, `workspaces/${WS}/job_memory/mem1`), { serviceType: 'carpet_install', status: 'won', marginPct: 30 });
     await setDoc(doc(db, `workspaces/${WS}/legal_records/lr1`), { type: 'incident', summary: 'sensitive' });
     await setDoc(doc(db, `workspaces/${WS}/audit_log/a1`), { action: 'X' });
     await setDoc(doc(db, `workspaces/${WS}/integrations/qbo`), { accessToken: 'SECRET' });
@@ -149,6 +150,8 @@ async function main() {
   await check('crew CANNOT write learning patterns', assertFails(setDoc(doc(crew, `workspaces/${WS}/learning_patterns/pat2`), { value: 1 })));
   await check('owner reads executive reviews', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/executive_reviews/exr1`))));
   await check('crew CANNOT read executive reviews', assertFails(getDoc(doc(crew, `workspaces/${WS}/executive_reviews/exr1`))));
+  await check('owner reads job memory', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/job_memory/mem1`))));
+  await check('crew CANNOT read job memory', assertFails(getDoc(doc(crew, `workspaces/${WS}/job_memory/mem1`))));
   // legal records: owner + manager (the legal roles) may read/write; crew cannot.
   await check('owner reads legal records', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/legal_records/lr1`))));
   await check('manager reads legal records', assertSucceeds(getDoc(doc(manager, `workspaces/${WS}/legal_records/lr1`))));
