@@ -53,7 +53,10 @@ service cloud.firestore {
           // Privacy & data governance: vault key + retention config, the
           // encrypted PII vault, and erasure requests — owner-only (the vault
           // protects the most sensitive PII).
-          || c == 'privacy_config' || c == 'privacy_vault' || c == 'deletion_requests';
+          || c == 'privacy_config' || c == 'privacy_vault' || c == 'deletion_requests'
+          // Reliability Command Center: metric snapshots + incidents aggregate
+          // conversion/margin-derived KPIs — owner-only, same as the analysis.
+          || c == 'reliability_snapshots' || c == 'incidents';
     }
     // Collections only a trusted backend (Admin SDK) may touch. Notably
     // 'integrations' holds QuickBooks OAuth tokens — clients must never read it.
