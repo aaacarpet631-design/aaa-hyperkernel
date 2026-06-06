@@ -65,7 +65,10 @@
     APPLY_CALIBRATION: { permission: 'VIEW_FINANCIALS', aiAllowed: false },
     // Sending a customer-facing message (SMS/email). Human-only: AI may draft a
     // message but a person must approve before anything leaves the building.
-    SEND_MESSAGE:      { permission: 'EDIT_CUSTOMER',   aiAllowed: false }
+    SEND_MESSAGE:      { permission: 'EDIT_CUSTOMER',   aiAllowed: false },
+    // Owner acting on a Supervisor Council decision. Advisory + audited; the
+    // council recommends, a person decides — it never auto-acts.
+    REVIEW_COUNCIL:    { permission: 'VIEW_FINANCIALS', aiAllowed: false }
   };
 
   const Gateway = {
