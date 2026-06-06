@@ -53,7 +53,10 @@
     // person reviews before anything leaves the building.
     MODIFY_QUOTE:      { permission: 'CREATE_QUOTE',    aiAllowed: false },
     SEND_QUOTE:        { permission: 'APPROVE_QUOTE',   aiAllowed: false },
-    RESOLVE_QUOTE:     { permission: 'CREATE_QUOTE',    aiAllowed: false }
+    RESOLVE_QUOTE:     { permission: 'CREATE_QUOTE',    aiAllowed: false },
+    // Marking a pricing recommendation reviewed/acted-on. Audited; never changes
+    // a price (the optimizer has no price-mutation path at all).
+    REVIEW_PRICING:    { permission: 'VIEW_FINANCIALS', aiAllowed: false }
   };
 
   const Gateway = {
