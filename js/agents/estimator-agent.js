@@ -86,6 +86,12 @@
       const conf = computeConfidence(sessions, services, inferred, i.visionAnalysis, q);
       const risk = computeRisk(q, conf.score);
 
+      // Consume any APPROVED calibration for this agent (confidence + risk bias).
+      // 0 when nothing is approved, so default behavior is unchanged.
+      const cal = calibrationBias();
+      const confidence = clamp(Math.round(conf.score + cal.confidenceBias), 0, 100);
+      const riskScore = clamp(Math.round(risk.score + cal.riskBias), 0, 100);
+
       const reasoning = buildReasoning(q, services, inferred, conf, risk);
       return {
         ok: true,
@@ -95,9 +101,13 @@
         inferredServices: inferred,
         quote: q,                 // includes internal _labor/_material/_ruleNotes
         receipt: receipt,         // customer-safe
-        confidence: conf.score,
+        confidence: confidence,
+        baseConfidence: conf.score,
+        calibrationBias: cal.confidenceBias,
         confidenceFactors: conf.factors,
-        risk: risk.score,
+        risk: riskScore,
+        baseRisk: risk.score,
+        calibrationRiskBias: cal.riskBias,
         severity: risk.severity,
         riskFactors: risk.factors,
         reasoning: reasoning,
@@ -197,6 +207,16 @@
       return { ok: true, entries: res.result, auditId: res.auditId, jobId: i.jobId };
     }
   };
+
+  // Approved calibration bias for the estimator (global confidence + risk). 0
+  // when nothing is approved, so the agent's default behavior is unchanged.
+  function calibrationBias() {
+    const A = global.AAA_AGENTS; if (!A) return { confidenceBias: 0, riskBias: 0 };
+    const cb = A.confidenceBias ? num(A.confidenceBias(SPEC.agentId)) : 0;
+    const tun = A.getTuning ? A.getTuning(SPEC.agentId) : null;
+    const rb = tun && typeof tun.riskBias === 'number' ? num(tun.riskBias) : 0;
+    return { confidenceBias: cb, riskBias: rb };
+  }
 
   // ---- service inference (only when caller didn't specify) ----------------
   function inferServices(sessions, Q) {

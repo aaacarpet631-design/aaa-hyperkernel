@@ -143,11 +143,22 @@
       });
     },
 
-    /** Re-install active tunings into the registry (call on app boot). No audit. */
+    /**
+     * Re-install active tunings into the registry (call on app boot). No audit.
+     * Migration-safe: skips malformed/older records and never throws — a bad
+     * version can't break startup, and older records (missing segmentAdjustments
+     * / riskBias / schema) are applied with safe defaults.
+     */
     async rehydrate() {
-      const active = (await data().list(VERSIONS)).filter((v) => mine(v) && v.active);
-      active.forEach((v) => this._applyTuning(v.agent, v));
-      return { ok: true, applied: active.length };
+      let rows = [];
+      try { rows = await data().list(VERSIONS); } catch (_) { return { ok: true, applied: 0, skipped: 0 }; }
+      let applied = 0, skipped = 0;
+      (rows || []).forEach((v) => {
+        if (!mine(v) || !v.active) return;
+        if (!v.agent || typeof v.agent !== 'string') { skipped++; return; } // malformed → skip
+        try { this._applyTuning(v.agent, v); applied++; } catch (_) { skipped++; }
+      });
+      return { ok: true, applied: applied, skipped: skipped };
     },
 
     /** Version comparison (params + bias diffs). */
