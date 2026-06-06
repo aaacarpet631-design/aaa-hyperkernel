@@ -69,6 +69,14 @@ service cloud.firestore {
       return c == 'legal_records';
     }
     function canLegal(ws) { return role(ws) == 'owner' || role(ws) == 'manager'; }
+    // Native Transport conversations: customer threads, inbound replies, and
+    // owner notifications. Office-only (owner + manager hold EDIT_CUSTOMER);
+    // crew never sees customer conversations — enforced server-side to mirror
+    // the inbox's client-side gate.
+    function isCommsCollection(c) {
+      return c == 'comm_threads' || c == 'comm_inbound' || c == 'comm_notifications';
+    }
+    function canComms(ws) { return role(ws) == 'owner' || role(ws) == 'manager'; }
 
     match /workspaces/{ws} {
       allow read: if isMember(ws);
@@ -92,12 +100,14 @@ service cloud.firestore {
       match /{collection}/{docId} {
         allow read, write: if isMember(ws) && !isSpecialCollection(collection)
           && (!isFinancialCollection(collection) || isOwner(ws))
-          && (!isLegalCollection(collection) || canLegal(ws));
+          && (!isLegalCollection(collection) || canLegal(ws))
+          && (!isCommsCollection(collection) || canComms(ws));
       }
       match /{collection}/{docId}/{sub=**} {
         allow read, write: if isMember(ws) && !isSpecialCollection(collection)
           && (!isFinancialCollection(collection) || isOwner(ws))
-          && (!isLegalCollection(collection) || canLegal(ws));
+          && (!isLegalCollection(collection) || canLegal(ws))
+          && (!isCommsCollection(collection) || canComms(ws));
       }
     }
   }
