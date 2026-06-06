@@ -6,7 +6,7 @@
  * app fully usable offline. Old caches are purged on activate, and the worker
  * takes control immediately to avoid serving a stale shell after an update.
  */
-const CACHE_NAME = 'hyperkernel-v53';
+const CACHE_NAME = 'hyperkernel-v54';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -24,6 +24,7 @@ const PRECACHE = [
   '/js/core/aaa-rbac.js',
   '/js/core/aaa-runtime-gateway.js',
   '/js/core/aaa-security.js',
+  '/js/core/aaa-privacy.js',
   '/js/core/aaa-events.js',
   '/js/core/aaa-event-bus.js',
   '/js/core/aaa-firebase.js',
@@ -113,6 +114,7 @@ const PRECACHE = [
   '/js/ui/transport-inbox-ui.js',
   '/js/ui/security-center-ui.js',
   '/js/ui/event-stream-ui.js',
+  '/js/ui/privacy-dashboard-ui.js',
   '/js/ui/agent-council-ui.js',
   '/js/ui/provenance-ui.js',
   '/js/ui/governance-registry-ui.js',
