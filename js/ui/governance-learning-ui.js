@@ -178,7 +178,10 @@
       const e = await R.entry(agentId); const verify = await R.verify(agentId);
       s.body.innerHTML = '';
       if (!e) { s.body.appendChild(ui.el('p', { className: 'aaa-empty', text: 'No registry entry.' })); return; }
-      s.body.appendChild(ui.el('div', { className: 'aaa-list-sub', html: '<strong>Active:</strong> v' + e.currentVersion + ' · <strong>Integrity:</strong> ' + (verify.ok ? '✅ verified' : '⛔ ' + esc(verify.reason)) }));
+      s.body.appendChild(ui.el('div', { className: 'aaa-list-sub', html: '<strong>Production:</strong> v' + e.currentVersion + (e.stagingVersion ? ' · <strong>Staging:</strong> v' + e.stagingVersion : '') + ' · <strong>Integrity:</strong> ' + (verify.ok ? '✅ verified' : '⛔ ' + esc(verify.reason)) }));
+      if (e.stagingVersion && canAct()) {
+        s.body.appendChild(ui.button({ label: '⬆ Promote staging v' + e.stagingVersion + ' → production', variant: 'primary', full: true, onClick: async function () { await R.promote(agentId, {}); s.close(); self._registryDrawer(agentId); } }));
+      }
       const history = await R.history(agentId);
       history.slice().reverse().forEach((v) => {
         const r = ui.el('div', { className: 'aaa-list-row' });

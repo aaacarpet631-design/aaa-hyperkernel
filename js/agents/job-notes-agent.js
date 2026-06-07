@@ -77,9 +77,10 @@
       if (!text) return { ok: false, error: 'EMPTY_TRANSCRIPT' };
       if (!this.isReady()) return { ok: false, error: 'AI_NOT_CONFIGURED' };
 
+      const system = global.AAA_PROMPT_REGISTRY ? await global.AAA_PROMPT_REGISTRY.resolve('job_notes', SYSTEM) : SYSTEM;
       const res = await data().callAgent({
         agent: 'job_notes', model: MODEL, max_tokens: 800,
-        system: SYSTEM,
+        system: system,
         output_config: { format: { type: 'json_schema', schema: SCHEMA } },
         messages: [{ role: 'user', content: 'FIELD NOTE TRANSCRIPT:\n"""\n' + text + '\n"""\n\nExtract per the schema. Suggestions only.' }]
       });

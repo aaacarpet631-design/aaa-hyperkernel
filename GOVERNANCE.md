@@ -299,6 +299,21 @@ auto-wired as the Phase-4 pipeline's registry.)
 Audit (immutable ledger): `prompt_version_proposed / _approved / _applied /
 _rolled_back` and `prompt_registry_exported`.
 
+## Org-wide governed prompts + staging channel (Phase 6)
+
+- **Every agent governable** — `resolve()` is wired into the generic agent-os
+  runner (so every sub-agent: sales, operations, marketing, accounting,
+  customer_success, kpi, data_scientist, compliance, ceo) plus the job-notes,
+  estimator, and review-request agents. Each uses the registry's active version
+  when one exists, otherwise its built-in prompt — verified, no breakage.
+- **Staging → production (canary)** — `applyVersion(proposalId, { channel:
+  'staging' })` registers a version on the staging channel without touching
+  production; `resolve(agentId, fallback, { channel: 'staging' })` reads it.
+  `promote(agentId)` (Admin-only) swaps staging into production and clears
+  staging. Version numbers are monotonic across channels and share one checksum
+  chain, so integrity verification spans both. Apply (with channel) and
+  `promote` are audited.
+
 ## Adding the next guardrail
 
 A new high-risk guardrail (say contract-clause review) needs only to:

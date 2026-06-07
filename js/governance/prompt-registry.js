@@ -30,6 +30,16 @@
     return fnv(s) + fnv('promptreg:' + s + '|' + s.length);
   }
 
+  // Next version number is monotonic across channels; chains off the highest
+  // existing version's checksum so staging + production share one hash chain.
+  function nextVersion(entry) {
+    const versions = entry && entry.versions ? entry.versions : [];
+    if (!versions.length) return { version: 1, prevChecksum: '0' };
+    let max = versions[0];
+    versions.forEach(function (v) { if (v.version > max.version) max = v; });
+    return { version: max.version + 1, prevChecksum: max.checksum };
+  }
+
   async function audit(type, payload) { try { if (ledger() && ledger().append) return await ledger().append(type, payload); } catch (_) {} return null; }
   function actor(opts) { opts = opts || {}; const uid = cfg().firebaseUid || (cfg().flag ? cfg().flag('firebaseUid', null) : null); return { id: opts.actorId || uid || 'local-operator', role: (rbac() && rbac().role) ? rbac().role() : 'unknown' }; }
   function canApprove() { return !!(rbac() && rbac().can && rbac().can('OVERRIDE_AI_DECISION')); }
@@ -52,6 +62,13 @@
       const v = e.versions.filter(function (x) { return x.version === e.currentVersion; })[0];
       return v ? v.text : null;
     },
+    /** Text of the staging (canary) version, if one is set. */
+    async getStaging(agentId) {
+      const e = await getEntry(agentId);
+      if (!e || !e.stagingVersion) return null;
+      const v = (e.versions || []).filter(function (x) { return x.version === e.stagingVersion; })[0];
+      return v ? v.text : null;
+    },
     async getVersion(agentId, version) {
       const e = await getEntry(agentId);
       return e ? (e.versions || []).filter(function (x) { return x.version === version; })[0] || null : null;
@@ -60,9 +77,17 @@
     async list() { return (data() && data().list) ? data().list(ENTRIES) : []; },
     async proposals() { return (data() && data().list) ? data().list(VPROPS) : []; },
 
-    /** Runtime: active version text, or the agent's hardcoded fallback. Never throws. */
-    async resolve(agentId, fallback) {
-      try { const cur = await this.getCurrent(agentId); return (cur != null && cur !== '') ? cur : fallback; } catch (_) { return fallback; }
+    /** Runtime: active version text, or the agent's hardcoded fallback. Never throws.
+     *  Pass { channel: 'staging' } to read the canary version when one is set. */
+    async resolve(agentId, fallback, opts) {
+      try {
+        if (opts && opts.channel === 'staging') {
+          const st = await this.getStaging(agentId);
+          if (st != null && st !== '') return st;
+        }
+        const cur = await this.getCurrent(agentId);
+        return (cur != null && cur !== '') ? cur : fallback;
+      } catch (_) { return fallback; }
     },
 
     // ---- governance flow ---------------------------------------------------
@@ -111,21 +136,51 @@
       if (!rollbackNote || String(rollbackNote).trim().length < 5) return { ok: false, error: 'ROLLBACK_NOTE_REQUIRED' };
 
       const who = actor(opts);
+      const staging = opts.channel === 'staging';
       const entry = await getEntry(prop.agentId);
-      const versions = entry ? entry.versions.slice() : [];
-      const prevChecksum = versions.length ? versions[versions.length - 1].checksum : '0';
-      const version = entry ? entry.currentVersion + 1 : 1;
+      const ni = nextVersion(entry);
+      const version = ni.version, prevChecksum = ni.prevChecksum;
       const cs = checksum(prop.text, version, prevChecksum);
-      const auditEntry = await audit('prompt_version_applied', { agentId: prop.agentId, version: version, checksum: cs, prevChecksum: prevChecksum, proposalId: proposalId, sourceProposalId: prop.sourceProposalId || null, rollbackNote: String(rollbackNote).trim(), actorId: who.id, actorRole: who.role, at: now() });
+      const auditEntry = await audit('prompt_version_applied', { agentId: prop.agentId, version: version, channel: staging ? 'staging' : 'production', checksum: cs, prevChecksum: prevChecksum, proposalId: proposalId, sourceProposalId: prop.sourceProposalId || null, rollbackNote: String(rollbackNote).trim(), actorId: who.id, actorRole: who.role, at: now() });
       const auditRef = auditEntry ? auditEntry.id : null;
-      const vrec = { version: version, text: prop.text, checksum: cs, prevChecksum: prevChecksum, status: 'active', createdBy: prop.createdBy, approvedBy: prop.approvedBy || who.id, createdAt: prop.createdAt, approvedAt: prop.approvedAt || now(), appliedAt: now(), proposalId: proposalId, sourceProposalId: prop.sourceProposalId || null, rollbackNote: String(rollbackNote).trim(), auditRef: auditRef };
-      const archived = versions.map(function (v) { return v.status === 'active' ? Object.assign({}, v, { status: 'archived' }) : v; });
-      const newEntry = entry
-        ? Object.assign({}, entry, { currentVersion: version, status: 'active', versions: archived.concat([vrec]), approvedBy: vrec.approvedBy, approvedAt: vrec.approvedAt, updatedAt: now() })
-        : { agentId: prop.agentId, agentType: prop.agentType || null, name: prop.name || 'system', currentVersion: version, status: 'active', createdBy: prop.createdBy, approvedBy: vrec.approvedBy, createdAt: now(), approvedAt: vrec.approvedAt, versions: [vrec] };
+      const vrec = { version: version, text: prop.text, checksum: cs, prevChecksum: prevChecksum, status: staging ? 'staging' : 'active', createdBy: prop.createdBy, approvedBy: prop.approvedBy || who.id, createdAt: prop.createdAt, approvedAt: prop.approvedAt || now(), appliedAt: now(), proposalId: proposalId, sourceProposalId: prop.sourceProposalId || null, rollbackNote: String(rollbackNote).trim(), auditRef: auditRef };
+      const versions = entry ? entry.versions.slice() : [];
+
+      let newEntry;
+      if (staging) {
+        // Canary: register the version on the staging channel; production is untouched.
+        newEntry = entry
+          ? Object.assign({}, entry, { stagingVersion: version, versions: versions.concat([vrec]), updatedAt: now() })
+          : { agentId: prop.agentId, agentType: prop.agentType || null, name: prop.name || 'system', currentVersion: 0, stagingVersion: version, status: 'active', createdBy: prop.createdBy, createdAt: now(), versions: [vrec] };
+      } else {
+        const archived = versions.map(function (v) { return v.status === 'active' ? Object.assign({}, v, { status: 'archived' }) : v; });
+        newEntry = entry
+          ? Object.assign({}, entry, { currentVersion: version, status: 'active', stagingVersion: null, versions: archived.concat([vrec]), approvedBy: vrec.approvedBy, approvedAt: vrec.approvedAt, updatedAt: now() })
+          : { agentId: prop.agentId, agentType: prop.agentType || null, name: prop.name || 'system', currentVersion: version, stagingVersion: null, status: 'active', createdBy: prop.createdBy, approvedBy: vrec.approvedBy, createdAt: now(), approvedAt: vrec.approvedAt, versions: [vrec] };
+      }
       await putEntry(newEntry);
-      await putProp(Object.assign({}, prop, { status: 'applied', appliedVersion: version, appliedAt: now(), auditRef: auditRef }));
-      return { ok: true, version: version, checksum: cs, auditRef: auditRef, entry: newEntry };
+      await putProp(Object.assign({}, prop, { status: 'applied', appliedVersion: version, appliedChannel: staging ? 'staging' : 'production', appliedAt: now(), auditRef: auditRef }));
+      return { ok: true, version: version, channel: staging ? 'staging' : 'production', checksum: cs, auditRef: auditRef, entry: newEntry };
+    },
+
+    /** Promote the staging (canary) version to production (Admin only). Audited. */
+    async promote(agentId, opts) {
+      opts = opts || {};
+      if (!canApprove()) return { ok: false, error: 'FORBIDDEN' };
+      const entry = await getEntry(agentId);
+      if (!entry) return { ok: false, error: 'NOT_FOUND' };
+      if (!entry.stagingVersion) return { ok: false, error: 'NO_STAGING' };
+      const who = actor(opts);
+      const promoted = entry.stagingVersion;
+      const versions = entry.versions.map(function (v) {
+        if (v.status === 'active') return Object.assign({}, v, { status: 'archived' });
+        if (v.version === promoted) return Object.assign({}, v, { status: 'active', promotedAt: now() });
+        return v;
+      });
+      const newEntry = Object.assign({}, entry, { currentVersion: promoted, stagingVersion: null, status: 'active', versions: versions, updatedAt: now() });
+      await putEntry(newEntry);
+      await audit('prompt_version_promoted', { agentId: agentId, version: promoted, actorId: who.id, actorRole: who.role, at: now() });
+      return { ok: true, version: promoted, entry: newEntry };
     },
 
     /**
@@ -141,8 +196,8 @@
       if (!target) return { ok: false, error: 'VERSION_NOT_FOUND' };
       const who = actor(opts);
       const versions = entry.versions.slice();
-      const prevChecksum = versions[versions.length - 1].checksum;
-      const version = entry.currentVersion + 1;
+      const ni = nextVersion(entry);
+      const version = ni.version, prevChecksum = ni.prevChecksum;
       const cs = checksum(target.text, version, prevChecksum);
       const auditEntry = await audit('prompt_version_rolled_back', { agentId: agentId, toVersion: targetVersion, newVersion: version, checksum: cs, reason: opts.reason || null, actorId: who.id, actorRole: who.role, at: now() });
       const vrec = { version: version, text: target.text, checksum: cs, prevChecksum: prevChecksum, status: 'active', rollbackOf: targetVersion, createdBy: who.id, approvedBy: who.id, createdAt: now(), appliedAt: now(), auditRef: auditEntry ? auditEntry.id : null };
