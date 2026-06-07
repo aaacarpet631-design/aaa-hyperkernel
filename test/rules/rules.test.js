@@ -73,6 +73,7 @@ async function main() {
     await setDoc(doc(db, `workspaces/${WS}/job_memory/mem1`), { serviceType: 'carpet_install', status: 'won', marginPct: 30 });
     await setDoc(doc(db, `workspaces/${WS}/twin_scenarios/tw1`), { name: 'Hire a crew', netProfitImpact: 12000 });
     await setDoc(doc(db, `workspaces/${WS}/financial_snapshots/fs1`), { revenue: 3000, netProfit: 2200 });
+    await setDoc(doc(db, `workspaces/${WS}/proposals/prop1`), { title: 'Follow up faster', status: 'pending', confidence: 70 });
     await setDoc(doc(db, `workspaces/${WS}/legal_records/lr1`), { type: 'incident', summary: 'sensitive' });
     await setDoc(doc(db, `workspaces/${WS}/audit_log/a1`), { action: 'X' });
     await setDoc(doc(db, `workspaces/${WS}/integrations/qbo`), { accessToken: 'SECRET' });
@@ -158,6 +159,8 @@ async function main() {
   await check('crew CANNOT read twin scenarios', assertFails(getDoc(doc(crew, `workspaces/${WS}/twin_scenarios/tw1`))));
   await check('owner reads financial snapshots', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/financial_snapshots/fs1`))));
   await check('crew CANNOT read financial snapshots', assertFails(getDoc(doc(crew, `workspaces/${WS}/financial_snapshots/fs1`))));
+  await check('owner reads proposals', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/proposals/prop1`))));
+  await check('crew CANNOT read proposals', assertFails(getDoc(doc(crew, `workspaces/${WS}/proposals/prop1`))));
   // legal records: owner + manager (the legal roles) may read/write; crew cannot.
   await check('owner reads legal records', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/legal_records/lr1`))));
   await check('manager reads legal records', assertSucceeds(getDoc(doc(manager, `workspaces/${WS}/legal_records/lr1`))));

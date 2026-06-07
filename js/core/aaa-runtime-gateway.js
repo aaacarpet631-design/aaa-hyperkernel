@@ -81,6 +81,10 @@
     // calibration): create draft / propose / approve / activate / rollback /
     // deprecate. Human-only + audited; no version goes active without this path.
     GOVERN_REGISTRY:   { permission: 'MANAGE_GOVERNANCE', aiAllowed: false },
+    // Owner reviewing a Governed Learning Loop proposal (approve → a governance
+    // draft is created/proposed; reject → retained as learning). Human-only +
+    // audited; the engine proposes, a person decides — nothing auto-applies.
+    REVIEW_PROPOSAL:   { permission: 'MANAGE_GOVERNANCE', aiAllowed: false },
     // Security hardening admin (configure step-up/MFA, toggle enforcement).
     // Owner-only (MANAGE_SETTINGS) + audited; AI can never reconfigure security.
     MANAGE_SECURITY:   { permission: 'MANAGE_SETTINGS',   aiAllowed: false },

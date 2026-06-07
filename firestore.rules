@@ -67,7 +67,9 @@ service cloud.firestore {
           // Business Digital Twin saved scenarios model revenue/margin — owner-only.
           || c == 'twin_scenarios'
           // Financial Intelligence snapshots expose the books — owner-only.
-          || c == 'financial_snapshots';
+          || c == 'financial_snapshots'
+          // Governed Learning Loop proposals carry margins/win-rates — owner-only.
+          || c == 'proposals';
     }
     // Collections only a trusted backend (Admin SDK) may touch. Notably
     // 'integrations' holds QuickBooks OAuth tokens — clients must never read it.
