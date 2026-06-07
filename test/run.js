@@ -94,6 +94,7 @@ const SUITES = [
   'unit/hypermind-core.test.js',
   'unit/knowledge-graph.test.js',
   'unit/signal-ingest.test.js',
+  'unit/hypermind-executor.test.js',
   'unit/legal.test.js',
   'unit/legal-war-room-ui.test.js',
   'unit/crew-tools.test.js',

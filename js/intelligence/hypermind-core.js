@@ -71,10 +71,15 @@
   const HyperMind = {
     PHASES: ['observe', 'remember', 'predict', 'plan', 'execute', 'measure', 'learn', 'update', 'repeat'],
 
-    // ---- owner controls (persisted, default off) --------------------------
-    enabled() { return !!flag('hypermindEnabled', false); },
+    // ---- owner controls (persisted) ---------------------------------------
+    enabled() { return !!flag('hypermindEnabled', false); },   // master switch (off by default)
     intervalMs() { return Math.max(MIN_INTERVAL_MS, Number(flag('hypermindIntervalMs', DEFAULT_INTERVAL_MS)) || DEFAULT_INTERVAL_MS); },
     running() { return !!state.running; },
+    /** Autonomous internal-learning apply. On by default ("fully autonomous"), but
+     *  inert until the master switch (enabled) turns the loop on. Set false to drop
+     *  the running loop to advisory-only (proposes, leaves pending) without stopping it. */
+    autoApply() { return !!flag('hypermindAutoApply', true); },
+    setAutoApply(on) { if (cfg() && cfg().set) cfg().set({ hypermindAutoApply: !!on }); return this.autoApply(); },
 
     /** Turn the loop on/off (persisted). Starts/stops the interval immediately. */
     setEnabled(on) {
@@ -210,7 +215,7 @@
     // ---- observability (for the Command Center) ---------------------------
     status() {
       return {
-        enabled: this.enabled(), running: this.running(), intervalMs: this.intervalMs(),
+        enabled: this.enabled(), running: this.running(), autoApply: this.autoApply(), intervalMs: this.intervalMs(),
         tickCount: state.count, lastTickAt: state.lastTickAt, lastStatus: state.lastStatus, lastTickId: state.lastTickId
       };
     },

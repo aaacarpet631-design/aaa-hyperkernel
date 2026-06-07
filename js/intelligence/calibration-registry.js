@@ -90,21 +90,22 @@
       const p = await getOne(PROPOSALS, proposalId);
       if (!p) return { ok: false, error: 'NOT_FOUND' };
       if (p.status === 'approved') return { ok: true, alreadyApproved: true, versionId: p.versionId };
-      return this._gated('APPLY_CALIBRATION', 'approve', proposalId, o, async () => {
-        const prior = await this.activeVersion(p.agent);
-        const version = await this._nextVersion(p.agent);
-        const ver = {
-          id: ids() ? ids().createId('calv') : 'calv_' + Date.now(), workspaceId: ws(), agent: p.agent, version: version,
-          confidenceBias: p.confidenceBias, riskBias: p.riskBias, segmentAdjustments: p.segmentAdjustments || [],
-          proposalId: p.id, active: true, appliedBy: o.actor || null, appliedAt: nowISO(),
-          supersedes: prior ? prior.id : null, rolledBack: false, note: o.note || null
-        };
-        if (prior) await put(VERSIONS, Object.assign({}, prior, { active: false, supersededBy: ver.id, updatedAt: nowISO() }));
-        await put(VERSIONS, ver);
-        this._applyTuning(p.agent, ver);   // the ONLY place a tuning is installed
-        await put(PROPOSALS, Object.assign({}, p, { status: 'approved', reviewedBy: o.actor || null, reviewedAt: nowISO(), versionId: ver.id, updatedAt: nowISO() }));
-        return ver;
-      });
+      return this._gated('APPLY_CALIBRATION', 'approve', proposalId, o, () => this._commit(p, o));
+    },
+
+    /**
+     * Autonomous apply (HyperMind). Same effect as approve(), but routed through
+     * the AUTO_TUNE gateway action with origin 'ai' — permitted ONLY when the
+     * owner has switched on full autonomy (hypermindAutoApply). Audited as
+     * autonomous; reversible via rollback/autoRollback. Never touches money.
+     */
+    async autoApprove(proposalId, opts) {
+      const o = Object.assign({}, opts || {}, { origin: 'ai', autonomous: true });
+      if (!o.actor) o.actor = 'hypermind';
+      const p = await getOne(PROPOSALS, proposalId);
+      if (!p) return { ok: false, error: 'NOT_FOUND' };
+      if (p.status === 'approved') return { ok: true, alreadyApproved: true, versionId: p.versionId };
+      return this._gated('AUTO_TUNE', 'auto_approve', proposalId, o, () => this._commit(p, o));
     },
 
     async reject(proposalId, opts) {
@@ -118,29 +119,21 @@
       });
     },
 
-    /** One-click revert to the prior version (or baseline). Audited. */
+    /** One-click revert to the prior version (or baseline). Human, audited. */
     async rollback(agent, opts) {
       const o = opts || {};
       const active = await this.activeVersion(agent);
       if (!active) return { ok: false, error: 'NOTHING_ACTIVE', message: 'No active calibration to roll back.' };
-      return this._gated('APPLY_CALIBRATION', 'rollback', agent, o, async () => {
-        const prior = active.supersedes ? await getOne(VERSIONS, active.supersedes) : null;
-        const before = await this.simulate({ agent: agent, confidenceBias: active.confidenceBias });
-        const version = await this._nextVersion(agent);
-        const ver = {
-          id: ids() ? ids().createId('calv') : 'calv_' + Date.now(), workspaceId: ws(), agent: agent, version: version,
-          confidenceBias: prior ? prior.confidenceBias : 0, riskBias: prior ? prior.riskBias : 0, segmentAdjustments: prior ? (prior.segmentAdjustments || []) : [],
-          proposalId: null, active: true, appliedBy: o.actor || null, appliedAt: nowISO(),
-          supersedes: active.id, rolledBack: true, rolledBackFrom: active.id, note: 'Rollback of v' + active.version + (prior ? ' to v' + prior.version : ' to baseline')
-        };
-        await put(VERSIONS, Object.assign({}, active, { active: false, supersededBy: ver.id, updatedAt: nowISO() }));
-        await put(VERSIONS, ver);
-        if (prior) this._applyTuning(agent, prior); else if (registry() && registry().setTuning) registry().setTuning(agent, null);
-        const after = await this.simulate({ agent: agent, confidenceBias: ver.confidenceBias });
-        ver.beforeAfter = { before: before.afterAlignmentRate, after: after.afterAlignmentRate };
-        await put(VERSIONS, ver);
-        return ver;
-      });
+      return this._gated('APPLY_CALIBRATION', 'rollback', agent, o, () => this._rollbackMutate(agent, active, o));
+    },
+
+    /** Autonomous revert (HyperMind kill-switch path). Routed through AUTO_TUNE. */
+    async autoRollback(agent, opts) {
+      const o = Object.assign({}, opts || {}, { origin: 'ai', autonomous: true });
+      if (!o.actor) o.actor = 'hypermind';
+      const active = await this.activeVersion(agent);
+      if (!active) return { ok: false, error: 'NOTHING_ACTIVE', message: 'No active calibration to roll back.' };
+      return this._gated('AUTO_TUNE', 'auto_rollback', agent, o, () => this._rollbackMutate(agent, active, o));
     },
 
     /**
@@ -203,6 +196,44 @@
     },
 
     // ---- internals ----
+    /** Create + activate a new version from a proposal, install the tuning, mark
+     *  the proposal approved. The ONLY place a calibration tuning is installed.
+     *  Shared by approve() (human) and autoApprove() (autonomous). */
+    async _commit(p, o) {
+      const prior = await this.activeVersion(p.agent);
+      const version = await this._nextVersion(p.agent);
+      const ver = {
+        id: ids() ? ids().createId('calv') : 'calv_' + Date.now(), workspaceId: ws(), agent: p.agent, version: version,
+        confidenceBias: p.confidenceBias, riskBias: p.riskBias, segmentAdjustments: p.segmentAdjustments || [],
+        proposalId: p.id, active: true, appliedBy: o.actor || null, autonomous: !!o.autonomous, appliedAt: nowISO(),
+        supersedes: prior ? prior.id : null, rolledBack: false, note: o.note || null
+      };
+      if (prior) await put(VERSIONS, Object.assign({}, prior, { active: false, supersededBy: ver.id, updatedAt: nowISO() }));
+      await put(VERSIONS, ver);
+      this._applyTuning(p.agent, ver);
+      await put(PROPOSALS, Object.assign({}, p, { status: 'approved', reviewedBy: o.actor || null, autonomous: !!o.autonomous, reviewedAt: nowISO(), versionId: ver.id, updatedAt: nowISO() }));
+      return ver;
+    },
+    /** Revert an agent to its prior version (or baseline). Shared by rollback +
+     *  autoRollback. */
+    async _rollbackMutate(agent, active, o) {
+      const prior = active.supersedes ? await getOne(VERSIONS, active.supersedes) : null;
+      const before = await this.simulate({ agent: agent, confidenceBias: active.confidenceBias });
+      const version = await this._nextVersion(agent);
+      const ver = {
+        id: ids() ? ids().createId('calv') : 'calv_' + Date.now(), workspaceId: ws(), agent: agent, version: version,
+        confidenceBias: prior ? prior.confidenceBias : 0, riskBias: prior ? prior.riskBias : 0, segmentAdjustments: prior ? (prior.segmentAdjustments || []) : [],
+        proposalId: null, active: true, appliedBy: o.actor || null, autonomous: !!o.autonomous, appliedAt: nowISO(),
+        supersedes: active.id, rolledBack: true, rolledBackFrom: active.id, note: 'Rollback of v' + active.version + (prior ? ' to v' + prior.version : ' to baseline')
+      };
+      await put(VERSIONS, Object.assign({}, active, { active: false, supersededBy: ver.id, updatedAt: nowISO() }));
+      await put(VERSIONS, ver);
+      if (prior) this._applyTuning(agent, prior); else if (registry() && registry().setTuning) registry().setTuning(agent, null);
+      const after = await this.simulate({ agent: agent, confidenceBias: ver.confidenceBias });
+      ver.beforeAfter = { before: before.afterAlignmentRate, after: after.afterAlignmentRate };
+      await put(VERSIONS, ver);
+      return ver;
+    },
     _applyTuning(agent, ver) {
       const A = registry(); if (!A || !A.setTuning) return;
       A.setTuning(agent, { confidenceBias: num(ver.confidenceBias), riskBias: num(ver.riskBias), segmentAdjustments: ver.segmentAdjustments || [], version: ver.version, source: 'calibration_registry' });

@@ -11,6 +11,12 @@
  *   2. Checks the caller's RBAC permission.
  *   3. Hard-blocks AI-originated calls on human-only actions — no exceptions,
  *      no config override, no prompt can bypass it (it's a code constant).
+ *      The ONLY exception is a narrow set of INTERNAL-LEARNING actions that
+ *      declare an owner-controlled autonomy flag (aiAllowedFlag): AI may perform
+ *      those when, and only when, the owner has switched that flag on, and every
+ *      such run is audited as autonomous. Actions that touch money, prices,
+ *      customer records, or outbound messages declare NO flag, so their AI block
+ *      is absolute and no setting can lift it.
  *   4. Writes an audit_log entry for EVERY attempt (allowed or denied).
  *   5. Runs the actual mutation only if allowed.
  *
@@ -64,6 +70,12 @@
     // Approving / rejecting / rolling back an AI calibration version. Human-only
     // + audited. Never touches money — it tunes agent confidence, not prices.
     APPLY_CALIBRATION: { permission: 'VIEW_FINANCIALS', aiAllowed: false },
+    // Autonomous INTERNAL-LEARNING apply (HyperMind): auto-applying calibration /
+    // routing / prompt tunings / scorecards. Human-only by default; AI may perform
+    // it ONLY when the owner has switched on full autonomy (hypermindAutoApply).
+    // Touches NO money/price/customer/message — it tunes the AI's own internals,
+    // is fully audited (autonomous:true) and reversible via rollback.
+    AUTO_TUNE:         { permission: 'VIEW_FINANCIALS', aiAllowed: false, aiAllowedFlag: 'hypermindAutoApply' },
     // Sending a customer-facing message (SMS/email). Human-only: AI may draft a
     // message but a person must approve before anything leaves the building.
     SEND_MESSAGE:      { permission: 'EDIT_CUSTOMER',   aiAllowed: false },
@@ -138,10 +150,19 @@
         return { ok: false, error: 'UNKNOWN_ACTION' };
       }
 
-      // 1) Hard AI block — a code constant, not a setting. Cannot be overridden.
+      // 1) Hard AI block — a code constant, not a setting. Cannot be overridden,
+      //    EXCEPT for an internal-learning action that declares an owner autonomy
+      //    flag (aiAllowedFlag) which the owner has explicitly switched on. Such a
+      //    run is permitted and recorded as autonomous. Money/price/customer/
+      //    message actions declare no flag, so this branch can never lift them.
+      let autonomous = false;
       if (origin === 'ai' && !policy.aiAllowed) {
-        const a = await this._audit({ action: r.action, origin: origin, actor: r.actor, decision: 'denied', reason: 'AI_NOT_PERMITTED', target: r.target, detail: r.detail });
-        return { ok: false, error: 'AI_NOT_PERMITTED', message: 'AI may recommend this but a person must approve it.', auditId: a };
+        const flagOn = !!(policy.aiAllowedFlag && cfg().flag && cfg().flag(policy.aiAllowedFlag, false));
+        if (!flagOn) {
+          const a = await this._audit({ action: r.action, origin: origin, actor: r.actor, decision: 'denied', reason: 'AI_NOT_PERMITTED', target: r.target, detail: r.detail });
+          return { ok: false, error: 'AI_NOT_PERMITTED', message: 'AI may recommend this but a person must approve it.', auditId: a };
+        }
+        autonomous = true;
       }
 
       // 2) RBAC check for human-origin actions.
@@ -163,7 +184,8 @@
       }
 
       // 3) Allowed — record intent, run the mutation, record outcome.
-      const auditId = await this._audit({ action: r.action, origin: origin, actor: r.actor || (rbac() && rbac().role()), decision: 'allowed', target: r.target, detail: r.detail });
+      const auditDetail = autonomous ? Object.assign({ autonomous: true }, r.detail || {}) : r.detail;
+      const auditId = await this._audit({ action: r.action, origin: origin, actor: r.actor || (rbac() && rbac().role()), decision: 'allowed', target: r.target, detail: auditDetail });
       let result = null;
       if (typeof r.mutate === 'function') {
         try {
