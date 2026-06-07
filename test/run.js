@@ -42,6 +42,7 @@ const SUITES = [
   'unit/prompt-registry.test.js',
   'unit/prompt-registry-channels.test.js',
   'unit/agent-os-governed-prompt.test.js',
+  'unit/governance-sync.test.js',
   'unit/review-governance.test.js',
   'static/integrity.test.js',
   'smoke/boot.test.js'

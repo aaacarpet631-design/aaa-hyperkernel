@@ -52,6 +52,13 @@
       return { ok: false, error: 'NOT_CONFIGURED' };
     },
 
+    /** List a workspace-scoped collection (for governance hydrate/pull). Firebase only. */
+    async listEntities(collection) {
+      const p = this.provider();
+      if (p === 'firebase') return global.AAA_FIREBASE.listEntities(collection);
+      return { ok: false, error: 'NOT_SUPPORTED', provider: p };
+    },
+
     /** Append an event (auto-id) — for logs / kpi snapshots. */
     async insertEvent(collection, fields) {
       const p = this.provider();

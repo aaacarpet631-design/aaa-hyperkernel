@@ -314,6 +314,25 @@ _rolled_back` and `prompt_registry_exported`.
   chain, so integrity verification spans both. Apply (with channel) and
   `promote` are audited.
 
+## Cloud persistence (Phase 7)
+
+Governance is local-first; this mirrors it to the workspace cloud so it survives
+device loss and is shared across the team. (`AAA_GOVERNANCE_SYNC`.)
+
+- **Automatic mirroring** — every governance write (`AAA_DATA.put` into a `gov_*`
+  / `governance_*` collection) is best-effort mirrored to the cloud, non-blocking;
+  a cloud failure never blocks the local write.
+- **Push / pull / hydrate** — `push()` mirrors all local governance records;
+  `pull()` / `hydrate()` load them back on a new device (mirroring suspended
+  during pull so it doesn't echo).
+- **Backend** — Firestore (schemaless workspace subcollections fit governance
+  records directly). Supabase deployments keep governance local (push/pull
+  no-op) until a relational schema is added — never corrupting data.
+- **Server-enforced integrity** — Firestore rules make `governance_audit`
+  append-only + owner-read (the ledger is tamper-proof server-side too), and
+  `gov_prompt_registry` owner-write / member-read (only the owner can change live
+  agent behavior; everyone can resolve prompts at runtime).
+
 ## Adding the next guardrail
 
 A new high-risk guardrail (say contract-clause review) needs only to:

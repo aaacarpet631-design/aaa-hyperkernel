@@ -42,6 +42,19 @@
     Object.keys(obj || {}).forEach((k) => { if (obj[k] !== undefined) f[k] = encodeValue(obj[k]); });
     return f;
   }
+  function decodeValue(v) {
+    if (!v || typeof v !== 'object') return v;
+    if ('nullValue' in v) return null;
+    if ('booleanValue' in v) return v.booleanValue;
+    if ('integerValue' in v) return Number(v.integerValue);
+    if ('doubleValue' in v) return v.doubleValue;
+    if ('stringValue' in v) return v.stringValue;
+    if ('arrayValue' in v) return ((v.arrayValue && v.arrayValue.values) || []).map(decodeValue);
+    if ('mapValue' in v) return decodeFields((v.mapValue && v.mapValue.fields) || {});
+    if ('timestampValue' in v) return v.timestampValue;
+    return null;
+  }
+  function decodeFields(f) { const o = {}; Object.keys(f || {}).forEach((k) => { o[k] = decodeValue(f[k]); }); return o; }
 
   async function fbFetch(url, options) {
     try {
@@ -65,6 +78,23 @@
       const id = encodeURIComponent(String(clientId));
       const url = docBase() + '/workspaces/' + ws + '/' + collection + '/' + id + '?key=' + cfg().firebaseApiKey;
       return fbFetch(url, { method: 'PATCH', headers: authHeaders(), body: JSON.stringify({ fields: encodeFields(fields) }) });
+    },
+
+    /** List all documents in a workspace-scoped collection (decoded). Paged. */
+    async listEntities(collection) {
+      if (!configured()) return { ok: false, error: 'NOT_CONFIGURED' };
+      const ws = cfg().workspaceId;
+      const base = docBase() + '/workspaces/' + ws + '/' + collection;
+      const items = []; let pageToken = null, guard = 0;
+      do {
+        const url = base + '?pageSize=300' + (pageToken ? '&pageToken=' + encodeURIComponent(pageToken) : '') + '&key=' + cfg().firebaseApiKey;
+        const r = await fbFetch(url, { method: 'GET', headers: authHeaders() });
+        if (!r.ok) return r;
+        const docs = (r.data && r.data.documents) || [];
+        docs.forEach((d) => { const id = String(d.name || '').split('/').pop(); items.push(Object.assign({ _id: id }, decodeFields(d.fields || {}))); });
+        pageToken = r.data && r.data.nextPageToken; guard++;
+      } while (pageToken && guard < 20);
+      return { ok: true, items: items };
     },
 
     /** Append an event document (auto-id) under a workspace collection. */

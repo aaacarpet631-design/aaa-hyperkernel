@@ -37,7 +37,9 @@ service cloud.firestore {
     // silently override the stricter rules for members + audit_log (any member
     // could read/edit/delete the audit_log and write member docs).
     function isSpecialCollection(c) {
-      return c == 'members' || c == 'audit_log' || isServerOnlyCollection(c);
+      return c == 'members' || c == 'audit_log'
+          || c == 'governance_audit' || c == 'gov_prompt_registry'
+          || isServerOnlyCollection(c);
     }
 
     match /workspaces/{ws} {
@@ -55,6 +57,21 @@ service cloud.firestore {
         allow create: if isMember(ws);
         allow read: if isOwner(ws);
         allow update, delete: if false;
+      }
+
+      // Governance immutable ledger: any member may append; nobody may edit or
+      // delete (tamper-proof, server-enforced); only the owner reads the trail.
+      match /governance_audit/{docId} {
+        allow create: if isMember(ws);
+        allow read: if isOwner(ws);
+        allow update, delete: if false;
+      }
+
+      // Governed prompt registry drives live agent behavior — any member reads
+      // (runtime prompt resolution), only the owner writes (apply/rollback/promote).
+      match /gov_prompt_registry/{docId} {
+        allow read: if isMember(ws);
+        allow write: if isOwner(ws);
       }
 
       // All other workspace-scoped collections. Financial collections are
