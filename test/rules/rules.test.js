@@ -75,6 +75,7 @@ async function main() {
     await setDoc(doc(db, `workspaces/${WS}/financial_snapshots/fs1`), { revenue: 3000, netProfit: 2200 });
     await setDoc(doc(db, `workspaces/${WS}/proposals/prop1`), { title: 'Follow up faster', status: 'pending', confidence: 70 });
     await setDoc(doc(db, `workspaces/${WS}/agent_evaluations/ae1`), { agent: 'pricing_optimizer', roi: 9, accuracy: 84 });
+    await setDoc(doc(db, `workspaces/${WS}/knowledge_nodes/kn1`), { kind: 'quote', sensitivity: 'financial' });
     await setDoc(doc(db, `workspaces/${WS}/legal_records/lr1`), { type: 'incident', summary: 'sensitive' });
     await setDoc(doc(db, `workspaces/${WS}/audit_log/a1`), { action: 'X' });
     await setDoc(doc(db, `workspaces/${WS}/integrations/qbo`), { accessToken: 'SECRET' });
@@ -164,6 +165,8 @@ async function main() {
   await check('crew CANNOT read proposals', assertFails(getDoc(doc(crew, `workspaces/${WS}/proposals/prop1`))));
   await check('owner reads agent evaluations', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/agent_evaluations/ae1`))));
   await check('crew CANNOT read agent evaluations', assertFails(getDoc(doc(crew, `workspaces/${WS}/agent_evaluations/ae1`))));
+  await check('owner reads knowledge nodes', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/knowledge_nodes/kn1`))));
+  await check('crew CANNOT read knowledge nodes', assertFails(getDoc(doc(crew, `workspaces/${WS}/knowledge_nodes/kn1`))));
   // legal records: owner + manager (the legal roles) may read/write; crew cannot.
   await check('owner reads legal records', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/legal_records/lr1`))));
   await check('manager reads legal records', assertSucceeds(getDoc(doc(manager, `workspaces/${WS}/legal_records/lr1`))));
