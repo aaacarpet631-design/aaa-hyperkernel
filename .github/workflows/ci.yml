@@ -6,6 +6,20 @@ on:
     branches: [main]
 
 jobs:
+  lint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # Only the lint toolchain is needed here.
+      - name: Install dev dependencies
+        run: npm install --no-audit --no-fund
+      - name: Lint
+        run: npm run lint
+
   test:
     name: Unit + integrity + boot smoke
     runs-on: ubuntu-latest
@@ -17,6 +31,22 @@ jobs:
       # The core suite is zero-dependency: no install needed.
       - name: Run test suite
         run: npm test
+
+  netlify-build:
+    name: Netlify build (offline)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # Function bundling needs the runtime dependencies installed.
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      # Verifies netlify.toml is valid and every function bundles.
+      # --offline keeps it self-contained: no site link or auth token needed.
+      - name: Verify Netlify build
+        run: npm run build:check
 
   rules:
     name: Firestore rules (emulator)
