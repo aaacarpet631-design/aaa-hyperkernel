@@ -28,6 +28,7 @@
   function ids() { return global.AAA_ID_FACTORY; }
   function clock() { return global.AAA_RUNTIME_CLOCK; }
   function events() { return global.AAA_EVENTS; }
+  function security() { return global.AAA_SECURITY; }
   function nowISO() { return clock() && clock().nowISO ? clock().nowISO() : new Date().toISOString(); }
 
   /**
@@ -46,7 +47,68 @@
     EDIT_RATE_CARD:    { permission: 'VIEW_PRICING_RATES', aiAllowed: false },
     // Lower-risk mutations a manager/crew may do; still audited.
     ADD_ESTIMATE:      { permission: 'CREATE_QUOTE',    aiAllowed: false },
-    EDIT_JOB:          { permission: 'EDIT_JOB',        aiAllowed: false }
+    EDIT_JOB:          { permission: 'EDIT_JOB',        aiAllowed: false },
+    // Quote lifecycle commits — human-only + audited. Drafting a quote is NOT
+    // here (a draft is an AI-allowed recommendation); only the committing
+    // transitions are gated. Sending to a customer requires APPROVE_QUOTE so a
+    // person reviews before anything leaves the building.
+    MODIFY_QUOTE:      { permission: 'CREATE_QUOTE',    aiAllowed: false },
+    SEND_QUOTE:        { permission: 'APPROVE_QUOTE',   aiAllowed: false },
+    RESOLVE_QUOTE:     { permission: 'CREATE_QUOTE',    aiAllowed: false },
+    // Marking a pricing recommendation reviewed/acted-on. Audited; never changes
+    // a price (the optimizer has no price-mutation path at all).
+    REVIEW_PRICING:    { permission: 'VIEW_FINANCIALS', aiAllowed: false },
+    // Owner acknowledging a prediction-closure / learning-feedback record.
+    // Audited; never changes a price (closures are read-only observations).
+    REVIEW_LEARNING:   { permission: 'VIEW_FINANCIALS', aiAllowed: false },
+    // Approving / rejecting / rolling back an AI calibration version. Human-only
+    // + audited. Never touches money — it tunes agent confidence, not prices.
+    APPLY_CALIBRATION: { permission: 'VIEW_FINANCIALS', aiAllowed: false },
+    // Sending a customer-facing message (SMS/email). Human-only: AI may draft a
+    // message but a person must approve before anything leaves the building.
+    SEND_MESSAGE:      { permission: 'EDIT_CUSTOMER',   aiAllowed: false },
+    // Recording an INBOUND customer message (a reply arriving from a network
+    // adapter/webhook). Not a customer-facing send, so AI/system ingestion is
+    // allowed — it records reality — and every receipt is audited.
+    INBOUND_MESSAGE:   { permission: null,              aiAllowed: true  },
+    // Owner acting on a Supervisor Council decision. Advisory + audited; the
+    // council recommends, a person decides — it never auto-acts.
+    REVIEW_COUNCIL:    { permission: 'VIEW_FINANCIALS', aiAllowed: false },
+    // Owner acting on an Executive Council review of a high-impact decision
+    // (price change / ad spend / hire / large quote). Advisory + audited.
+    REVIEW_EXECUTIVE:  { permission: 'VIEW_FINANCIALS', aiAllowed: false },
+    // Governing a versioned registry artifact (prompt/model/template/policy/
+    // calibration): create draft / propose / approve / activate / rollback /
+    // deprecate. Human-only + audited; no version goes active without this path.
+    GOVERN_REGISTRY:   { permission: 'MANAGE_GOVERNANCE', aiAllowed: false },
+    // Owner reviewing a Governed Learning Loop proposal (approve → a governance
+    // draft is created/proposed; reject → retained as learning). Human-only +
+    // audited; the engine proposes, a person decides — nothing auto-applies.
+    REVIEW_PROPOSAL:   { permission: 'MANAGE_GOVERNANCE', aiAllowed: false },
+    // External (NVIDIA Nemotron) model inference through the Governed Model Router.
+    // Office-level (owner + manager hold VIEW_ALL_JOBS); crew denied. AI agents MAY
+    // run advisory inference (they cannot bypass the router) — output is advisory.
+    RUN_MODEL:            { permission: 'VIEW_ALL_JOBS',  aiAllowed: true },
+    // Enabling/disabling a model is an owner-only control; AI can never toggle it.
+    MANAGE_MODEL_SETTINGS:{ permission: 'MANAGE_SETTINGS', aiAllowed: false },
+    // Security hardening admin (configure step-up/MFA, toggle enforcement).
+    // Owner-only (MANAGE_SETTINGS) + audited; AI can never reconfigure security.
+    MANAGE_SECURITY:   { permission: 'MANAGE_SETTINGS',   aiAllowed: false },
+    // Privacy & data governance. Configuring retention/vault is owner-only +
+    // audited; executing an erasure (right to be forgotten) is its own action so
+    // the destructive step is separately gated + audited. AI can never erase data.
+    MANAGE_PRIVACY:    { permission: 'MANAGE_SETTINGS',   aiAllowed: false },
+    ERASE_DATA:        { permission: 'MANAGE_SETTINGS',   aiAllowed: false },
+    // Running a Replay Sandbox simulation: re-decide a past trace under chosen
+    // governed versions. Owner-only + audited; read-only by construction (it
+    // writes no business record — only an optional owner-only replay snapshot).
+    REPLAY_SANDBOX:    { permission: 'MANAGE_GOVERNANCE', aiAllowed: false },
+    // Legal Intelligence Division. Agents advise; humans record. The one
+    // AI-allowed action is preparing a fact package for human attorney review.
+    ADD_LEGAL_RECORD:     { permission: 'MANAGE_LEGAL', aiAllowed: false },
+    FILE_INCIDENT:        { permission: null,           aiAllowed: false },
+    PREPARE_LEGAL_REVIEW: { permission: null,           aiAllowed: true  },
+    RESOLVE_LEGAL_REVIEW: { permission: 'MANAGE_LEGAL', aiAllowed: false }
   };
 
   const Gateway = {
@@ -83,6 +145,18 @@
       if (origin === 'human' && policy.permission && rbac() && !rbac().can(policy.permission)) {
         const a = await this._audit({ action: r.action, origin: origin, actor: r.actor || (rbac() && rbac().role()), decision: 'denied', reason: 'FORBIDDEN', target: r.target, detail: r.detail });
         return { ok: false, error: 'FORBIDDEN', message: 'Your role cannot perform this action.', permission: policy.permission, auditId: a };
+      }
+
+      // 2b) Security hardening gate (opt-in). When an owner has enabled
+      // enforcement, a privileged action needs a valid session + a fresh step-up
+      // (MFA). Inert until configured — absent/off behaves exactly as before.
+      if (origin === 'human' && security() && security().gateCheck) {
+        let gate = { allow: true };
+        try { gate = await security().gateCheck(r.action, origin); } catch (_) { gate = { allow: true }; }
+        if (gate && !gate.allow) {
+          const a = await this._audit({ action: r.action, origin: origin, actor: r.actor || (rbac() && rbac().role()), decision: 'denied', reason: gate.error || 'SECURITY_BLOCKED', target: r.target, detail: r.detail });
+          return { ok: false, error: gate.error || 'SECURITY_BLOCKED', message: gate.error === 'STEP_UP_REQUIRED' ? 'Verify your identity (step-up) to perform this privileged action.' : 'Your session must be re-validated.', auditId: a };
+        }
       }
 
       // 3) Allowed — record intent, run the mutation, record outcome.
@@ -123,9 +197,14 @@
         target: entry.target || null,
         detail: entry.detail || null
       };
-      try { if (data() && data().put) await data().put('audit_log', id, rec); } catch (_) {}
+      // Tamper-evidence: when the Security module is present, chain this entry to
+      // its predecessor (seq + prevHash + hash) and sign privileged approvals.
+      // Inert (no extra fields) when the module isn't loaded — fully backward-compatible.
+      let sealed = rec;
+      try { if (security() && security().sealAudit) sealed = await security().sealAudit(rec); } catch (_) { sealed = rec; }
+      try { if (data() && data().put) await data().put('audit_log', id, sealed); } catch (_) {}
       // Best-effort cloud mirror (rules make audit_log append-only / owner-read).
-      try { if (data() && data().cloudReady && data().cloudReady() && cloud()) await cloud().insertEvent('audit_log', rec); } catch (_) {}
+      try { if (data() && data().cloudReady && data().cloudReady() && cloud()) await cloud().insertEvent('audit_log', sealed); } catch (_) {}
       return id;
     },
 

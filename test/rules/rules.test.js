@@ -47,9 +47,40 @@ async function main() {
     const db = ctx.firestore();
     await setDoc(doc(db, `workspaces/${WS}/members/owner1`), { role: 'owner' });
     await setDoc(doc(db, `workspaces/${WS}/members/crew1`), { role: 'crew' });
+    await setDoc(doc(db, `workspaces/${WS}/members/manager1`), { role: 'manager' });
     await setDoc(doc(db, `workspaces/${WS}/members/norole`), { name: 'x' }); // defaults to crew
     await setDoc(doc(db, `workspaces/${WS}/invoices/inv1`), { amount: 100 });
     await setDoc(doc(db, `workspaces/${WS}/receipts/r1`), { total: 42, vendor: 'Home Depot' });
+    await setDoc(doc(db, `workspaces/${WS}/quotes/q1`), { customerTotal: 500, marginEstimate: 200 });
+    await setDoc(doc(db, `workspaces/${WS}/pricing_recommendations/pr1`), { title: 'x', confidence: 70 });
+    await setDoc(doc(db, `workspaces/${WS}/learning_feedback/lf1`), { kind: 'closure', status: 'validated' });
+    await setDoc(doc(db, `workspaces/${WS}/calibration_versions/cv1`), { agent: 'pricing_optimizer', confidenceBias: 5 });
+    await setDoc(doc(db, `workspaces/${WS}/council_sessions/cs1`), { decision: 'approve', disagreement: 20 });
+    await setDoc(doc(db, `workspaces/${WS}/provenance/pv1`), { subjectType: 'pricing_recommendation', subjectId: 'rec1' });
+    await setDoc(doc(db, `workspaces/${WS}/governance_versions/gv1`), { artifactType: 'prompt', name: 'pricing_optimizer', status: 'active', version: 1 });
+    await setDoc(doc(db, `workspaces/${WS}/replay_snapshots/rs1`), { subjectType: 'pricing_recommendation', anyChange: true });
+    await setDoc(doc(db, `workspaces/${WS}/comm_threads/ct1`), { channel: 'sms', peer: '+15551112222' });
+    await setDoc(doc(db, `workspaces/${WS}/comm_inbound/ci1`), { channel: 'sms', from: '+15551112222', body: 'hi' });
+    await setDoc(doc(db, `workspaces/${WS}/security_config/config`), { enforce: true, signingKey: 'SECRET' });
+    await setDoc(doc(db, `workspaces/${WS}/security_sessions/se1`), { actor: 'owner', role: 'owner' });
+    await setDoc(doc(db, `workspaces/${WS}/event_log/ev1`), { type: 'quote.created', seq: 1 });
+    await setDoc(doc(db, `workspaces/${WS}/privacy_vault/vlt1`), { refType: 'customer', refId: 'c1', ct: 'CIPHER' });
+    await setDoc(doc(db, `workspaces/${WS}/deletion_requests/er1`), { subjectId: 'c1', status: 'pending' });
+    await setDoc(doc(db, `workspaces/${WS}/incidents/inc1`), { title: 'Transport failure rate critical', status: 'open' });
+    await setDoc(doc(db, `workspaces/${WS}/agent_scores/score_estimator`), { agent: 'estimator', accuracy: 84 });
+    await setDoc(doc(db, `workspaces/${WS}/learning_patterns/pat1`), { dimension: 'serviceType', key: 'carpet_install', value: 75 });
+    await setDoc(doc(db, `workspaces/${WS}/executive_reviews/exr1`), { type: 'price_change', decision: 'revise' });
+    await setDoc(doc(db, `workspaces/${WS}/job_memory/mem1`), { serviceType: 'carpet_install', status: 'won', marginPct: 30 });
+    await setDoc(doc(db, `workspaces/${WS}/twin_scenarios/tw1`), { name: 'Hire a crew', netProfitImpact: 12000 });
+    await setDoc(doc(db, `workspaces/${WS}/financial_snapshots/fs1`), { revenue: 3000, netProfit: 2200 });
+    await setDoc(doc(db, `workspaces/${WS}/proposals/prop1`), { title: 'Follow up faster', status: 'pending', confidence: 70 });
+    await setDoc(doc(db, `workspaces/${WS}/agent_evaluations/ae1`), { agent: 'pricing_optimizer', roi: 9, accuracy: 84 });
+    await setDoc(doc(db, `workspaces/${WS}/knowledge_nodes/kn1`), { kind: 'quote', sensitivity: 'financial' });
+    await setDoc(doc(db, `workspaces/${WS}/owner_briefings/brief1`), { date: '2026-06-07', attentionItems: 3 });
+    await setDoc(doc(db, `workspaces/${WS}/model_versions/mv1`), { name: 'win_predictor', status: 'candidate' });
+    await setDoc(doc(db, `workspaces/${WS}/model_settings/config`), { enabled: { 'nvidia.nemotron4_340b_instruct': true } });
+    await setDoc(doc(db, `workspaces/${WS}/model_calls/mc1`), { modelKey: 'nvidia.nemotron4_340b_instruct', ok: true });
+    await setDoc(doc(db, `workspaces/${WS}/legal_records/lr1`), { type: 'incident', summary: 'sensitive' });
     await setDoc(doc(db, `workspaces/${WS}/audit_log/a1`), { action: 'X' });
     await setDoc(doc(db, `workspaces/${WS}/integrations/qbo`), { accessToken: 'SECRET' });
     await setDoc(doc(db, `workspaces/${WS}/jobs/j1`), { name: 'job' });
@@ -57,6 +88,7 @@ async function main() {
 
   const owner = env.authenticatedContext('owner1').firestore();
   const crew = env.authenticatedContext('crew1').firestore();
+  const manager = env.authenticatedContext('manager1').firestore();
   const norole = env.authenticatedContext('norole').firestore();
   const stranger = env.authenticatedContext('nobody').firestore();
 
@@ -73,6 +105,86 @@ async function main() {
   await check('owner reads receipts', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/receipts/r1`))));
   await check('crew CANNOT read receipts', assertFails(getDoc(doc(crew, `workspaces/${WS}/receipts/r1`))));
   await check('crew CANNOT write receipts', assertFails(setDoc(doc(crew, `workspaces/${WS}/receipts/r2`), { total: 9 })));
+  await check('owner reads quotes', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/quotes/q1`))));
+  await check('crew CANNOT read quotes (margins)', assertFails(getDoc(doc(crew, `workspaces/${WS}/quotes/q1`))));
+  await check('owner reads pricing recommendations', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/pricing_recommendations/pr1`))));
+  await check('crew CANNOT read pricing recommendations', assertFails(getDoc(doc(crew, `workspaces/${WS}/pricing_recommendations/pr1`))));
+  await check('owner reads learning feedback', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/learning_feedback/lf1`))));
+  await check('crew CANNOT read learning feedback', assertFails(getDoc(doc(crew, `workspaces/${WS}/learning_feedback/lf1`))));
+  await check('owner reads calibration versions', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/calibration_versions/cv1`))));
+  await check('crew CANNOT read calibration versions', assertFails(getDoc(doc(crew, `workspaces/${WS}/calibration_versions/cv1`))));
+  await check('owner reads council sessions', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/council_sessions/cs1`))));
+  await check('crew CANNOT read council sessions', assertFails(getDoc(doc(crew, `workspaces/${WS}/council_sessions/cs1`))));
+  await check('owner reads provenance', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/provenance/pv1`))));
+  await check('crew CANNOT read provenance', assertFails(getDoc(doc(crew, `workspaces/${WS}/provenance/pv1`))));
+  await check('owner reads governance versions', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/governance_versions/gv1`))));
+  await check('crew CANNOT read governance versions', assertFails(getDoc(doc(crew, `workspaces/${WS}/governance_versions/gv1`))));
+  await check('crew CANNOT write governance versions', assertFails(setDoc(doc(crew, `workspaces/${WS}/governance_versions/gv2`), { artifactType: 'prompt', status: 'draft' })));
+  await check('owner CAN write a governance version', assertSucceeds(setDoc(doc(owner, `workspaces/${WS}/governance_versions/gv3`), { artifactType: 'policy', status: 'draft' })));
+  await check('owner reads replay snapshots', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/replay_snapshots/rs1`))));
+  await check('crew CANNOT read replay snapshots', assertFails(getDoc(doc(crew, `workspaces/${WS}/replay_snapshots/rs1`))));
+  await check('crew CANNOT write replay snapshots', assertFails(setDoc(doc(crew, `workspaces/${WS}/replay_snapshots/rs2`), { anyChange: false })));
+  // native transport conversations: owner + manager (office) may read/write; crew cannot.
+  await check('owner reads comm threads', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/comm_threads/ct1`))));
+  await check('manager reads comm threads', assertSucceeds(getDoc(doc(manager, `workspaces/${WS}/comm_threads/ct1`))));
+  await check('crew CANNOT read comm threads', assertFails(getDoc(doc(crew, `workspaces/${WS}/comm_threads/ct1`))));
+  await check('crew CANNOT read inbound replies', assertFails(getDoc(doc(crew, `workspaces/${WS}/comm_inbound/ci1`))));
+  await check('manager CAN write an inbound reply', assertSucceeds(setDoc(doc(manager, `workspaces/${WS}/comm_inbound/ci2`), { channel: 'sms', from: 'x' })));
+  await check('crew CANNOT write comm threads', assertFails(setDoc(doc(crew, `workspaces/${WS}/comm_threads/ct2`), { channel: 'sms' })));
+  // security hardening: owner-only (secrets + signed sessions); manager + crew denied.
+  await check('owner reads security config', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/security_config/config`))));
+  await check('crew CANNOT read security config (secrets)', assertFails(getDoc(doc(crew, `workspaces/${WS}/security_config/config`))));
+  await check('manager CANNOT read security config (secrets)', assertFails(getDoc(doc(manager, `workspaces/${WS}/security_config/config`))));
+  await check('crew CANNOT read security sessions', assertFails(getDoc(doc(crew, `workspaces/${WS}/security_sessions/se1`))));
+  await check('crew CANNOT write security config', assertFails(setDoc(doc(crew, `workspaces/${WS}/security_config/config`), { enforce: false })));
+  await check('owner CAN write a security session', assertSucceeds(setDoc(doc(owner, `workspaces/${WS}/security_sessions/se2`), { actor: 'owner', role: 'owner' })));
+  // native event log: owner-only (may carry business data); crew denied.
+  await check('owner reads event log', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/event_log/ev1`))));
+  await check('crew CANNOT read event log', assertFails(getDoc(doc(crew, `workspaces/${WS}/event_log/ev1`))));
+  await check('crew CANNOT write event log', assertFails(setDoc(doc(crew, `workspaces/${WS}/event_log/ev2`), { type: 'x' })));
+  // privacy: encrypted vault + erasure requests are owner-only; manager + crew denied.
+  await check('owner reads the privacy vault', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/privacy_vault/vlt1`))));
+  await check('crew CANNOT read the privacy vault', assertFails(getDoc(doc(crew, `workspaces/${WS}/privacy_vault/vlt1`))));
+  await check('manager CANNOT read the privacy vault', assertFails(getDoc(doc(manager, `workspaces/${WS}/privacy_vault/vlt1`))));
+  await check('crew CANNOT read erasure requests', assertFails(getDoc(doc(crew, `workspaces/${WS}/deletion_requests/er1`))));
+  await check('crew CANNOT write the privacy vault', assertFails(setDoc(doc(crew, `workspaces/${WS}/privacy_vault/vlt2`), { ct: 'x' })));
+  // reliability: KPI snapshots + incidents are owner-only; crew denied.
+  await check('owner reads incidents', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/incidents/inc1`))));
+  await check('crew CANNOT read incidents', assertFails(getDoc(doc(crew, `workspaces/${WS}/incidents/inc1`))));
+  await check('crew CANNOT write reliability snapshots', assertFails(setDoc(doc(crew, `workspaces/${WS}/reliability_snapshots/rsnap1`), { score: 1 })));
+  // outcome intelligence: agent scores + learning patterns are owner-only; crew denied.
+  await check('owner reads agent scores', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/agent_scores/score_estimator`))));
+  await check('crew CANNOT read agent scores', assertFails(getDoc(doc(crew, `workspaces/${WS}/agent_scores/score_estimator`))));
+  await check('crew CANNOT read learning patterns', assertFails(getDoc(doc(crew, `workspaces/${WS}/learning_patterns/pat1`))));
+  await check('crew CANNOT write learning patterns', assertFails(setDoc(doc(crew, `workspaces/${WS}/learning_patterns/pat2`), { value: 1 })));
+  await check('owner reads executive reviews', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/executive_reviews/exr1`))));
+  await check('crew CANNOT read executive reviews', assertFails(getDoc(doc(crew, `workspaces/${WS}/executive_reviews/exr1`))));
+  await check('owner reads job memory', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/job_memory/mem1`))));
+  await check('crew CANNOT read job memory', assertFails(getDoc(doc(crew, `workspaces/${WS}/job_memory/mem1`))));
+  await check('owner reads twin scenarios', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/twin_scenarios/tw1`))));
+  await check('crew CANNOT read twin scenarios', assertFails(getDoc(doc(crew, `workspaces/${WS}/twin_scenarios/tw1`))));
+  await check('owner reads financial snapshots', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/financial_snapshots/fs1`))));
+  await check('crew CANNOT read financial snapshots', assertFails(getDoc(doc(crew, `workspaces/${WS}/financial_snapshots/fs1`))));
+  await check('owner reads proposals', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/proposals/prop1`))));
+  await check('crew CANNOT read proposals', assertFails(getDoc(doc(crew, `workspaces/${WS}/proposals/prop1`))));
+  await check('owner reads agent evaluations', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/agent_evaluations/ae1`))));
+  await check('crew CANNOT read agent evaluations', assertFails(getDoc(doc(crew, `workspaces/${WS}/agent_evaluations/ae1`))));
+  await check('owner reads knowledge nodes', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/knowledge_nodes/kn1`))));
+  await check('crew CANNOT read knowledge nodes', assertFails(getDoc(doc(crew, `workspaces/${WS}/knowledge_nodes/kn1`))));
+  await check('owner reads owner briefings', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/owner_briefings/brief1`))));
+  await check('crew CANNOT read owner briefings', assertFails(getDoc(doc(crew, `workspaces/${WS}/owner_briefings/brief1`))));
+  await check('owner reads model versions', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/model_versions/mv1`))));
+  await check('crew CANNOT read model versions', assertFails(getDoc(doc(crew, `workspaces/${WS}/model_versions/mv1`))));
+  await check('owner reads model settings', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/model_settings/config`))));
+  await check('crew CANNOT read model settings', assertFails(getDoc(doc(crew, `workspaces/${WS}/model_settings/config`))));
+  await check('crew CANNOT write model settings', assertFails(setDoc(doc(crew, `workspaces/${WS}/model_settings/config`), { enabled: {} })));
+  await check('crew CANNOT read model-call usage', assertFails(getDoc(doc(crew, `workspaces/${WS}/model_calls/mc1`))));
+  // legal records: owner + manager (the legal roles) may read/write; crew cannot.
+  await check('owner reads legal records', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/legal_records/lr1`))));
+  await check('manager reads legal records', assertSucceeds(getDoc(doc(manager, `workspaces/${WS}/legal_records/lr1`))));
+  await check('crew CANNOT read legal records', assertFails(getDoc(doc(crew, `workspaces/${WS}/legal_records/lr1`))));
+  await check('crew CANNOT write legal records', assertFails(setDoc(doc(crew, `workspaces/${WS}/legal_records/lr2`), { type: 'incident' })));
+  await check('manager CAN write a legal record', assertSucceeds(setDoc(doc(manager, `workspaces/${WS}/legal_records/lr3`), { type: 'contract' })));
 
   // audit_log: append-only + owner-read (regression for the wildcard bug)
   await check('member CAN create audit entry', assertSucceeds(setDoc(doc(crew, `workspaces/${WS}/audit_log/a2`), { action: 'Y' })));

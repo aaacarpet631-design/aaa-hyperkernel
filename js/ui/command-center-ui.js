@@ -186,8 +186,98 @@
     if (global.AAA_RUNTIME_GATEWAY && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_AUDIT_LOG'))) {
       actions.appendChild(ui.button({ label: 'Audit Log', icon: '🛡', variant: 'secondary', full: true, onClick: () => auditFlow(body) }));
     }
+    if (global.AAA_PREDICTION_LEDGER_UI) {
+      actions.appendChild(ui.button({ label: 'Prediction Ledger', icon: '🎯', variant: 'secondary', full: true, onClick: () => global.AAA_PREDICTION_LEDGER_UI.open() }));
+    }
     if (global.AAA_RECEIPT_INTAKE_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
       actions.appendChild(ui.button({ label: 'Receipts', icon: '🧾', variant: 'secondary', full: true, onClick: () => global.AAA_RECEIPT_INTAKE_UI.open() }));
+    }
+    if (global.AAA_FINANCIAL_INTEL_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Financial Intelligence', icon: '📊', variant: 'secondary', full: true, onClick: () => global.AAA_FINANCIAL_INTEL_UI.open() }));
+    }
+    if (global.AAA_ESTIMATOR_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('CREATE_QUOTE'))) {
+      actions.appendChild(ui.button({ label: 'AI Estimator', icon: '📐', variant: 'secondary', full: true, onClick: () => global.AAA_ESTIMATOR_UI.open() }));
+    }
+    if (global.AAA_QUOTE_LIFECYCLE_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Quotes', icon: '📋', variant: 'secondary', full: true, onClick: () => global.AAA_QUOTE_LIFECYCLE_UI.open() }));
+    }
+    if (global.AAA_PRICING_OPTIMIZER_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Pricing Optimizer', icon: '📈', variant: 'secondary', full: true, onClick: () => global.AAA_PRICING_OPTIMIZER_UI.open() }));
+    }
+    if (global.AAA_LEARNING_FEEDBACK_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Learning Feedback', icon: '🔁', variant: 'secondary', full: true, onClick: () => global.AAA_LEARNING_FEEDBACK_UI.open() }));
+    }
+    if (global.AAA_CALIBRATION_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Calibration', icon: '🎛', variant: 'secondary', full: true, onClick: () => global.AAA_CALIBRATION_UI.open() }));
+    }
+    if (global.AAA_TRANSPORT_DASHBOARD_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('EDIT_CUSTOMER'))) {
+      actions.appendChild(ui.button({ label: 'Delivery', icon: '📨', variant: 'secondary', full: true, onClick: () => global.AAA_TRANSPORT_DASHBOARD_UI.open() }));
+    }
+    if (global.AAA_TRANSPORT_INBOX_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('EDIT_CUSTOMER'))) {
+      actions.appendChild(ui.button({ label: 'Conversations', icon: '💬', variant: 'secondary', full: true, onClick: () => global.AAA_TRANSPORT_INBOX_UI.open() }));
+    }
+    if (global.AAA_SECURITY_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('MANAGE_SETTINGS'))) {
+      actions.appendChild(ui.button({ label: 'Security Center', icon: '🛡', variant: 'secondary', full: true, onClick: () => global.AAA_SECURITY_UI.open() }));
+    }
+    if (global.AAA_EVENT_STREAM_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Event Stream', icon: '🔁', variant: 'secondary', full: true, onClick: () => global.AAA_EVENT_STREAM_UI.open() }));
+    }
+    if (global.AAA_PRIVACY_DASHBOARD_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('MANAGE_SETTINGS'))) {
+      actions.appendChild(ui.button({ label: 'Data Governance', icon: '🔐', variant: 'secondary', full: true, onClick: () => global.AAA_PRIVACY_DASHBOARD_UI.open() }));
+    }
+    if (global.AAA_RELIABILITY_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Reliability', icon: '📟', variant: 'secondary', full: true, onClick: () => global.AAA_RELIABILITY_UI.open() }));
+    }
+    if (global.AAA_OUTCOME_INTELLIGENCE_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Outcome Intelligence', icon: '🧠', variant: 'secondary', full: true, onClick: () => global.AAA_OUTCOME_INTELLIGENCE_UI.open() }));
+    }
+    if (global.AAA_EXECUTIVE_COUNCIL_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Executive Council', icon: '🏛', variant: 'secondary', full: true, onClick: () => global.AAA_EXECUTIVE_COUNCIL_UI.open() }));
+    }
+    if (global.AAA_LEARNING_FABRIC_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Learning Fabric', icon: '🧬', variant: 'secondary', full: true, onClick: () => global.AAA_LEARNING_FABRIC_UI.open() }));
+    }
+    if (global.AAA_DIGITAL_TWIN_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Digital Twin', icon: '🔮', variant: 'secondary', full: true, onClick: () => global.AAA_DIGITAL_TWIN_UI.open() }));
+    }
+    if (global.AAA_FINANCIAL_INTELLIGENCE_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Financial Intelligence', icon: '💰', variant: 'secondary', full: true, onClick: () => global.AAA_FINANCIAL_INTELLIGENCE_UI.open() }));
+    }
+    if (global.AAA_AI_OPS_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'AI Operations Center', icon: '🛰', variant: 'primary', full: true, onClick: () => global.AAA_AI_OPS_UI.open() }));
+    }
+    if (global.AAA_PROPOSAL_REVIEW_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('MANAGE_GOVERNANCE'))) {
+      actions.appendChild(ui.button({ label: 'Learning Proposals', icon: '🔁', variant: 'secondary', full: true, onClick: () => global.AAA_PROPOSAL_REVIEW_UI.open() }));
+    }
+    if (global.AAA_AGENT_EVAL_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Agent Evaluation Lab', icon: '🧪', variant: 'secondary', full: true, onClick: () => global.AAA_AGENT_EVAL_UI.open() }));
+    }
+    if (global.AAA_KNOWLEDGE_OS_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_ALL_JOBS'))) {
+      actions.appendChild(ui.button({ label: 'Knowledge OS', icon: '📚', variant: 'secondary', full: true, onClick: () => global.AAA_KNOWLEDGE_OS_UI.open() }));
+    }
+    if (global.AAA_OWNER_COPILOT_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Owner Copilot — Daily Briefing', icon: '☀', variant: 'primary', full: true, onClick: () => global.AAA_OWNER_COPILOT_UI.open() }));
+    }
+    if (global.AAA_MODEL_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('MANAGE_GOVERNANCE'))) {
+      actions.appendChild(ui.button({ label: 'Native Model Lab', icon: '🧠', variant: 'secondary', full: true, onClick: () => global.AAA_MODEL_UI.open() }));
+    }
+    if (global.AAA_MODEL_GOVERNANCE_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('MANAGE_GOVERNANCE'))) {
+      actions.appendChild(ui.button({ label: 'Model Governance (NVIDIA)', icon: '🟩', variant: 'secondary', full: true, onClick: () => global.AAA_MODEL_GOVERNANCE_UI.open() }));
+    }
+    if (global.AAA_AGENT_COUNCIL_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Supervisor Council', icon: '⚖️', variant: 'secondary', full: true, onClick: () => global.AAA_AGENT_COUNCIL_UI.open() }));
+    }
+    if (global.AAA_PROVENANCE_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'Provenance', icon: '🧭', variant: 'secondary', full: true, onClick: () => global.AAA_PROVENANCE_UI.open() }));
+    }
+    if (global.AAA_GOVERNANCE_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('MANAGE_GOVERNANCE'))) {
+      actions.appendChild(ui.button({ label: 'Governance', icon: '🏛', variant: 'secondary', full: true, onClick: () => global.AAA_GOVERNANCE_UI.open() }));
+    }
+    if (global.AAA_REPLAY_SANDBOX_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('MANAGE_GOVERNANCE'))) {
+      actions.appendChild(ui.button({ label: 'Replay Sandbox', icon: '⏵', variant: 'secondary', full: true, onClick: () => global.AAA_REPLAY_SANDBOX_UI.open() }));
+    }
+    if (global.AAA_LEGAL_WAR_ROOM && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_LEGAL'))) {
+      actions.appendChild(ui.button({ label: 'Legal War Room', icon: '⚖️', variant: 'secondary', full: true, onClick: () => global.AAA_LEGAL_WAR_ROOM.open() }));
     }
     if (global.AAA_CREW_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('MANAGE_CREW'))) {
       actions.appendChild(ui.button({ label: 'Crew & Tools', icon: '👷', variant: 'secondary', full: true, onClick: () => global.AAA_CREW_UI.open() }));
@@ -242,6 +332,11 @@
       body.appendChild(kv('Prepared', String(reqs.length)));
       body.appendChild(kv('Sent', String(sent), sent ? '#10B981' : '#A1A1AA'));
       if (!reqs.length) body.appendChild(empty('Review requests are prepared automatically when a job is closed.'));
+    }
+
+    // ---- Decision challenges (Internal Challenge Protocol) ----
+    if (global.AAA_CHALLENGE_UI && global.AAA_CHALLENGE_UI.renderSection) {
+      try { await global.AAA_CHALLENGE_UI.renderSection(body); } catch (_) {}
     }
 
     // ---- Agent meetings ----

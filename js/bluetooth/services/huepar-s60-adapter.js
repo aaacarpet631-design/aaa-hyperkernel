@@ -34,6 +34,20 @@
   const HUEPAR_NOTIFY  = '0000ae02-0000-1000-8000-00805f9b34fb'; // device -> app
   const BATTERY_SERVICE = 'battery_service';                     // 0x180F
 
+  // Candidate service UUIDs seen across S-series / common Chinese BLE laser
+  // modules. We declare ALL of them at scan time so Web Bluetooth will expose
+  // whichever this particular S60 firmware actually uses (a service not declared
+  // up front is invisible post-connect). Discovery + subscription is by
+  // capability, so listing extras is harmless — it only widens what we can see.
+  const CANDIDATE_SERVICES = [
+    HUEPAR_SERVICE,
+    '0000ae00-0000-1000-8000-00805f9b34fb',                 // sibling AE00 family
+    '0000fff0-0000-1000-8000-00805f9b34fb',                 // common FFF0 UART-like
+    '0000ffe0-0000-1000-8000-00805f9b34fb',                 // common FFE0 UART-like
+    '6e400001-b5a3-f393-e0a9-e50e24dcca9e',                 // Nordic UART service
+    BATTERY_SERVICE
+  ];
+
   // Commands the app writes to HUEPAR_WRITE (hex strings). Unit-change commands
   // exist upstream (f101030105, ...0206, ...0307) but are display-only and
   // unverified, so we deliberately don't ship them — meters stay canonical.
@@ -224,9 +238,10 @@
             { namePrefix: 'LDM' },
             { namePrefix: 'Huepar' },
             { namePrefix: 'HUEPAR' },
+            { namePrefix: 'S60' },
             { services: [HUEPAR_SERVICE] }
           ],
-          optionalServices: [HUEPAR_SERVICE, BATTERY_SERVICE]
+          optionalServices: CANDIDATE_SERVICES.slice()
         });
         this._device = device;
         return { ok: true, device: { id: device.id, name: device.name || 'Huepar device' } };
@@ -236,16 +251,31 @@
       }
     };
 
-    // After the generic subscribe wires up notifications, grab the write
-    // characteristic so we can trigger measurements.
+    // After the generic subscribe wires up notifications, locate the write
+    // characteristic used to trigger a measurement. Prefer the known Huepar
+    // UUID, but fall back to ANY writable characteristic the device exposed —
+    // so a firmware variant that uses a different service/UUID still works
+    // (the generic walk already captured every writable char by capability).
     const baseSubscribe = a._subscribeAll.bind(a);
     a._subscribeAll = async function () {
       await baseSubscribe();
       this._writeChar = null;
+      // 1) exact known control characteristic
       try {
         const svc = await this._server.getPrimaryService(HUEPAR_SERVICE);
         this._writeChar = await svc.getCharacteristic(HUEPAR_WRITE);
-      } catch (_) { /* device may not expose it under this id; measure() will report */ }
+      } catch (_) { /* not under this id on this firmware */ }
+      // 2) any characteristic whose UUID matches the known write id, across services
+      if (!this._writeChar) {
+        this._writeChar = (this._writableChars || []).find(function (c) {
+          return String(c.uuid).toLowerCase() === HUEPAR_WRITE;
+        }) || null;
+      }
+      // 3) last resort: the first writable characteristic discovered. The meter's
+      // own button still works regardless; this just enables the remote trigger.
+      if (!this._writeChar && this._writableChars && this._writableChars.length) {
+        this._writeChar = this._writableChars[0];
+      }
     };
 
     // Trigger a single measurement (remote shutter). The reading arrives async
@@ -289,9 +319,11 @@
       label: 'Huepar S-series (BT)',
       priority: 50,
       match: matchHuepar,
-      // Declared at scan time so getPrimaryService(HUEPAR_SERVICE) is allowed
-      // post-connect — without this the connect throws SecurityError ("error").
-      optionalServices: [HUEPAR_SERVICE, BATTERY_SERVICE],
+      // Declared at scan time so getPrimaryService() is allowed post-connect —
+      // without this the connect throws SecurityError ("error"). We declare the
+      // whole candidate family so an S60 firmware variant on any of these
+      // services is still reachable.
+      optionalServices: CANDIDATE_SERVICES.slice(),
       factory: () => createHueparS60Adapter()
     });
   }

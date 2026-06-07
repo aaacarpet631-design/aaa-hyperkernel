@@ -48,7 +48,12 @@
     MANAGE_AUTOMATION: 'Turn automation/auto-pilot on/off',
     MANAGE_SETTINGS: 'Cloud settings, members, integrations',
     MANAGE_CREW: 'Manage employees / crew / tools',
-    VIEW_AUDIT_LOG: 'View the audit trail'
+    VIEW_AUDIT_LOG: 'View the audit trail',
+    // Legal Intelligence Division
+    VIEW_LEGAL: 'View the Legal War Room (risk, compliance, contracts, audit)',
+    MANAGE_LEGAL: 'Add / resolve legal records (contracts, compliance, reviews)',
+    // Governance Registry — versioned prompts/models/templates/policies/calibrations.
+    MANAGE_GOVERNANCE: 'Create / approve / activate / roll back governed versions'
   };
 
   // Role → granted permissions. Owner gets everything by construction.
@@ -58,7 +63,7 @@
       'CREATE_QUOTE', 'APPROVE_QUOTE', 'EDIT_JOB', 'CLOSE_JOB', 'VIEW_ALL_JOBS',
       'EDIT_CUSTOMER', 'CAPTURE_MEASUREMENT', 'CAPTURE_PHOTO', 'COMPLETE_CHECKLIST',
       'RUN_AI_AGENTS', 'MANAGE_AUTOMATION', 'MANAGE_CREW', 'VIEW_AUDIT_LOG',
-      'VIEW_PRICING_RATES'
+      'VIEW_PRICING_RATES', 'VIEW_LEGAL', 'MANAGE_LEGAL'
       // NOTE: no VIEW_FINANCIALS / VIEW_MARGINS — managers run production, not the books.
     ],
     crew: [
