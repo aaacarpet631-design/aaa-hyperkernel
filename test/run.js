@@ -69,6 +69,8 @@ const SUITES = [
   'unit/agent-evaluation-ui.test.js',
   'unit/knowledge-fabric.test.js',
   'unit/knowledge-os-ui.test.js',
+  'unit/owner-copilot.test.js',
+  'unit/owner-copilot-ui.test.js',
   'unit/agent-council.test.js',
   'unit/agent-council-ui.test.js',
   'unit/provenance.test.js',
