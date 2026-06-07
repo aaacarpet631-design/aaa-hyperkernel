@@ -20,6 +20,7 @@
   function quote() { return global.AAA_MEASUREMENT_QUOTE; }
   function ai() { return global.AAA_MEASUREMENT_AI; }
   function seqEngine() { return global.AAA_CAPTURE_SEQUENCER; }
+  function tts() { return global.AAA_TTS; }
   function events() { return global.AAA_EVENTS; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
@@ -423,6 +424,14 @@
     body.appendChild(navRow([{ label: 'Back', onClick: () => go('review') }]));
   }
 
+  // Plain-English spoken version of a customer receipt (read aloud on site).
+  function receiptSpeech(r) {
+    const parts = ['Estimate from ' + r.businessName + '.'];
+    (r.items || []).forEach((it) => parts.push(it.description + ', ' + it.amount + ' dollars.'));
+    parts.push('Estimated total, ' + r.estimateRange + '.');
+    return parts.join(' ');
+  }
+
   function showReceipt(q) {
     const ui = U();
     const r = quote().toReceipt(q, {});
@@ -431,6 +440,18 @@
     r.items.forEach((it) => s.body.appendChild(ui.el('div', { className: 'aaa-list-row', html: '<strong>' + esc(it.description) + '</strong><div class="aaa-list-sub">$' + it.amount + '</div>' })));
     s.body.appendChild(ui.el('div', { className: 'aaa-list-row', html: '<strong>Estimated total: ' + esc(r.estimateRange) + '</strong>' }));
     s.body.appendChild(ui.el('p', { className: 'aaa-voice-hint', text: r.note }));
+
+    // Read the estimate to the customer hands-free (Riva TTS, browser-voice
+    // fallback). Only shown when some TTS path is actually available.
+    if (tts() && tts().isConfigured()) {
+      s.body.appendChild(ui.button({ label: 'Read aloud', icon: '🔊', variant: 'secondary', full: true, onClick: async () => {
+        const res = await tts().speak(receiptSpeech(r));
+        if (!res || !res.ok) toast(s.body, (res && res.message) || 'Could not read the estimate aloud.', '#F59E0B');
+      } }));
+      // Stop any playback when the receipt is dismissed.
+      const origClose = s.close;
+      s.close = function () { try { tts().stop(); } catch (_) {} origClose(); };
+    }
   }
 
   async function applyToJob(body, q, sessions) {

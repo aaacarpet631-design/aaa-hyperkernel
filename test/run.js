@@ -104,6 +104,7 @@ const SUITES = [
   'unit/portal-links.test.js',
   'unit/voice.test.js',
   'unit/transcribe.test.js',
+  'unit/tts.test.js',
   'unit/research-brain.test.js',
   'static/integrity.test.js',
   'smoke/boot.test.js'
@@ -115,6 +116,7 @@ const EXTERNAL = [
   'functions/qbo-proxy/test.js',
   'functions/portal-proxy/test.js',
   'functions/nemotron-translate.test.js',
+  'functions/chatterbox-tts.test.js',
   'functions/private-gpu-translate.test.js',
   'functions/sense-normalize.test.js'
 ];

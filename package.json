@@ -5,13 +5,25 @@
   "type": "module",
   "description": "AAA HyperKernel — local-first field PWA with Claude-backed vision estimating and Netlify Blobs sync.",
   "scripts": {
+    "dev": "node scripts/dev-server.js",
+    "build": "echo \"AAA HyperKernel is a no-build static PWA (Netlify publishes '.'); nothing to compile. Run: npm test / npm run lint.\"",
     "test": "node test/run.js && node test/intelligence-smoke.mjs",
     "test:harness": "node test/run.js",
     "test:intel": "node test/intelligence-smoke.mjs",
-    "test:rules": "node test/run-rules.js"
+    "test:rules": "node test/run-rules.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@anthropic-ai/sdk": "latest",
     "@netlify/blobs": "latest"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.4.1",
+    "globals": "^17.6.0",
+    "prettier": "^3.8.3"
   }
 }
