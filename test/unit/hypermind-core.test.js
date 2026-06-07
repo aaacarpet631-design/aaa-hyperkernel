@@ -31,14 +31,16 @@ module.exports = async function run() {
     scoreAgents: async () => { calls.score = true; return { ok: true, scoreboard: [1, 2, 3] }; },
     extractPatterns: async () => { calls.patterns = true; return { ok: true, patterns: 4 }; }
   };
-  G.AAA_GRAPH = { build: async () => { calls.graph = true; return { stats: { nodes: 12, edges: 20 } }; } };
+  G.AAA_GRAPH = { stats: async () => { calls.graph = true; return { nodeCount: 12, edgeCount: 20, byType: {} }; } };
+  G.AAA_KNOWLEDGE = { index: async () => { calls.knowledge = true; return { ok: true, added: 3, total: 9 }; } };
   G.AAA_PREDICTION_CLOSURE = { evaluate: async () => { calls.evaluate = true; return { ok: true, evaluated: 3 }; }, close: async () => ({ ok: true, closed: 2 }) };
   G.AAA_PRICING_OPTIMIZER = { analyze: async () => { calls.plan = true; return { ok: true, recommendations: [{ id: 'r1' }, { id: 'r2' }] }; } };
   G.AAA_RELIABILITY = { snapshot: async () => { calls.snapshot = true; return { ok: true }; } };
 
   const t1 = await HM.tick({ source: 'test' });
   t.ok('OBSERVE called outcome-intelligence.ingest', calls.ingest === true);
-  t.ok('REMEMBER built the graph', calls.graph === true);
+  t.ok('REMEMBER refreshed the graph', calls.graph === true);
+  t.ok('REMEMBER indexed the knowledge fabric', calls.knowledge === true);
   t.ok('PREDICT evaluated closures', calls.evaluate === true);
   t.ok('PLAN produced recommendations', calls.plan === true);
   t.ok('MEASURE scored agents', calls.score === true);

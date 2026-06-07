@@ -2,15 +2,20 @@
  * AAA Knowledge Graph — "everything is a node; everything connects."
  *
  * Builds a real relationship graph from shared memory (no fabrication): every
- * customer, job, estimate, outcome, review, lead source, agent, and agent
- * decision becomes a node, linked by real foreign-key relationships. Supports
- * stats, neighbor traversal, and honest pattern detection (best lead source,
- * repeat customers, coverage gaps, top agents) for discovery and insight.
+ * customer, job, estimate, outcome, review, lead source, agent, agent decision,
+ * technician (crew), and invoice becomes a node, linked by real foreign-key
+ * relationships. Supports stats, neighbor traversal, arbitrary relationship-path
+ * queries (path), honest pattern detection (best lead source, repeat customers,
+ * coverage gaps, top agents), and technician profitability (Technician→Job→Margin).
+ * The relationships the business reasons over are queryable end to end.
  */
 ;(function (global) {
   'use strict';
 
   function data() { return global.AAA_DATA; }
+
+  // List a collection that may not exist yet; never throws, always an array.
+  async function listSafe(d, coll) { try { return (await d.list(coll)) || []; } catch (_) { return []; } }
 
   function quoteMid(range) {
     if (range == null) return null;
@@ -28,6 +33,9 @@
       const outcomes = await d.list('outcomes');
       const reviews = await d.list('review_requests');
       const decisions = await d.list('agent_decisions');
+      // Newer entity sources (null-tolerant — empty/absent collections are fine).
+      const crew = await listSafe(d, 'crew_members');
+      const invoices = await listSafe(d, 'invoices');
 
       const nodes = {};
       const edges = [];
@@ -68,10 +76,24 @@
         addEdge('dec:' + dec.id, aid, 'by_agent');
         if (dec.jobId && nodes['job:' + dec.jobId]) addEdge('dec:' + dec.id, 'job:' + dec.jobId, 'about_job');
       });
+      // Technicians (crew) → the jobs they worked (job.assigneeIds).
+      crew.forEach((m) => { addNode('tech:' + m.id, 'technician', m.name || 'Technician', m); });
+      jobs.forEach((j) => {
+        (Array.isArray(j.assigneeIds) ? j.assigneeIds : []).forEach((aid) => {
+          if (nodes['tech:' + aid]) addEdge('tech:' + aid, 'job:' + j.id, 'worked_job');
+        });
+      });
+      // Invoices → their job and their customer.
+      invoices.forEach((inv) => {
+        addNode('inv:' + inv.id, 'invoice', inv.status || 'invoice', inv);
+        if (inv.jobId && nodes['job:' + inv.jobId]) addEdge('job:' + inv.jobId, 'inv:' + inv.id, 'has_invoice');
+        if (inv.customerId && nodes['cust:' + inv.customerId]) addEdge('cust:' + inv.customerId, 'inv:' + inv.id, 'billed_customer');
+      });
 
       return { nodes: nodes, edges: edges, adj: adj,
         list: Object.keys(nodes).map((k) => nodes[k]),
-        customers: customers, jobs: jobs, outcomes: outcomes, decisions: decisions };
+        customers: customers, jobs: jobs, outcomes: outcomes, decisions: decisions,
+        crew: crew, invoices: invoices };
     },
 
     /** Node-type counts + edge count + most-connected nodes. */
@@ -83,6 +105,60 @@
         .map((n) => ({ id: n.id, type: n.type, label: n.label, degree: (g.adj[n.id] || []).length }))
         .sort((a, b) => b.degree - a.degree).slice(0, 8);
       return { nodeCount: g.list.length, edgeCount: g.edges.length, byType: byType, mostConnected: connected };
+    },
+
+    /**
+     * Shortest relationship PATH between two nodes (BFS over the graph), so any
+     * chain the business reasons over is queryable end to end — e.g.
+     *   path('cust:c1', 'rev:r1')  → Customer → Job → Review
+     *   path('tech:t1', 'out:o1')  → Technician → Job → Outcome
+     * Returns an ordered array of {id, type, label, rel} hops, or null if no
+     * path within maxDepth (default 6).
+     */
+    async path(fromId, toId, maxDepth) {
+      const g = await this.build();
+      if (!g.nodes[fromId] || !g.nodes[toId]) return null;
+      const max = maxDepth || 6;
+      const seen = {}; seen[fromId] = true;
+      const queue = [[{ id: fromId, rel: null }]];
+      while (queue.length) {
+        const p = queue.shift();
+        const last = p[p.length - 1].id;
+        if (last === toId) return p.map((h) => ({ id: h.id, type: g.nodes[h.id].type, label: g.nodes[h.id].label, rel: h.rel }));
+        if (p.length > max) continue;
+        (g.adj[last] || []).forEach((e) => { if (!seen[e.to]) { seen[e.to] = true; queue.push(p.concat([{ id: e.to, rel: e.rel }])); } });
+      }
+      return null;
+    },
+
+    /**
+     * Technician → Job → Margin: per-crew-member productivity + profitability
+     * derived from real assignments (job.assigneeIds), outcomes, and estimate
+     * margins. Honest about thin data (null margin/winRate when none). Ranked by
+     * average margin, best first.
+     */
+    async technicianPerformance() {
+      const g = await this.build();
+      const outByJob = {}; g.outcomes.forEach((o) => { if (o.jobId) outByJob[o.jobId] = o; });
+      const perf = {};
+      (g.crew || []).forEach((m) => { perf[m.id] = { id: m.id, name: m.name || 'Technician', jobs: 0, won: 0, revenue: 0, margins: [] }; });
+      g.jobs.forEach((j) => {
+        (Array.isArray(j.assigneeIds) ? j.assigneeIds : []).forEach((aid) => {
+          const p = perf[aid]; if (!p) return;
+          p.jobs++;
+          const o = outByJob[j.id];
+          if (o && o.result === 'won') { p.won++; const amt = Number(o.finalAmount); if (isFinite(amt)) p.revenue += amt; }
+          const est = Array.isArray(j.estimates) && j.estimates.length ? j.estimates[0] : null;
+          const m = est && est.marginPct != null ? Number(est.marginPct) : null;
+          if (m != null && isFinite(m)) p.margins.push(m);
+        });
+      });
+      return Object.values(perf).map((p) => ({
+        id: p.id, name: p.name, jobs: p.jobs, won: p.won,
+        winRate: p.jobs ? Math.round((p.won / p.jobs) * 100) : null,
+        revenue: Math.round(p.revenue),
+        avgMargin: p.margins.length ? Math.round(p.margins.reduce((a, b) => a + b, 0) / p.margins.length) : null
+      })).sort((a, b) => (b.avgMargin || 0) - (a.avgMargin || 0) || b.jobs - a.jobs);
     },
 
     /** A node plus its neighbors grouped by relationship. */

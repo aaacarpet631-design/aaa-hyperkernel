@@ -124,11 +124,13 @@
       // 1) OBSERVE — pull new business signals into the event stream.
       phases.push(await runPhase('observe', () => call('AAA_OUTCOME_INTELLIGENCE', 'ingest')));
 
-      // 2) REMEMBER — refresh memory: the relationship graph + job memory.
+      // 2) REMEMBER — refresh memory: relationship graph + job memory + the
+      //    queryable knowledge fabric (index over all records).
       phases.push(await runPhase('remember', async () => {
-        const graph = await call('AAA_GRAPH', 'build');
+        const graph = await call('AAA_GRAPH', 'stats');
         const fabric = await call('AAA_LEARNING_FABRIC', 'ingest');
-        return merge({ graph: graph, fabric: fabric });
+        const knowledge = await call('AAA_KNOWLEDGE', 'index');
+        return merge({ graph: graph, fabric: fabric, knowledge: knowledge });
       }));
 
       // 3) PREDICT — evaluate open predictions against the latest reality.
@@ -260,7 +262,7 @@
     if (r.__skip) return { skipped: true, note: r.note };
     if (typeof r !== 'object') return r;
     const keep = {};
-    ['ok', 'added', 'scored', 'scoredAgents', 'patterns', 'totalEvents', 'count', 'closed', 'evaluated', 'updated', 'nodes', 'edges', 'recommendations', 'accepted', 'status'].forEach((k) => { if (r[k] != null) keep[k] = r[k]; });
+    ['ok', 'added', 'scored', 'scoredAgents', 'patterns', 'totalEvents', 'count', 'closed', 'evaluated', 'updated', 'nodeCount', 'edgeCount', 'total', 'accepted', 'status'].forEach((k) => { if (r[k] != null) keep[k] = r[k]; });
     if (Array.isArray(r.recommendations)) keep.recommendations = r.recommendations.length;
     if (Array.isArray(r.results)) keep.results = r.results.length;
     if (r.stats && typeof r.stats === 'object') { if (r.stats.nodes != null) keep.nodes = r.stats.nodes; if (r.stats.edges != null) keep.edges = r.stats.edges; }

@@ -115,6 +115,14 @@
       if (ins.repeatCustomers) container.appendChild(row('🔁 Repeat customers<div class="aaa-list-sub">' + ins.repeatCustomers + ' with more than one job</div>'));
       if (ins.topAgent) container.appendChild(row('🤖 Top agent: <strong>' + esc(ins.topAgent.agent) + '</strong><div class="aaa-list-sub">avg accuracy ' + Math.round(ins.topAgent.avg * 100) + '% over ' + ins.topAgent.n + ' scored</div>'));
       if (ins.noEstimate || ins.noOutcome) container.appendChild(row('⚠️ Coverage gaps<div class="aaa-list-sub">' + ins.noEstimate + ' jobs without an estimate · ' + ins.noOutcome + ' without a recorded outcome</div>'));
+      // Technician → Job → Margin (real, from crew assignments)
+      if (global.AAA_GRAPH.technicianPerformance) {
+        const techs = (await global.AAA_GRAPH.technicianPerformance()).filter((tp) => tp.jobs > 0);
+        if (techs.length) {
+          const top = techs[0];
+          container.appendChild(row('👷 Top crew by margin: <strong>' + esc(top.name) + '</strong><div class="aaa-list-sub">avg margin ' + (top.avgMargin != null ? top.avgMargin + '%' : 'n/a') + ' · ' + (top.winRate != null ? top.winRate + '% win' : 'n/a') + ' over ' + top.jobs + ' job(s)</div>'));
+        }
+      }
       container.appendChild(ui.button({ label: 'Explore connections', icon: '🕸', variant: 'secondary', full: true, onClick: () => exploreGraph() }));
     }
 
