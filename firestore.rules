@@ -108,7 +108,9 @@ service cloud.firestore {
     // crew never sees customer conversations — enforced server-side to mirror
     // the inbox's client-side gate.
     function isCommsCollection(c) {
-      return c == 'comm_threads' || c == 'comm_inbound' || c == 'comm_notifications';
+      return c == 'comm_threads' || c == 'comm_inbound' || c == 'comm_notifications'
+          // AI-drafted customer messages awaiting owner approval — office-only.
+          || c == 'assisted_drafts';
     }
     function canComms(ws) { return role(ws) == 'owner' || role(ws) == 'manager'; }
     // Security hardening: step-up/MFA secrets, signing key, and signed sessions.

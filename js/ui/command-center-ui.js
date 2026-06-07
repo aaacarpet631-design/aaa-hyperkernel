@@ -264,6 +264,9 @@
     if (global.AAA_MODEL_GOVERNANCE_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('MANAGE_GOVERNANCE'))) {
       actions.appendChild(ui.button({ label: 'Model Governance (NVIDIA)', icon: '🟩', variant: 'secondary', full: true, onClick: () => global.AAA_MODEL_GOVERNANCE_UI.open() }));
     }
+    if (global.AAA_ASSISTED_DRAFTS_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('EDIT_CUSTOMER'))) {
+      actions.appendChild(ui.button({ label: 'Assisted Drafts', icon: '✍️', variant: 'secondary', full: true, onClick: () => global.AAA_ASSISTED_DRAFTS_UI.open() }));
+    }
     if (global.AAA_AGENT_COUNCIL_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
       actions.appendChild(ui.button({ label: 'Supervisor Council', icon: '⚖️', variant: 'secondary', full: true, onClick: () => global.AAA_AGENT_COUNCIL_UI.open() }));
     }

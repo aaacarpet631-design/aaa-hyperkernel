@@ -78,6 +78,8 @@ const SUITES = [
   'unit/nvidia-nemotron-adapter.test.js',
   'unit/model-governance-ui.test.js',
   'unit/nemotron-transport.test.js',
+  'unit/assisted-draft-queue.test.js',
+  'unit/assisted-drafts-ui.test.js',
   'unit/agent-council.test.js',
   'unit/agent-council-ui.test.js',
   'unit/provenance.test.js',
