@@ -36,6 +36,15 @@
       provider: 'nvidia', riskTier: 'low', customerFacing: false, exposure: 'scoring',
       allowedTasks: ['agent_output_score', 'recommendation_rank', 'proposal_quality_score'],
       candidates: { huggingface: 'nvidia/Nemotron-4-340B-Reward', nim: 'nvidia/nemotron-4-340b-reward' }
+    },
+    // Private, self-hosted GPU model (OpenAI-style /v1/chat/completions). The
+    // operative modelId + endpoint live server-side; the owner confirms the served
+    // model name when activating the governed artifact.
+    'privategpu.local': {
+      key: 'privategpu.local', family: 'private-gpu', variant: 'instruct', label: 'Private GPU Model (OpenAI-compatible)',
+      provider: 'private_gpu', riskTier: 'medium', customerFacing: false, exposure: 'advisory',
+      allowedTasks: ['draft_customer_message', 'owner_briefing_explanation', 'executive_council_reasoning', 'scenario_generation', 'synthetic_training_case'],
+      candidates: { local: 'local-model', openai_compat: 'local-model' }
     }
   };
 
@@ -65,7 +74,10 @@
     providerCandidates(key) {
       const m = MODELS[key]; if (!m) return null;
       const runtime = String(flag('modelRuntime', 'nim'));
-      return { runtime: runtime, modelId: m.candidates[runtime] || m.candidates.nim || m.candidates.huggingface, verified: false, note: 'Confirm this id in the provider catalog (NVIDIA NIM / Hugging Face) before activation.', all: m.candidates };
+      const ckeys = Object.keys(m.candidates || {});
+      const modelId = m.candidates[runtime] || m.candidates.nim || m.candidates.huggingface || (ckeys.length ? m.candidates[ckeys[0]] : null);
+      const note = m.provider === 'private_gpu' ? 'Set the served model name on your GPU server, then confirm it here before activation.' : 'Confirm this id in the provider catalog (NVIDIA NIM / Hugging Face) before activation.';
+      return { runtime: m.provider === 'private_gpu' ? 'private_gpu' : runtime, modelId: modelId, verified: false, note: note, all: m.candidates };
     },
 
     /** Risk score for a (model, task) pair from its tier + task sensitivity. */

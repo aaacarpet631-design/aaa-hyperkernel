@@ -81,6 +81,15 @@
       const cloudReady = await quiet(() => (data() && data().cloudReady ? !!data().cloudReady() : null), null);
       if (cloudReady != null) m.push(metric('sync_health', 'Cloud sync', cloudReady ? 'online' : 'offline', '', cloudReady ? 'ok' : 'warn', cloudReady ? 'mirroring to cloud' : 'local-only (offline)'));
 
+      // --- private GPU model provider health (circuit breaker + call errors) ---
+      const gpu = await quiet(() => (global.AAA_PRIVATE_GPU_TRANSPORT && global.AAA_PRIVATE_GPU_TRANSPORT.health) ? global.AAA_PRIVATE_GPU_TRANSPORT.health() : null, null);
+      if (gpu && gpu.installed) {
+        const gpuCalls = await quiet(async () => (global.AAA_MODEL_CALL_PROVENANCE && global.AAA_MODEL_CALL_PROVENANCE.usage) ? (await global.AAA_MODEL_CALL_PROVENANCE.usage()).filter((u) => u.provider === 'private_gpu') : [], []);
+        const errs = gpuCalls.filter((u) => u.ok === false || u.fallback).length;
+        const status = gpu.breaker === 'open' ? 'crit' : (gpu.breaker === 'half-open' || (gpuCalls.length && errs / gpuCalls.length > 0.5) ? 'warn' : 'ok');
+        m.push(metric('gpu_model_health', 'Private GPU model', gpu.breaker === 'open' ? 'unavailable' : (gpu.breaker === 'half-open' ? 'recovering' : 'online'), '', status, (gpu.lastError ? 'last error: ' + gpu.lastError + ' · ' : '') + errs + '/' + gpuCalls.length + ' failed call(s)'));
+      }
+
       // --- integrity: event-bus chain + audit chain ---
       const evChain = await quiet(() => (global.AAA_EVENT_BUS && global.AAA_EVENT_BUS.verifyChain ? global.AAA_EVENT_BUS.verifyChain() : null), null);
       if (evChain) m.push(metric('event_chain', 'Event-log integrity', evChain.ok ? 'intact' : (evChain.breaks.length + ' break(s)'), '', evChain.ok ? 'ok' : 'crit', evChain.length + ' events'));

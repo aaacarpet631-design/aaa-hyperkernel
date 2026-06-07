@@ -80,6 +80,9 @@ const SUITES = [
   'unit/nemotron-transport.test.js',
   'unit/assisted-draft-queue.test.js',
   'unit/assisted-drafts-ui.test.js',
+  'unit/private-gpu-adapter.test.js',
+  'unit/private-gpu-transport.test.js',
+  'unit/reliability-gpu-health.test.js',
   'unit/agent-council.test.js',
   'unit/agent-council-ui.test.js',
   'unit/provenance.test.js',
@@ -107,7 +110,8 @@ const SUITES = [
 const EXTERNAL = [
   'functions/qbo-proxy/test.js',
   'functions/portal-proxy/test.js',
-  'functions/nemotron-translate.test.js'
+  'functions/nemotron-translate.test.js',
+  'functions/private-gpu-translate.test.js'
 ];
 
 function runSuite(rel) {
