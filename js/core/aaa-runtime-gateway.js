@@ -71,6 +71,11 @@
     // adapter/webhook). Not a customer-facing send, so AI/system ingestion is
     // allowed — it records reality — and every receipt is audited.
     INBOUND_MESSAGE:   { permission: null,              aiAllowed: true  },
+    // Sensing ingress: recording a real-world signal (inbound SMS, missed call,
+    // web lead) into the system. Any member / automated webhook may record an
+    // observation (it is not a privileged action); the RESPONSE it triggers is a
+    // pending owner-approval draft — nothing is sent without a human.
+    SENSE_SIGNAL:      { permission: null,              aiAllowed: true  },
     // Owner acting on a Supervisor Council decision. Advisory + audited; the
     // council recommends, a person decides — it never auto-acts.
     REVIEW_COUNCIL:    { permission: 'VIEW_FINANCIALS', aiAllowed: false },
@@ -91,6 +96,9 @@
     RUN_MODEL:            { permission: 'VIEW_ALL_JOBS',  aiAllowed: true },
     // Enabling/disabling a model is an owner-only control; AI can never toggle it.
     MANAGE_MODEL_SETTINGS:{ permission: 'MANAGE_SETTINGS', aiAllowed: false },
+    // Approving / rejecting an AI-drafted customer message. Office-level (owner +
+    // manager hold EDIT_CUSTOMER); human-only — a model draft never sends itself.
+    APPROVE_ASSISTED_MSG: { permission: 'EDIT_CUSTOMER',  aiAllowed: false },
     // Security hardening admin (configure step-up/MFA, toggle enforcement).
     // Owner-only (MANAGE_SETTINGS) + audited; AI can never reconfigure security.
     MANAGE_SECURITY:   { permission: 'MANAGE_SETTINGS',   aiAllowed: false },

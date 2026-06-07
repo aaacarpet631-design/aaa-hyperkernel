@@ -6,7 +6,7 @@
  * app fully usable offline. Old caches are purged on activate, and the worker
  * takes control immediately to avoid serving a stale shell after an update.
  */
-const CACHE_NAME = 'hyperkernel-v69';
+const CACHE_NAME = 'hyperkernel-v74';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -93,12 +93,18 @@ const PRECACHE = [
   '/js/intelligence/proposal-engine.js',
   '/js/intelligence/agent-evaluation-lab.js',
   '/js/intelligence/knowledge-fabric.js',
+  '/js/intelligence/vector-memory.js',
   '/js/intelligence/owner-copilot.js',
   '/js/intelligence/native-model.js',
   '/js/ai/model-registry.js',
   '/js/ai/providers/nvidia-nemotron-adapter.js',
+  '/js/ai/providers/nemotron-transport.js',
+  '/js/ai/providers/private-gpu-adapter.js',
+  '/js/ai/providers/private-gpu-transport.js',
   '/js/ai/model-call-provenance.js',
   '/js/ai/model-router.js',
+  '/js/ai/assisted-draft-queue.js',
+  '/js/core/sensing-ingress.js',
   '/js/intelligence/provenance-store.js',
   '/js/intelligence/provenance-builder.js',
   '/js/intelligence/governance-registry.js',
@@ -142,9 +148,12 @@ const PRECACHE = [
   '/js/ui/proposal-review-ui.js',
   '/js/ui/agent-evaluation-ui.js',
   '/js/ui/knowledge-os-ui.js',
+  '/js/ui/vector-memory-ui.js',
   '/js/ui/owner-copilot-ui.js',
   '/js/ui/native-model-ui.js',
   '/js/ui/model-governance-ui.js',
+  '/js/ui/assisted-drafts-ui.js',
+  '/js/ui/sensing-ui.js',
   '/js/ui/agent-council-ui.js',
   '/js/ui/provenance-ui.js',
   '/js/ui/governance-registry-ui.js',

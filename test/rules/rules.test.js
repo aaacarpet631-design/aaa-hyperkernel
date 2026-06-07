@@ -77,9 +77,12 @@ async function main() {
     await setDoc(doc(db, `workspaces/${WS}/agent_evaluations/ae1`), { agent: 'pricing_optimizer', roi: 9, accuracy: 84 });
     await setDoc(doc(db, `workspaces/${WS}/knowledge_nodes/kn1`), { kind: 'quote', sensitivity: 'financial' });
     await setDoc(doc(db, `workspaces/${WS}/owner_briefings/brief1`), { date: '2026-06-07', attentionItems: 3 });
+    await setDoc(doc(db, `workspaces/${WS}/memory_vectors/vec1`), { nodeId: 'kn1', sensitivity: 'financial' });
     await setDoc(doc(db, `workspaces/${WS}/model_versions/mv1`), { name: 'win_predictor', status: 'candidate' });
     await setDoc(doc(db, `workspaces/${WS}/model_settings/config`), { enabled: { 'nvidia.nemotron4_340b_instruct': true } });
     await setDoc(doc(db, `workspaces/${WS}/model_calls/mc1`), { modelKey: 'nvidia.nemotron4_340b_instruct', ok: true });
+    await setDoc(doc(db, `workspaces/${WS}/assisted_drafts/ad1`), { to: '+1555', status: 'pending_owner', intent: 'follow_up' });
+    await setDoc(doc(db, `workspaces/${WS}/sensed_events/se1`), { type: 'inbound_sms', externalId: 'SM1' });
     await setDoc(doc(db, `workspaces/${WS}/legal_records/lr1`), { type: 'incident', summary: 'sensitive' });
     await setDoc(doc(db, `workspaces/${WS}/audit_log/a1`), { action: 'X' });
     await setDoc(doc(db, `workspaces/${WS}/integrations/qbo`), { accessToken: 'SECRET' });
@@ -171,6 +174,8 @@ async function main() {
   await check('crew CANNOT read agent evaluations', assertFails(getDoc(doc(crew, `workspaces/${WS}/agent_evaluations/ae1`))));
   await check('owner reads knowledge nodes', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/knowledge_nodes/kn1`))));
   await check('crew CANNOT read knowledge nodes', assertFails(getDoc(doc(crew, `workspaces/${WS}/knowledge_nodes/kn1`))));
+  await check('owner reads memory vectors', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/memory_vectors/vec1`))));
+  await check('crew CANNOT read memory vectors', assertFails(getDoc(doc(crew, `workspaces/${WS}/memory_vectors/vec1`))));
   await check('owner reads owner briefings', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/owner_briefings/brief1`))));
   await check('crew CANNOT read owner briefings', assertFails(getDoc(doc(crew, `workspaces/${WS}/owner_briefings/brief1`))));
   await check('owner reads model versions', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/model_versions/mv1`))));
@@ -179,6 +184,10 @@ async function main() {
   await check('crew CANNOT read model settings', assertFails(getDoc(doc(crew, `workspaces/${WS}/model_settings/config`))));
   await check('crew CANNOT write model settings', assertFails(setDoc(doc(crew, `workspaces/${WS}/model_settings/config`), { enabled: {} })));
   await check('crew CANNOT read model-call usage', assertFails(getDoc(doc(crew, `workspaces/${WS}/model_calls/mc1`))));
+  await check('manager reads assisted drafts (office)', assertSucceeds(getDoc(doc(manager, `workspaces/${WS}/assisted_drafts/ad1`))));
+  await check('crew CANNOT read assisted drafts', assertFails(getDoc(doc(crew, `workspaces/${WS}/assisted_drafts/ad1`))));
+  await check('manager reads sensed signals (office)', assertSucceeds(getDoc(doc(manager, `workspaces/${WS}/sensed_events/se1`))));
+  await check('crew CANNOT read sensed signals', assertFails(getDoc(doc(crew, `workspaces/${WS}/sensed_events/se1`))));
   // legal records: owner + manager (the legal roles) may read/write; crew cannot.
   await check('owner reads legal records', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/legal_records/lr1`))));
   await check('manager reads legal records', assertSucceeds(getDoc(doc(manager, `workspaces/${WS}/legal_records/lr1`))));

@@ -255,6 +255,9 @@
     if (global.AAA_KNOWLEDGE_OS_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_ALL_JOBS'))) {
       actions.appendChild(ui.button({ label: 'Knowledge OS', icon: '📚', variant: 'secondary', full: true, onClick: () => global.AAA_KNOWLEDGE_OS_UI.open() }));
     }
+    if (global.AAA_VECTOR_MEMORY_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_ALL_JOBS'))) {
+      actions.appendChild(ui.button({ label: 'Semantic Memory', icon: '🧭', variant: 'secondary', full: true, onClick: () => global.AAA_VECTOR_MEMORY_UI.open() }));
+    }
     if (global.AAA_OWNER_COPILOT_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
       actions.appendChild(ui.button({ label: 'Owner Copilot — Daily Briefing', icon: '☀', variant: 'primary', full: true, onClick: () => global.AAA_OWNER_COPILOT_UI.open() }));
     }
@@ -263,6 +266,12 @@
     }
     if (global.AAA_MODEL_GOVERNANCE_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('MANAGE_GOVERNANCE'))) {
       actions.appendChild(ui.button({ label: 'Model Governance (NVIDIA)', icon: '🟩', variant: 'secondary', full: true, onClick: () => global.AAA_MODEL_GOVERNANCE_UI.open() }));
+    }
+    if (global.AAA_ASSISTED_DRAFTS_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('EDIT_CUSTOMER'))) {
+      actions.appendChild(ui.button({ label: 'Assisted Drafts', icon: '✍️', variant: 'secondary', full: true, onClick: () => global.AAA_ASSISTED_DRAFTS_UI.open() }));
+    }
+    if (global.AAA_SENSING_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('EDIT_CUSTOMER'))) {
+      actions.appendChild(ui.button({ label: 'Sensing — Signals', icon: '📡', variant: 'secondary', full: true, onClick: () => global.AAA_SENSING_UI.open() }));
     }
     if (global.AAA_AGENT_COUNCIL_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
       actions.appendChild(ui.button({ label: 'Supervisor Council', icon: '⚖️', variant: 'secondary', full: true, onClick: () => global.AAA_AGENT_COUNCIL_UI.open() }));

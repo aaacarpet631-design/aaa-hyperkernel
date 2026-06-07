@@ -69,6 +69,8 @@ const SUITES = [
   'unit/agent-evaluation-ui.test.js',
   'unit/knowledge-fabric.test.js',
   'unit/knowledge-os-ui.test.js',
+  'unit/vector-memory.test.js',
+  'unit/vector-memory-ui.test.js',
   'unit/owner-copilot.test.js',
   'unit/owner-copilot-ui.test.js',
   'unit/native-model.test.js',
@@ -77,6 +79,14 @@ const SUITES = [
   'unit/ai-model-router.test.js',
   'unit/nvidia-nemotron-adapter.test.js',
   'unit/model-governance-ui.test.js',
+  'unit/nemotron-transport.test.js',
+  'unit/assisted-draft-queue.test.js',
+  'unit/assisted-drafts-ui.test.js',
+  'unit/private-gpu-adapter.test.js',
+  'unit/private-gpu-transport.test.js',
+  'unit/reliability-gpu-health.test.js',
+  'unit/sensing.test.js',
+  'unit/sensing-ui.test.js',
   'unit/agent-council.test.js',
   'unit/agent-council-ui.test.js',
   'unit/provenance.test.js',
@@ -106,7 +116,9 @@ const EXTERNAL = [
   'functions/qbo-proxy/test.js',
   'functions/portal-proxy/test.js',
   'functions/nemotron-translate.test.js',
-  'functions/chatterbox-tts.test.js'
+  'functions/chatterbox-tts.test.js',
+  'functions/private-gpu-translate.test.js',
+  'functions/sense-normalize.test.js'
 ];
 
 function runSuite(rel) {
