@@ -69,6 +69,8 @@ const SUITES = [
   'unit/agent-evaluation-ui.test.js',
   'unit/knowledge-fabric.test.js',
   'unit/knowledge-os-ui.test.js',
+  'unit/vector-memory.test.js',
+  'unit/vector-memory-ui.test.js',
   'unit/owner-copilot.test.js',
   'unit/owner-copilot-ui.test.js',
   'unit/native-model.test.js',

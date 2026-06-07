@@ -77,6 +77,7 @@ async function main() {
     await setDoc(doc(db, `workspaces/${WS}/agent_evaluations/ae1`), { agent: 'pricing_optimizer', roi: 9, accuracy: 84 });
     await setDoc(doc(db, `workspaces/${WS}/knowledge_nodes/kn1`), { kind: 'quote', sensitivity: 'financial' });
     await setDoc(doc(db, `workspaces/${WS}/owner_briefings/brief1`), { date: '2026-06-07', attentionItems: 3 });
+    await setDoc(doc(db, `workspaces/${WS}/memory_vectors/vec1`), { nodeId: 'kn1', sensitivity: 'financial' });
     await setDoc(doc(db, `workspaces/${WS}/model_versions/mv1`), { name: 'win_predictor', status: 'candidate' });
     await setDoc(doc(db, `workspaces/${WS}/model_settings/config`), { enabled: { 'nvidia.nemotron4_340b_instruct': true } });
     await setDoc(doc(db, `workspaces/${WS}/model_calls/mc1`), { modelKey: 'nvidia.nemotron4_340b_instruct', ok: true });
@@ -173,6 +174,8 @@ async function main() {
   await check('crew CANNOT read agent evaluations', assertFails(getDoc(doc(crew, `workspaces/${WS}/agent_evaluations/ae1`))));
   await check('owner reads knowledge nodes', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/knowledge_nodes/kn1`))));
   await check('crew CANNOT read knowledge nodes', assertFails(getDoc(doc(crew, `workspaces/${WS}/knowledge_nodes/kn1`))));
+  await check('owner reads memory vectors', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/memory_vectors/vec1`))));
+  await check('crew CANNOT read memory vectors', assertFails(getDoc(doc(crew, `workspaces/${WS}/memory_vectors/vec1`))));
   await check('owner reads owner briefings', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/owner_briefings/brief1`))));
   await check('crew CANNOT read owner briefings', assertFails(getDoc(doc(crew, `workspaces/${WS}/owner_briefings/brief1`))));
   await check('owner reads model versions', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/model_versions/mv1`))));

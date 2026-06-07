@@ -115,7 +115,14 @@
       return res;
     },
 
-    async queries(limit) { return (await data().list(QUERIES)).filter(mine).sort((a, b) => String(b.at || '').localeCompare(String(a.at || ''))).slice(0, limit || 25); }
+    async queries(limit) { return (await data().list(QUERIES)).filter(mine).sort((a, b) => String(b.at || '').localeCompare(String(a.at || ''))).slice(0, limit || 25); },
+
+    /** Semantic search via Vector Memory if present, else token search. Advisory. */
+    async semanticSearch(query, opts) {
+      const vm = global.AAA_VECTOR_MEMORY;
+      if (vm && vm.search) { try { await vm.index(); return { ok: true, mode: 'semantic', hits: await vm.search(query, opts) }; } catch (_) {} }
+      return { ok: true, mode: 'keyword', hits: await this.search(query, opts) };
+    }
   };
 
   // ---- intent answerers (deterministic aggregation over indexed quotes) ----

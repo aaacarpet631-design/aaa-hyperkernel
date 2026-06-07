@@ -74,6 +74,8 @@ service cloud.firestore {
           || c == 'agent_evaluations'
           // Knowledge OS index + query log aggregate everything — owner-only.
           || c == 'knowledge_nodes' || c == 'knowledge_queries'
+          // Vector/semantic memory embeds the knowledge corpus — owner-only.
+          || c == 'memory_vectors'
           // Owner Copilot daily briefings aggregate the whole business — owner-only.
           || c == 'owner_briefings'
           // Native Model candidates carry trained weights + metrics — owner-only.
