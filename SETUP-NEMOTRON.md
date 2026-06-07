@@ -100,6 +100,17 @@ Use the exact served name from build.nvidia.com (e.g. `google/gemma-2-27b-it`,
 never hardcode it in a client script. To make a model the deploy-wide default,
 set `NEMOTRON_MODEL` instead of pinning it per call.
 
+**Smoke-test a model/key from a machine with egress** (reads the key from the
+env, never from source; goes through the same `nemotron-translate.js` the proxy
+uses):
+```bash
+NVIDIA_API_KEY=nvapi-… npm run nv:smoke                                   # default: google/gemma-2-27b-it, "Reply with exactly: OK"
+NVIDIA_API_KEY=nvapi-… npm run nv:smoke -- --model meta/llama-3.1-8b-instruct
+NVIDIA_API_KEY=nvapi-… npm run nv:smoke -- --think "Walk through 17*23, then answer."
+```
+Exits 0 on a valid reply, non-zero on a missing key / HTTP error / blocked
+egress — safe to chain in a deploy check.
+
 ## Enabling "thinking" (reasoning mode)
 Nemotron is a reasoning model. Thinking is **off by default** so normal agent
 calls stay cheap; opt in per call by passing the same params NVIDIA's own

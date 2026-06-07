@@ -8,7 +8,8 @@
     "test": "node test/run.js && node test/intelligence-smoke.mjs",
     "test:harness": "node test/run.js",
     "test:intel": "node test/intelligence-smoke.mjs",
-    "test:rules": "node test/run-rules.js"
+    "test:rules": "node test/run-rules.js",
+    "nv:smoke": "node scripts/nv-smoke.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "latest",
