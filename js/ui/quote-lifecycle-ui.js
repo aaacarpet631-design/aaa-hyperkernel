@@ -107,6 +107,13 @@
       chip(money(q.grossMargin), 'Gross (actual)', '#10B981')
     ]));
 
+    // Native model win prediction (governed, advisory, read-only) — guarded hook.
+    if (global.AAA_QUOTE_WIN_UI && global.AAA_QUOTE_WIN_UI.renderInto) {
+      const winBox = ui.el('div', {});
+      container.appendChild(winBox);
+      global.AAA_QUOTE_WIN_UI.renderInto(winBox, q);
+    }
+
     // Customer-facing receipt (what the customer would see — no internal numbers).
     const cv = store().customerView(q);
     container.appendChild(title('Customer Quote (no internal numbers)'));
