@@ -189,6 +189,9 @@
     if (global.AAA_PREDICTION_LEDGER_UI) {
       actions.appendChild(ui.button({ label: 'Prediction Ledger', icon: '🎯', variant: 'secondary', full: true, onClick: () => global.AAA_PREDICTION_LEDGER_UI.open() }));
     }
+    if (global.AAA_HYPERMIND_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
+      actions.appendChild(ui.button({ label: 'HyperMind', icon: '🧠', variant: 'secondary', full: true, onClick: () => global.AAA_HYPERMIND_UI.open() }));
+    }
     if (global.AAA_RECEIPT_INTAKE_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
       actions.appendChild(ui.button({ label: 'Receipts', icon: '🧾', variant: 'secondary', full: true, onClick: () => global.AAA_RECEIPT_INTAKE_UI.open() }));
     }
