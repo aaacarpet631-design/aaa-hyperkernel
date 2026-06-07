@@ -54,10 +54,9 @@
     return fnv1a(s) + fnv1a('aaa-governance:' + s + '|' + s.length);
   }
 
-  // Synchronous, dependency-free SHA-256 (standard algorithm) over a UTF-8
-  // string → 64-char hex. Sync keeps append off the async crypto path (so its
-  // timing contract is unchanged) and is identical to Node's crypto SHA-256, so
-  // the server-side verifier agrees byte-for-byte.
+  // Synchronous, dependency-free SHA-256 (standard) over a byte pipeline, so it
+  // also backs HMAC. Sync keeps append off the async crypto path; the digests
+  // are identical to Node's crypto, so the server-side verifier agrees exactly.
   const SHA_K = [0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
     0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
     0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
@@ -66,8 +65,7 @@
     0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
     0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
     0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2];
-  function sha256(str) {
-    const rotr = function (n, x) { return (x >>> n) | (x << (32 - n)); };
+  function utf8Bytes(str) {
     const bytes = [];
     for (let i = 0; i < str.length; i++) {
       let c = str.charCodeAt(i);
@@ -76,6 +74,11 @@
       else if (c >= 0xd800 && c <= 0xdbff) { const c2 = str.charCodeAt(++i); const cp = 0x10000 + ((c & 0x3ff) << 10) + (c2 & 0x3ff); bytes.push(0xf0 | (cp >> 18), 0x80 | ((cp >> 12) & 0x3f), 0x80 | ((cp >> 6) & 0x3f), 0x80 | (cp & 0x3f)); }
       else bytes.push(0xe0 | (c >> 12), 0x80 | ((c >> 6) & 0x3f), 0x80 | (c & 0x3f));
     }
+    return bytes;
+  }
+  function sha256Words(msg) {
+    const rotr = function (n, x) { return (x >>> n) | (x << (32 - n)); };
+    const bytes = msg.slice();
     const bitLen = bytes.length * 8;
     bytes.push(0x80);
     while (bytes.length % 64 !== 56) bytes.push(0);
@@ -98,8 +101,26 @@
       H[0] = (H[0] + a) | 0; H[1] = (H[1] + b) | 0; H[2] = (H[2] + c) | 0; H[3] = (H[3] + d) | 0;
       H[4] = (H[4] + e) | 0; H[5] = (H[5] + f) | 0; H[6] = (H[6] + g) | 0; H[7] = (H[7] + h) | 0;
     }
-    return H.map(function (x) { return ('00000000' + (x >>> 0).toString(16)).slice(-8); }).join('');
+    return H;
   }
+  function wordsToHex(H) { return H.map(function (x) { return ('00000000' + (x >>> 0).toString(16)).slice(-8); }).join(''); }
+  function wordsToBytes(H) { const b = []; H.forEach(function (x) { b.push((x >>> 24) & 0xff, (x >>> 16) & 0xff, (x >>> 8) & 0xff, x & 0xff); }); return b; }
+  function sha256(str) { return wordsToHex(sha256Words(utf8Bytes(str))); }
+
+  // HMAC-SHA256 (standard) — signs an entry with the workspace signing key so a
+  // party holding the cloud copy but NOT the key cannot forge an entry.
+  function hmacSha256(keyStr, msgStr) {
+    let key = utf8Bytes(keyStr);
+    if (key.length > 64) key = wordsToBytes(sha256Words(key));
+    while (key.length < 64) key.push(0);
+    const ipad = [], opad = [];
+    for (let i = 0; i < 64; i++) { ipad.push(key[i] ^ 0x36); opad.push(key[i] ^ 0x5c); }
+    const inner = wordsToBytes(sha256Words(ipad.concat(utf8Bytes(msgStr))));
+    return wordsToHex(sha256Words(opad.concat(inner)));
+  }
+
+  // Optional workspace signing key (opt-in; never mirrored to the cloud).
+  function signingKey() { return cfg().flag ? cfg().flag('governanceSigningKey', null) : (cfg().governanceSigningKey || null); }
 
   // Stable per-device writer id (so concurrent devices use separate lanes).
   let _writerId = null;
@@ -155,7 +176,9 @@
       };
       const hash = hashEntry(base);
       const sha = sha256(canonical(base) + '|' + prevSha);
-      const rec = deepFreeze(Object.assign({}, base, { hash: hash, prevSha: prevSha, sha: sha }));
+      const key = signingKey();
+      const sig = key ? hmacSha256(key, canonical(base) + '|' + prevHash + '|' + prevSha) : null;
+      const rec = deepFreeze(Object.assign({}, base, { hash: hash, prevSha: prevSha, sha: sha, sig: sig }));
       if (data() && data().put) await data().put(COLLECTION, rec.id, rec);
       return rec;
     },
@@ -194,6 +217,24 @@
         }
       }
       return { ok: true, length: chain.length, writers: Object.keys(by).length };
+    },
+
+    /**
+     * Verify HMAC signatures when a workspace signing key is configured. This
+     * makes entries non-forgeable by anyone WITHOUT the key (e.g. direct cloud/
+     * DB tampering): a rewritten entry can't be re-signed. Skipped (ok) when no
+     * key is set. A key-holder is trusted within the workspace by design.
+     */
+    async verifySig() {
+      const key = signingKey();
+      if (!key) return { ok: true, skipped: true, reason: 'NO_KEY' };
+      const chain = await ordered();
+      for (const rec of chain) {
+        if (rec.sig == null) return { ok: false, writerId: rec.writerId, brokenAt: rec.writerSeq, reason: 'UNSIGNED' };
+        const expect = hmacSha256(key, canonical(baseOf(rec)) + '|' + rec.prevHash + '|' + (rec.prevSha != null ? rec.prevSha : GENESIS_SHA));
+        if (rec.sig !== expect) return { ok: false, writerId: rec.writerId, brokenAt: rec.writerSeq, reason: 'BAD_SIGNATURE' };
+      }
+      return { ok: true, length: chain.length };
     },
 
     /** Independent server-side SHA-256 re-verification (Netlify function). */

@@ -51,5 +51,25 @@ module.exports = async function run() {
   const mv = await L.verify();
   t.ok('tamper isolated to the offending writer lane', mv.ok === false && mv.writerId === 'devB' && mv.brokenAt === 1);
 
+  // ---- HMAC signing (non-forgeable without the workspace key) -------------
+  const { G: G2, cfg: cfg2, data: data2 } = setupEnv({ config: { governanceSigningKey: 's3cr3t-workspace-key' } });
+  load('js/governance/audit-ledger.js');
+  const L2 = G2.AAA_AUDIT_LEDGER;
+  const s1 = await L2.append('flagged', { caseId: 'x' });
+  t.ok('signed entries carry an hmac sig', /^[0-9a-f]{64}$/.test(s1.sig));
+  t.ok('signature verifies with the key', (await L2.verifySig()).ok === true);
+
+  // forge: rewrite content AND recompute the sha chain (passes verifySha) — but
+  // without the key the signature can't be reproduced, so verifySig catches it.
+  const forged = Object.assign({}, s1, { payload: { caseId: 'FORGED' } });
+  forged.sha = L2.sha256(L2.canonical({ id: forged.id, seq: forged.seq, writerId: forged.writerId, writerSeq: forged.writerSeq, type: forged.type, at: forged.at, payload: forged.payload, prevHash: forged.prevHash }) + '|' + forged.prevSha);
+  forged.hash = L2.hashEntry({ id: forged.id, seq: forged.seq, writerId: forged.writerId, writerSeq: forged.writerSeq, type: forged.type, at: forged.at, payload: forged.payload, prevHash: forged.prevHash });
+  await data2.put('governance_audit', s1.id, forged);
+  t.ok('a forged entry passes sha but FAILS signature', (await L2.verifySha()).ok === true && (await L2.verifySig()).reason === 'BAD_SIGNATURE');
+
+  // no key configured → signing is opt-in (skipped, ok)
+  cfg2.set({ governanceSigningKey: null });
+  t.ok('no key → verifySig skipped/ok', (await L2.verifySig()).skipped === true);
+
   return t.report();
 };

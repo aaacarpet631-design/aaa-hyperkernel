@@ -352,6 +352,23 @@ device loss and is shared across the team. (`AAA_GOVERNANCE_SYNC`.)
   independently, attributing any break to the offending writer. A single-writer
   install is still a plain linear chain (fully backward-compatible).
 
+## Ledger hardening (Phase 9)
+
+- **Signed entries (non-forgeable)** — with an opt-in workspace signing key
+  (`governanceSigningKey`, never mirrored to the cloud), every entry is HMAC-
+  SHA256 signed. `verifySig()` makes entries non-forgeable by anyone *without*
+  the key: a rewritten record can pass the FNV + SHA chains (which recompute from
+  content) but cannot be re-signed, so direct cloud/DB tampering is caught. A
+  key-holder is trusted within the workspace by design; with no key set, signing
+  is simply skipped (backward-compatible). Tested: a forged entry passes
+  `verifySha()` but fails `verifySig()`.
+- **Scheduled server-side audit** — `governance-ledger-audit` (Netlify scheduled
+  function, `@daily`) pulls the cloud-persisted ledger and re-verifies the
+  SHA-256 chain server-side (reusing `verifyShaChain`). On any break it raises a
+  **critical, PII-free integrity alert** through the existing
+  `/api/governance-alert` email channel — continuous monitoring independent of
+  any client. (Supabase service-role read; env-gated, no-op without DB creds.)
+
 ## Adding the next guardrail
 
 A new high-risk guardrail (say contract-clause review) needs only to:
