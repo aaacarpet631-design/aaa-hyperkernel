@@ -71,6 +71,11 @@
     // adapter/webhook). Not a customer-facing send, so AI/system ingestion is
     // allowed — it records reality — and every receipt is audited.
     INBOUND_MESSAGE:   { permission: null,              aiAllowed: true  },
+    // Sensing ingress: recording a real-world signal (inbound SMS, missed call,
+    // web lead) into the system. Any member / automated webhook may record an
+    // observation (it is not a privileged action); the RESPONSE it triggers is a
+    // pending owner-approval draft — nothing is sent without a human.
+    SENSE_SIGNAL:      { permission: null,              aiAllowed: true  },
     // Owner acting on a Supervisor Council decision. Advisory + audited; the
     // council recommends, a person decides — it never auto-acts.
     REVIEW_COUNCIL:    { permission: 'VIEW_FINANCIALS', aiAllowed: false },
