@@ -91,6 +91,7 @@ const SUITES = [
   'unit/governance-registry-ui.test.js',
   'unit/replay-sandbox.test.js',
   'unit/replay-sandbox-ui.test.js',
+  'unit/hypermind-core.test.js',
   'unit/legal.test.js',
   'unit/legal-war-room-ui.test.js',
   'unit/crew-tools.test.js',

@@ -100,6 +100,7 @@
     <script src="/js/intelligence/knowledge-fabric.js"></script>
     <script src="/js/intelligence/owner-copilot.js"></script>
     <script src="/js/intelligence/native-model.js"></script>
+    <script src="/js/intelligence/hypermind-core.js"></script>
     <!-- Governed NVIDIA Model Adapter Layer (registry → adapter → provenance → router) -->
     <script src="/js/ai/model-registry.js"></script>
     <script src="/js/ai/providers/nvidia-nemotron-adapter.js"></script>
@@ -237,6 +238,8 @@
             if (window.AAA_JOB_LIST_UI && window.AAA_JOB_LIST_UI.render) await window.AAA_JOB_LIST_UI.render('app-root');
             if (window.AAA_SYNC_ENGINE && window.AAA_SYNC_ENGINE.init) window.AAA_SYNC_ENGINE.init();
             if (window.AAA_AUTOMATION && window.AAA_AUTOMATION.init) window.AAA_AUTOMATION.init();
+            // HyperMind continuous loop — starts ONLY if the owner enabled it (off by default).
+            try { if (window.AAA_HYPERMIND && window.AAA_HYPERMIND.boot) window.AAA_HYPERMIND.boot(); } catch (e) { console.warn('hypermind boot', e); }
             if (window.AAA_PROMPT_ARCHITECT && window.AAA_PROMPT_ARCHITECT.loadSaved) await window.AAA_PROMPT_ARCHITECT.loadSaved();
             if (window.AAA_SELF_IMPROVEMENT && window.AAA_SELF_IMPROVEMENT.loadTunings) await window.AAA_SELF_IMPROVEMENT.loadTunings();
             // Re-install any owner-approved AI calibration so it survives a restart.
