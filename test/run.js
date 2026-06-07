@@ -29,6 +29,7 @@ const SUITES = [
   'unit/portal-links.test.js',
   'unit/voice.test.js',
   'unit/transcribe.test.js',
+  'unit/tts.test.js',
   'static/integrity.test.js',
   'smoke/boot.test.js'
 ];
@@ -38,7 +39,8 @@ const SUITES = [
 const EXTERNAL = [
   'functions/qbo-proxy/test.js',
   'functions/portal-proxy/test.js',
-  'functions/nemotron-translate.test.js'
+  'functions/nemotron-translate.test.js',
+  'functions/chatterbox-tts.test.js'
 ];
 
 function runSuite(rel) {
