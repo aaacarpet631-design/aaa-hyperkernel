@@ -136,6 +136,16 @@
       return { ok: true, review: rec, auditId: res.auditId };
     },
 
+    /** Advisory narrative for a review via the governed Instruct model (if live).
+     *  Pure advisory — it never changes the decision or the review. */
+    async narrate(reviewId, opts) {
+      const o = opts || {};
+      const r = await this.get(reviewId); if (!r) return { ok: false, error: 'NOT_FOUND' };
+      const router = global.AAA_GOVERNED_MODEL_ROUTER; if (!router) return { ok: false, error: 'NO_MODEL_ROUTER' };
+      const res = await router.call({ taskType: 'executive_council_reasoning', input: { title: r.title, decision: r.decision, objections: r.objections, riskScore: r.riskScore }, context: { subject: 'executive_review', id: reviewId }, actor: o.actor || null, origin: o.origin, agent: 'executive_council', ownerApprovalRequired: true });
+      return { ok: true, advisory: true, narrative: res.output ? (res.output.text || null) : null, envelope: res };
+    },
+
     async _context(p, override) {
       const c = Object.assign({}, override || {});
       if (c.winRate == null || c.marginPct == null || c.sample == null) {

@@ -77,7 +77,10 @@ service cloud.firestore {
           // Owner Copilot daily briefings aggregate the whole business — owner-only.
           || c == 'owner_briefings'
           // Native Model candidates carry trained weights + metrics — owner-only.
-          || c == 'model_versions';
+          || c == 'model_versions'
+          // NVIDIA Model Adapter Layer: enablement settings + model-call usage/
+          // provenance stream — owner-only (governs external intelligence engines).
+          || c == 'model_settings' || c == 'model_calls';
     }
     // Collections only a trusted backend (Admin SDK) may touch. Notably
     // 'integrations' holds QuickBooks OAuth tokens — clients must never read it.

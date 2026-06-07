@@ -147,6 +147,14 @@
     },
     async patterns(dimension) { const all = (await data().list(PATTERNS)).filter(mine); return (dimension ? all.filter((p) => p.dimension === dimension) : all).sort((a, b) => b.value - a.value); },
 
+    /** Score an agent output via the governed Reward model (if live). Advisory. */
+    async rewardScore(input, opts) {
+      const o = opts || {};
+      const router = global.AAA_GOVERNED_MODEL_ROUTER; if (!router) return { ok: false, error: 'NO_MODEL_ROUTER' };
+      const res = await router.call({ taskType: 'agent_output_score', input: input, actor: o.actor || null, origin: o.origin, agent: o.agent || 'outcome_intelligence' });
+      return { ok: true, advisory: true, score: res.output ? (res.output.score != null ? res.output.score : null) : null, envelope: res };
+    },
+
     // ---- one-call refresh + summary ----------------------------------------
     async refresh() { await this.ingest(); await this.scoreAgents(); await this.extractPatterns(); return this.metrics(); },
     async metrics() {

@@ -85,6 +85,12 @@
     // draft is created/proposed; reject → retained as learning). Human-only +
     // audited; the engine proposes, a person decides — nothing auto-applies.
     REVIEW_PROPOSAL:   { permission: 'MANAGE_GOVERNANCE', aiAllowed: false },
+    // External (NVIDIA Nemotron) model inference through the Governed Model Router.
+    // Office-level (owner + manager hold VIEW_ALL_JOBS); crew denied. AI agents MAY
+    // run advisory inference (they cannot bypass the router) — output is advisory.
+    RUN_MODEL:            { permission: 'VIEW_ALL_JOBS',  aiAllowed: true },
+    // Enabling/disabling a model is an owner-only control; AI can never toggle it.
+    MANAGE_MODEL_SETTINGS:{ permission: 'MANAGE_SETTINGS', aiAllowed: false },
     // Security hardening admin (configure step-up/MFA, toggle enforcement).
     // Owner-only (MANAGE_SETTINGS) + audited; AI can never reconfigure security.
     MANAGE_SECURITY:   { permission: 'MANAGE_SETTINGS',   aiAllowed: false },
