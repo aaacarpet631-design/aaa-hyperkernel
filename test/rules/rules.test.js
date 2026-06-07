@@ -81,6 +81,7 @@ async function main() {
     await setDoc(doc(db, `workspaces/${WS}/model_settings/config`), { enabled: { 'nvidia.nemotron4_340b_instruct': true } });
     await setDoc(doc(db, `workspaces/${WS}/model_calls/mc1`), { modelKey: 'nvidia.nemotron4_340b_instruct', ok: true });
     await setDoc(doc(db, `workspaces/${WS}/assisted_drafts/ad1`), { to: '+1555', status: 'pending_owner', intent: 'follow_up' });
+    await setDoc(doc(db, `workspaces/${WS}/sensed_events/se1`), { type: 'inbound_sms', externalId: 'SM1' });
     await setDoc(doc(db, `workspaces/${WS}/legal_records/lr1`), { type: 'incident', summary: 'sensitive' });
     await setDoc(doc(db, `workspaces/${WS}/audit_log/a1`), { action: 'X' });
     await setDoc(doc(db, `workspaces/${WS}/integrations/qbo`), { accessToken: 'SECRET' });
@@ -182,6 +183,8 @@ async function main() {
   await check('crew CANNOT read model-call usage', assertFails(getDoc(doc(crew, `workspaces/${WS}/model_calls/mc1`))));
   await check('manager reads assisted drafts (office)', assertSucceeds(getDoc(doc(manager, `workspaces/${WS}/assisted_drafts/ad1`))));
   await check('crew CANNOT read assisted drafts', assertFails(getDoc(doc(crew, `workspaces/${WS}/assisted_drafts/ad1`))));
+  await check('manager reads sensed signals (office)', assertSucceeds(getDoc(doc(manager, `workspaces/${WS}/sensed_events/se1`))));
+  await check('crew CANNOT read sensed signals', assertFails(getDoc(doc(crew, `workspaces/${WS}/sensed_events/se1`))));
   // legal records: owner + manager (the legal roles) may read/write; crew cannot.
   await check('owner reads legal records', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/legal_records/lr1`))));
   await check('manager reads legal records', assertSucceeds(getDoc(doc(manager, `workspaces/${WS}/legal_records/lr1`))));

@@ -110,7 +110,9 @@ service cloud.firestore {
     function isCommsCollection(c) {
       return c == 'comm_threads' || c == 'comm_inbound' || c == 'comm_notifications'
           // AI-drafted customer messages awaiting owner approval — office-only.
-          || c == 'assisted_drafts';
+          || c == 'assisted_drafts'
+          // Sensed real-world signals carry customer contact + message content.
+          || c == 'sensed_events';
     }
     function canComms(ws) { return role(ws) == 'owner' || role(ws) == 'manager'; }
     // Security hardening: step-up/MFA secrets, signing key, and signed sessions.

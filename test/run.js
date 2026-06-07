@@ -83,6 +83,8 @@ const SUITES = [
   'unit/private-gpu-adapter.test.js',
   'unit/private-gpu-transport.test.js',
   'unit/reliability-gpu-health.test.js',
+  'unit/sensing.test.js',
+  'unit/sensing-ui.test.js',
   'unit/agent-council.test.js',
   'unit/agent-council-ui.test.js',
   'unit/provenance.test.js',
@@ -111,7 +113,8 @@ const EXTERNAL = [
   'functions/qbo-proxy/test.js',
   'functions/portal-proxy/test.js',
   'functions/nemotron-translate.test.js',
-  'functions/private-gpu-translate.test.js'
+  'functions/private-gpu-translate.test.js',
+  'functions/sense-normalize.test.js'
 ];
 
 function runSuite(rel) {
