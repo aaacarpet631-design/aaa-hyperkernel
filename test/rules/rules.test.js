@@ -78,6 +78,8 @@ async function main() {
     await setDoc(doc(db, `workspaces/${WS}/knowledge_nodes/kn1`), { kind: 'quote', sensitivity: 'financial' });
     await setDoc(doc(db, `workspaces/${WS}/owner_briefings/brief1`), { date: '2026-06-07', attentionItems: 3 });
     await setDoc(doc(db, `workspaces/${WS}/model_versions/mv1`), { name: 'win_predictor', status: 'candidate' });
+    await setDoc(doc(db, `workspaces/${WS}/model_settings/config`), { enabled: { 'nvidia.nemotron4_340b_instruct': true } });
+    await setDoc(doc(db, `workspaces/${WS}/model_calls/mc1`), { modelKey: 'nvidia.nemotron4_340b_instruct', ok: true });
     await setDoc(doc(db, `workspaces/${WS}/legal_records/lr1`), { type: 'incident', summary: 'sensitive' });
     await setDoc(doc(db, `workspaces/${WS}/audit_log/a1`), { action: 'X' });
     await setDoc(doc(db, `workspaces/${WS}/integrations/qbo`), { accessToken: 'SECRET' });
@@ -173,6 +175,10 @@ async function main() {
   await check('crew CANNOT read owner briefings', assertFails(getDoc(doc(crew, `workspaces/${WS}/owner_briefings/brief1`))));
   await check('owner reads model versions', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/model_versions/mv1`))));
   await check('crew CANNOT read model versions', assertFails(getDoc(doc(crew, `workspaces/${WS}/model_versions/mv1`))));
+  await check('owner reads model settings', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/model_settings/config`))));
+  await check('crew CANNOT read model settings', assertFails(getDoc(doc(crew, `workspaces/${WS}/model_settings/config`))));
+  await check('crew CANNOT write model settings', assertFails(setDoc(doc(crew, `workspaces/${WS}/model_settings/config`), { enabled: {} })));
+  await check('crew CANNOT read model-call usage', assertFails(getDoc(doc(crew, `workspaces/${WS}/model_calls/mc1`))));
   // legal records: owner + manager (the legal roles) may read/write; crew cannot.
   await check('owner reads legal records', assertSucceeds(getDoc(doc(owner, `workspaces/${WS}/legal_records/lr1`))));
   await check('manager reads legal records', assertSucceeds(getDoc(doc(manager, `workspaces/${WS}/legal_records/lr1`))));

@@ -127,6 +127,15 @@
       };
     },
 
+    /** Generate an INTERNAL synthetic scenario via the governed Base model (if
+     *  live). Internal-only — never customer-facing. Advisory. */
+    async generateScenario(seed, opts) {
+      const o = opts || {};
+      const router = global.AAA_GOVERNED_MODEL_ROUTER; if (!router) return { ok: false, error: 'NO_MODEL_ROUTER' };
+      const res = await router.call({ taskType: 'scenario_generation', input: seed, actor: o.actor || null, origin: o.origin, agent: 'learning_fabric' });
+      return { ok: true, advisory: true, internalOnly: true, scenario: res.output ? (res.output.text || null) : null, envelope: res };
+    },
+
     async refresh() { await this.ingest(); return this.insights(); }
   };
 
