@@ -91,6 +91,9 @@
     RUN_MODEL:            { permission: 'VIEW_ALL_JOBS',  aiAllowed: true },
     // Enabling/disabling a model is an owner-only control; AI can never toggle it.
     MANAGE_MODEL_SETTINGS:{ permission: 'MANAGE_SETTINGS', aiAllowed: false },
+    // Approving / rejecting an AI-drafted customer message. Office-level (owner +
+    // manager hold EDIT_CUSTOMER); human-only — a model draft never sends itself.
+    APPROVE_ASSISTED_MSG: { permission: 'EDIT_CUSTOMER',  aiAllowed: false },
     // Security hardening admin (configure step-up/MFA, toggle enforcement).
     // Owner-only (MANAGE_SETTINGS) + audited; AI can never reconfigure security.
     MANAGE_SECURITY:   { permission: 'MANAGE_SETTINGS',   aiAllowed: false },
