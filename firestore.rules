@@ -71,7 +71,9 @@ service cloud.firestore {
           // Governed Learning Loop proposals carry margins/win-rates — owner-only.
           || c == 'proposals'
           // Agent Evaluation Lab snapshots expose performance/ROI — owner-only.
-          || c == 'agent_evaluations';
+          || c == 'agent_evaluations'
+          // Knowledge OS index + query log aggregate everything — owner-only.
+          || c == 'knowledge_nodes' || c == 'knowledge_queries';
     }
     // Collections only a trusted backend (Admin SDK) may touch. Notably
     // 'integrations' holds QuickBooks OAuth tokens — clients must never read it.
