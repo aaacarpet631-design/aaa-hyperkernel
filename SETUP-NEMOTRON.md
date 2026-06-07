@@ -82,6 +82,24 @@ The same "honest by construction" rule still holds: with no proxy configured,
 agents return `AI_NOT_CONFIGURED` and fall back to real data — they never
 fabricate.
 
+## Targeting another build.nvidia.com model (Gemma, Llama, …)
+The proxy is a generic bridge to NVIDIA's OpenAI-compatible catalog, not just
+Nemotron. Agents that pin **Claude** ids (`claude-opus-4-8`, …) fall back to the
+configured default; any **other** explicit id is forwarded verbatim, so you can
+target any served catalog model per call:
+```js
+await AAA_DATA.callAgent({
+  model: 'google/gemma-2-27b-it',   // any valid build.nvidia.com served name
+  max_tokens: 4096,
+  messages: [{ role: 'user', content: 'Summarize this quote.' }],
+  chat_template_kwargs: { enable_thinking: true }   // if the model supports it
+});
+```
+Use the exact served name from build.nvidia.com (e.g. `google/gemma-2-27b-it`,
+`meta/llama-3.1-405b-instruct`). The key stays server-side as `NVIDIA_API_KEY` —
+never hardcode it in a client script. To make a model the deploy-wide default,
+set `NEMOTRON_MODEL` instead of pinning it per call.
+
 ## Enabling "thinking" (reasoning mode)
 Nemotron is a reasoning model. Thinking is **off by default** so normal agent
 calls stay cheap; opt in per call by passing the same params NVIDIA's own

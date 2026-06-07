@@ -47,14 +47,15 @@ function toOpenAIContent(content) {
 /**
  * Resolve which model to actually call. Agents across the app pin Claude model
  * ids (claude-opus-4-8, claude-sonnet-4-6, …); against NVIDIA those are
- * meaningless, so any non-Nemotron request transparently falls back to the
- * configured Nemotron default. An explicit nvidia/* (or *nemotron*) id is
- * honored so callers can still target a specific served model.
+ * meaningless, so a Claude-pinned (or empty) request transparently falls back
+ * to the configured default. Any other explicit id is a real build.nvidia.com
+ * catalog name (`nvidia/*`, `google/*`, `meta/*`, `mistralai/*`, …) and is
+ * honored verbatim, so callers can target a specific served model.
  */
 function resolveModel(requested, fallback) {
-  const m = typeof requested === 'string' ? requested : '';
-  if (/^nvidia\//i.test(m) || /nemotron/i.test(m)) return m;
-  return fallback || DEFAULT_MODEL;
+  const m = typeof requested === 'string' ? requested.trim() : '';
+  if (!m || /^claude/i.test(m)) return fallback || DEFAULT_MODEL;
+  return m;
 }
 
 /** App payload -> NVIDIA (OpenAI chat-completions) request body. */

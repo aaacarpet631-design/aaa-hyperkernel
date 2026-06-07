@@ -19,6 +19,9 @@ ok('claude id falls back to default', resolveModel('claude-opus-4-8') === DEFAUL
 ok('falls back to provided default', resolveModel('claude-sonnet-4-6', 'nvidia/custom') === 'nvidia/custom');
 ok('nvidia/* honored', resolveModel('nvidia/nemotron-foo') === 'nvidia/nemotron-foo');
 ok('bare nemotron honored', resolveModel('nemotron-x') === 'nemotron-x');
+ok('non-nvidia catalog id honored (google/*)', resolveModel('google/gemma-2-27b-it') === 'google/gemma-2-27b-it');
+ok('other vendor id honored (meta/*)', resolveModel('meta/llama-3.1-405b-instruct') === 'meta/llama-3.1-405b-instruct');
+ok('whitespace-only falls back', resolveModel('   ') === DEFAULT_MODEL);
 ok('empty falls back', resolveModel('') === DEFAULT_MODEL);
 
 // toRequest — system hoisted, roles mapped, model resolved
