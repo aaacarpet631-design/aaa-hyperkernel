@@ -75,7 +75,9 @@ service cloud.firestore {
           // Knowledge OS index + query log aggregate everything — owner-only.
           || c == 'knowledge_nodes' || c == 'knowledge_queries'
           // Owner Copilot daily briefings aggregate the whole business — owner-only.
-          || c == 'owner_briefings';
+          || c == 'owner_briefings'
+          // Native Model candidates carry trained weights + metrics — owner-only.
+          || c == 'model_versions';
     }
     // Collections only a trusted backend (Admin SDK) may touch. Notably
     // 'integrations' holds QuickBooks OAuth tokens — clients must never read it.
