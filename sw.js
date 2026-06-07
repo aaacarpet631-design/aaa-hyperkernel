@@ -6,7 +6,7 @@
  * app fully usable offline. Old caches are purged on activate, and the worker
  * takes control immediately to avoid serving a stale shell after an update.
  */
-const CACHE_NAME = 'hyperkernel-v68';
+const CACHE_NAME = 'hyperkernel-v69';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -97,6 +97,7 @@ const PRECACHE = [
   '/js/intelligence/native-model.js',
   '/js/ai/model-registry.js',
   '/js/ai/providers/nvidia-nemotron-adapter.js',
+  '/js/ai/providers/nemotron-transport.js',
   '/js/ai/model-call-provenance.js',
   '/js/ai/model-router.js',
   '/js/intelligence/provenance-store.js',
