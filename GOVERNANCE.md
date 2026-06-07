@@ -336,6 +336,22 @@ device loss and is shared across the team. (`AAA_GOVERNANCE_SYNC`.)
   change live agent behavior; everyone can resolve prompts at runtime). Enforced
   by `firestore.rules` and by Postgres RLS on `governance_store`.
 
+## Cryptographic + multi-writer ledger (Phase 8)
+
+- **SHA-256 chain** — alongside the fast FNV-1a checksum, every ledger entry now
+  carries a **SHA-256** linked to the previous entry's sha (a sync, dependency-
+  free implementation identical to Node's crypto). `verifySha()` recomputes it
+  in-app; **`/api/governance-verify`** (Netlify) re-verifies it server-side in a
+  trusted environment — a tamper that the client can't be relied on to report.
+  The two implementations are cross-validated in tests (client build → server
+  verify agree byte-for-byte).
+- **Conflict-safe multi-writer** — each entry carries a `writerId` + per-writer
+  sequence and chains off the previous entry *from the same writer*. Two devices
+  appending concurrently extend independent lanes and never collide; a cloud
+  merge simply unions them, and `verify()` / `verifySha()` validate each lane
+  independently, attributing any break to the offending writer. A single-writer
+  install is still a plain linear chain (fully backward-compatible).
+
 ## Adding the next guardrail
 
 A new high-risk guardrail (say contract-clause review) needs only to:
