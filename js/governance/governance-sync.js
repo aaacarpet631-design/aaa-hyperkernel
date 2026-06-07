@@ -49,15 +49,16 @@
     _suspendMirror: false,
     isCollection: function (c) { return Object.prototype.hasOwnProperty.call(ID_FIELD, c); },
 
-    /** Cloud persistence is available (Firestore workspace + configured). */
+    /** Cloud persistence is available (Firestore or Supabase workspace, configured). */
     ready: function () {
-      return !!(cloud() && cloud().isConfigured && cloud().isConfigured() && cloud().provider && cloud().provider() === 'firebase' && cfg().workspaceId);
+      const p = cloud() && cloud().provider ? cloud().provider() : null;
+      return !!(cloud() && cloud().isConfigured && cloud().isConfigured() && (p === 'firebase' || p === 'supabase') && cfg().workspaceId);
     },
 
     /** Mirror one governance record up (best-effort, never throws). */
     async mirror(collection, id, rec) {
       if (this._suspendMirror || !this.ready() || !this.isCollection(collection)) return { ok: false, error: 'SKIPPED' };
-      try { return await cloud().upsertEntity(collection, id, rec); } catch (e) { return { ok: false, error: String((e && e.message) || e) }; }
+      try { return await cloud().upsertGovernance(collection, id, rec); } catch (e) { return { ok: false, error: String((e && e.message) || e) }; }
     },
 
     /** Push every local governance record to the cloud. Returns counts. */
@@ -68,7 +69,7 @@
         const recs = (data() && data().list) ? await data().list(c) : [];
         for (const r of (recs || [])) {
           const id = idOf(c, r);
-          if (id != null) { try { await cloud().upsertEntity(c, id, r); pushed++; } catch (_) {} }
+          if (id != null) { try { await cloud().upsertGovernance(c, id, r); pushed++; } catch (_) {} }
         }
       }
       return { ok: true, pushed: pushed };
@@ -81,7 +82,7 @@
       this._suspendMirror = true; // avoid re-uploading what we just pulled
       try {
         for (const c of COLLECTIONS) {
-          const r = await cloud().listEntities(c);
+          const r = await cloud().listGovernance(c);
           if (r && r.ok && Array.isArray(r.items)) {
             for (const item of r.items) {
               const rec = Object.assign({}, item); const id = rec._id != null ? rec._id : idOf(c, rec); delete rec._id;

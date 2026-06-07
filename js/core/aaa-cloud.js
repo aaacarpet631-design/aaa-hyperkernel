@@ -59,6 +59,22 @@
       return { ok: false, error: 'NOT_SUPPORTED', provider: p };
     },
 
+    /** Mirror one governance record up (Firestore subcollection or Supabase governance_store). */
+    async upsertGovernance(collection, id, rec) {
+      const p = this.provider();
+      if (p === 'firebase') return global.AAA_FIREBASE.upsertEntity(collection, id, rec);
+      if (p === 'supabase') return global.AAA_SUPABASE.upsertGovernance(collection, id, rec);
+      return { ok: false, error: 'NOT_CONFIGURED' };
+    },
+
+    /** Read a governance collection back (Firestore subcollection or Supabase governance_store). */
+    async listGovernance(collection) {
+      const p = this.provider();
+      if (p === 'firebase') return global.AAA_FIREBASE.listEntities(collection);
+      if (p === 'supabase') return global.AAA_SUPABASE.listGovernance(collection);
+      return { ok: false, error: 'NOT_SUPPORTED', provider: p };
+    },
+
     /** Append an event (auto-id) — for logs / kpi snapshots. */
     async insertEvent(collection, fields) {
       const p = this.provider();

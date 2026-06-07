@@ -13,8 +13,8 @@ function mockCloud(provider) {
     _up: [], _store: {},
     isConfigured: function () { return true; },
     provider: function () { return provider; },
-    async upsertEntity(c, id, e) { this._up.push({ c: c, id: id }); (this._store[c] = this._store[c] || {})[id] = e; return { ok: true }; },
-    async listEntities(c) { return provider === 'firebase' ? { ok: true, items: Object.keys(this._store[c] || {}).map((k) => Object.assign({ _id: k }, this._store[c][k])) } : { ok: false, error: 'NOT_SUPPORTED' }; }
+    async upsertGovernance(c, id, e) { this._up.push({ c: c, id: id }); (this._store[c] = this._store[c] || {})[id] = e; return { ok: true }; },
+    async listGovernance(c) { return { ok: true, items: Object.keys(this._store[c] || {}).map((k) => Object.assign({ _id: k }, this._store[c][k])) }; }
   };
 }
 
@@ -61,11 +61,15 @@ module.exports = async function run() {
   t.ok('pull did not re-upload (mirror suspended)', cloud._up.length === upBefore);
   t.ok('mirror flag reset after pull', SYNC._suspendMirror === false);
 
-  // ---- Supabase backend is a safe no-op ----------------------------------
-  G.AAA_CLOUD = mockCloud('supabase');
-  t.ok('not ready on supabase (governance stays local)', SYNC.ready() === false);
-  t.eq('mirror no-op on supabase', (await SYNC.mirror('gov_agent_decisions', 'x', {})).error, 'SKIPPED');
-  t.eq('push no-op on supabase', (await SYNC.push()).error, 'NOT_READY');
+  // ---- Supabase backend now persists too (parity) ------------------------
+  const sb = mockCloud('supabase');
+  G.AAA_CLOUD = sb;
+  t.ok('ready on supabase', SYNC.ready() === true);
+  const sbm = await SYNC.mirror('gov_agent_decisions', 'x', { decisionId: 'x' });
+  t.ok('mirror persists on supabase', sbm.ok === true && sb._up.some((u) => u.id === 'x'));
+  sb._store['governance_audit'] = { a1: { id: 'a1', type: 'flagged' } };
+  const sbpull = await SYNC.pull();
+  t.ok('pull works on supabase', sbpull.ok === true && !!(await DATA.get('governance_audit', 'a1')));
 
   return t.report();
 };

@@ -325,13 +325,16 @@ device loss and is shared across the team. (`AAA_GOVERNANCE_SYNC`.)
 - **Push / pull / hydrate** — `push()` mirrors all local governance records;
   `pull()` / `hydrate()` load them back on a new device (mirroring suspended
   during pull so it doesn't echo).
-- **Backend** — Firestore (schemaless workspace subcollections fit governance
-  records directly). Supabase deployments keep governance local (push/pull
-  no-op) until a relational schema is added — never corrupting data.
-- **Server-enforced integrity** — Firestore rules make `governance_audit`
-  append-only + owner-read (the ledger is tamper-proof server-side too), and
-  `gov_prompt_registry` owner-write / member-read (only the owner can change live
-  agent behavior; everyone can resolve prompts at runtime).
+- **Both backends** — Firestore stores each record as a schemaless workspace
+  subcollection document; Supabase stores them in a single schemaless JSONB
+  `governance_store` table keyed by `(workspace_id, collection, doc_id)`. The
+  cloud layer (`upsertGovernance` / `listGovernance`) hides the difference.
+- **Server-enforced integrity (both backends)** — `governance_audit` is
+  append-only + owner-read (the ledger is tamper-proof server-side too;
+  Supabase upserts it with `ignore-duplicates` so a re-push never updates it),
+  and `gov_prompt_registry` is owner-write / member-read (only the owner can
+  change live agent behavior; everyone can resolve prompts at runtime). Enforced
+  by `firestore.rules` and by Postgres RLS on `governance_store`.
 
 ## Adding the next guardrail
 
