@@ -36,9 +36,11 @@ module.exports = async function run() {
   G.AAA_PREDICTION_CLOSURE = { evaluate: async () => { calls.evaluate = true; return { ok: true, evaluated: 3 }; }, close: async () => ({ ok: true, closed: 2 }) };
   G.AAA_PRICING_OPTIMIZER = { analyze: async () => { calls.plan = true; return { ok: true, recommendations: [{ id: 'r1' }, { id: 'r2' }] }; } };
   G.AAA_RELIABILITY = { snapshot: async () => { calls.snapshot = true; return { ok: true }; } };
+  G.AAA_SIGNAL_INGEST = { ingest: async () => { calls.signals = true; return { ok: true, added: 4, bySource: { invoices: 4 } }; } };
 
   const t1 = await HM.tick({ source: 'test' });
   t.ok('OBSERVE called outcome-intelligence.ingest', calls.ingest === true);
+  t.ok('OBSERVE called the wider signal ingest', calls.signals === true);
   t.ok('REMEMBER refreshed the graph', calls.graph === true);
   t.ok('REMEMBER indexed the knowledge fabric', calls.knowledge === true);
   t.ok('PREDICT evaluated closures', calls.evaluate === true);
@@ -46,7 +48,7 @@ module.exports = async function run() {
   t.ok('MEASURE scored agents', calls.score === true);
   t.ok('LEARN extracted patterns', calls.patterns === true);
   t.ok('UPDATE snapshotted reliability', calls.snapshot === true);
-  t.ok('observe summary captured added count', t1.phases.find((p) => p.phase === 'observe').summary.added === 5);
+  t.ok('observe summary captured outcome + signal ingest', t1.phases.find((p) => p.phase === 'observe').summary.outcomes.added === 5 && t1.phases.find((p) => p.phase === 'observe').summary.signals.added === 4);
   t.ok('plan summary compresses recommendations to a count', t1.phases.find((p) => p.phase === 'plan').summary.recommendations.recommendations === 2);
 
   // ===== a throwing module is contained as an 'error' phase, loop survives =====

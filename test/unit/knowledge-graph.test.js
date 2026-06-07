@@ -52,6 +52,25 @@ module.exports = async function run() {
   t.eq('technician realized revenue from won outcome', dana.revenue, 1000);
   t.ok('ranked by avg margin (best first)', perf[0].avgMargin >= (perf[perf.length - 1].avgMargin || 0));
 
+  // ===== expense / product / supplier / campaign entity types =====
+  await data.put('invoices', 'inv2', { id: 'inv2', jobId: 'j1', customerId: 'c1', status: 'sent', items: [{ description: 'Carpet Cleaning', amount: 300 }, { description: 'Tile Sealing', amount: 200 }] });
+  await data.put('expenses', 'e1', { id: 'e1', jobId: 'j1', category: 'materials', amount: 120, supplierId: 's1' });
+  await data.put('suppliers', 's1', { id: 's1', name: 'Shaw Floors' });
+  await data.put('campaigns', 'cmp1', { id: 'cmp1', name: 'Spring Promo' });
+  await data.put('customers', 'c1', { id: 'c1', name: 'Acme Apts', source: 'referral', campaignId: 'cmp1' });
+  const st3 = await GR.stats();
+  t.eq('product nodes derived from invoice line items', st3.byType.product, 2);
+  t.eq('expense node from expenses', st3.byType.expense, 1);
+  t.eq('supplier node from suppliers', st3.byType.supplier, 1);
+  t.eq('campaign node from campaigns', st3.byType.campaign, 1);
+  const invNode = await GR.node('inv:inv2');
+  t.ok('invoice → includes_product edges', invNode.groups.includes_product && invNode.groups.includes_product.length === 2);
+  const supNode = await GR.node('sup:s1');
+  t.ok('supplier → supplied (expense) edge', supNode.groups.supplied && supNode.groups.supplied.length === 1);
+  const campNode = await GR.node('camp:cmp1');
+  t.ok('campaign → acquired (customer) edge', campNode.groups.acquired && campNode.groups.acquired.length === 1);
+  t.ok('Supplier → Expense → Job path is queryable', (await GR.path('sup:s1', 'job:j1')) !== null);
+
   // ===== null-tolerant: no crew/invoices collections at all =====
   const env2 = setupEnv();
   load('js/core/knowledge-graph.js');

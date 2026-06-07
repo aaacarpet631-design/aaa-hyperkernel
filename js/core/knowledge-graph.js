@@ -16,6 +16,8 @@
 
   // List a collection that may not exist yet; never throws, always an array.
   async function listSafe(d, coll) { try { return (await d.list(coll)) || []; } catch (_) { return []; } }
+  // Stable slug for deriving a product node id from a free-text line description.
+  function slug(s) { return String(s).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, ''); }
 
   function quoteMid(range) {
     if (range == null) return null;
@@ -36,6 +38,9 @@
       // Newer entity sources (null-tolerant — empty/absent collections are fine).
       const crew = await listSafe(d, 'crew_members');
       const invoices = await listSafe(d, 'invoices');
+      const expenses = await listSafe(d, 'expenses');
+      const suppliers = await listSafe(d, 'suppliers');
+      const campaigns = await listSafe(d, 'campaigns');
 
       const nodes = {};
       const edges = [];
@@ -83,17 +88,33 @@
           if (nodes['tech:' + aid]) addEdge('tech:' + aid, 'job:' + j.id, 'worked_job');
         });
       });
-      // Invoices → their job and their customer.
+      // Invoices → their job and their customer; line items → product nodes.
       invoices.forEach((inv) => {
         addNode('inv:' + inv.id, 'invoice', inv.status || 'invoice', inv);
         if (inv.jobId && nodes['job:' + inv.jobId]) addEdge('job:' + inv.jobId, 'inv:' + inv.id, 'has_invoice');
         if (inv.customerId && nodes['cust:' + inv.customerId]) addEdge('cust:' + inv.customerId, 'inv:' + inv.id, 'billed_customer');
+        (Array.isArray(inv.items) ? inv.items : []).forEach((it) => {
+          const name = String((it && it.description) || '').trim(); if (!name) return;
+          const pid = 'prod:' + slug(name);
+          addNode(pid, 'product', name, { name: name });
+          addEdge('inv:' + inv.id, pid, 'includes_product');
+        });
       });
+      // Expenses → their job; suppliers → the expenses they billed.
+      expenses.forEach((e) => {
+        addNode('exp:' + e.id, 'expense', e.category || 'expense', e);
+        if (e.jobId && nodes['job:' + e.jobId]) addEdge('job:' + e.jobId, 'exp:' + e.id, 'has_expense');
+      });
+      suppliers.forEach((s) => { addNode('sup:' + s.id, 'supplier', s.name || 'Supplier', s); });
+      expenses.forEach((e) => { if (e.supplierId && nodes['sup:' + e.supplierId]) addEdge('sup:' + e.supplierId, 'exp:' + e.id, 'supplied'); });
+      // Campaigns → the customers they acquired.
+      campaigns.forEach((c) => { addNode('camp:' + c.id, 'campaign', c.name || 'Campaign', c); });
+      customers.forEach((c) => { if (c.campaignId && nodes['camp:' + c.campaignId]) addEdge('camp:' + c.campaignId, 'cust:' + c.id, 'acquired'); });
 
       return { nodes: nodes, edges: edges, adj: adj,
         list: Object.keys(nodes).map((k) => nodes[k]),
         customers: customers, jobs: jobs, outcomes: outcomes, decisions: decisions,
-        crew: crew, invoices: invoices };
+        crew: crew, invoices: invoices, expenses: expenses, suppliers: suppliers, campaigns: campaigns };
     },
 
     /** Node-type counts + edge count + most-connected nodes. */

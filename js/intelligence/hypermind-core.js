@@ -121,8 +121,14 @@
       const startedAt = now();
       const phases = [];
 
-      // 1) OBSERVE — pull new business signals into the event stream.
-      phases.push(await runPhase('observe', () => call('AAA_OUTCOME_INTELLIGENCE', 'ingest')));
+      // 1) OBSERVE — pull new business signals into the event streams: outcome
+      //    events (jobs/quotes) + the wider signal stream (invoices/payments/
+      //    expenses/leads/calls/refunds/ads).
+      phases.push(await runPhase('observe', async () => {
+        const outcomes = await call('AAA_OUTCOME_INTELLIGENCE', 'ingest');
+        const signals = await call('AAA_SIGNAL_INGEST', 'ingest');
+        return merge({ outcomes: outcomes, signals: signals });
+      }));
 
       // 2) REMEMBER — refresh memory: relationship graph + job memory + the
       //    queryable knowledge fabric (index over all records).
