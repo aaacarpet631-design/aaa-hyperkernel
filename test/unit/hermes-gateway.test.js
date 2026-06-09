@@ -14,6 +14,7 @@ module.exports = async function run() {
   const { G, data } = setupEnv({ fixedISO: '2026-06-01T00:00:00Z' });
 
   load('js/agents/agent-registry.js');
+  load('js/agents/model-router.js');
   load('js/agents/hermes-gateway.js');
   const H = G.AAA_HERMES;
   t.ok('module loaded', !!H);
@@ -25,6 +26,8 @@ module.exports = async function run() {
   t.eq('route: keyword → accounting', H.route('What is our margin on this invoice?').agent, 'accounting');
   t.eq('route: unknown @mention falls through to keywords/CEO', H.route('@nobody hello there').agent, 'ceo');
   t.eq('route: no match → ceo', H.route('hello there').agent, 'ceo');
+  t.eq('route: default fallback is marked', H.route('hello there').fallback, true);
+  t.ok('route: confident keyword match is NOT marked fallback', !H.route('crew schedule').fallback);
 
   // ---- status / channels -----------------------------------------------------
   t.eq('status: not ready without agent OS', H.status().ready, false);
@@ -91,6 +94,50 @@ module.exports = async function run() {
   // logging breadcrumb
   const logs = await data.list('agent_logs');
   t.ok('hermes logged routing breadcrumbs', logs.some((l) => l.agent === 'hermes'));
+
+  // ---- LLM routing fallback -----------------------------------------------------------
+  // Give the data fake a callAgent stub so classify() can run; count calls so we
+  // can prove the LLM is consulted ONLY on the deterministic fallback path.
+  let classifyCalls = 0;
+  let stubAgent = 'marketing';
+  data.callAgent = async function (payload) {
+    classifyCalls++;
+    t.eq('classify uses Haiku tier', payload.model, 'claude-haiku-4-5');
+    return { ok: true, text: JSON.stringify({ agent: stubAgent }) };
+  };
+
+  // A message with no keyword hit would default to CEO; smart routing should
+  // instead consult the model and pick its (valid) answer.
+  classifyCalls = 0;
+  const noKeyword = 'Should we open a second storefront downtown next year?';
+  t.eq('precondition: keyword table misses → fallback', H.route(noKeyword).fallback, true);
+  const smart = await H.send({ channel: 'test', text: noKeyword });
+  t.eq('smart routing overrode the CEO default', smart.routed.agent, 'marketing');
+  t.ok('smart routing reason names LLM', smart.routed.reason.indexOf('LLM') !== -1);
+  t.eq('classify was consulted exactly once', classifyCalls, 1);
+
+  // Deterministic matches must NOT spend a classification call.
+  classifyCalls = 0;
+  await H.send({ channel: 'test', text: 'What is our margin this month?' });
+  t.eq('confident keyword route skips the LLM', classifyCalls, 0);
+
+  // An invalid agent id from the model is rejected; we keep the CEO default.
+  classifyCalls = 0; stubAgent = 'not_a_real_agent';
+  const badvised = await H.send({ channel: 'test', text: 'Tell me something vague and unroutable please.' });
+  t.eq('bad classification falls back to CEO', badvised.routed.agent, 'ceo');
+
+  // classify() is callable directly and validates against the registry.
+  stubAgent = 'compliance';
+  const direct = await H.classify('is this lease agreement enforceable?');
+  t.eq('classify returns a valid agent', direct.agent, 'compliance');
+
+  // The flag disables smart routing (deterministic-only mode).
+  G.AAA_CONFIG.set({ hermesSmartRouting: false });
+  classifyCalls = 0; stubAgent = 'marketing';
+  const off = await H.send({ channel: 'test', text: 'A completely unroutable vague question.' });
+  t.eq('flag off → stays on CEO default', off.routed.agent, 'ceo');
+  t.eq('flag off → no LLM call', classifyCalls, 0);
+  G.AAA_CONFIG.set({ hermesSmartRouting: true });
 
   // ---- reset ------------------------------------------------------------------------
   await H.reset('test');

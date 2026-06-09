@@ -19,6 +19,7 @@
   function data() { return global.AAA_DATA; }
   function registry() { return global.AAA_AGENTS; }
   function os() { return global.AAA_AGENT_OS; }
+  function router() { return global.AAA_MODEL_ROUTER; }
   function bus() { return global.AAA_EVENT_BUS; }
   function ids() { return global.AAA_ID_FACTORY; }
   function clock() { return global.AAA_RUNTIME_CLOCK; }
@@ -75,7 +76,7 @@
       if (hits > bestHits) { best = ROUTES[i].agent; bestHits = hits; }
     }
     if (best) return { agent: best, reason: 'keyword match (' + bestHits + ')' };
-    return { agent: 'ceo', reason: 'default — CEO owns the final call' };
+    return { agent: 'ceo', reason: 'default — CEO owns the final call', fallback: true };
   }
 
   // ---- channels ---------------------------------------------------------------
@@ -185,6 +186,61 @@
     route: route,
 
     /**
+     * LLM routing fallback: when the deterministic table can't confidently pick
+     * an agent, ask the cheapest model (Haiku tier, via the model router) to
+     * choose one. Constrained to a real agent id by a json_schema enum, then
+     * validated against the registry. Cheap, bounded, and honest — any failure
+     * returns { ok:false } so the caller keeps the safe CEO default. Never
+     * mutates anything; this is a classification call, not an agent run.
+     * @returns {Promise<{ok:boolean, agent?:string, reason?:string, error?:string}>}
+     */
+    async classify(text) {
+      const reg = registry();
+      const d = data();
+      if (!reg || !d || !d.callAgent) return { ok: false, error: 'NOT_AVAILABLE' };
+      if (!this.isReady()) return { ok: false, error: 'AI_NOT_CONFIGURED' };
+
+      const idsList = reg.ids ? reg.ids() : Object.keys(reg.all || {});
+      if (!idsList.length) return { ok: false, error: 'NO_AGENTS' };
+
+      const roster = idsList.map(function (id) { const a = reg.get(id); return '- ' + id + ': ' + (a ? a.title : id); }).join('\n');
+      const model = router() ? router().route('routing').model : 'claude-haiku-4-5';
+
+      let res;
+      try {
+        res = await d.callAgent({
+          agent: 'hermes_router',
+          model: model,
+          max_tokens: 80,
+          system:
+            'You are the router for a carpet-cleaning company\'s AI team. Pick the ONE agent best suited to handle the user\'s message. ' +
+            'Choose the most specific specialist; use "ceo" only for broad strategy or when nothing else fits.\n\nAGENTS:\n' + roster +
+            '\n\nRespond ONLY as JSON: {"agent":"<id>"} using an id from the list.',
+          output_config: { format: { type: 'json_schema', schema: {
+            type: 'object',
+            properties: { agent: { type: 'string', enum: idsList } },
+            required: ['agent'], additionalProperties: false
+          } } },
+          messages: [{ role: 'user', content: String(text || '').slice(0, 1000) }]
+        });
+      } catch (e) {
+        return { ok: false, error: 'CALL_THREW' };
+      }
+      if (!res || res.ok === false) return { ok: false, error: (res && res.error) || 'CALL_FAILED' };
+
+      // Tolerant parse: straight JSON, then first balanced object.
+      let picked = null;
+      const s = String(res.text == null ? '' : res.text).trim();
+      try { picked = JSON.parse(s); } catch (_) {
+        const a = s.indexOf('{'), b = s.lastIndexOf('}');
+        if (a !== -1 && b > a) { try { picked = JSON.parse(s.slice(a, b + 1)); } catch (_) {} }
+      }
+      const agent = picked && typeof picked.agent === 'string' ? picked.agent : null;
+      if (!agent || !reg.get(agent)) return { ok: false, error: 'BAD_CLASSIFICATION' };
+      return { ok: true, agent: agent, reason: 'LLM routing (' + (model || 'haiku') + ')' };
+    },
+
+    /**
      * The middleman entry point. Routes the message, runs the chosen agent via
      * AAA_AGENT_OS, records the exchange in the channel session, delivers the
      * reply to the channel, and returns the full result to the caller.
@@ -207,9 +263,18 @@
         return res;
       }
 
-      const r = route(text);
+      let r = route(text);
       if (!this.isReady()) {
         return { ok: false, error: 'AI_NOT_CONFIGURED', routed: r };
+      }
+
+      // Smart-routing fallback: only when the keyword table wasn't confident
+      // (deterministic mention/keyword routing always wins to stay cheap and
+      // predictable). Gated by config flag; any failure keeps the CEO default.
+      const smart = !global.AAA_CONFIG || !global.AAA_CONFIG.flag || global.AAA_CONFIG.flag('hermesSmartRouting', true);
+      if (r.fallback && smart) {
+        const c = await this.classify(text);
+        if (c.ok) r = { agent: c.agent, reason: c.reason };
       }
 
       let result;
