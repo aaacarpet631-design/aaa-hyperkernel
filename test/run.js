@@ -20,6 +20,7 @@ const SUITES = [
   'unit/crew-tools.test.js',
   'unit/scheduling.test.js',
   'unit/contracts.test.js',
+  'unit/leads.test.js',
   'unit/quickbooks-online.test.js',
   'unit/portal-links.test.js',
   'unit/voice.test.js',
