@@ -25,7 +25,6 @@
   'use strict';
 
   function data() { return global.AAA_DATA; }
-  function cloud() { return global.AAA_CLOUD; }
   function rbac() { return global.AAA_RBAC; }
   function ledger() { return global.AAA_AUDIT_LEDGER; }
   function cfg() { return global.AAA_CONFIG || {}; }
@@ -338,5 +337,5 @@
     }
   };
 
-  global.AAA_GOVERNANCE = Governance;
+  global.AAA_GOVERNANCE_ENGINE = Governance;
 })(typeof window !== 'undefined' ? window : this);

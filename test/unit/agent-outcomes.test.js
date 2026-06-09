@@ -6,7 +6,7 @@ const { makeRunner, setupEnv, load } = require('../helpers/harness');
 
 module.exports = async function run() {
   const t = makeRunner('agent-outcomes');
-  const { G, data } = setupEnv({});
+  const { G } = setupEnv({});
   load('js/governance/audit-ledger.js');
   load('js/governance/agent-outcomes.js');
   const O = G.AAA_AGENT_OUTCOMES;

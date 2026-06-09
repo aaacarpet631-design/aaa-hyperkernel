@@ -10,7 +10,7 @@ const { makeRunner, setupEnv, load } = require('../helpers/harness');
 
 module.exports = async function run() {
   const t = makeRunner('review-governance');
-  const { G, cfg, data } = setupEnv({ config: { role: 'owner', firebaseUid: 'owner_1', businessName: 'AAA Carpet' } });
+  const { G, data } = setupEnv({ config: { role: 'owner', firebaseUid: 'owner_1', businessName: 'AAA Carpet' } });
   load('js/core/aaa-rbac.js');
   load('js/governance/audit-ledger.js');
   load('js/governance/governance-engine.js');
@@ -20,7 +20,7 @@ module.exports = async function run() {
 
   load('js/agents/review-request-engine.js');
   const engine = G.AAA_REVIEW_REQUEST_ENGINE;
-  const gov = G.AAA_GOVERNANCE;
+  const gov = G.AAA_GOVERNANCE_ENGINE;
 
   await data.put('jobs', 'j1', { id: 'j1', customerName: 'Jane Doe', notes: 'cleaned carpets' });
   const r = await engine.requestReview('j1');

@@ -12,7 +12,6 @@
 
   function data() { return global.AAA_DATA; }
   function ledger() { return global.AAA_AUDIT_LEDGER; }
-  function reg() { return global.AAA_AGENT_OUTCOMES; }
   function sup() { return global.AAA_GOVERNANCE_SUPERVISOR; }
   function cards() { return global.AAA_AGENT_SCORECARDS; }
   function rbac() { return global.AAA_RBAC; }

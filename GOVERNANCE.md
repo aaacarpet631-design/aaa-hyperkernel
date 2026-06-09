@@ -20,7 +20,7 @@ guardrail verdict → record() → CASE ──(held)──► Review Safety Deci
 
 ## Components
 
-- **`AAA_GOVERNANCE`** (`js/governance/governance-engine.js`) — records guardrail
+- **`AAA_GOVERNANCE_ENGINE`** (`js/governance/governance-engine.js`) — records guardrail
   decisions as **cases**, gates overrides, copies overrides to the supervisor
   **review queue**, runs **drift detection**, and computes **metrics**. Generic
   across a `DOMAINS` registry (content_safety, legal, accounting, contract,
@@ -81,7 +81,7 @@ trigger; legal/accounting/contract/ad-copy/SMS/email/agent risks use the same
   alongside the unchanged "Drift Alerts" signal, and emit a `governance.escalation`
   event for any notifier to consume.
 
-`AAA_GOVERNANCE.requestOverride()` calls `evaluateDrift()` per category after an
+`AAA_GOVERNANCE_ENGINE.requestOverride()` calls `evaluateDrift()` per category after an
 override, so escalation is automatic — but additive: if the module is absent the
 override path is unaffected.
 
@@ -386,7 +386,7 @@ device loss and is shared across the team. (`AAA_GOVERNANCE_SYNC`.)
 
 A new high-risk guardrail (say contract-clause review) needs only to:
 1. produce a decision (`allow` / `block` / `queue`) + verdict + categories,
-2. call `AAA_GOVERNANCE.record({ domain: 'contract', subjectType, subjectId, … })`,
+2. call `AAA_GOVERNANCE_ENGINE.record({ domain: 'contract', subjectType, subjectId, … })`,
 3. gate its own send/commit on the returned case status.
 
 It then inherits the entire review → override → audit → training → analytics

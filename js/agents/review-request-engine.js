@@ -124,8 +124,8 @@
       // case id is stored so the UI can open the review/override flow.
       if (safety.source === 'ai') {
         try {
-          if (global.AAA_GOVERNANCE && global.AAA_GOVERNANCE.record) {
-            const gc = await global.AAA_GOVERNANCE.record({
+          if (global.AAA_GOVERNANCE_ENGINE && global.AAA_GOVERNANCE_ENGINE.record) {
+            const gc = await global.AAA_GOVERNANCE_ENGINE.record({
               domain: 'content_safety', guardrail: SAFETY_MODEL, model: safety.model,
               subjectType: 'review_request', subjectId: id, messageContextId: id,
               decision: safety.decision, verdict: safety.verdict,

@@ -7,7 +7,7 @@ const { makeRunner, setupEnv, load } = require('../helpers/harness');
 
 module.exports = async function run() {
   const t = makeRunner('agent-scorecards');
-  const { G, cfg, data } = setupEnv({ config: { role: 'owner', governanceEscalationCooldownMs: 1000, govMinSample: 5 } });
+  const { G } = setupEnv({ config: { role: "owner", governanceEscalationCooldownMs: 1000, govMinSample: 5 } });
   let T = 1000000;
   G.AAA_RUNTIME_CLOCK = { now: () => T, nowISO: () => new Date(T).toISOString() };
   load('js/core/aaa-rbac.js');

@@ -40,7 +40,7 @@ module.exports = async function run() {
   t.ok('a critical ledger_integrity escalation was raised', escs.some((e) => e.kind === 'ledger_integrity' && e.severity === 'critical' && e.status === 'open'));
 
   // ---- without a signing key, signatures are reported as not-configured --
-  const { G: G2, data: d2 } = setupEnv({ config: { role: 'owner' } });
+  const { G: G2 } = setupEnv({ config: { role: 'owner' } });
   load('js/governance/audit-ledger.js');
   load('js/governance/governance-escalation.js');
   load('js/governance/governance-integrity.js');

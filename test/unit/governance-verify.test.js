@@ -10,7 +10,7 @@ const { makeRunner, setupEnv, load, ROOT } = require('../helpers/harness');
 
 module.exports = async function run() {
   const t = makeRunner('governance-verify');
-  const { G, data } = setupEnv({});
+  const { G } = setupEnv({});
   load('js/governance/audit-ledger.js');
   const L = G.AAA_AUDIT_LEDGER;
   const lib = await import(path.join(ROOT, 'netlify/functions/governance-verify.mjs'));

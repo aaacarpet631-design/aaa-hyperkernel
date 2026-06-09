@@ -12,11 +12,11 @@ const { makeRunner, setupEnv, load } = require('../helpers/harness');
 
 module.exports = async function run() {
   const t = makeRunner('governance');
-  const { G, cfg, data } = setupEnv({ config: { role: 'owner', firebaseUid: 'user_admin_1' } });
+  const { G, cfg } = setupEnv({ config: { role: 'owner', firebaseUid: 'user_admin_1' } });
   load('js/core/aaa-rbac.js');
   load('js/governance/audit-ledger.js');
   load('js/governance/governance-engine.js');
-  const gov = G.AAA_GOVERNANCE;
+  const gov = G.AAA_GOVERNANCE_ENGINE;
   const L = G.AAA_AUDIT_LEDGER;
 
   // ---- pure helpers -------------------------------------------------------

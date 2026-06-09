@@ -19,7 +19,6 @@
 ;(function (global) {
   'use strict';
 
-  function data() { return global.AAA_DATA; }
   function cfg() { return global.AAA_CONFIG || {}; }
   function events() { return global.AAA_EVENTS; }
   function ledger() { return global.AAA_AUDIT_LEDGER; }

@@ -435,11 +435,11 @@
      * Governance review & override flow. Shows the full safety verdict and,
      * for an Admin (owner), a justified-override path that merely UNLOCKS the
      * Send button — the human must then explicitly send. Everything is audited
-     * by AAA_GOVERNANCE; this UI only presents it.
+     * by AAA_GOVERNANCE_ENGINE; this UI only presents it.
      */
     async _governanceReview(rec) {
       const ui = UI();
-      const gov = global.AAA_GOVERNANCE;
+      const gov = global.AAA_GOVERNANCE_ENGINE;
       const sf = rec.safety || {};
       const s = ui.sheet({ title: 'Review Safety Decision', subtitle: (rec.customerName || 'Customer') + ' · ' + (rec.status === 'blocked' ? 'Blocked' : 'Queued') });
       document.body.appendChild(s.overlay);
@@ -513,7 +513,7 @@
       const links = engine.links(rec);
       const markSent = async (channel) => {
         await engine.markSent(rec.id, channel);
-        try { if (global.AAA_GOVERNANCE && global.AAA_GOVERNANCE.recordSent) await global.AAA_GOVERNANCE.recordSent(caseId, { channel: channel }); } catch (_) {}
+        try { if (global.AAA_GOVERNANCE_ENGINE && global.AAA_GOVERNANCE_ENGINE.recordSent) await global.AAA_GOVERNANCE_ENGINE.recordSent(caseId, { channel: channel }); } catch (_) {}
       };
       const smsA = ui.el('a', { className: 'aaa-btn aaa-btn--primary aaa-btn--full', text: '✉ Send via SMS', attrs: { role: 'button', href: links.sms } });
       const mailA = ui.el('a', { className: 'aaa-btn aaa-btn--secondary aaa-btn--full', text: '✉ Send via Email', attrs: { role: 'button', href: links.email } });

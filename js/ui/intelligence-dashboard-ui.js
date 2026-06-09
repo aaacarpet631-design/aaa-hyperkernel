@@ -23,7 +23,6 @@
   function meetings() { return global.AAA_MEETINGS; }
   function rankings() { return global.AAA_RANKINGS; }
   function evolution() { return global.AAA_EVOLUTION; }
-  function debate() { return global.AAA_DEBATE; }
   function research() { return global.AAA_RESEARCH; }
 
   const GREEN = '#16A34A', AMBER = '#D97706', RED = '#DC2626', GREY = '#71717A', BLUE = '#2563EB';
@@ -74,7 +73,7 @@
   function riskLevel(reports) {
     let high = 0, blocked = 0;
     reports.forEach(function (r) {
-      if (r.layers) { const L4 = r.layers.find(function (x) { return x.layer === 4; }); }
+
       if (Array.isArray(r.risks)) high += r.risks.length >= 3 ? 1 : 0;
       if (r.verdict === 'reject') blocked++;
     });
@@ -107,7 +106,7 @@
     const meetingList = meetings() ? (await meetings().list()).slice(0, 4) : [];
     const evoList = evolution() ? (await evolution().list()).slice(0, 1) : [];
     const supMetrics = global.AAA_SUPERVISOR ? await global.AAA_SUPERVISOR.metrics() : { ok: false };
-    const govMetrics = global.AAA_GOVERNANCE ? await global.AAA_GOVERNANCE.metrics() : null;
+    const govMetrics = global.AAA_GOVERNANCE_ENGINE ? await global.AAA_GOVERNANCE_ENGINE.metrics() : null;
     const agentInsights = global.AAA_AGENT_SCORECARDS ? await global.AAA_AGENT_SCORECARDS.insights() : null;
 
     body.innerHTML = '';
@@ -178,7 +177,7 @@
     body.appendChild(kv('Close Rate', supMetrics.ok ? pct(supMetrics.closeRate) : '—'));
 
     // ---- Opportunities & threats (from latest accepted analyses) ----
-    const accepted = reports.filter(function (r) { return r.accepted; });
+
     const opps = []; const threats = [];
     Object.keys(latestByTeam).forEach(function (tid) {
       const r = latestByTeam[tid];
