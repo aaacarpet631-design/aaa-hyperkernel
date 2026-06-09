@@ -51,7 +51,7 @@ function makeWindow() {
 
 function scriptList() {
   const index = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
-  return (index.match(/src="(\/js\/[^"]+)"/g) || []).map((m) => m.slice(6, -1));
+  return [...index.matchAll(/src="(\/[^"]+\.js)"/g)].map((m) => m[1].replace(/^\//, ''));
 }
 
 module.exports = function run() {
