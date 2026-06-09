@@ -52,7 +52,12 @@
     // Governance: override a blocked/queued high-risk AI decision. Owner-only
     // by construction (it is not in the manager/crew lists below), giving the
     // Governance Engine its "Admin can override" gate without a separate flag.
-    OVERRIDE_AI_DECISION: 'Override a blocked/queued high-risk AI decision (governance)'
+    OVERRIDE_AI_DECISION: 'Override a blocked/queued high-risk AI decision (governance)',
+    // Legal Intelligence Division
+    VIEW_LEGAL: 'View the Legal War Room (risk, compliance, contracts, audit)',
+    MANAGE_LEGAL: 'Add / resolve legal records (contracts, compliance, reviews)',
+    // Governance Registry — versioned prompts/models/templates/policies/calibrations.
+    MANAGE_GOVERNANCE: 'Create / approve / activate / roll back governed versions'
   };
 
   // Role → granted permissions. Owner gets everything by construction.
@@ -62,7 +67,7 @@
       'CREATE_QUOTE', 'APPROVE_QUOTE', 'EDIT_JOB', 'CLOSE_JOB', 'VIEW_ALL_JOBS',
       'EDIT_CUSTOMER', 'CAPTURE_MEASUREMENT', 'CAPTURE_PHOTO', 'COMPLETE_CHECKLIST',
       'RUN_AI_AGENTS', 'MANAGE_AUTOMATION', 'MANAGE_CREW', 'VIEW_AUDIT_LOG',
-      'VIEW_PRICING_RATES'
+      'VIEW_PRICING_RATES', 'VIEW_LEGAL', 'MANAGE_LEGAL'
       // NOTE: no VIEW_FINANCIALS / VIEW_MARGINS — managers run production, not the books.
     ],
     crew: [

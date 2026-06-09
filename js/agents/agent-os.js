@@ -14,6 +14,8 @@
 
   function data() { return global.AAA_DATA; }
   function registry() { return global.AAA_AGENTS; }
+  function router() { return global.AAA_MODEL_ROUTER; }
+  function gate() { return global.AAA_ACTION_GATE; }
 
   function buildUserPrompt(task, context) {
     return (
@@ -64,8 +66,10 @@
      * @param {string} roleId  e.g. 'sales'
      * @param {string} task    natural-language task
      * @param {object} context structured facts (job, customer, kpis…)
+     * @param {object} [opts]  { taskKind } to route by task (Opus/Sonnet/Haiku);
+     *                         omit to keep the agent's declared model.
      */
-    async runAgent(roleId, task, context) {
+    async runAgent(roleId, task, context, opts) {
       const reg = registry();
       if (!reg) return { ok: false, error: 'REGISTRY_MISSING' };
       const agent = reg.get(roleId);
@@ -75,9 +79,14 @@
       // Governed prompt: use the registry's active version for this role when
       // one exists, otherwise the agent's built-in system prompt (unchanged).
       const system = global.AAA_PROMPT_REGISTRY ? await global.AAA_PROMPT_REGISTRY.resolve(roleId, agent.system) : agent.system;
+
+      // Task-aware model routing (adds the Haiku tier for cheap task kinds);
+      // with no taskKind this returns the agent's declared model unchanged.
+      const routed = router() ? router().forAgent(agent.model, opts && opts.taskKind) : { model: agent.model, reason: 'no router' };
+
       const res = await data().callAgent({
         agent: roleId,
-        model: agent.model,
+        model: routed.model,
         max_tokens: 700,
         system: system,
         output_config: { format: { type: 'json_schema', schema: reg.DECISION_SCHEMA } },
@@ -87,6 +96,17 @@
 
       const decision = parseDecision(res.text || '');
       if (!decision) return { ok: false, error: 'BAD_OUTPUT', roleId: roleId, raw: res.text };
+
+      // Record which model actually ran (and why) for cost/audit transparency.
+      decision.model = routed.model;
+      decision.routing = { model: routed.model, tier: routed.tier, reason: routed.reason };
+
+      // Flag any recommended next_action that is destructive / external /
+      // spend-bearing so the operator sees it needs approval before execution.
+      if (gate() && decision.next_actions && decision.next_actions.length) {
+        const review = gate().review(decision.next_actions);
+        if (review.blocked) decision.actionReview = review;
+      }
 
       // Apply the Self-Improvement confidence bias (learned from this agent's
       // real track record). The raw value is preserved for transparency; the

@@ -1,0 +1,65 @@
+{
+  "root": true,
+  "env": {
+    "browser": true,
+    "es2022": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "script"
+  },
+  "extends": "eslint:recommended",
+  "rules": {
+    "no-unused-vars": ["warn", { "args": "none", "varsIgnorePattern": "^_" }],
+    "no-empty": ["error", { "allowEmptyCatch": true }],
+    "no-constant-condition": ["error", { "checkLoops": false }],
+    "no-async-promise-executor": "warn",
+    "no-extra-semi": "off"
+  },
+  "ignorePatterns": [
+    "node_modules/",
+    "**/node_modules/",
+    "**/*.min.js"
+  ],
+  "overrides": [
+    {
+      "files": ["js/**/*.js"],
+      "env": { "browser": true, "serviceworker": true },
+      "globals": {
+        "AAA": "writable",
+        "AAA_CONFIG": "writable",
+        "AAA_ENV": "readonly",
+        "firebase": "readonly",
+        "supabase": "readonly",
+        "Anthropic": "readonly"
+      },
+      "rules": {
+        "no-undef": "off"
+      }
+    },
+    {
+      "files": ["sw.js"],
+      "env": { "serviceworker": true, "browser": true }
+    },
+    {
+      "files": ["netlify/functions/**/*.mjs", "*.mjs"],
+      "env": { "node": true, "browser": false },
+      "parserOptions": { "sourceType": "module" }
+    },
+    {
+      "files": ["functions/**/*.js"],
+      "env": { "node": true, "commonjs": true, "browser": false },
+      "parserOptions": { "sourceType": "script" }
+    },
+    {
+      "files": ["test/**/*.js", "test/**/*.cjs"],
+      "env": { "node": true, "commonjs": true, "browser": false },
+      "parserOptions": { "sourceType": "script" }
+    },
+    {
+      "files": ["test/**/*.mjs"],
+      "env": { "node": true, "browser": false },
+      "parserOptions": { "sourceType": "module" }
+    }
+  ]
+}

@@ -8,10 +8,15 @@
     "test": "node test/run.js && node test/intelligence-smoke.mjs",
     "test:harness": "node test/run.js",
     "test:intel": "node test/intelligence-smoke.mjs",
-    "test:rules": "node test/run-rules.js"
+    "test:rules": "node test/run-rules.js",
+    "lint": "eslint .",
+    "build:check": "npx --yes netlify-cli@26 build --offline"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "latest",
     "@netlify/blobs": "latest"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0"
   }
 }

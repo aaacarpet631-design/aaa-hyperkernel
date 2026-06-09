@@ -24,7 +24,65 @@ service cloud.firestore {
     // so a tampered or crew client still cannot read them.
     function isFinancialCollection(c) {
       return c == 'accounting' || c == 'invoices' || c == 'payments'
-          || c == 'expenses' || c == 'kpi_snapshots' || c == 'rate_cards';
+          || c == 'expenses' || c == 'kpi_snapshots' || c == 'rate_cards'
+          // Receipt intake + the expense classifier's learning/accuracy stores
+          // all expose spend internals — owner-only, same as the rest of the books.
+          || c == 'receipts' || c == 'expense_corrections' || c == 'expense_predictions'
+          // Quote lifecycle records carry internal cost + margin + job cost.
+          || c == 'quotes'
+          // Pricing optimizer recommendations expose margin/win-rate analysis.
+          || c == 'pricing_recommendations'
+          // Prediction-closure / learning-feedback records expose win-rate/margin.
+          || c == 'learning_feedback'
+          // Calibration proposals + versions govern AI tuning from spend data.
+          || c == 'calibration_proposals' || c == 'calibration_versions'
+          // Supervisor Council sessions expose margin/finance deliberation.
+          || c == 'council_sessions'
+          // Provenance traces expose the quotes/margins/win-rates behind a
+          // recommendation — owner-only, same as the rest of the analysis.
+          || c == 'provenance'
+          // Governance Registry: versioned prompts/models/templates/policies/
+          // calibrations + approval workflow — owner-only (governs the AI org).
+          || c == 'governance_versions'
+          // Replay Sandbox snapshots replay margins/win-rates/decisions under
+          // alternative governed versions — owner-only, same as the analysis.
+          || c == 'replay_snapshots'
+          // Native event-bus log — immutable domain events that can carry
+          // business data (quotes/jobs/messages); owner-only.
+          || c == 'event_log'
+          // Privacy & data governance: vault key + retention config, the
+          // encrypted PII vault, and erasure requests — owner-only (the vault
+          // protects the most sensitive PII).
+          || c == 'privacy_config' || c == 'privacy_vault' || c == 'deletion_requests'
+          // Reliability Command Center: metric snapshots + incidents aggregate
+          // conversion/margin-derived KPIs — owner-only, same as the analysis.
+          || c == 'reliability_snapshots' || c == 'incidents'
+          // Outcome Intelligence: outcome events, agent scores/accuracy, and
+          // learning patterns expose margins + win rates — owner-only.
+          || c == 'outcome_events' || c == 'agent_scores' || c == 'agent_accuracy' || c == 'learning_patterns'
+          // Executive Council reviews high-impact money decisions — owner-only.
+          || c == 'executive_reviews'
+          // Learning Fabric job memory exposes margins + win rates — owner-only.
+          || c == 'job_memory'
+          // Business Digital Twin saved scenarios model revenue/margin — owner-only.
+          || c == 'twin_scenarios'
+          // Financial Intelligence snapshots expose the books — owner-only.
+          || c == 'financial_snapshots'
+          // Governed Learning Loop proposals carry margins/win-rates — owner-only.
+          || c == 'proposals'
+          // Agent Evaluation Lab snapshots expose performance/ROI — owner-only.
+          || c == 'agent_evaluations'
+          // Knowledge OS index + query log aggregate everything — owner-only.
+          || c == 'knowledge_nodes' || c == 'knowledge_queries'
+          // Vector/semantic memory embeds the knowledge corpus — owner-only.
+          || c == 'memory_vectors'
+          // Owner Copilot daily briefings aggregate the whole business — owner-only.
+          || c == 'owner_briefings'
+          // Native Model candidates carry trained weights + metrics — owner-only.
+          || c == 'model_versions'
+          // NVIDIA Model Adapter Layer: enablement settings + model-call usage/
+          // provenance stream — owner-only (governs external intelligence engines).
+          || c == 'model_settings' || c == 'model_calls';
     }
     // Collections only a trusted backend (Admin SDK) may touch. Notably
     // 'integrations' holds QuickBooks OAuth tokens — clients must never read it.
@@ -40,6 +98,32 @@ service cloud.firestore {
       return c == 'members' || c == 'audit_log'
           || c == 'governance_audit' || c == 'gov_prompt_registry'
           || isServerOnlyCollection(c);
+    }
+    // Legal records carry sensitive legal / incident detail — restricted to the
+    // legal roles. Owner + manager hold VIEW_LEGAL/MANAGE_LEGAL; crew cannot read
+    // or write them (mirrors the Legal War Room's client-side gate, enforced
+    // server-side so a tampered/crew client still can't reach legal records).
+    function isLegalCollection(c) {
+      return c == 'legal_records';
+    }
+    function canLegal(ws) { return role(ws) == 'owner' || role(ws) == 'manager'; }
+    // Native Transport conversations: customer threads, inbound replies, and
+    // owner notifications. Office-only (owner + manager hold EDIT_CUSTOMER);
+    // crew never sees customer conversations — enforced server-side to mirror
+    // the inbox's client-side gate.
+    function isCommsCollection(c) {
+      return c == 'comm_threads' || c == 'comm_inbound' || c == 'comm_notifications'
+          // AI-drafted customer messages awaiting owner approval — office-only.
+          || c == 'assisted_drafts'
+          // Sensed real-world signals carry customer contact + message content.
+          || c == 'sensed_events';
+    }
+    function canComms(ws) { return role(ws) == 'owner' || role(ws) == 'manager'; }
+    // Security hardening: step-up/MFA secrets, signing key, and signed sessions.
+    // Owner-only (these hold the secrets that protect privileged actions); in a
+    // multi-tenant deployment these belong server-side entirely.
+    function isSecurityCollection(c) {
+      return c == 'security_config' || c == 'security_sessions';
     }
 
     match /workspaces/{ws} {
@@ -78,11 +162,17 @@ service cloud.firestore {
       // owner-only; everything else is any member.
       match /{collection}/{docId} {
         allow read, write: if isMember(ws) && !isSpecialCollection(collection)
-          && (!isFinancialCollection(collection) || isOwner(ws));
+          && (!isFinancialCollection(collection) || isOwner(ws))
+          && (!isLegalCollection(collection) || canLegal(ws))
+          && (!isCommsCollection(collection) || canComms(ws))
+          && (!isSecurityCollection(collection) || isOwner(ws));
       }
       match /{collection}/{docId}/{sub=**} {
         allow read, write: if isMember(ws) && !isSpecialCollection(collection)
-          && (!isFinancialCollection(collection) || isOwner(ws));
+          && (!isFinancialCollection(collection) || isOwner(ws))
+          && (!isLegalCollection(collection) || canLegal(ws))
+          && (!isCommsCollection(collection) || canComms(ws))
+          && (!isSecurityCollection(collection) || isOwner(ws));
       }
     }
   }

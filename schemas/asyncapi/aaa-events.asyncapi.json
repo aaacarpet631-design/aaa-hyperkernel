@@ -1,0 +1,177 @@
+{
+  "asyncapi": "2.6.0",
+  "info": {
+    "title": "AAA HyperKernel Events",
+    "version": "1.0.0",
+    "description": "Native, contract-validated domain events. App-owned; transport-neutral; offline-safe."
+  },
+  "defaultContentType": "application/json",
+  "channels": {
+    "comm.inbound": {
+      "description": "An inbound customer message arrived.",
+      "subscribe": {
+        "operationId": "on_comm_inbound",
+        "message": {
+          "name": "comm.inbound",
+          "contentType": "application/json",
+          "x-version": 1,
+          "x-bridged": true,
+          "payload": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "threadId": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "comm.notification": {
+      "description": "An owner notification was raised.",
+      "subscribe": {
+        "operationId": "on_comm_notification",
+        "message": {
+          "name": "comm.notification",
+          "contentType": "application/json",
+          "x-version": 1,
+          "x-bridged": true,
+          "payload": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "job.closed": {
+      "description": "A job was closed/completed.",
+      "subscribe": {
+        "operationId": "on_job_closed",
+        "message": {
+          "name": "job.closed",
+          "contentType": "application/json",
+          "x-version": 1,
+          "x-bridged": false,
+          "payload": {
+            "type": "object",
+            "required": [
+              "jobId"
+            ],
+            "properties": {
+              "jobId": {
+                "type": "string"
+              },
+              "outcome": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "quote.created": {
+      "description": "A quote/estimate was created.",
+      "subscribe": {
+        "operationId": "on_quote_created",
+        "message": {
+          "name": "quote.created",
+          "contentType": "application/json",
+          "x-version": 1,
+          "x-bridged": false,
+          "payload": {
+            "type": "object",
+            "required": [
+              "quoteId"
+            ],
+            "properties": {
+              "quoteId": {
+                "type": "string"
+              },
+              "customerId": {
+                "type": "string"
+              },
+              "total": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    },
+    "quote.sent": {
+      "description": "A quote was sent to a customer.",
+      "subscribe": {
+        "operationId": "on_quote_sent",
+        "message": {
+          "name": "quote.sent",
+          "contentType": "application/json",
+          "x-version": 1,
+          "x-bridged": false,
+          "payload": {
+            "type": "object",
+            "required": [
+              "quoteId"
+            ],
+            "properties": {
+              "quoteId": {
+                "type": "string"
+              },
+              "channel": {
+                "type": "string",
+                "enum": [
+                  "sms",
+                  "email"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "recommendation.created": {
+      "description": "An AI recommendation was produced.",
+      "subscribe": {
+        "operationId": "on_recommendation_created",
+        "message": {
+          "name": "recommendation.created",
+          "contentType": "application/json",
+          "x-version": 1,
+          "x-bridged": false,
+          "payload": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "agent": {
+                "type": "string"
+              },
+              "confidence": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

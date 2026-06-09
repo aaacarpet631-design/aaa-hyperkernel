@@ -88,6 +88,9 @@
     get syncEndpoint() { return read('syncEndpoint', '/api/sync'); },
     /** Audio transcription endpoint (Netlify Whisper proxy by default). */
     get transcriptionEndpoint() { return read('transcriptionEndpoint', '/api/transcribe'); },
+    /** Research Brain endpoint — Netlify proxy to a SEPARATE AI-Q service.
+     *  Read-only research/strategy; never touches jobs/quotes/billing/customers. */
+    get researchEndpoint() { return read('researchEndpoint', '/api/research'); },
     /** Auto-pilot: let agents act on domain events. Off by default. */
     get autoAgents() { return !!read('autoAgents', false); },
     /** Business name + Google review link used in review-request messages. */

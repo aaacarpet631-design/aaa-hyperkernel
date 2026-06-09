@@ -23,7 +23,10 @@
     <script src="/js/core/aaa-config.js"></script>
     <script src="/js/core/aaa-rbac.js"></script>
     <script src="/js/core/aaa-runtime-gateway.js"></script>
+    <script src="/js/core/aaa-security.js"></script>
+    <script src="/js/core/aaa-privacy.js"></script>
     <script src="/js/core/aaa-events.js"></script>
+    <script src="/js/core/aaa-event-bus.js"></script>
     <script src="/js/core/aaa-firebase.js"></script>
     <script src="/js/core/aaa-supabase.js"></script>
     <script src="/js/core/aaa-cloud.js"></script>
@@ -51,15 +54,27 @@
     <script src="/js/accounting/accounting-store.js"></script>
     <script src="/js/accounting/quickbooks-export.js"></script>
     <script src="/js/accounting/quickbooks-online.js"></script>
+    <!-- Receipt Intelligence: classify → intake/review queue → capture engine -->
+    <script src="/js/accounting/expense-classifier.js"></script>
+    <script src="/js/accounting/receipt-intake-store.js"></script>
+    <script src="/js/accounting/receipt-intelligence-engine.js"></script>
+    <script src="/js/accounting/controller-agent.js"></script>
     <script src="/js/contracts/contract-store.js"></script>
     <script src="/js/portal/portal-link-store.js"></script>
     <script src="/js/scheduling/schedule-store.js"></script>
     <script src="/js/leads/lead-store.js"></script>
 
+    <!-- Legal Intelligence Division (memory → risk → agents) -->
+    <script src="/js/legal/legal-store.js"></script>
+    <script src="/js/legal/legal-risk-engine.js"></script>
+    <script src="/js/legal/legal-division.js"></script>
+
     <script src="/js/ui/ui-kit.js"></script>
     <script src="/js/ui/governance-badge-ui.js"></script>
     <script src="/js/ui/governance-learning-ui.js"></script>
 
+    <script src="/js/agents/model-router.js"></script>
+    <script src="/js/agents/action-safety-gate.js"></script>
     <script src="/js/agents/agent-registry.js"></script>
     <script src="/js/agents/agent-os.js"></script>
     <script src="/js/agents/supervisor.js"></script>
@@ -72,6 +87,10 @@
     <script src="/js/agents/review-request-engine.js"></script>
     <script src="/js/agents/marketing-intel.js"></script>
     <script src="/js/agents/job-notes-agent.js"></script>
+    <script src="/js/agents/research-brain.js"></script>
+    <script src="/js/agents/estimator-agent.js"></script>
+    <script src="/js/quotes/quote-store.js"></script>
+    <script src="/js/agents/pricing-optimizer.js"></script>
 
     <!-- Analysis Division — the multi-layer autonomous intelligence org -->
     <script src="/js/intelligence/analysis-division.js"></script>
@@ -82,6 +101,45 @@
     <script src="/js/intelligence/intelligence-meetings.js"></script>
     <script src="/js/intelligence/analyst-rankings.js"></script>
     <script src="/js/intelligence/evolution-engine.js"></script>
+    <script src="/js/intelligence/outcome-learning-store.js"></script>
+    <script src="/js/intelligence/prediction-closure.js"></script>
+    <script src="/js/intelligence/calibration-registry.js"></script>
+    <script src="/js/intelligence/agent-council.js"></script>
+    <script src="/js/intelligence/reliability-center.js"></script>
+    <script src="/js/intelligence/outcome-intelligence.js"></script>
+    <script src="/js/intelligence/executive-council.js"></script>
+    <script src="/js/intelligence/learning-fabric.js"></script>
+    <script src="/js/intelligence/business-digital-twin.js"></script>
+    <script src="/js/intelligence/financial-intelligence.js"></script>
+    <script src="/js/intelligence/ai-operations-center.js"></script>
+    <script src="/js/intelligence/proposal-engine.js"></script>
+    <script src="/js/intelligence/agent-evaluation-lab.js"></script>
+    <script src="/js/intelligence/knowledge-fabric.js"></script>
+    <script src="/js/intelligence/vector-memory.js"></script>
+    <script src="/js/intelligence/owner-copilot.js"></script>
+    <script src="/js/intelligence/native-model.js"></script>
+    <!-- Governed NVIDIA Model Adapter Layer (registry → adapter → provenance → router) -->
+    <script src="/js/ai/model-registry.js"></script>
+    <script src="/js/ai/providers/nvidia-nemotron-adapter.js"></script>
+    <script src="/js/ai/providers/nemotron-transport.js"></script>
+    <script src="/js/ai/providers/private-gpu-adapter.js"></script>
+    <script src="/js/ai/providers/private-gpu-transport.js"></script>
+    <script src="/js/ai/model-call-provenance.js"></script>
+    <script src="/js/ai/model-router.js"></script>
+    <script src="/js/ai/assisted-draft-queue.js"></script>
+    <script src="/js/core/sensing-ingress.js"></script>
+    <script src="/js/intelligence/provenance-store.js"></script>
+    <script src="/js/intelligence/provenance-builder.js"></script>
+    <script src="/js/intelligence/governance-registry.js"></script>
+    <script src="/js/intelligence/replay-sandbox.js"></script>
+
+    <!-- Customer transport layer (templates → providers → governed queue) -->
+    <script src="/js/transport/template-registry.js"></script>
+    <script src="/js/transport/providers.js"></script>
+    <script src="/js/transport/transport-store.js"></script>
+    <script src="/js/transport/transport-scheduler.js"></script>
+    <script src="/js/transport/transport-adapters.js"></script>
+    <script src="/js/transport/transport-core.js"></script>
 
     <script src="/js/ai/content-safety.js"></script>
     <script src="/js/ai/sidekick-context-engine.js"></script>
@@ -101,6 +159,7 @@
     <script src="/js/bluetooth/services/huepar-s60-adapter.js"></script>
     <script src="/js/bluetooth/hooks/use-bluetooth-connection.js"></script>
     <script src="/js/quotes/integrations/measurement-to-quote.js"></script>
+    <script src="/js/measurements/capture-sequencer.js"></script>
     <script src="/js/measurements/measurement-ai-assistant.js"></script>
     <script src="/js/bluetooth/screens/measurement-hud-ui.js"></script>
 
@@ -110,11 +169,47 @@
     <script src="/js/ui/vision-hud-ui.js"></script>
     <script src="/js/ui/closure-hud-ui.js"></script>
     <script src="/js/ui/command-center-ui.js"></script>
+    <script src="/js/ui/legal-war-room-ui.js"></script>
+    <script src="/js/ui/challenge-ui.js"></script>
+    <script src="/js/ui/prediction-ledger-ui.js"></script>
     <script src="/js/ui/intelligence-dashboard-ui.js"></script>
     <script src="/js/ui/crew-ui.js"></script>
     <script src="/js/ui/contracts-ui.js"></script>
     <script src="/js/ui/schedule-ui.js"></script>
     <script src="/js/ui/business-ui.js"></script>
+    <script src="/js/ui/receipt-intake-ui.js"></script>
+    <script src="/js/ui/financial-intelligence-ui.js"></script>
+    <script src="/js/ui/estimator-ui.js"></script>
+    <script src="/js/ui/quote-lifecycle-ui.js"></script>
+    <script src="/js/ui/quote-win-probability-ui.js"></script>
+    <script src="/js/ui/pricing-optimizer-ui.js"></script>
+    <script src="/js/ui/learning-feedback-ui.js"></script>
+    <script src="/js/ui/calibration-ui.js"></script>
+    <script src="/js/ui/transport-dashboard-ui.js"></script>
+    <script src="/js/ui/transport-inbox-ui.js"></script>
+    <script src="/js/ui/security-center-ui.js"></script>
+    <script src="/js/ui/event-stream-ui.js"></script>
+    <script src="/js/ui/privacy-dashboard-ui.js"></script>
+    <script src="/js/ui/reliability-command-center-ui.js"></script>
+    <script src="/js/ui/outcome-intelligence-ui.js"></script>
+    <script src="/js/ui/executive-council-ui.js"></script>
+    <script src="/js/ui/learning-fabric-ui.js"></script>
+    <script src="/js/ui/business-digital-twin-ui.js"></script>
+    <script src="/js/ui/financial-intelligence-suite-ui.js"></script>
+    <script src="/js/ui/ai-operations-center-ui.js"></script>
+    <script src="/js/ui/proposal-review-ui.js"></script>
+    <script src="/js/ui/agent-evaluation-ui.js"></script>
+    <script src="/js/ui/knowledge-os-ui.js"></script>
+    <script src="/js/ui/vector-memory-ui.js"></script>
+    <script src="/js/ui/owner-copilot-ui.js"></script>
+    <script src="/js/ui/native-model-ui.js"></script>
+    <script src="/js/ui/model-governance-ui.js"></script>
+    <script src="/js/ui/assisted-drafts-ui.js"></script>
+    <script src="/js/ui/sensing-ui.js"></script>
+    <script src="/js/ui/agent-council-ui.js"></script>
+    <script src="/js/ui/provenance-ui.js"></script>
+    <script src="/js/ui/governance-registry-ui.js"></script>
+    <script src="/js/ui/replay-sandbox-ui.js"></script>
     <script src="/js/ui/job-list-ui.js"></script>
     
     <script src="/js/core/app-lifecycle.js"></script>
@@ -166,6 +261,8 @@
             if (window.AAA_AUTOMATION && window.AAA_AUTOMATION.init) window.AAA_AUTOMATION.init();
             if (window.AAA_PROMPT_ARCHITECT && window.AAA_PROMPT_ARCHITECT.loadSaved) await window.AAA_PROMPT_ARCHITECT.loadSaved();
             if (window.AAA_SELF_IMPROVEMENT && window.AAA_SELF_IMPROVEMENT.loadTunings) await window.AAA_SELF_IMPROVEMENT.loadTunings();
+            // Re-install any owner-approved AI calibration so it survives a restart.
+            try { if (window.AAA_CALIBRATION_REGISTRY && window.AAA_CALIBRATION_REGISTRY.rehydrate) await window.AAA_CALIBRATION_REGISTRY.rehydrate(); } catch (e) { console.warn('calibration rehydrate', e); }
             // If we returned from the QuickBooks OAuth consent screen, finish the
             // connection via the proxy (tokens are stored server-side, not here).
             try { if (window.AAA_QUICKBOOKS_ONLINE && window.AAA_QUICKBOOKS_ONLINE.handleRedirect) await window.AAA_QUICKBOOKS_ONLINE.handleRedirect(); } catch (e) { console.warn('qbo redirect', e); }
