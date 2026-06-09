@@ -65,6 +65,14 @@
 
     body.innerHTML = '';
 
+    // ---- Hermes console (message the team through the gateway) ----
+    if (global.AAA_HERMES_CONSOLE_UI && global.AAA_HERMES_CONSOLE_UI.render) {
+      const hermesMount = document.createElement('div');
+      hermesMount.style.marginBottom = '14px';
+      body.appendChild(hermesMount);
+      try { await global.AAA_HERMES_CONSOLE_UI.render(hermesMount); } catch (e) { console.warn('hermes console', e); }
+    }
+
     // ---- System health ----
     body.appendChild(section('System Health'));
     const healthRows = [

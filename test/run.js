@@ -14,6 +14,7 @@ const SUITES = [
   'unit/gateway.test.js',
   'unit/model-router.test.js',
   'unit/action-safety-gate.test.js',
+  'unit/hermes-gateway.test.js',
   'unit/pricing.test.js',
   'unit/huepar-s60.test.js',
   'unit/capture-sequencer.test.js',
