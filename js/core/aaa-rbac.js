@@ -49,6 +49,10 @@
     MANAGE_SETTINGS: 'Cloud settings, members, integrations',
     MANAGE_CREW: 'Manage employees / crew / tools',
     VIEW_AUDIT_LOG: 'View the audit trail',
+    // Governance: override a blocked/queued high-risk AI decision. Owner-only
+    // by construction (it is not in the manager/crew lists below), giving the
+    // Governance Engine its "Admin can override" gate without a separate flag.
+    OVERRIDE_AI_DECISION: 'Override a blocked/queued high-risk AI decision (governance)',
     // Legal Intelligence Division
     VIEW_LEGAL: 'View the Legal War Room (risk, compliance, contracts, audit)',
     MANAGE_LEGAL: 'Add / resolve legal records (contracts, compliance, reviews)',

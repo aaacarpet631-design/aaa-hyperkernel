@@ -23,7 +23,6 @@
   function meetings() { return global.AAA_MEETINGS; }
   function rankings() { return global.AAA_RANKINGS; }
   function evolution() { return global.AAA_EVOLUTION; }
-  function debate() { return global.AAA_DEBATE; }
   function research() { return global.AAA_RESEARCH; }
 
   const GREEN = '#16A34A', AMBER = '#D97706', RED = '#DC2626', GREY = '#71717A', BLUE = '#2563EB';
@@ -74,7 +73,7 @@
   function riskLevel(reports) {
     let high = 0, blocked = 0;
     reports.forEach(function (r) {
-      if (r.layers) { const L4 = r.layers.find(function (x) { return x.layer === 4; }); }
+
       if (Array.isArray(r.risks)) high += r.risks.length >= 3 ? 1 : 0;
       if (r.verdict === 'reject') blocked++;
     });
@@ -107,6 +106,8 @@
     const meetingList = meetings() ? (await meetings().list()).slice(0, 4) : [];
     const evoList = evolution() ? (await evolution().list()).slice(0, 1) : [];
     const supMetrics = global.AAA_SUPERVISOR ? await global.AAA_SUPERVISOR.metrics() : { ok: false };
+    const govMetrics = global.AAA_GOVERNANCE_ENGINE ? await global.AAA_GOVERNANCE_ENGINE.metrics() : null;
+    const agentInsights = global.AAA_AGENT_SCORECARDS ? await global.AAA_AGENT_SCORECARDS.insights() : null;
 
     body.innerHTML = '';
 
@@ -131,11 +132,52 @@
     });
     const risk = riskLevel(reports);
     body.appendChild(kv('Risk Level', risk.label, risk.color));
+
+    // ---- AI Governance (override / audit analytics across all guardrails) ----
+    if (govMetrics) {
+      body.appendChild(section('AI Governance'));
+      const orPct = Math.round((govMetrics.overrideRate || 0) * 100) + '%';
+      body.appendChild(kv('Safety Checks', govMetrics.safetyChecks));
+      body.appendChild(kv('Blocked', govMetrics.blocked, govMetrics.blocked ? RED : GREY));
+      body.appendChild(kv('Queued', govMetrics.queued, govMetrics.queued ? AMBER : GREY));
+      body.appendChild(kv('Overrides', govMetrics.overrides, govMetrics.overrides ? AMBER : GREY));
+      body.appendChild(kv('Override Rate', orPct, (govMetrics.overrideRate || 0) > 0.5 ? RED : GREY));
+      body.appendChild(kv('False-Positive Candidates', govMetrics.falsePositiveCandidates, govMetrics.falsePositiveCandidates ? AMBER : GREY));
+      if (govMetrics.reviewQueue) body.appendChild(kv('Supervisor Review Queue', govMetrics.reviewQueue, AMBER));
+      if (govMetrics.alerts) body.appendChild(kv('Drift Alerts', govMetrics.alerts, RED));
+      if (govMetrics.escalations) body.appendChild(kv('Open Escalations', govMetrics.escalations, RED));
+      if (global.AAA_GOVERNANCE_INTEGRITY) {
+        const integ = await global.AAA_GOVERNANCE_INTEGRITY.selfAudit({});
+        body.appendChild(kv('Ledger Integrity', integ.ok
+          ? '✅ verified · ' + integ.entries + ' entries · ' + integ.writers + ' writer(s)' + (integ.signed ? ' · signed' : '')
+          : '⛔ ' + (integ.reason || 'FAILED') + (integ.writerId ? ' (writer ' + integ.writerId + ')' : ''), integ.ok ? GREEN : RED));
+      }
+    }
+
+    // ---- Agent performance (Governance Intelligence Layer) ----
+    if (agentInsights) {
+      const anyCards = (agentInsights.top.length + agentInsights.worst.length) > 0;
+      body.appendChild(section('Agent Performance'));
+      if (!anyCards) {
+        body.appendChild(note('No agent has enough scored outcomes yet — agents are unproven, not bad.'));
+      } else {
+        const fmtCard = function (c) { return c.agentType + ' · ' + pct(c.successRate) + ' success · acc ' + pct(c.accuracy) + ' · ' + (c.samples ? c.samples.considered : 0) + ' scored'; };
+        if (agentInsights.top.length) { body.appendChild(note('Top performing')); agentInsights.top.forEach(function (c) { body.appendChild(row('<strong style="color:' + GREEN + '">' + esc(c.agentType) + '</strong><div class="aaa-list-sub">' + esc(fmtCard(c)) + '</div>')); }); }
+        if (agentInsights.worst.length) { body.appendChild(note('Worst performing')); agentInsights.worst.forEach(function (c) { body.appendChild(row('<strong style="color:' + RED + '">' + esc(c.agentType) + '</strong><div class="aaa-list-sub">' + esc(fmtCard(c)) + '</div>')); }); }
+        if (agentInsights.drifting.length) body.appendChild(kv('Drifting agents', agentInsights.drifting.map(function (c) { return c.agentType; }).join(', '), AMBER));
+        if (agentInsights.excessiveOverrides.length) body.appendChild(kv('Excessive overrides', agentInsights.excessiveOverrides.map(function (c) { return c.agentType; }).join(', '), AMBER));
+        if (agentInsights.needingRetraining.length) body.appendChild(kv('Needs retraining', agentInsights.needingRetraining.map(function (c) { return c.agentType; }).join(', '), RED));
+        if (agentInsights.insufficientData && agentInsights.insufficientData.length) body.appendChild(kv('Insufficient data', agentInsights.insufficientData.map(function (c) { return c.agentType; }).join(', '), GREY));
+      }
+      if (global.AAA_GOVERNANCE_LEARNING_UI) {
+        body.appendChild(ui.button({ label: '🎓 Open Learning Command Center', variant: 'secondary', full: true, onClick: function () { global.AAA_GOVERNANCE_LEARNING_UI.open(); } }));
+      }
+    }
     body.appendChild(kv('Prediction Accuracy (calibration)', supMetrics.ok && supMetrics.avgCalibration != null ? String(supMetrics.avgCalibration) : '—', BLUE));
     body.appendChild(kv('Close Rate', supMetrics.ok ? pct(supMetrics.closeRate) : '—'));
 
     // ---- Opportunities & threats (from latest accepted analyses) ----
-    const accepted = reports.filter(function (r) { return r.accepted; });
+
     const opps = []; const threats = [];
     Object.keys(latestByTeam).forEach(function (tid) {
       const r = latestByTeam[tid];

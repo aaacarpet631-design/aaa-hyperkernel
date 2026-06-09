@@ -6,7 +6,7 @@
  * app fully usable offline. Old caches are purged on activate, and the worker
  * takes control immediately to avoid serving a stale shell after an update.
  */
-const CACHE_NAME = 'hyperkernel-v73';
+const CACHE_NAME = 'hyperkernel-v75';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -47,6 +47,7 @@ const PRECACHE = [
   '/js/contracts/contract-store.js',
   '/js/portal/portal-link-store.js',
   '/js/scheduling/schedule-store.js',
+  '/js/leads/lead-store.js',
   '/js/legal/legal-store.js',
   '/js/legal/legal-risk-engine.js',
   '/js/legal/legal-division.js',
@@ -60,6 +61,8 @@ const PRECACHE = [
   '/js/agents/agent-registry.js',
   '/js/agents/agent-os.js',
   '/js/agents/supervisor.js',
+  '/js/agents/challenge-protocol.js',
+  '/js/agents/escalation-policy.js',
   '/js/agents/prompt-architect.js',
   '/js/agents/self-improvement.js',
   '/js/agents/agent-marketplace.js',
@@ -159,6 +162,22 @@ const PRECACHE = [
   '/js/ui/governance-registry-ui.js',
   '/js/ui/replay-sandbox-ui.js',
   '/js/ui/job-list-ui.js',
+  '/js/governance/governance-sync.js',
+  '/js/governance/audit-ledger.js',
+  '/js/governance/governance-engine.js',
+  '/js/governance/governance-escalation.js',
+  '/js/governance/governance-notifier.js',
+  '/js/governance/agent-outcomes.js',
+  '/js/governance/agent-scorecards.js',
+  '/js/governance/governance-supervisor.js',
+  '/js/governance/governance-bridge.js',
+  '/js/governance/governance-learning.js',
+  '/js/governance/prompt-change-pipeline.js',
+  '/js/governance/prompt-registry.js',
+  '/js/governance/governance-integrity.js',
+  '/js/ui/governance-badge-ui.js',
+  '/js/ui/governance-learning-ui.js',
+  '/js/ai/content-safety.js',
   '/js/ai/sidekick-context-engine.js',
   '/js/ai/voice-diagnostics.js',
   '/js/ai/voice-note-store.js',
