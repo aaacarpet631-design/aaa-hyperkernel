@@ -369,6 +369,19 @@ device loss and is shared across the team. (`AAA_GOVERNANCE_SYNC`.)
   `/api/governance-alert` email channel — continuous monitoring independent of
   any client. (Supabase service-role read; env-gated, no-op without DB creds.)
 
+## Integrity visibility + on-device self-audit (Phase 10)
+
+- **`AAA_GOVERNANCE_INTEGRITY.check()`** runs all three layers at once (FNV
+  checksum chain, SHA-256 cryptographic chain, HMAC signatures) and reports a
+  combined status with entry/writer counts and the first break.
+- **`selfAudit()`** verifies and, on any failure, raises a critical
+  `ledger_integrity` escalation (cooldown-deduped → email) — continuous
+  **on-device** detection that complements the daily server-side sweep.
+- **Surfaced** — the Executive Intelligence dashboard shows a live "Ledger
+  Integrity ✅ verified / ⛔ tampered" line (and self-audits on open); the
+  Learning Command Center has a panel with per-layer status, "Re-verify", and
+  "Verify on server (SHA-256)".
+
 ## Adding the next guardrail
 
 A new high-risk guardrail (say contract-clause review) needs only to:

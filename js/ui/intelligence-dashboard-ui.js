@@ -146,6 +146,12 @@
       if (govMetrics.reviewQueue) body.appendChild(kv('Supervisor Review Queue', govMetrics.reviewQueue, AMBER));
       if (govMetrics.alerts) body.appendChild(kv('Drift Alerts', govMetrics.alerts, RED));
       if (govMetrics.escalations) body.appendChild(kv('Open Escalations', govMetrics.escalations, RED));
+      if (global.AAA_GOVERNANCE_INTEGRITY) {
+        const integ = await global.AAA_GOVERNANCE_INTEGRITY.selfAudit({});
+        body.appendChild(kv('Ledger Integrity', integ.ok
+          ? '✅ verified · ' + integ.entries + ' entries · ' + integ.writers + ' writer(s)' + (integ.signed ? ' · signed' : '')
+          : '⛔ ' + (integ.reason || 'FAILED') + (integ.writerId ? ' (writer ' + integ.writerId + ')' : ''), integ.ok ? GREEN : RED));
+      }
     }
 
     // ---- Agent performance (Governance Intelligence Layer) ----

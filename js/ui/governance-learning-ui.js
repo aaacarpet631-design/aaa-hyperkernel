@@ -167,6 +167,21 @@
         });
       }
 
+      // ---- audit ledger integrity ----
+      if (global.AAA_GOVERNANCE_INTEGRITY) {
+        s.body.appendChild(ui.el('h2', { className: 'aaa-section-title', text: 'Audit Ledger Integrity' }));
+        const integ = await global.AAA_GOVERNANCE_INTEGRITY.check();
+        const line = function (k, st) { return ui.el('div', { className: 'aaa-list-sub', html: '<strong>' + esc(k) + ':</strong> ' + (st.skipped ? '— (not configured)' : (st.ok ? '✅ ok' : '⛔ ' + esc(st.reason || 'failed'))) }); };
+        s.body.appendChild(ui.el('div', { className: 'aaa-list-row', html: '<strong style="color:' + (integ.ok ? '#16A34A' : '#DC2626') + '">' + (integ.ok ? '✅ Verified' : '⛔ Tampered') + '</strong> · ' + integ.entries + ' entries · ' + integ.writers + ' writer(s)' }));
+        s.body.appendChild(line('FNV checksum chain', integ.fnv));
+        s.body.appendChild(line('SHA-256 chain', integ.sha));
+        s.body.appendChild(line('HMAC signatures', integ.sig));
+        const msg = ui.el('p', { className: 'aaa-dialog__message' });
+        s.body.appendChild(ui.button({ label: 'Re-verify now', variant: 'secondary', size: 'sm', onClick: async function () { await global.AAA_GOVERNANCE_INTEGRITY.selfAudit({}); self.render(); } }));
+        s.body.appendChild(ui.button({ label: 'Verify on server (SHA-256)', variant: 'ghost', size: 'sm', onClick: async function () { const r = await global.AAA_AUDIT_LEDGER.verifyOnServer(); msg.textContent = r && r.ok ? '✅ Server re-verified ' + (r.length || 0) + ' entries.' : '⛔ Server: ' + ((r && (r.reason || r.error)) || 'failed'); } }));
+        s.body.appendChild(msg);
+      }
+
       s.body.appendChild(ui.button({ label: 'Done', variant: 'ghost', full: true, onClick: function () { s.close(); } }));
     },
 
