@@ -66,6 +66,7 @@ const SUITES = [
   'unit/sms-copilot.test.js',
   'unit/chat-canvas.test.js',
   'unit/field-mode.test.js',
+  'unit/field-quick-actions.test.js',
   'unit/field-capture-session.test.js',
   'unit/seam-layout-optimizer.test.js',
   'unit/room-scan-engine.test.js',

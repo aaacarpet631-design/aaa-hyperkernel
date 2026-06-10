@@ -26,12 +26,13 @@
   }
   function ownerName() { const c = cfg(); return (c.flag && c.flag('ownerName', null)) || c.ownerName || (c.businessName ? c.businessName.replace(/\s*(carpet|flooring).*$/i, '').trim() : '') || 'there'; }
 
-  // quick action → which global must exist for it to be live
+  // quick action → which global hosts it (target) + the method that launches it
+  // (entry). `needs` is what must exist for the card to be live.
   const QUICK = [
-    { id: 'scan_room', icon: '📷', label: 'Scan Room', needs: ['VISION_HUD_UI', 'CAPTURE_SEQUENCER'], boot: 'VISION_HUD_UI' },
-    { id: 'laser_measure', icon: '📐', label: 'Laser Measure', needs: ['BLUETOOTH', 'DEVICE_ADAPTER_REGISTRY'], boot: 'MEASUREMENT_HUD_UI' },
-    { id: 'quick_estimate', icon: '📝', label: 'Quick Estimate', needs: ['QUOTES', 'MEASUREMENT_QUOTE'], boot: 'QUOTES' },
-    { id: 'voice_note', icon: '🎤', label: 'Voice Note', needs: ['VOICE_HUD_UI'], boot: 'VOICE_HUD_UI' }
+    { id: 'scan_room', icon: '📷', label: 'Scan Room', needs: ['VISION_HUD_UI', 'CAPTURE_SEQUENCER'], boot: 'VISION_HUD_UI', entry: 'boot' },
+    { id: 'laser_measure', icon: '📐', label: 'Laser Measure', needs: ['MEASUREMENT_HUD_UI', 'BLUETOOTH', 'DEVICE_ADAPTER_REGISTRY'], boot: 'MEASUREMENT_HUD_UI', entry: 'boot' },
+    { id: 'quick_estimate', icon: '📝', label: 'Quick Estimate', needs: ['ESTIMATOR_UI'], boot: 'ESTIMATOR_UI', entry: 'open' },
+    { id: 'voice_note', icon: '🎤', label: 'Voice Note', needs: ['VOICE_HUD_UI'], boot: 'VOICE_HUD_UI', entry: 'open' }
   ];
   function actionAvailable(a) { return a.needs.some(has); }
 
@@ -79,7 +80,10 @@
       if (!a) return { ok: false, reason: 'UNKNOWN_ACTION' };
       if (!actionAvailable(a)) return { ok: false, routed: false, reason: 'unavailable', action: id };
       const target = global['AAA_' + a.boot];
-      if (target && target.boot && typeof document !== 'undefined') { target.boot((opts || {})); return { ok: true, routed: true, via: a.boot }; }
+      // Honor the action's declared entry, then fall back to whatever launch
+      // method the target actually exposes (HUDs use boot, panels use open).
+      const fn = target && (target[a.entry] || target.boot || target.open || target.start);
+      if (typeof fn === 'function' && typeof document !== 'undefined') { fn.call(target, (opts || {})); return { ok: true, routed: true, via: a.boot, entry: a.entry }; }
       return { ok: true, routed: false, via: a.boot, reason: (typeof document === 'undefined' ? 'no_dom' : 'no_boot') };
     },
 
