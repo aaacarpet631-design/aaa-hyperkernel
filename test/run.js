@@ -53,6 +53,7 @@ const SUITES = [
   'unit/genesis-foundry.test.js',
   'unit/tool-forge.test.js',
   'unit/capability-economy.test.js',
+  'unit/simulation-council.test.js',
   'unit/event-stream-ui.test.js',
   'unit/privacy.test.js',
   'unit/privacy-dashboard-ui.test.js',

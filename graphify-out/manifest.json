@@ -3880,9 +3880,9 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "/home/user/aaa-hyperkernel/test/run.js": {
-    "mtime": 1781085953.914554,
-    "ast_hash": "104064f08fa03ca8a255739ff83fcc61",
-    "semantic_hash": "104064f08fa03ca8a255739ff83fcc61"
+    "mtime": 1781089932.3400135,
+    "ast_hash": "51fc04e77130d12eb0a45e5e0f26fd96",
+    "semantic_hash": "51fc04e77130d12eb0a45e5e0f26fd96"
   },
   "/home/user/aaa-hyperkernel/test/smoke/boot.test.js": {
     "mtime": 1781065386.5464003,
@@ -4605,9 +4605,9 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "/home/user/aaa-hyperkernel/index.html": {
-    "mtime": 1781086061.8985517,
-    "ast_hash": "41f9fd33e1760e402529e977b3ff32e0",
-    "semantic_hash": "41f9fd33e1760e402529e977b3ff32e0"
+    "mtime": 1781089941.436014,
+    "ast_hash": "1fc33bf3ec7f3215abf647b4635a137a",
+    "semantic_hash": "1fc33bf3ec7f3215abf647b4635a137a"
   },
   "/home/user/aaa-hyperkernel/netlify/functions/RESEARCH.md": {
     "mtime": 1780633642.6350634,
@@ -4688,5 +4688,55 @@
     "mtime": 1781069242.3424327,
     "ast_hash": "f075e96da59ca572eb6df98c6b776272",
     "semantic_hash": "f075e96da59ca572eb6df98c6b776272"
+  },
+  "/home/user/aaa-hyperkernel/js/simulation/counterfactual-runner.js": {
+    "mtime": 1781089804.6600058,
+    "ast_hash": "9de6770d8a53d798acad91c6a5412874",
+    "semantic_hash": "9de6770d8a53d798acad91c6a5412874"
+  },
+  "/home/user/aaa-hyperkernel/js/simulation/monte-carlo-engine.js": {
+    "mtime": 1781089775.352004,
+    "ast_hash": "8e2c622db4c3f29fa0644f622971da30",
+    "semantic_hash": "8e2c622db4c3f29fa0644f622971da30"
+  },
+  "/home/user/aaa-hyperkernel/js/simulation/outcome-estimator.js": {
+    "mtime": 1781089754.440003,
+    "ast_hash": "d5612217eacb66a6e63ec14e7d7290e0",
+    "semantic_hash": "d5612217eacb66a6e63ec14e7d7290e0"
+  },
+  "/home/user/aaa-hyperkernel/js/simulation/policy-simulator.js": {
+    "mtime": 1781089841.268008,
+    "ast_hash": "9154e171f4ca11359d310a0c7befafda",
+    "semantic_hash": "9154e171f4ca11359d310a0c7befafda"
+  },
+  "/home/user/aaa-hyperkernel/js/simulation/scenario-engine.js": {
+    "mtime": 1781089723.9120011,
+    "ast_hash": "3e1e3a3430ae8409fc329dc9d086650a",
+    "semantic_hash": "3e1e3a3430ae8409fc329dc9d086650a"
+  },
+  "/home/user/aaa-hyperkernel/js/simulation/simulation-governance.js": {
+    "mtime": 1781089882.5800104,
+    "ast_hash": "13fed860bae97e46fab84a907c6bfd3b",
+    "semantic_hash": "13fed860bae97e46fab84a907c6bfd3b"
+  },
+  "/home/user/aaa-hyperkernel/js/simulation/simulation-ledger.js": {
+    "mtime": 1781089692.551999,
+    "ast_hash": "beba4d50bebc4b3594b48485073703d7",
+    "semantic_hash": "beba4d50bebc4b3594b48485073703d7"
+  },
+  "/home/user/aaa-hyperkernel/js/simulation/strategy-scorecard.js": {
+    "mtime": 1781089825.336007,
+    "ast_hash": "47b26e2f74064c23769986a3e67af1ef",
+    "semantic_hash": "47b26e2f74064c23769986a3e67af1ef"
+  },
+  "/home/user/aaa-hyperkernel/test/unit/simulation-council.test.js": {
+    "mtime": 1781089927.4200132,
+    "ast_hash": "a93125fd6fb668a6987c009ff78c04bd",
+    "semantic_hash": "a93125fd6fb668a6987c009ff78c04bd"
+  },
+  "/home/user/aaa-hyperkernel/SIMULATION.md": {
+    "mtime": 1781089988.7120168,
+    "ast_hash": "fb3d2d3194681593f6be5a6ba64acf1b",
+    "semantic_hash": "fb3d2d3194681593f6be5a6ba64acf1b"
   }
 }
