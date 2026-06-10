@@ -58,6 +58,7 @@ const SUITES = [
   'unit/revenue-council.test.js',
   'unit/innovation-council.test.js',
   'unit/teleological.test.js',
+  'unit/epistemology.test.js',
   'unit/event-stream-ui.test.js',
   'unit/privacy.test.js',
   'unit/privacy-dashboard-ui.test.js',
