@@ -1,0 +1,220 @@
+/*
+ * AAA HyperKernel — Field Mode OS theme.
+ *
+ * A futuristic, glove-friendly field skin: deep-space gradient base,
+ * glassmorphism panels, a duotone (electric cyan + AAA red) accent, soft glow,
+ * and big tap targets. Styles the previously-unstyled Field Mode home (.fm-*),
+ * Chat Canvas (.cc-* / .cp-*), the bottom nav (.aaa-tabbar), and the FAB.
+ * Loaded last so it layers over the legacy hud stylesheets.
+ */
+
+:root {
+  --hk-bg-0: #05060a;
+  --hk-bg-1: #0b0e16;
+  --hk-bg-2: #11151f;
+  --hk-panel: rgba(20, 26, 38, 0.66);
+  --hk-panel-2: rgba(30, 38, 54, 0.55);
+  --hk-stroke: rgba(120, 160, 220, 0.16);
+  --hk-stroke-2: rgba(120, 160, 220, 0.28);
+  --hk-text: #eaf0fb;
+  --hk-text-dim: #93a0ba;
+  --hk-cyan: #2ee6d6;
+  --hk-cyan-2: #38bdf8;
+  --hk-red: #ff3b4e;
+  --hk-amber: #f5b53d;
+  --hk-green: #2fe08a;
+  --hk-radius: 18px;
+  --hk-nav-h: 64px;
+}
+
+/* ---- app shell base ---- */
+html, body { background: var(--hk-bg-0); color: var(--hk-text); }
+body {
+  margin: 0;
+  font-family: "Inter", "SF Pro Display", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background:
+    radial-gradient(1200px 700px at 78% -8%, rgba(56, 189, 248, 0.10), transparent 60%),
+    radial-gradient(900px 600px at -10% 8%, rgba(255, 59, 78, 0.08), transparent 55%),
+    linear-gradient(180deg, var(--hk-bg-1), var(--hk-bg-0));
+  min-height: 100vh;
+}
+#app-root { padding-bottom: calc(var(--hk-nav-h) + env(safe-area-inset-bottom, 0px) + 18px); }
+.aaa-main { max-width: 560px; margin: 0 auto; padding: 14px 16px 0; }
+
+/* ===================== Field Mode Home ===================== */
+.fm-home {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: max(18px, env(safe-area-inset-top, 0px)) 16px 8px;
+  animation: hk-fade 0.4s ease both;
+}
+@keyframes hk-fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.fm-greeting {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 6px 2px 16px;
+  background: linear-gradient(92deg, #fff 30%, var(--hk-cyan-2));
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* The money action — big, glowing, impossible to miss. */
+.fm-primary {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; min-height: 76px;
+  border: 0; border-radius: 22px;
+  font-size: 20px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+  color: #04121a; cursor: pointer;
+  background: linear-gradient(135deg, var(--hk-cyan) 0%, var(--hk-cyan-2) 100%);
+  box-shadow: 0 10px 34px rgba(46, 230, 214, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transition: transform 0.12s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  position: relative; overflow: hidden;
+}
+.fm-primary::after {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(120px 60px at 50% 120%, rgba(255, 255, 255, 0.5), transparent 70%);
+  opacity: 0.5;
+}
+.fm-primary:active { transform: scale(0.985); box-shadow: 0 6px 20px rgba(46, 230, 214, 0.30); }
+
+/* Quick action grid — glass cards. */
+.fm-quick { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 14px 0 22px; }
+.fm-q {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+  min-height: 84px; padding: 14px;
+  border-radius: var(--hk-radius);
+  border: 1px solid var(--hk-stroke);
+  background: var(--hk-panel);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  color: var(--hk-text); font-size: 26px; cursor: pointer; /* font-size sizes the leading emoji icon */
+  transition: transform 0.12s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  text-align: left; position: relative;
+}
+.fm-q:active { transform: scale(0.97); }
+.fm-q span { display: block; font-size: 14px; font-weight: 600; color: var(--hk-text); }
+.fm-q:not(.fm-q--off):hover { border-color: var(--hk-stroke-2); box-shadow: 0 8px 24px rgba(56, 189, 248, 0.14); }
+.fm-q--off { opacity: 0.42; filter: grayscale(0.5); }
+
+/* Section headers. */
+.fm-sec, .aaa-main h3 {
+  font-size: 12px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--hk-text-dim); margin: 18px 2px 10px;
+}
+
+/* Today's jobs — status cards. */
+.fm-jobs { display: flex; flex-direction: column; gap: 8px; }
+.fm-job {
+  position: relative;
+  padding: 14px 14px 14px 18px;
+  border-radius: 14px;
+  background: var(--hk-panel-2);
+  border: 1px solid var(--hk-stroke);
+  font-size: 15px; font-weight: 600; color: var(--hk-text);
+  cursor: pointer; transition: transform 0.1s ease, border-color 0.2s ease;
+}
+.fm-job::before { content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 3px; border-radius: 3px; background: linear-gradient(180deg, var(--hk-cyan), var(--hk-cyan-2)); }
+.fm-job:active { transform: scale(0.99); }
+.fm-empty { padding: 18px; border-radius: 14px; border: 1px dashed var(--hk-stroke-2); color: var(--hk-text-dim); text-align: center; }
+
+.fm-ask {
+  display: block; width: 100%; margin-top: 18px; padding: 15px 16px;
+  border-radius: 16px; cursor: pointer; text-align: left;
+  border: 1px solid rgba(255, 59, 78, 0.30);
+  background: linear-gradient(135deg, rgba(255, 59, 78, 0.12), rgba(255, 59, 78, 0.04));
+  color: var(--hk-text); font-size: 15px; font-weight: 600;
+}
+.fm-ask:active { transform: scale(0.99); }
+
+/* ===================== Bottom Nav ===================== */
+.aaa-tabbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+  display: flex; justify-content: space-around; align-items: center;
+  height: calc(var(--hk-nav-h) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: rgba(8, 11, 18, 0.82);
+  -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+  border-top: 1px solid var(--hk-stroke);
+}
+.aaa-tab {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  background: none; border: 0; cursor: pointer;
+  color: var(--hk-text-dim); font-size: 11px; font-weight: 600; letter-spacing: 0.02em;
+  padding: 8px 0; position: relative; transition: color 0.2s ease;
+}
+.aaa-tab__icon { font-size: 20px; line-height: 1; filter: grayscale(0.4); transition: filter 0.2s ease, transform 0.15s ease; }
+.aaa-tab.is-active { color: var(--hk-cyan); }
+.aaa-tab.is-active .aaa-tab__icon { filter: none; transform: translateY(-1px); }
+.aaa-tab.is-active::before {
+  content: ""; position: absolute; top: 0; width: 26px; height: 3px; border-radius: 3px;
+  background: linear-gradient(90deg, var(--hk-cyan), var(--hk-cyan-2));
+  box-shadow: 0 0 12px var(--hk-cyan);
+}
+
+/* ===================== FAB ===================== */
+.voice-fab {
+  position: fixed; right: 18px; bottom: calc(var(--hk-nav-h) + env(safe-area-inset-bottom, 0px) + 18px);
+  z-index: 45; width: 60px; height: 60px; border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.18); cursor: pointer; font-size: 24px; color: #fff;
+  background: radial-gradient(circle at 35% 30%, #ff6a78, var(--hk-red));
+  box-shadow: 0 8px 26px rgba(255, 59, 78, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition: transform 0.12s ease;
+}
+.voice-fab:active { transform: scale(0.92); }
+
+/* ===================== Chat Canvas ===================== */
+.cc-root { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; min-height: 60vh; padding: 12px 14px 0; }
+.cc-thread { display: flex; flex-direction: column; gap: 10px; padding-bottom: 96px; }
+.cc-msg { max-width: 86%; padding: 12px 14px; border-radius: 16px; font-size: 15px; line-height: 1.4; }
+.cc-user { align-self: flex-end; color: #04121a; font-weight: 600; background: linear-gradient(135deg, var(--hk-cyan), var(--hk-cyan-2)); border-bottom-right-radius: 5px; }
+.cc-assistant { align-self: flex-start; background: var(--hk-panel); border: 1px solid var(--hk-stroke); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom-left-radius: 5px; }
+.cc-bar {
+  position: fixed; left: 0; right: 0; bottom: calc(var(--hk-nav-h) + env(safe-area-inset-bottom, 0px));
+  display: flex; gap: 8px; padding: 10px 14px;
+  background: linear-gradient(180deg, transparent, rgba(5, 6, 10, 0.9) 30%);
+}
+.cc-input {
+  flex: 1; min-height: 46px; padding: 0 16px; border-radius: 23px;
+  border: 1px solid var(--hk-stroke-2); background: var(--hk-bg-2); color: var(--hk-text);
+  font-size: 15px; outline: none;
+}
+.cc-input::placeholder { color: var(--hk-text-dim); }
+.cc-input:focus { border-color: var(--hk-cyan-2); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18); }
+.cc-send {
+  min-width: 64px; border: 0; border-radius: 23px; cursor: pointer; font-weight: 700; color: #04121a;
+  background: linear-gradient(135deg, var(--hk-cyan), var(--hk-cyan-2));
+}
+.cc-send:active { transform: scale(0.96); }
+
+/* ===================== Rich Cards ===================== */
+.cp-card {
+  border-radius: 16px; padding: 14px 16px; margin: 4px 0;
+  background: var(--hk-panel); border: 1px solid var(--hk-stroke);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+}
+.cp-card h3 { margin: 0 0 8px; font-size: 15px; font-weight: 700; color: var(--hk-text); }
+.cp-summary { font-size: 15px; color: var(--hk-text); }
+.cp-meta { font-size: 12px; color: var(--hk-text-dim); margin-top: 6px; letter-spacing: 0.03em; }
+.cp-sec { margin-top: 10px; font-size: 14px; color: var(--hk-text); }
+.cp-sec b { color: var(--hk-cyan-2); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; }
+.cp-sec ul { margin: 6px 0 0; padding-left: 18px; color: var(--hk-text-dim); }
+.cp-cases { width: 100%; border-collapse: collapse; margin: 8px 0; }
+.cp-cases th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--hk-text-dim); padding: 4px; }
+.cp-cases td { text-align: center; font-weight: 700; padding: 6px 4px; color: var(--hk-text); }
+.cp-rec { font-size: 14px; color: var(--hk-text); margin: 6px 0 0; }
+.cp-gov, .ly-review, .rs-review { margin-top: 10px; font-size: 13px; font-weight: 700; color: var(--hk-amber); }
+.cp-missing, .ly-missing, .rs-missing { margin-top: 8px; font-size: 12px; color: var(--hk-text-dim); }
+.cp-actions { display: flex; gap: 8px; margin-top: 12px; }
+.cp-approve, .cp-reject, .rs-review-layout, .ly-card button {
+  border: 0; border-radius: 12px; padding: 10px 14px; cursor: pointer; font-weight: 700; font-size: 14px;
+}
+.cp-approve, .rs-review-layout { background: linear-gradient(135deg, var(--hk-green), #19c06b); color: #042014; }
+.cp-reject { background: rgba(255, 59, 78, 0.16); color: var(--hk-red); border: 1px solid rgba(255, 59, 78, 0.4); }
+
+/* Layout + scan cards reuse the glass look. */
+.ly-card, .rs-card { border-radius: 16px; padding: 14px 16px; background: var(--hk-panel); border: 1px solid var(--hk-stroke); margin: 8px 0; }
+.ly-card h3, .rs-card h3 { margin: 0 0 8px; font-size: 15px; }
+.rs-moisture { margin-top: 8px; color: #5fd0ff; font-weight: 700; font-size: 13px; }
+.rs-conflict, .ly-warn { margin-top: 8px; color: var(--hk-amber); font-size: 13px; }
