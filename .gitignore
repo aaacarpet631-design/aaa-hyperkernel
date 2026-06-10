@@ -2,3 +2,7 @@ node_modules/
 package-lock.json
 .netlify/
 *.log
+
+# graphify: machine-local interpreter pointers (re-resolved by the skill)
+graphify-out/.graphify_python
+graphify-out/.graphify_root

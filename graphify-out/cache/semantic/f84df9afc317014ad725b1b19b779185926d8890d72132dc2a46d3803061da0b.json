@@ -1,0 +1,1 @@
+{"nodes": [{"id": "accounting_receipt_intake_store_aaa_receipt_intake", "label": "AAA_RECEIPT_INTAKE (review queue + posting)", "file_type": "code", "source_file": "js/accounting/receipt-intake-store.js", "source_location": null, "source_url": null, "captured_at": null, "author": null, "contributor": null}], "edges": [], "hyperedges": []}
