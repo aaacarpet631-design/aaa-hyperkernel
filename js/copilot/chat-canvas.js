@@ -42,6 +42,27 @@
       }
 
       const route = router() ? router().classify(text) : { intent: 'unknown', cardType: 'text', confidence: 0 };
+
+      // Company Brain — evidence-cited answers for business questions the
+      // copilot router doesn't claim (win rates, profitability, revenue
+      // trends, pipeline). Only fires on the unknown route, so every existing
+      // intent keeps its rich card; the brain never fabricates (each finding
+      // cites source, metric, value, and sample size).
+      if (route.intent === 'unknown' && global.AAA_COMPANY_BRAIN && global.AAA_COMPANY_BRAIN.ask) {
+        try {
+          const brain = await global.AAA_COMPANY_BRAIN.ask(text);
+          if (brain && brain.ok && brain.intent !== 'unknown') {
+            const lines = (brain.answer.findings || []).map(function (f) {
+              return '• ' + f.claim + (f.evidence ? ' (' + f.evidence.source + ' · n=' + f.evidence.sample + ')' : '');
+            });
+            if (brain.answer.caveat) lines.push('⚠ ' + brain.answer.caveat);
+            const brainCard = { type: 'text', summary: [brain.answer.headline].concat(lines).join('\n'), suggestions: [], confidence: brain.confidence, missingData: [] };
+            const brainMsg = store() ? await store().add({ role: 'assistant', text: brain.answer.headline, card: brainCard, threadId: o.threadId, status: 'sent' }) : null;
+            return { queued: false, intent: 'company_brain.' + brain.intent, cardType: 'text', confidence: brain.confidence, userMessage: userMsg, assistantMessage: brainMsg, card: brainCard, answer: brain };
+          }
+        } catch (_) { /* fall through to the copilot path */ }
+      }
+
       let answer = null;
       const needsCopilot = route.intent !== 'software_factory' && route.intent !== 'governance_approval';
       if (needsCopilot && copilot()) answer = await copilot().ask(text, o);

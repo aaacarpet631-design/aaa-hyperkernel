@@ -1,16 +1,16 @@
 # Graph Report - aaa-hyperkernel  (2026-06-10)
 
 ## Corpus Check
-- 672 files · ~561,425 words
+- 680 files · ~572,844 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 7294 nodes · 12837 edges · 578 communities (515 shown, 63 thin omitted)
+- 7373 nodes · 13010 edges · 582 communities (521 shown, 61 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 34 edges (avg confidence: 0.81)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `f30b07b0`
+- Built from commit: `bd270ce8`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -561,11 +561,15 @@
 - [[_COMMUNITY_Community 575|Community 575]]
 - [[_COMMUNITY_Community 576|Community 576]]
 - [[_COMMUNITY_Community 577|Community 577]]
+- [[_COMMUNITY_Community 578|Community 578]]
+- [[_COMMUNITY_Community 579|Community 579]]
+- [[_COMMUNITY_Community 580|Community 580]]
+- [[_COMMUNITY_Community 581|Community 581]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `makeRunner()` - 150 edges
-2. `setupEnv()` - 147 edges
-3. `load()` - 142 edges
+1. `makeRunner()` - 154 edges
+2. `setupEnv()` - 151 edges
+3. `load()` - 146 edges
 4. `render()` - 30 edges
 5. `claude-obsidian: Self-Organizing AI Second Brain for Obsidian + Claude Code` - 27 edges
 6. `read()` - 24 edges
@@ -594,11 +598,11 @@
 - **HyperKernel Phase-1 founding architecture** — hyperkernel_event_taxonomy, hyperkernel_derived_graph, hyperkernel_five_primitives, hyperkernel_provenance, hyperkernel_closure_loops, hyperkernel_council_structure, hyperkernel_agent_lifecycle, hyperkernel_memory_lifecycle, hyperkernel_audit_architecture, hyperkernel_kernel_invariants, hyperkernel_hyperkernel [EXTRACTED 1.00]
 - **Bluetooth laser measurement pipeline (capture to quote)** — services_raw_reading_log_rawbluetoothreadinglog, services_measurement_parser_measurementparser, services_generic_ble_adapter_genericblemeasurementadapter, services_device_adapter_registry_deviceadapterregistry, services_huepar_s60_adapter_aaa_huepar_s60_adapter, hooks_use_bluetooth_connection_aaa_bluetooth, storage_measurement_store, measurements_measurement_ai_assistant, integrations_measurement_to_quote [EXTRACTED 1.00]
 
-## Communities (578 total, 63 thin omitted)
+## Communities (582 total, 61 thin omitted)
 
 ### Community 0 - "Unit Audit Ledger"
 Cohesion: 0.02
-Nodes (92): load(), makeClock(), makeConfig(), makeData(), makeEvents(), makeIds(), makeRunner(), path (+84 more)
+Nodes (96): load(), makeClock(), makeConfig(), makeData(), makeEvents(), makeIds(), makeRunner(), path (+88 more)
 
 ### Community 1 - "Intelligence Vector Memory"
 Cohesion: 0.08
@@ -649,8 +653,8 @@ Cohesion: 0.14
 Nodes (31): appendHistory(), applyStatusEvent(), approve(), cancel(), cfg(), clock(), data(), draft() (+23 more)
 
 ### Community 13 - "Intelligence Prediction Closure"
-Cohesion: 0.10
-Nodes (30): Learning Closure Loops (estimate, recommendation, prediction), append(), bands(), calibrationSummary(), cfg(), clock(), close(), _closedPredictionIds() (+22 more)
+Cohesion: 0.11
+Nodes (29): append(), bands(), calibrationSummary(), cfg(), clock(), close(), _closedPredictionIds(), closures() (+21 more)
 
 ### Community 14 - "Intelligence Dashboard"
 Cohesion: 0.17
@@ -893,8 +897,8 @@ Cohesion: 0.16
 Nodes (10): aggregate(), avgField(), avgIntField(), finalizeGroup(), _followUp(), groupBy(), mean(), num() (+2 more)
 
 ### Community 74 - "Intelligence Outcome Spine"
-Cohesion: 0.20
-Nodes (16): applyOverlay(), blank(), classifyResult(), data(), finalize(), govOutcomes(), lc(), leadsStore() (+8 more)
+Cohesion: 0.18
+Nodes (17): Learning Closure Loops (estimate, recommendation, prediction), applyOverlay(), blank(), classifyResult(), data(), finalize(), govOutcomes(), lc() (+9 more)
 
 ### Community 75 - "Intelligence World State"
 Cohesion: 0.22
@@ -1589,8 +1593,8 @@ Cohesion: 0.04
 Nodes (46): 10.1 Push-blocker (must fix before any public push), 10.2 v1.7.1 patch (within 1 week of push), 10.3 v1.7.x (defer to next minor; file as issues), 10.4 v1.8 (methodology modes + reviews — already in roadmap), 10.5 v1.9 (multimodal ingest — already in roadmap), 10.6 v2.0 (derive — already in roadmap, scope adjusted), 10.7 v2.5+ (GUI onramp — major effort), 10.8 Polish PR (bundle before v1.8) (+38 more)
 
 ### Community 251 - "Agents Review Request"
-Cohesion: 0.40
-Nodes (6): AAA_REVIEW_REQUEST_ENGINE, AAA_CONTENT_SAFETY (Nemotron content-safety guardrail), Fail-Closed Override Policy, AAA_GOVERNANCE_ENGINE, Fail-Closed Review-Safety Verdict Mapping, NVIDIA Nemotron Provider (hosted, OpenAI-compatible)
+Cohesion: 0.30
+Nodes (12): clamp01(), confidenceFor(), learning(), mean(), num(), priceBandKey(), quotes(), recommend() (+4 more)
 
 ### Community 252 - "Copilot Copilot Goal"
 Cohesion: 0.52
@@ -1888,6 +1892,10 @@ Nodes (46): additionalProperties, minLength, type, maximum, minimum, type, minLe
 Cohesion: 0.50
 Nodes (3): iso(), { makeRunner, setupEnv, load }, seed()
 
+### Community 339 - "Unit Legal War"
+Cohesion: 0.19
+Nodes (28): answerMostProfitable(), answerPipelineState(), answerRevenueChange(), answerUnknown(), answerWhyWinning(), answerWinRate(), ask(), cap() (+20 more)
+
 ### Community 340 - "Unit Outcome Learning"
 Cohesion: 0.50
 Nodes (4): BASE, iso(), { makeRunner, setupEnv, load }, seed()
@@ -1940,6 +1948,10 @@ Nodes (3): sequence(), silence(), timing()
 Cohesion: 0.83
 Nodes (3): forecast(), num(), trust()
 
+### Community 360 - "Unit Chat Canvas"
+Cohesion: 0.35
+Nodes (9): data(), esc(), fmtMoney(), has(), jobState(), mount(), num(), quiet() (+1 more)
+
 ### Community 361 - "Unit Content Safety"
 Cohesion: 0.09
 Nodes (41): applyTurnNotification(), belongsToTurn(), buildAppServerAuthStatus(), buildAuthStatus(), buildResumeParams(), buildTaskThreadName(), buildThreadParams(), BUILTIN_PROVIDER_LABELS (+33 more)
@@ -1948,9 +1960,17 @@ Nodes (41): applyTurnNotification(), belongsToTurn(), buildAppServerAuthStatus()
 Cohesion: 0.05
 Nodes (43): 10. GROW — feedback loop notes, 11. Push gate decision, 12. Punch list (ordered), 13. Critical files (paths used in audit), 14. Appendix — subagent dispatch summary, 1. Executive verdict (200 words), 2. Methodology — 10-principle spine in action, 3. Per-skill score table (+35 more)
 
+### Community 364 - "Unit Governance Business"
+Cohesion: 0.38
+Nodes (9): data(), esc(), has(), hhmm(), mount(), openTeam(), quiet(), renderModel() (+1 more)
+
 ### Community 368 - "Unit Review Safety"
 Cohesion: 0.26
 Nodes (16): actorLabel(), clock(), countUp(), data(), esc(), fmtMoney(), fmtValue(), has() (+8 more)
+
+### Community 369 - "Unit Transport Scheduler"
+Cohesion: 0.67
+Nodes (3): installDom(), makeEl(), { makeRunner, setupEnv, load }
 
 ### Community 370 - "Unit World Model"
 Cohesion: 0.05
@@ -2524,7 +2544,15 @@ Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphif
 Cohesion: 0.67
 Nodes (3): installDom(), makeEl(), { makeRunner, setupEnv, load }
 
+### Community 538 - "Community 538"
+Cohesion: 0.40
+Nodes (6): AAA_REVIEW_REQUEST_ENGINE, AAA_CONTENT_SAFETY (Nemotron content-safety guardrail), Fail-Closed Override Policy, AAA_GOVERNANCE_ENGINE, Fail-Closed Review-Safety Verdict Mapping, NVIDIA Nemotron Provider (hosted, OpenAI-compatible)
+
 ### Community 546 - "Community 546"
+Cohesion: 0.67
+Nodes (3): installDom(), makeEl(), { makeRunner, setupEnv, load }
+
+### Community 576 - "Community 576"
 Cohesion: 0.67
 Nodes (3): installDom(), makeEl(), { makeRunner, setupEnv, load }
 
@@ -2533,24 +2561,24 @@ Nodes (3): installDom(), makeEl(), { makeRunner, setupEnv, load }
   icons/icon-512.png · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **1572 isolated node(s):** `session-start.sh script`, `$schema`, `name`, `name`, `url` (+1567 more)
+- **1576 isolated node(s):** `session-start.sh script`, `$schema`, `name`, `name`, `url` (+1571 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **63 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **61 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **What is the exact relationship between `HyperKernel PWA App Icon (512x512)` and `White glyph on transparent background (exact shape indiscernible against white viewer background)`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
-- **Why does `setupEnv()` connect `Unit Audit Ledger` to `Unit Bluetooth Connect`, `Unit Assisted Drafts`, `Unit Quote Win`, `Community 536`, `Community 537`, `Community 538`, `Unit Agent Council`, `Unit Agent Evaluation`, `Unit Ai Operations`, `Unit Business Digital`, `Unit Calibration`, `Unit Event Stream`, `Community 545`, `Community 546`, `Unit Executive Council`, `Unit Financial Intelligence`, `Community 549`, `Unit Goal Capability`, `Unit Governance Registry`, `Unit Knowledge Os`, `Unit Learning Fabric`, `Unit Learning Feedback`, `Unit Model Governance`, `Unit Native Model`, `Unit Outcome Intelligence`, `Unit Owner Copilot`, `Unit Privacy Dashboard`, `Unit Proposal Review`, `Unit Provenance`, `Unit Reliability`, `Unit Replay Sandbox`, `Unit Security`, `Unit Sensing`, `Unit Teleological Test`, `Unit Transport Dashboard`, `Unit Transport Inbox`, `Unit Vector Memory`, `Community 575`, `Community 576`, `Community 577`, `Community 547`, `Community 548`, `Unit Capability Economy`, `Unit Copilot Test`, `Unit Estimator`, `Unit Innovation Council`, `Unit Legal War`, `Unit Outcome Learning`, `Unit Pricing Optimizer`, `Core Rbac`, `Unit Quote Lifecycle`, `Unit Revenue Council`, `Unit Sms Copilot`, `Unit Chat Canvas`, `Unit Governance Bridge`, `Unit Governance Business`, `Unit Governance Sync`, `Unit Hermes Gateway`, `Unit Prediction Closure`, `Unit Transport Scheduler`, `Unit Pricing Optimizer`?**
-  _High betweenness centrality (0.002) - this node is a cross-community bridge._
-- **Why does `makeRunner()` connect `Unit Audit Ledger` to `Unit Bluetooth Connect`, `Unit Assisted Drafts`, `Unit Quote Win`, `Community 536`, `Community 537`, `Community 538`, `Unit Agent Council`, `Unit Agent Evaluation`, `Unit Ai Operations`, `Unit Business Digital`, `Unit Calibration`, `Unit Event Stream`, `Community 545`, `Community 546`, `Unit Executive Council`, `Unit Financial Intelligence`, `Community 549`, `Unit Goal Capability`, `Unit Governance Registry`, `Unit Knowledge Os`, `Unit Learning Fabric`, `Unit Learning Feedback`, `Unit Model Governance`, `Unit Native Model`, `Unit Outcome Intelligence`, `Unit Owner Copilot`, `Unit Privacy Dashboard`, `Unit Proposal Review`, `Unit Provenance`, `Unit Reliability`, `Unit Replay Sandbox`, `Unit Security`, `Unit Sensing`, `Unit Teleological Test`, `Unit Transport Dashboard`, `Unit Transport Inbox`, `Unit Vector Memory`, `Community 575`, `Community 576`, `Community 577`, `Community 547`, `Community 548`, `Unit Capability Economy`, `Unit Copilot Test`, `Unit Estimator`, `Unit Innovation Council`, `Unit Legal War`, `Unit Outcome Learning`, `Unit Pricing Optimizer`, `Core Rbac`, `Unit Quote Lifecycle`, `Unit Revenue Council`, `Unit Sms Copilot`, `Unit Chat Canvas`, `Unit Governance Bridge`, `Unit Governance Business`, `Unit Governance Sync`, `Unit Hermes Gateway`, `Unit Prediction Closure`, `Unit Transport Scheduler`, `Unit Pricing Optimizer`?**
+- **Why does `makeRunner()` connect `Unit Audit Ledger` to `Unit Bluetooth Connect`, `Unit Assisted Drafts`, `Unit Quote Win`, `Community 536`, `Community 537`, `Unit Agent Council`, `Unit Agent Evaluation`, `Unit Ai Operations`, `Unit Business Digital`, `Unit Calibration`, `Unit Event Stream`, `Unit Executive Council`, `Community 546`, `Unit Financial Intelligence`, `Community 545`, `Community 549`, `Unit Goal Capability`, `Unit Governance Registry`, `Unit Knowledge Os`, `Unit Learning Fabric`, `Unit Learning Feedback`, `Community 548`, `Unit Model Governance`, `Unit Native Model`, `Unit Outcome Intelligence`, `Unit Owner Copilot`, `Unit Privacy Dashboard`, `Unit Proposal Review`, `Unit Provenance`, `Unit Reliability`, `Unit Replay Sandbox`, `Unit Security`, `Unit Sensing`, `Unit Teleological Test`, `Unit Transport Dashboard`, `Unit Transport Inbox`, `Unit Vector Memory`, `Community 575`, `Community 576`, `Community 577`, `Community 578`, `Community 579`, `Community 580`, `Community 581`, `Community 547`, `Unit Capability Economy`, `Unit Copilot Test`, `Unit Estimator`, `Unit Innovation Council`, `Unit Outcome Learning`, `Unit Pricing Optimizer`, `Core Rbac`, `Unit Quote Lifecycle`, `Unit Revenue Council`, `Unit Sms Copilot`, `Unit Governance Bridge`, `Unit Governance Sync`, `Unit Hermes Gateway`, `Unit Prediction Closure`, `Unit Transport Scheduler`, `Unit Pricing Optimizer`?**
   _High betweenness centrality (0.001) - this node is a cross-community bridge._
-- **Why does `load()` connect `Unit Audit Ledger` to `Unit Bluetooth Connect`, `Unit Assisted Drafts`, `Unit Quote Win`, `Community 536`, `Community 537`, `Community 538`, `Unit Agent Council`, `Unit Agent Evaluation`, `Unit Ai Operations`, `Unit Business Digital`, `Unit Calibration`, `Unit Event Stream`, `Community 545`, `Community 546`, `Unit Executive Council`, `Unit Financial Intelligence`, `Community 549`, `Unit Goal Capability`, `Unit Governance Registry`, `Unit Knowledge Os`, `Unit Learning Fabric`, `Unit Learning Feedback`, `Unit Model Governance`, `Unit Native Model`, `Unit Outcome Intelligence`, `Unit Owner Copilot`, `Unit Privacy Dashboard`, `Unit Proposal Review`, `Unit Provenance`, `Unit Reliability`, `Unit Replay Sandbox`, `Unit Security`, `Unit Sensing`, `Unit Teleological Test`, `Unit Transport Dashboard`, `Unit Transport Inbox`, `Unit Vector Memory`, `Community 575`, `Community 576`, `Community 577`, `Community 547`, `Community 548`, `Unit Capability Economy`, `Unit Copilot Test`, `Unit Estimator`, `Unit Innovation Council`, `Unit Legal War`, `Unit Outcome Learning`, `Unit Pricing Optimizer`, `Core Rbac`, `Unit Quote Lifecycle`, `Unit Revenue Council`, `Unit Sms Copilot`, `Unit Chat Canvas`, `Unit Governance Bridge`, `Unit Governance Business`, `Unit Governance Sync`, `Unit Hermes Gateway`, `Unit Prediction Closure`, `Unit Transport Scheduler`, `Unit Pricing Optimizer`?**
+- **Why does `setupEnv()` connect `Unit Audit Ledger` to `Unit Bluetooth Connect`, `Unit Assisted Drafts`, `Unit Quote Win`, `Community 536`, `Community 537`, `Unit Agent Council`, `Unit Agent Evaluation`, `Unit Ai Operations`, `Unit Business Digital`, `Unit Calibration`, `Unit Event Stream`, `Unit Executive Council`, `Community 546`, `Unit Financial Intelligence`, `Community 545`, `Community 549`, `Unit Goal Capability`, `Unit Governance Registry`, `Unit Knowledge Os`, `Unit Learning Fabric`, `Unit Learning Feedback`, `Community 548`, `Unit Model Governance`, `Unit Native Model`, `Unit Outcome Intelligence`, `Unit Owner Copilot`, `Unit Privacy Dashboard`, `Unit Proposal Review`, `Unit Provenance`, `Unit Reliability`, `Unit Replay Sandbox`, `Unit Security`, `Unit Sensing`, `Unit Teleological Test`, `Unit Transport Dashboard`, `Unit Transport Inbox`, `Unit Vector Memory`, `Community 575`, `Community 576`, `Community 577`, `Community 578`, `Community 579`, `Community 580`, `Community 581`, `Community 547`, `Unit Capability Economy`, `Unit Copilot Test`, `Unit Estimator`, `Unit Innovation Council`, `Unit Outcome Learning`, `Unit Pricing Optimizer`, `Core Rbac`, `Unit Quote Lifecycle`, `Unit Revenue Council`, `Unit Sms Copilot`, `Unit Governance Bridge`, `Unit Governance Sync`, `Unit Hermes Gateway`, `Unit Prediction Closure`, `Unit Transport Scheduler`, `Unit Pricing Optimizer`?**
+  _High betweenness centrality (0.001) - this node is a cross-community bridge._
+- **Why does `load()` connect `Unit Audit Ledger` to `Unit Bluetooth Connect`, `Unit Assisted Drafts`, `Unit Quote Win`, `Community 536`, `Community 537`, `Unit Agent Council`, `Unit Agent Evaluation`, `Unit Ai Operations`, `Unit Business Digital`, `Unit Calibration`, `Unit Event Stream`, `Unit Executive Council`, `Community 546`, `Unit Financial Intelligence`, `Community 545`, `Community 549`, `Unit Goal Capability`, `Unit Governance Registry`, `Unit Knowledge Os`, `Unit Learning Fabric`, `Unit Learning Feedback`, `Community 548`, `Unit Model Governance`, `Unit Native Model`, `Unit Outcome Intelligence`, `Unit Owner Copilot`, `Unit Privacy Dashboard`, `Unit Proposal Review`, `Unit Provenance`, `Unit Reliability`, `Unit Replay Sandbox`, `Unit Security`, `Unit Sensing`, `Unit Teleological Test`, `Unit Transport Dashboard`, `Unit Transport Inbox`, `Unit Vector Memory`, `Community 575`, `Community 576`, `Community 577`, `Community 578`, `Community 579`, `Community 580`, `Community 581`, `Community 547`, `Unit Capability Economy`, `Unit Copilot Test`, `Unit Estimator`, `Unit Innovation Council`, `Unit Outcome Learning`, `Unit Pricing Optimizer`, `Core Rbac`, `Unit Quote Lifecycle`, `Unit Revenue Council`, `Unit Sms Copilot`, `Unit Governance Bridge`, `Unit Governance Sync`, `Unit Hermes Gateway`, `Unit Prediction Closure`, `Unit Transport Scheduler`, `Unit Pricing Optimizer`?**
   _High betweenness centrality (0.001) - this node is a cross-community bridge._
 - **What connects `session-start.sh script`, `$schema`, `name` to the rest of the system?**
-  _1606 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1610 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Unit Audit Ledger` be split into smaller, more focused modules?**
-  _Cohesion score 0.023342059336823734 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.02182942142374191 - nodes in this community are weakly interconnected._
 - **Should `Intelligence Vector Memory` be split into smaller, more focused modules?**
   _Cohesion score 0.0784313725490196 - nodes in this community are weakly interconnected._

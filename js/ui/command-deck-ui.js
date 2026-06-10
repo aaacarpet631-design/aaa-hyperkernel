@@ -164,9 +164,36 @@
       const network = { teams: teams, totalAgents: totalAgents, empty: teams.length === 0, emptyLabel: 'Agent roster not loaded.' };
 
       // ---- 5. Opportunity Radar -----------------------------------------------
+      // Per-quote decision objects from the entity scorer when it's loaded;
+      // without it, fall back to the aggregate proxy (segment or company rate).
       const open = (quotes || []).filter(function (q) { return q && OPEN_STATUSES.indexOf(q.status) !== -1; });
+      const byQuoteId = {};
+      open.forEach(function (q) { byQuoteId[q.quoteId || q.id] = q; });
+      const scored = await quiet(function () { return has('OPPORTUNITY_SCORER') && global.AAA_OPPORTUNITY_SCORER.scoreAll ? global.AAA_OPPORTUNITY_SCORER.scoreAll() : null; }, null);
+      let oppItems, probabilityNote;
+      if (scored && scored.ok && scored.items && scored.items.length) {
+        const METHOD_LABEL = { segment_blend: 'this quote’s outcome history (segment blend)', overall_rate: 'company win rate', uninformed_prior: 'an uninformed prior — record outcomes to calibrate' };
+        oppItems = scored.items.slice(0, 3).map(function (d) {
+          const q = byQuoteId[d.quoteId] || {};
+          const key = serviceKey(q);
+          const label = q.customerName || key || 'Quote';
+          return {
+            quoteId: d.quoteId, amount: d.amount, customer: q.customerName || null,
+            service: key, label: label, status: q.status || null,
+            probabilityPct: d.probabilityPct,
+            probabilitySource: METHOD_LABEL[d.basis && d.basis.method] || 'outcome history',
+            expectedValue: d.expectedValue,
+            action: d.recommendedAction ? d.recommendedAction.label : null,
+            urgency: d.urgency || null, scoreConfidence: d.confidence || null,
+            display: fmtMoney(d.amount) + ' — ' + label + ' — ' + (d.probabilityPct != null ? d.probabilityPct + '% close probability' : 'close probability unknown')
+          };
+        });
+        probabilityNote = 'Probability from ' + oppItems[0].probabilitySource + '.';
+        const radar = { items: oppItems, empty: false, emptyLabel: 'No open opportunities yet.', probabilityNote: probabilityNote };
+        return this._assembleModel(pulse, supervisor, feed, network, radar);
+      }
       const overallWin = agg && agg.ok && agg.overall && agg.overall.winRate != null ? Math.round(agg.overall.winRate * 100) : null;
-      const oppItems = open.map(function (q) {
+      oppItems = open.map(function (q) {
         const amount = num(q.customerTotal);
         const key = serviceKey(q);
         let prob = null, source = null;
@@ -183,15 +210,12 @@
         };
       }).sort(function (a, b) { return b.expectedValue - a.expectedValue; }).slice(0, 3);
       const radar = { items: oppItems, empty: oppItems.length === 0, emptyLabel: 'No open opportunities yet.', probabilityNote: oppItems.length && oppItems[0].probabilitySource ? 'Probability from ' + oppItems[0].probabilitySource + '.' : null };
+      return this._assembleModel(pulse, supervisor, feed, network, radar);
+    },
 
-      return {
-        generatedAt: nowMs(),
-        pulse: pulse,
-        supervisor: supervisor,
-        feed: feed,
-        network: network,
-        radar: radar
-      };
+    /** Assemble the five sections into the deck model. */
+    _assembleModel(pulse, supervisor, feed, network, radar) {
+      return { generatedAt: nowMs(), pulse: pulse, supervisor: supervisor, feed: feed, network: network, radar: radar };
     },
 
     /** Render the Command Deck into a DOM element (DOM-guarded). */
@@ -265,6 +289,7 @@
                   '<div class="cd-opp__amount">' + esc(fmtMoney(i.amount)) + '</div>' +
                   '<div class="cd-opp__who">' + esc(i.label) + '</div>' +
                   '<div class="cd-opp__prob">' + esc(i.probabilityPct != null ? i.probabilityPct + '% close probability' : 'close probability unknown') + '</div>' +
+                  (i.action ? '<div class="cd-opp__action">' + (i.urgency === 'now' ? '🔥 ' : '') + esc(i.action) + '</div>' : '') +
                   '</div>';
               }).join('') + (m.radar.probabilityNote ? '<div class="cd-note">' + esc(m.radar.probabilityNote) + '</div>' : '')) +
         '</div>';
@@ -274,13 +299,28 @@
         const raw = Number(v.getAttribute('data-count'));
         if (isFinite(raw)) countUp(v, raw, v.getAttribute('data-kind'));
       });
-      // Execute → route to chat; swarm tap → AI Team tab. Null-safe on stubs.
+      // Execute → route to chat. Swarm tap → Agent Command drill-down (sheet)
+      // when it's loaded, else the AI Team tab. Null-safe on stubs.
       wrap.querySelectorAll('.cd-rec__exec').forEach(function (b) {
         b.onclick = function () { if (global.AAA_JOB_LIST_UI && global.AAA_JOB_LIST_UI._switchTab) global.AAA_JOB_LIST_UI._switchTab('chat'); };
       });
       wrap.querySelectorAll('.cd-swarm').forEach(function (b) {
-        b.onclick = function () { if (global.AAA_JOB_LIST_UI && global.AAA_JOB_LIST_UI._switchTab) global.AAA_JOB_LIST_UI._switchTab('agents'); };
+        b.onclick = function () {
+          const ac = global.AAA_AGENT_COMMAND, kit = global.AAA_UI;
+          if (ac && ac.mount && kit && kit.sheet) { const s = kit.sheet({ title: 'Agent Command' }); ac.mount(s.body, { teamId: b.getAttribute('data-team') }); return; }
+          if (global.AAA_JOB_LIST_UI && global.AAA_JOB_LIST_UI._switchTab) global.AAA_JOB_LIST_UI._switchTab('agents');
+        };
       });
+      // Digital Twin entry — only when the living-model surface is loaded
+      // (business-digital-twin-ui's planner sheet alone has no mount()).
+      const twin = global.AAA_DIGITAL_TWIN_UI;
+      if (twin && typeof twin.mount === 'function' && global.AAA_UI && global.AAA_UI.sheet) {
+        const tw = document.createElement('button');
+        tw.className = 'cd-twin'; tw.type = 'button';
+        tw.textContent = '🧬 Digital Twin — live model & forecast';
+        tw.onclick = function () { const s = global.AAA_UI.sheet({ title: 'Digital Twin' }); twin.mount(s.body); };
+        wrap.appendChild(tw);
+      }
 
       root.appendChild(wrap);
       return { mounted: true };

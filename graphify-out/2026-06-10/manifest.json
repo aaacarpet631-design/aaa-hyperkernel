@@ -3388,5 +3388,45 @@
     "mtime": 1781109790.5558004,
     "ast_hash": "a72431661f6038c3fec37c70406b8d87",
     "semantic_hash": ""
+  },
+  "js/intelligence/opportunity-scorer.js": {
+    "mtime": 1781110359.2678342,
+    "ast_hash": "4d74e2746c1c95a4a6910f74524fc315",
+    "semantic_hash": ""
+  },
+  "js/ui/agent-command-ui.js": {
+    "mtime": 1781110297.7518306,
+    "ast_hash": "1fdf72bc6d03af3db13bcce416998b5a",
+    "semantic_hash": ""
+  },
+  "test/unit/agent-command.test.js": {
+    "mtime": 1781110371.5678349,
+    "ast_hash": "118499ac48a7e0d7ebbb76fcd1fa9d3c",
+    "semantic_hash": ""
+  },
+  "test/unit/opportunity-scorer.test.js": {
+    "mtime": 1781110400.8918366,
+    "ast_hash": "138c6bc2e6c5b687fcfd5855b1421332",
+    "semantic_hash": ""
+  },
+  "js/intelligence/company-brain.js": {
+    "mtime": 1781110503.6918428,
+    "ast_hash": "9538decd30a2feb2b4a7bc9872e87ec3",
+    "semantic_hash": ""
+  },
+  "js/ui/digital-twin-ui.js": {
+    "mtime": 1781110460.7758403,
+    "ast_hash": "b3a8c28391b403f7b1d086c90be54139",
+    "semantic_hash": ""
+  },
+  "test/unit/company-brain.test.js": {
+    "mtime": 1781110578.7398472,
+    "ast_hash": "e65edff977fb1f36bd06ae5de89641e3",
+    "semantic_hash": ""
+  },
+  "test/unit/digital-twin-ui.test.js": {
+    "mtime": 1781110570.5918467,
+    "ast_hash": "9c1611d7d3dbdb6f905473373bc6e767",
+    "semantic_hash": ""
   }
 }

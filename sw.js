@@ -6,7 +6,7 @@
  * app fully usable offline. Old caches are purged on activate, and the worker
  * takes control immediately to avoid serving a stale shell after an update.
  */
-const CACHE_NAME = 'hyperkernel-v80';
+const CACHE_NAME = 'hyperkernel-v81';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -18,6 +18,8 @@ const PRECACHE = [
   '/css/vision-hud.css',
   '/css/closure-hud.css',
   '/css/command-deck.css',
+  '/css/agent-command.css',
+  '/css/digital-twin.css',
   '/js/core/runtime-clock.js',
   '/js/core/id-factory.js',
   '/js/core/local-first-storage.js',
@@ -85,6 +87,7 @@ const PRECACHE = [
   '/js/intelligence/analyst-rankings.js',
   '/js/intelligence/evolution-engine.js',
   '/js/intelligence/outcome-learning-store.js',
+  '/js/intelligence/opportunity-scorer.js',
   '/js/intelligence/eval-golden-store.js',
   '/js/intelligence/outcome-spine.js',
   '/js/intelligence/price-book-store.js',
@@ -97,6 +100,7 @@ const PRECACHE = [
   '/js/intelligence/learning-fabric.js',
   '/js/intelligence/business-digital-twin.js',
   '/js/intelligence/financial-intelligence.js',
+  '/js/intelligence/company-brain.js',
   '/js/intelligence/ai-operations-center.js',
   '/js/intelligence/proposal-engine.js',
   '/js/intelligence/agent-evaluation-lab.js',
@@ -152,6 +156,7 @@ const PRECACHE = [
   '/js/ui/executive-council-ui.js',
   '/js/ui/learning-fabric-ui.js',
   '/js/ui/business-digital-twin-ui.js',
+  '/js/ui/digital-twin-ui.js',
   '/js/ui/financial-intelligence-suite-ui.js',
   '/js/ui/ai-operations-center-ui.js',
   '/js/ui/proposal-review-ui.js',
@@ -168,6 +173,7 @@ const PRECACHE = [
   '/js/ui/governance-registry-ui.js',
   '/js/ui/replay-sandbox-ui.js',
   '/js/ui/command-deck-ui.js',
+  '/js/ui/agent-command-ui.js',
   '/js/ui/job-list-ui.js',
   '/js/governance/governance-sync.js',
   '/js/governance/audit-ledger.js',

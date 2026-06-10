@@ -110,6 +110,21 @@ module.exports = async function run() {
       m.radar.items.length === 2 && m.radar.items[0].amount === 800 && m.radar.items[0].probabilityPct === 50 && /win rate|close rate/.test(m.radar.items[0].probabilitySource));
     t.ok('radar line reads "$X,XXX — who — NN% close probability"', /^\$800 — Marina Bay — 50% close probability$/.test(m.radar.items[0].display));
 
+    // ===== radar upgrades to per-quote decisions when the scorer is loaded ===
+    // The proxy gave both quotes an identical 50%; the scorer diverges them on
+    // real price-band history (won $600 → q1's band; lost $300 → q2's band):
+    // q1 (1+3·0.5)/(1+3)=0.625 → 63%, EV 500 · q2 (0+1.5)/4=0.375 → 38%, EV 169.
+    load('js/intelligence/opportunity-scorer.js');
+    const ms = await DECK.renderModel();
+    t.ok('with the scorer, radar items become per-quote decision objects',
+      ms.radar.items.length === 2 && ms.radar.items[0].quoteId === 'q1' && ms.radar.items[0].expectedValue === 500 && ms.radar.items[1].expectedValue === 169);
+    t.ok('per-quote probabilities DIVERGE on outcome history (63% vs 38%, not a shared 50%)',
+      ms.radar.items[0].probabilityPct === 63 && ms.radar.items[1].probabilityPct === 38 && ms.radar.items[0].label === 'Marina Bay');
+    t.ok('decisions carry recommended actions with urgency (follow_up_due → call now)',
+      /Follow up/.test(ms.radar.items[0].action) && /Call now/.test(ms.radar.items[1].action) && ms.radar.items[1].urgency === 'now');
+    t.ok('probability note names the scorer basis (segment blend)',
+      /segment blend/.test(ms.radar.probabilityNote));
+
     // ===== mount: DOM-guarded, never throws into a stub element =====
     const el = makeEl();
     let mountErr = null, mounted = null;
