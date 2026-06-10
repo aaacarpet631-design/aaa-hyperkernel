@@ -220,6 +220,18 @@
         if (global.AAA_APP_MODE) main.appendChild(ui.button({ label: 'Switch to ' + (global.AAA_APP_MODE.get() === 'field' ? 'Executive' : 'Field') + ' Mode', icon: '🔀', variant: 'primary', full: true, onClick: () => { global.AAA_APP_MODE.toggle(); this._landed = false; this.render(); } }));
         main.appendChild(ui.button({ label: 'AI Team', icon: '🧠', variant: 'secondary', full: true, onClick: () => this._switchTab('agents') }));
         main.appendChild(ui.button({ label: 'Business', icon: '📊', variant: 'secondary', full: true, onClick: () => this._switchTab('business') }));
+        // Build stamp — reads the live SW cache version so "is the deploy on
+        // my phone?" is answered by the screen itself, never by guesswork.
+        const stamp = ui.el('div', { className: 'aaa-build-stamp', text: 'Build: checking…' });
+        main.appendChild(stamp);
+        try {
+          if (typeof caches !== 'undefined' && caches.keys) {
+            caches.keys().then((keys) => {
+              const v = keys.map((k) => (k.match(/^hyperkernel-v(\d+)$/) || [])[1]).filter(Boolean).map(Number).sort((a, b) => a - b).pop();
+              stamp.textContent = 'Build: ' + (v ? 'hyperkernel-v' + v : 'no cache yet (first load)');
+            }).catch(() => { stamp.textContent = 'Build: unavailable'; });
+          } else stamp.textContent = 'Build: unavailable';
+        } catch (_) { stamp.textContent = 'Build: unavailable'; }
         return;
       }
 
