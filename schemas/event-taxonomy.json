@@ -1,0 +1,306 @@
+{
+  "title": "AAA HyperKernel — 25 highest-value business events",
+  "count": 25,
+  "domains": [
+    "campaign",
+    "crew",
+    "decision",
+    "invoice",
+    "job",
+    "lead",
+    "outcome",
+    "payment",
+    "quote",
+    "recommendation",
+    "referral",
+    "review"
+  ],
+  "stages": [
+    "acquisition",
+    "billing",
+    "delivery",
+    "governance",
+    "growth",
+    "intelligence",
+    "ops",
+    "retention",
+    "sales"
+  ],
+  "primitives": [
+    "Decision",
+    "Entity",
+    "Event",
+    "Memory",
+    "Relationship"
+  ],
+  "byStage": {
+    "acquisition": 3,
+    "billing": 3,
+    "delivery": 4,
+    "governance": 2,
+    "growth": 2,
+    "intelligence": 2,
+    "ops": 1,
+    "retention": 2,
+    "sales": 6
+  },
+  "byPrimitive": {
+    "Decision": 6,
+    "Entity": 3,
+    "Event": 4,
+    "Memory": 8,
+    "Relationship": 4
+  },
+  "events": [
+    {
+      "type": "campaign.launched",
+      "version": 1,
+      "domain": "campaign",
+      "stage": "growth",
+      "primitive": "Entity",
+      "reversible": false,
+      "risk": "medium",
+      "description": "Marketing spend started; attribution anchor."
+    },
+    {
+      "type": "crew.assigned",
+      "version": 1,
+      "domain": "crew",
+      "stage": "ops",
+      "primitive": "Relationship",
+      "reversible": true,
+      "risk": "low",
+      "description": "Labor (and a vehicle) were linked to a job."
+    },
+    {
+      "type": "decision.recorded",
+      "version": 1,
+      "domain": "decision",
+      "stage": "governance",
+      "primitive": "Decision",
+      "reversible": false,
+      "risk": "high",
+      "description": "A governed action was taken or held (emits a governance record)."
+    },
+    {
+      "type": "invoice.issued",
+      "version": 1,
+      "domain": "invoice",
+      "stage": "billing",
+      "primitive": "Entity",
+      "reversible": false,
+      "risk": "high",
+      "description": "Revenue was recognized; the AR clock started."
+    },
+    {
+      "type": "job.closed",
+      "version": 1,
+      "domain": "job",
+      "stage": "delivery",
+      "primitive": "Memory",
+      "reversible": false,
+      "risk": "low",
+      "description": "The engagement closed with a final outcome."
+    },
+    {
+      "type": "job.completed",
+      "version": 1,
+      "domain": "job",
+      "stage": "delivery",
+      "primitive": "Event",
+      "reversible": false,
+      "risk": "low",
+      "description": "Work was completed; cost is now knowable."
+    },
+    {
+      "type": "job.dispatched",
+      "version": 1,
+      "domain": "job",
+      "stage": "delivery",
+      "primitive": "Relationship",
+      "reversible": false,
+      "risk": "medium",
+      "description": "Crew + vehicle were committed to the field for a job."
+    },
+    {
+      "type": "job.scheduled",
+      "version": 1,
+      "domain": "job",
+      "stage": "delivery",
+      "primitive": "Relationship",
+      "reversible": true,
+      "risk": "low",
+      "description": "Capacity (crew + time) was committed to a job."
+    },
+    {
+      "type": "lead.captured",
+      "version": 1,
+      "domain": "lead",
+      "stage": "acquisition",
+      "primitive": "Entity",
+      "reversible": true,
+      "risk": "low",
+      "description": "A new lead entered the funnel."
+    },
+    {
+      "type": "lead.disqualified",
+      "version": 1,
+      "domain": "lead",
+      "stage": "acquisition",
+      "primitive": "Decision",
+      "reversible": true,
+      "risk": "low",
+      "description": "A lead was rejected; the reason is training data."
+    },
+    {
+      "type": "lead.qualified",
+      "version": 1,
+      "domain": "lead",
+      "stage": "acquisition",
+      "primitive": "Decision",
+      "reversible": true,
+      "risk": "low",
+      "description": "A lead was judged worth pursuing."
+    },
+    {
+      "type": "outcome.recorded",
+      "version": 1,
+      "domain": "outcome",
+      "stage": "governance",
+      "primitive": "Memory",
+      "reversible": false,
+      "risk": "low",
+      "description": "A ground-truth label arrived; scores everything upstream."
+    },
+    {
+      "type": "payment.failed",
+      "version": 1,
+      "domain": "payment",
+      "stage": "billing",
+      "primitive": "Event",
+      "reversible": true,
+      "risk": "high",
+      "description": "A payment attempt failed; collections risk signal."
+    },
+    {
+      "type": "payment.received",
+      "version": 1,
+      "domain": "payment",
+      "stage": "billing",
+      "primitive": "Memory",
+      "reversible": false,
+      "risk": "high",
+      "description": "Cash arrived — the outcome that pays the bills."
+    },
+    {
+      "type": "quote.accepted",
+      "version": 1,
+      "domain": "quote",
+      "stage": "sales",
+      "primitive": "Memory",
+      "reversible": false,
+      "risk": "low",
+      "description": "WON — the estimate prediction resolved positive."
+    },
+    {
+      "type": "quote.created",
+      "version": 1,
+      "domain": "quote",
+      "stage": "sales",
+      "primitive": "Decision",
+      "reversible": true,
+      "risk": "low",
+      "description": "An estimate (a price + win prediction) was created."
+    },
+    {
+      "type": "quote.expired",
+      "version": 1,
+      "domain": "quote",
+      "stage": "sales",
+      "primitive": "Memory",
+      "reversible": false,
+      "risk": "low",
+      "description": "EXPIRED — silent loss; a follow-up learning signal."
+    },
+    {
+      "type": "quote.rejected",
+      "version": 1,
+      "domain": "quote",
+      "stage": "sales",
+      "primitive": "Memory",
+      "reversible": false,
+      "risk": "low",
+      "description": "LOST — the estimate prediction resolved negative; reason is the lesson."
+    },
+    {
+      "type": "quote.sent",
+      "version": 1,
+      "domain": "quote",
+      "stage": "sales",
+      "primitive": "Event",
+      "reversible": false,
+      "risk": "medium",
+      "description": "An estimate was sent to the customer."
+    },
+    {
+      "type": "quote.viewed",
+      "version": 1,
+      "domain": "quote",
+      "stage": "sales",
+      "primitive": "Event",
+      "reversible": true,
+      "risk": "low",
+      "description": "The customer opened the estimate (engagement signal)."
+    },
+    {
+      "type": "recommendation.created",
+      "version": 1,
+      "domain": "recommendation",
+      "stage": "intelligence",
+      "primitive": "Decision",
+      "reversible": true,
+      "risk": "medium",
+      "description": "An AI advisory was surfaced to a human."
+    },
+    {
+      "type": "recommendation.validated",
+      "version": 1,
+      "domain": "recommendation",
+      "stage": "intelligence",
+      "primitive": "Memory",
+      "reversible": false,
+      "risk": "low",
+      "description": "An advisory was proven right or wrong."
+    },
+    {
+      "type": "referral.created",
+      "version": 1,
+      "domain": "referral",
+      "stage": "growth",
+      "primitive": "Relationship",
+      "reversible": true,
+      "risk": "low",
+      "description": "A customer referred new demand (lowest-CAC)."
+    },
+    {
+      "type": "review.received",
+      "version": 1,
+      "domain": "review",
+      "stage": "retention",
+      "primitive": "Memory",
+      "reversible": false,
+      "risk": "low",
+      "description": "A review arrived (CSAT / reputation outcome)."
+    },
+    {
+      "type": "review.requested",
+      "version": 1,
+      "domain": "review",
+      "stage": "retention",
+      "primitive": "Decision",
+      "reversible": true,
+      "risk": "medium",
+      "description": "A review request was raised (reputation flywheel input)."
+    }
+  ]
+}
