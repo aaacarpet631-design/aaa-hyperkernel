@@ -880,9 +880,9 @@
     "semantic_hash": "23819498c1e3b3a09630f35e879aa960"
   },
   "js/ui/job-list-ui.js": {
-    "mtime": 1781065386.5384004,
-    "ast_hash": "70d311121ebc15efa6c97df5b238987a",
-    "semantic_hash": "70d311121ebc15efa6c97df5b238987a"
+    "mtime": 1781095490.1988623,
+    "ast_hash": "4e30c289b6c6dc94cc89bd56fb7ca057",
+    "semantic_hash": "4e30c289b6c6dc94cc89bd56fb7ca057"
   },
   "js/ui/knowledge-os-ui.js": {
     "mtime": 1781065386.5384004,
@@ -1180,8 +1180,8 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "test/run.js": {
-    "mtime": 1781068430.4184258,
-    "ast_hash": "c385c6ddfffc0f746cf895df66c1760f",
+    "mtime": 1781096189.1589038,
+    "ast_hash": "131f9c3c7ef309a4989a8c5d0782cb2c",
     "semantic_hash": ""
   },
   "test/smoke/boot.test.js": {
@@ -1895,8 +1895,8 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "index.html": {
-    "mtime": 1781068486.2984264,
-    "ast_hash": "25a639b573e3ee68ec520587998bb3aa",
+    "mtime": 1781096223.5949059,
+    "ast_hash": "86d06304bcc79a8a4e4369577669fa64",
     "semantic_hash": ""
   },
   "netlify/functions/RESEARCH.md": {
@@ -2157,52 +2157,52 @@
   "js/genesis/agent-factory.js": {
     "mtime": 1781068471.1064262,
     "ast_hash": "794e9d98baf0b18b0681d85f75380f24",
-    "semantic_hash": ""
+    "semantic_hash": "794e9d98baf0b18b0681d85f75380f24"
   },
   "js/genesis/agent-template-schema.js": {
-    "mtime": 1781068083.006423,
-    "ast_hash": "003bbf3bec970469aa11d981e9d969ec",
-    "semantic_hash": ""
+    "mtime": 1781069136.6224318,
+    "ast_hash": "5587f309c808ac9c62880b76e2a666a6",
+    "semantic_hash": "5587f309c808ac9c62880b76e2a666a6"
   },
   "js/genesis/capability-gap-detector.js": {
     "mtime": 1781068133.0664234,
     "ast_hash": "d65d0c14734fc0c2c4498f266afc1359",
-    "semantic_hash": ""
+    "semantic_hash": "d65d0c14734fc0c2c4498f266afc1359"
   },
   "js/genesis/capability-registry.js": {
     "mtime": 1781068108.7824233,
     "ast_hash": "6fc69263d8c9dbe4e67ff24e4a946d81",
-    "semantic_hash": ""
+    "semantic_hash": "6fc69263d8c9dbe4e67ff24e4a946d81"
   },
   "js/genesis/ephemeral-agent-runtime.js": {
-    "mtime": 1781068247.8544245,
-    "ast_hash": "3645dc6619e640b551778bcc98722e7c",
-    "semantic_hash": ""
+    "mtime": 1781069130.5024319,
+    "ast_hash": "32ce764ffec5f8bb3410123ab5c40586",
+    "semantic_hash": "32ce764ffec5f8bb3410123ab5c40586"
   },
   "js/genesis/genesis-council.js": {
-    "mtime": 1781068332.9664252,
-    "ast_hash": "6ccebe7dce5522db949eb5f9d3c1c458",
-    "semantic_hash": ""
+    "mtime": 1781085894.2065554,
+    "ast_hash": "37f7538016c125dd7c75c95c721911c6",
+    "semantic_hash": "37f7538016c125dd7c75c95c721911c6"
   },
   "js/genesis/promotion-engine.js": {
-    "mtime": 1781068277.1864247,
-    "ast_hash": "d2dda387c4c4f6c4caf34e6ee7bf435c",
-    "semantic_hash": ""
+    "mtime": 1781085837.8065567,
+    "ast_hash": "b4a440e1e1f2fe7aac1bbe14779f7d5a",
+    "semantic_hash": "b4a440e1e1f2fe7aac1bbe14779f7d5a"
   },
   "js/genesis/spawn-policy.js": {
     "mtime": 1781068203.094424,
     "ast_hash": "016ee32efef294280fa3f6c00d730c80",
-    "semantic_hash": ""
+    "semantic_hash": "016ee32efef294280fa3f6c00d730c80"
   },
   "js/genesis/termination-engine.js": {
-    "mtime": 1781068480.9464264,
-    "ast_hash": "953e0ef9b5eef191047cca74bb7b0139",
-    "semantic_hash": ""
+    "mtime": 1781069134.2624319,
+    "ast_hash": "122b34b659577f7d70bd670b67866e67",
+    "semantic_hash": "122b34b659577f7d70bd670b67866e67"
   },
   "test/unit/genesis-foundry.test.js": {
     "mtime": 1781068482.8624263,
     "ast_hash": "58c4c249b02abcb293ff8bfc1d0ec3e4",
-    "semantic_hash": ""
+    "semantic_hash": "58c4c249b02abcb293ff8bfc1d0ec3e4"
   },
   ".claude/CLAUDE.md": {
     "mtime": 1781065822.2337568,
@@ -2645,13 +2645,593 @@
     "semantic_hash": ""
   },
   "GENESIS.md": {
-    "mtime": 1781068522.4664266,
-    "ast_hash": "a7178f91024f78178d40eb14ec9de526",
-    "semantic_hash": ""
+    "mtime": 1781086080.814551,
+    "ast_hash": "42b28d82594b505bd09e224daeb0d1c0",
+    "semantic_hash": "42b28d82594b505bd09e224daeb0d1c0"
   },
   ".claude/marketplaces/claude-obsidian/docs/install-guide.pdf": {
     "mtime": 1781066553.6557763,
     "ast_hash": "c54ed12aaed30066a1ba1c647873c0cd",
+    "semantic_hash": ""
+  },
+  "js/genesis/banned-capability-registry.js": {
+    "mtime": 1781086052.3305519,
+    "ast_hash": "41d7456391bf777195671dd4f05eb970",
+    "semantic_hash": "41d7456391bf777195671dd4f05eb970"
+  },
+  "js/genesis/capability-ledger.js": {
+    "mtime": 1781085632.6505613,
+    "ast_hash": "1be0f44005d3df08acb56e3515a39075",
+    "semantic_hash": "1be0f44005d3df08acb56e3515a39075"
+  },
+  "js/genesis/capability-marketplace-dashboard.js": {
+    "mtime": 1781086117.3265502,
+    "ast_hash": "7eb8d852bf2f11b920191192debcdfb7",
+    "semantic_hash": "7eb8d852bf2f11b920191192debcdfb7"
+  },
+  "js/genesis/capability-reputation-store.js": {
+    "mtime": 1781085680.2945604,
+    "ast_hash": "6b21013efc67dd5ff305200322685266",
+    "semantic_hash": "6b21013efc67dd5ff305200322685266"
+  },
+  "js/genesis/capability-roi-engine.js": {
+    "mtime": 1781085658.1185608,
+    "ast_hash": "2e14afc9d08146288133263c260cc055",
+    "semantic_hash": "2e14afc9d08146288133263c260cc055"
+  },
+  "js/genesis/failure-pattern-detector.js": {
+    "mtime": 1781085711.1105597,
+    "ast_hash": "c6eaf46a7653b31056c243eb549731fa",
+    "semantic_hash": "c6eaf46a7653b31056c243eb549731fa"
+  },
+  "js/genesis/promotion-scorer.js": {
+    "mtime": 1781085767.9465582,
+    "ast_hash": "2fafcd8e4eb644b313cb8aa02c1cecf2",
+    "semantic_hash": "2fafcd8e4eb644b313cb8aa02c1cecf2"
+  },
+  "js/genesis/tool-forge.js": {
+    "mtime": 1781069118.2544317,
+    "ast_hash": "dba78b8bd4e37c0c5a7143be44c81e50",
+    "semantic_hash": "dba78b8bd4e37c0c5a7143be44c81e50"
+  },
+  "test/unit/capability-economy.test.js": {
+    "mtime": 1781086016.4945526,
+    "ast_hash": "cc18eb72b4a0825801de417e84f26bcd",
+    "semantic_hash": "cc18eb72b4a0825801de417e84f26bcd"
+  },
+  "test/unit/tool-forge.test.js": {
+    "mtime": 1781069242.3424327,
+    "ast_hash": "f075e96da59ca572eb6df98c6b776272",
+    "semantic_hash": "f075e96da59ca572eb6df98c6b776272"
+  },
+  "js/simulation/counterfactual-runner.js": {
+    "mtime": 1781091229.122609,
+    "ast_hash": "84f30600fd85c4efb22ada15e8ca99a9",
+    "semantic_hash": "84f30600fd85c4efb22ada15e8ca99a9"
+  },
+  "js/simulation/monte-carlo-engine.js": {
+    "mtime": 1781089775.352004,
+    "ast_hash": "8e2c622db4c3f29fa0644f622971da30",
+    "semantic_hash": "8e2c622db4c3f29fa0644f622971da30"
+  },
+  "js/simulation/outcome-estimator.js": {
+    "mtime": 1781089754.440003,
+    "ast_hash": "d5612217eacb66a6e63ec14e7d7290e0",
+    "semantic_hash": "d5612217eacb66a6e63ec14e7d7290e0"
+  },
+  "js/simulation/policy-simulator.js": {
+    "mtime": 1781089841.268008,
+    "ast_hash": "9154e171f4ca11359d310a0c7befafda",
+    "semantic_hash": "9154e171f4ca11359d310a0c7befafda"
+  },
+  "js/simulation/scenario-engine.js": {
+    "mtime": 1781089723.9120011,
+    "ast_hash": "3e1e3a3430ae8409fc329dc9d086650a",
+    "semantic_hash": "3e1e3a3430ae8409fc329dc9d086650a"
+  },
+  "js/simulation/simulation-governance.js": {
+    "mtime": 1781089882.5800104,
+    "ast_hash": "13fed860bae97e46fab84a907c6bfd3b",
+    "semantic_hash": "13fed860bae97e46fab84a907c6bfd3b"
+  },
+  "js/simulation/simulation-ledger.js": {
+    "mtime": 1781089692.551999,
+    "ast_hash": "beba4d50bebc4b3594b48485073703d7",
+    "semantic_hash": "beba4d50bebc4b3594b48485073703d7"
+  },
+  "js/simulation/strategy-scorecard.js": {
+    "mtime": 1781089825.336007,
+    "ast_hash": "47b26e2f74064c23769986a3e67af1ef",
+    "semantic_hash": "47b26e2f74064c23769986a3e67af1ef"
+  },
+  "test/unit/simulation-council.test.js": {
+    "mtime": 1781089927.4200132,
+    "ast_hash": "a93125fd6fb668a6987c009ff78c04bd",
+    "semantic_hash": "a93125fd6fb668a6987c009ff78c04bd"
+  },
+  "SIMULATION.md": {
+    "mtime": 1781089988.7120168,
+    "ast_hash": "fb3d2d3194681593f6be5a6ba64acf1b",
+    "semantic_hash": "fb3d2d3194681593f6be5a6ba64acf1b"
+  },
+  "js/intelligence/causal-hypothesis-store.js": {
+    "mtime": 1781091167.2946053,
+    "ast_hash": "398f9acc410a0dad01d5cd68e948d42d",
+    "semantic_hash": "398f9acc410a0dad01d5cd68e948d42d"
+  },
+  "js/intelligence/causal-learning-engine.js": {
+    "mtime": 1781091145.318604,
+    "ast_hash": "a14f07f2dcf2e244cda14597ca2fccb8",
+    "semantic_hash": "a14f07f2dcf2e244cda14597ca2fccb8"
+  },
+  "js/intelligence/intelligence-scorecard.js": {
+    "mtime": 1781091218.7146084,
+    "ast_hash": "34b0dbfeb4ee7a0043cea8e15d41ecea",
+    "semantic_hash": "34b0dbfeb4ee7a0043cea8e15d41ecea"
+  },
+  "js/intelligence/prediction-actual-comparator.js": {
+    "mtime": 1781091395.7586188,
+    "ast_hash": "2e0cc8d9458a9233789446de7efa72c2",
+    "semantic_hash": "2e0cc8d9458a9233789446de7efa72c2"
+  },
+  "js/intelligence/signal-derivation-engine.js": {
+    "mtime": 1781091433.8586211,
+    "ast_hash": "7d02cd57e1d655c6907b49d80e245a76",
+    "semantic_hash": "7d02cd57e1d655c6907b49d80e245a76"
+  },
+  "js/intelligence/signal-freshness-sentinel.js": {
+    "mtime": 1781091013.582596,
+    "ast_hash": "7bcfeb69d800bb76ba2351aa726c7cd5",
+    "semantic_hash": "7bcfeb69d800bb76ba2351aa726c7cd5"
+  },
+  "js/intelligence/signal-quality-scorecard.js": {
+    "mtime": 1781091198.002607,
+    "ast_hash": "78fa6ce8c8c788febc191a8e4e2787be",
+    "semantic_hash": "78fa6ce8c8c788febc191a8e4e2787be"
+  },
+  "js/intelligence/signal-registry.js": {
+    "mtime": 1781090996.8545952,
+    "ast_hash": "295933b61712843542f48ef7cc903d1f",
+    "semantic_hash": "295933b61712843542f48ef7cc903d1f"
+  },
+  "js/intelligence/world-model.js": {
+    "mtime": 1781091434.9266212,
+    "ast_hash": "13d427044d0c7cfb947edc076fabd0a7",
+    "semantic_hash": "13d427044d0c7cfb947edc076fabd0a7"
+  },
+  "js/intelligence/world-state-ledger.js": {
+    "mtime": 1781091037.3625975,
+    "ast_hash": "8c97f1fce52dfa00a2a47648828badac",
+    "semantic_hash": "8c97f1fce52dfa00a2a47648828badac"
+  },
+  "test/unit/world-model.test.js": {
+    "mtime": 1781091374.3466177,
+    "ast_hash": "e288db2f957d78e7127104f1eed4a28a",
+    "semantic_hash": "e288db2f957d78e7127104f1eed4a28a"
+  },
+  "WORLDMODEL.md": {
+    "mtime": 1781091508.3066256,
+    "ast_hash": "2db46ebd7cecd7a9f6833cd3f519cbac",
+    "semantic_hash": "2db46ebd7cecd7a9f6833cd3f519cbac"
+  },
+  "js/innovation/adjacency-mapper.js": {
+    "mtime": 1781092369.8346767,
+    "ast_hash": "8e095fe3ec0f41ecf7377ba8b6756dbd",
+    "semantic_hash": "8e095fe3ec0f41ecf7377ba8b6756dbd"
+  },
+  "js/innovation/automation-discovery-engine.js": {
+    "mtime": 1781092463.8186824,
+    "ast_hash": "3814373ab8309790e1434719ea3cfb6c",
+    "semantic_hash": "3814373ab8309790e1434719ea3cfb6c"
+  },
+  "js/innovation/business-model-simulator.js": {
+    "mtime": 1781092426.9586802,
+    "ast_hash": "eb4503a81836dcdc4483e60764eae276",
+    "semantic_hash": "eb4503a81836dcdc4483e60764eae276"
+  },
+  "js/innovation/experiment-registry.js": {
+    "mtime": 1781092480.6746833,
+    "ast_hash": "2cd1e70df38bfe95ac2cc108283744a8",
+    "semantic_hash": "2cd1e70df38bfe95ac2cc108283744a8"
+  },
+  "js/innovation/experiment-scorecard.js": {
+    "mtime": 1781092492.918684,
+    "ast_hash": "2c6af350aa78f99ff32b0bbf2f8b6612",
+    "semantic_hash": "2c6af350aa78f99ff32b0bbf2f8b6612"
+  },
+  "js/innovation/innovation-council.js": {
+    "mtime": 1781092513.3346853,
+    "ast_hash": "1371e7f6d0e882dbe81e6ccfa0718a39",
+    "semantic_hash": "1371e7f6d0e882dbe81e6ccfa0718a39"
+  },
+  "js/innovation/innovation-dashboard.js": {
+    "mtime": 1781092524.782686,
+    "ast_hash": "2184e802572195c6330a636f4e9394e5",
+    "semantic_hash": "2184e802572195c6330a636f4e9394e5"
+  },
+  "js/innovation/opportunity-registry.js": {
+    "mtime": 1781092385.7226777,
+    "ast_hash": "7ef7a28da1f4077c04d97a07b309dfc3",
+    "semantic_hash": "7ef7a28da1f4077c04d97a07b309dfc3"
+  },
+  "js/innovation/technology-scout-engine.js": {
+    "mtime": 1781092446.5386813,
+    "ast_hash": "29e05c81ec14a74bfe569f74c1e2850f",
+    "semantic_hash": "29e05c81ec14a74bfe569f74c1e2850f"
+  },
+  "js/innovation/venture-discovery-engine.js": {
+    "mtime": 1781092402.9906788,
+    "ast_hash": "57d6d057842f2933750ecdb11431e09c",
+    "semantic_hash": "57d6d057842f2933750ecdb11431e09c"
+  },
+  "js/intelligence/goal-engine.js": {
+    "mtime": 1781092833.4547043,
+    "ast_hash": "0b21876880b6157e5ec349977e87c83f",
+    "semantic_hash": "0b21876880b6157e5ec349977e87c83f"
+  },
+  "js/intelligence/resource-allocator.js": {
+    "mtime": 1781092861.762706,
+    "ast_hash": "4a833eff4ee199a3788272c1171b69d3",
+    "semantic_hash": "4a833eff4ee199a3788272c1171b69d3"
+  },
+  "js/intelligence/teleological-schema.js": {
+    "mtime": 1781092791.750702,
+    "ast_hash": "8705cf24c52ee31723e55e79330fc0aa",
+    "semantic_hash": "8705cf24c52ee31723e55e79330fc0aa"
+  },
+  "js/revenue/authority-builder.js": {
+    "mtime": 1781092682.8426955,
+    "ast_hash": "6bcfdb33361e0119d29e2f3bcaae4cad",
+    "semantic_hash": "6bcfdb33361e0119d29e2f3bcaae4cad"
+  },
+  "js/revenue/budget-physics-engine.js": {
+    "mtime": 1781092682.9786954,
+    "ast_hash": "39908ea1834bcee817780b768181a8fd",
+    "semantic_hash": "39908ea1834bcee817780b768181a8fd"
+  },
+  "js/revenue/competitor-intelligence.js": {
+    "mtime": 1781091997.3866546,
+    "ast_hash": "2a64083132a4791e00a7cea3c8b4a335",
+    "semantic_hash": "2a64083132a4791e00a7cea3c8b4a335"
+  },
+  "js/revenue/council-governance.js": {
+    "mtime": 1781092843.166705,
+    "ast_hash": "7f8fbbbbfb8c78ba9d32f696aaecb6e8",
+    "semantic_hash": "7f8fbbbbfb8c78ba9d32f696aaecb6e8"
+  },
+  "js/revenue/creative-evolution-engine.js": {
+    "mtime": 1781092067.0106587,
+    "ast_hash": "65bbbdd44148b816d986eb92ecd50d1c",
+    "semantic_hash": "65bbbdd44148b816d986eb92ecd50d1c"
+  },
+  "js/revenue/demand-pulse-engine.js": {
+    "mtime": 1781092684.2906954,
+    "ast_hash": "e443f7ab98c1d9e0cff59214c7abeb1e",
+    "semantic_hash": "e443f7ab98c1d9e0cff59214c7abeb1e"
+  },
+  "js/revenue/followup-intelligence.js": {
+    "mtime": 1781092236.3546689,
+    "ast_hash": "0c7e6626c60b0e615f49367e73ef0d6c",
+    "semantic_hash": "0c7e6626c60b0e615f49367e73ef0d6c"
+  },
+  "js/revenue/margin-guardian.js": {
+    "mtime": 1781092176.7546654,
+    "ast_hash": "ba0f2c9b929a5d60ac2fbc7cd77f4a3d",
+    "semantic_hash": "ba0f2c9b929a5d60ac2fbc7cd77f4a3d"
+  },
+  "js/revenue/market-intelligence.js": {
+    "mtime": 1781092011.7746556,
+    "ast_hash": "eb8ddc0407a98b0cb52b64b77c12fb91",
+    "semantic_hash": "eb8ddc0407a98b0cb52b64b77c12fb91"
+  },
+  "js/revenue/neighborhood-opportunity-engine.js": {
+    "mtime": 1781091981.4466536,
+    "ast_hash": "8089bf2c85ee7d9c0a437bd31a397e0b",
+    "semantic_hash": "8089bf2c85ee7d9c0a437bd31a397e0b"
+  },
+  "js/revenue/objection-forecast-engine.js": {
+    "mtime": 1781092191.2706661,
+    "ast_hash": "af2ae19ed238a9ac7056946318bc775c",
+    "semantic_hash": "af2ae19ed238a9ac7056946318bc775c"
+  },
+  "js/revenue/proof-assembly-engine.js": {
+    "mtime": 1781092111.5826614,
+    "ast_hash": "d04ea3dfa13aa9b245da0960c7add79e",
+    "semantic_hash": "d04ea3dfa13aa9b245da0960c7add79e"
+  },
+  "js/revenue/referral-engine.js": {
+    "mtime": 1781092685.7106955,
+    "ast_hash": "f9e6e442205ab2cbb806843bca7f0a24",
+    "semantic_hash": "f9e6e442205ab2cbb806843bca7f0a24"
+  },
+  "js/revenue/reputation-engine.js": {
+    "mtime": 1781092261.9666703,
+    "ast_hash": "7be6f773430262947d97c143fb15cf11",
+    "semantic_hash": "7be6f773430262947d97c143fb15cf11"
+  },
+  "js/revenue/revenue-dashboard.js": {
+    "mtime": 1781092322.122674,
+    "ast_hash": "a80fe20f277c16e12ccc1deea92a102d",
+    "semantic_hash": "a80fe20f277c16e12ccc1deea92a102d"
+  },
+  "js/revenue/revenue-intelligence-council.js": {
+    "mtime": 1781092307.414673,
+    "ast_hash": "eca52c4c85da362ff0c4534ec583d858",
+    "semantic_hash": "eca52c4c85da362ff0c4534ec583d858"
+  },
+  "js/revenue/review-velocity-engine.js": {
+    "mtime": 1781092248.5626695,
+    "ast_hash": "57944ea50fc4b8b7cbf9b7178508fd0e",
+    "semantic_hash": "57944ea50fc4b8b7cbf9b7178508fd0e"
+  },
+  "js/revenue/search-intent-engine.js": {
+    "mtime": 1781092048.1586576,
+    "ast_hash": "aa7d60eb484f677dd420007b742e4e4b",
+    "semantic_hash": "aa7d60eb484f677dd420007b742e4e4b"
+  },
+  "js/revenue/silence-analyzer.js": {
+    "mtime": 1781092207.438667,
+    "ast_hash": "5fdd24ca1dabac42e598ae4f9eefde66",
+    "semantic_hash": "5fdd24ca1dabac42e598ae4f9eefde66"
+  },
+  "js/revenue/timing-engine.js": {
+    "mtime": 1781092219.2386677,
+    "ast_hash": "5ddb0b6cebae66b76cf1167af33aeb16",
+    "semantic_hash": "5ddb0b6cebae66b76cf1167af33aeb16"
+  },
+  "js/revenue/trust-gap-engine.js": {
+    "mtime": 1781092098.0786607,
+    "ast_hash": "90037294ac8d7c96a94340fee18a78fc",
+    "semantic_hash": "90037294ac8d7c96a94340fee18a78fc"
+  },
+  "js/revenue/win-probability-engine.js": {
+    "mtime": 1781092158.9066641,
+    "ast_hash": "053e774abf9ba0c2f6878cba488015f5",
+    "semantic_hash": "053e774abf9ba0c2f6878cba488015f5"
+  },
+  "test/unit/innovation-council.test.js": {
+    "mtime": 1781092623.0146918,
+    "ast_hash": "03ac6d5243d3f69519214b21ddf69df0",
+    "semantic_hash": "03ac6d5243d3f69519214b21ddf69df0"
+  },
+  "test/unit/revenue-council.test.js": {
+    "mtime": 1781092580.8706894,
+    "ast_hash": "613eefabb2356d0f574f5216ee5233a5",
+    "semantic_hash": "613eefabb2356d0f574f5216ee5233a5"
+  },
+  "test/unit/teleological.test.js": {
+    "mtime": 1781092900.8067083,
+    "ast_hash": "5d4b91c2026c6f677033ac96804e76e8",
+    "semantic_hash": "5d4b91c2026c6f677033ac96804e76e8"
+  },
+  "COUNCILS-REVENUE-INNOVATION.md": {
+    "mtime": 1781092724.630698,
+    "ast_hash": "bd0e3ca51883a9f4410ef66b5ba54cfa",
+    "semantic_hash": "bd0e3ca51883a9f4410ef66b5ba54cfa"
+  },
+  "TELEOLOGICAL.md": {
+    "mtime": 1781092959.270712,
+    "ast_hash": "7fc3f302e27ecd6b5dc19667721abd7d",
+    "semantic_hash": "7fc3f302e27ecd6b5dc19667721abd7d"
+  },
+  "js/copilot/copilot-dashboard-readmodel.js": {
+    "mtime": 1781093945.5427704,
+    "ast_hash": "78e145ac3ab60ba06556b23e2f4e57e8",
+    "semantic_hash": "78e145ac3ab60ba06556b23e2f4e57e8"
+  },
+  "js/copilot/copilot-goal-interface.js": {
+    "mtime": 1781093911.3347685,
+    "ast_hash": "6806175f0b827c84c1fac1297faede05",
+    "semantic_hash": "6806175f0b827c84c1fac1297faede05"
+  },
+  "js/copilot/copilot-governance-gate.js": {
+    "mtime": 1781093810.9347625,
+    "ast_hash": "6b42223941fc67ffc1a0e89bf9965251",
+    "semantic_hash": "6b42223941fc67ffc1a0e89bf9965251"
+  },
+  "js/copilot/copilot-intent-router.js": {
+    "mtime": 1781094969.8188314,
+    "ast_hash": "94822805de77c714240adfd9739efe21",
+    "semantic_hash": "94822805de77c714240adfd9739efe21"
+  },
+  "js/copilot/copilot-memory-retriever.js": {
+    "mtime": 1781093823.3547633,
+    "ast_hash": "fa7780826629a6a46868bf37c6ccaadf",
+    "semantic_hash": "fa7780826629a6a46868bf37c6ccaadf"
+  },
+  "js/copilot/copilot-simulation-interface.js": {
+    "mtime": 1781094973.4948316,
+    "ast_hash": "2e28be84dd18236cbd2f32f27fb669ac",
+    "semantic_hash": "2e28be84dd18236cbd2f32f27fb669ac"
+  },
+  "js/copilot/copilot-ui.js": {
+    "mtime": 1781094894.966827,
+    "ast_hash": "603dcbfb5a0fe7fec1cea25a9cdb3f1c",
+    "semantic_hash": "603dcbfb5a0fe7fec1cea25a9cdb3f1c"
+  },
+  "js/copilot/council-query-engine.js": {
+    "mtime": 1781093792.6747613,
+    "ast_hash": "4b321ceafb7827f8dfad57feeb60c250",
+    "semantic_hash": "4b321ceafb7827f8dfad57feeb60c250"
+  },
+  "js/copilot/executive-copilot.js": {
+    "mtime": 1781094122.498781,
+    "ast_hash": "1d09568fcb726afdc2c84fce8c771a66",
+    "semantic_hash": "1d09568fcb726afdc2c84fce8c771a66"
+  },
+  "js/copilot/executive-synthesizer.js": {
+    "mtime": 1781093866.3947659,
+    "ast_hash": "c8e6d1122337c55ace7f29190ad49bbb",
+    "semantic_hash": "c8e6d1122337c55ace7f29190ad49bbb"
+  },
+  "js/copilot/morning-briefing-engine.js": {
+    "mtime": 1781093929.9067695,
+    "ast_hash": "12e6168783cf378e2cebc8c018c86cb9",
+    "semantic_hash": "12e6168783cf378e2cebc8c018c86cb9"
+  },
+  "js/copilot/sms-command-router.js": {
+    "mtime": 1781094257.638789,
+    "ast_hash": "ab446ccfc46464ec632f9b07f85c8ba8",
+    "semantic_hash": "ab446ccfc46464ec632f9b07f85c8ba8"
+  },
+  "js/copilot/sms-copilot-adapter.js": {
+    "mtime": 1781094363.2747953,
+    "ast_hash": "bf5b65ab63027b5fd6e2ab9bcdc14478",
+    "semantic_hash": "bf5b65ab63027b5fd6e2ab9bcdc14478"
+  },
+  "js/copilot/sms-response-formatter.js": {
+    "mtime": 1781094275.53079,
+    "ast_hash": "18700f944def8434bf28a134352c9404",
+    "semantic_hash": "18700f944def8434bf28a134352c9404"
+  },
+  "js/copilot/voice-input-adapter.js": {
+    "mtime": 1781093963.5707715,
+    "ast_hash": "39154df04a34d2735ec1f08fd9079e7b",
+    "semantic_hash": "39154df04a34d2735ec1f08fd9079e7b"
+  },
+  "js/epistemology/belief-registry.js": {
+    "mtime": 1781093378.2227368,
+    "ast_hash": "95dfca67f03a07e5a9d43529a0f89b2f",
+    "semantic_hash": "95dfca67f03a07e5a9d43529a0f89b2f"
+  },
+  "js/epistemology/knowledge-compounding-engine.js": {
+    "mtime": 1781093303.5147324,
+    "ast_hash": "ff6a748161374866b01b18942ea973e7",
+    "semantic_hash": "ff6a748161374866b01b18942ea973e7"
+  },
+  "js/epistemology/scientific-discovery-council.js": {
+    "mtime": 1781093278.4667308,
+    "ast_hash": "5c5095af0fc533cec205d56eaa61b949",
+    "semantic_hash": "5c5095af0fc533cec205d56eaa61b949"
+  },
+  "js/genesis/goal-capability-bridge.js": {
+    "mtime": 1781093655.5987532,
+    "ast_hash": "69153c02bc126e5d11a12d460b46a2ba",
+    "semantic_hash": "69153c02bc126e5d11a12d460b46a2ba"
+  },
+  "test/unit/copilot.test.js": {
+    "mtime": 1781094069.7427778,
+    "ast_hash": "459a3830c3122b09b0373c6430070d97",
+    "semantic_hash": "459a3830c3122b09b0373c6430070d97"
+  },
+  "test/unit/epistemology.test.js": {
+    "mtime": 1781093354.2507353,
+    "ast_hash": "4203b6b4f7ae72768c6bb8f09b3b9179",
+    "semantic_hash": "4203b6b4f7ae72768c6bb8f09b3b9179"
+  },
+  "test/unit/goal-capability-bridge.test.js": {
+    "mtime": 1781093628.3787515,
+    "ast_hash": "89e82dfc8a1c249c9b1138f831050300",
+    "semantic_hash": "89e82dfc8a1c249c9b1138f831050300"
+  },
+  "test/unit/sms-copilot.test.js": {
+    "mtime": 1781094335.2267935,
+    "ast_hash": "00d57c2819017c8bfd28708e32132f8d",
+    "semantic_hash": "00d57c2819017c8bfd28708e32132f8d"
+  },
+  "references/HYPERKERNEL_EXECUTIVE_COPILOT.md": {
+    "mtime": 1781094171.7587838,
+    "ast_hash": "3a677110dbdc4c18d7205f9a74069dd5",
+    "semantic_hash": "3a677110dbdc4c18d7205f9a74069dd5"
+  },
+  "js/copilot/chat-canvas.js": {
+    "mtime": 1781094877.878826,
+    "ast_hash": "2c05828a1cb9a319b29ce8d7f7e7aeea",
+    "semantic_hash": "2c05828a1cb9a319b29ce8d7f7e7aeea"
+  },
+  "js/copilot/chat-intent-router.js": {
+    "mtime": 1781094740.4748178,
+    "ast_hash": "3e4fe21e81925318aa6b16d8b91b0c00",
+    "semantic_hash": "3e4fe21e81925318aa6b16d8b91b0c00"
+  },
+  "js/copilot/chat-message-store.js": {
+    "mtime": 1781094710.962816,
+    "ast_hash": "1b6261bf072118c80a45500d565b5c80",
+    "semantic_hash": "1b6261bf072118c80a45500d565b5c80"
+  },
+  "js/copilot/executive-briefing-card.js": {
+    "mtime": 1781094762.266819,
+    "ast_hash": "4e96f9d6338d7d512561926f85c3c16c",
+    "semantic_hash": "4e96f9d6338d7d512561926f85c3c16c"
+  },
+  "js/copilot/goal-progress-card.js": {
+    "mtime": 1781094781.27882,
+    "ast_hash": "62f5ed2d4763503895da9fd5e0d8d3a4",
+    "semantic_hash": "62f5ed2d4763503895da9fd5e0d8d3a4"
+  },
+  "js/copilot/governance-approval-card.js": {
+    "mtime": 1781094806.0268216,
+    "ast_hash": "bb2460d99541309f240d935a8e41948d",
+    "semantic_hash": "bb2460d99541309f240d935a8e41948d"
+  },
+  "js/copilot/offline-chat-queue.js": {
+    "mtime": 1781094727.3228168,
+    "ast_hash": "877f71265388969fb086955a5b028605",
+    "semantic_hash": "877f71265388969fb086955a5b028605"
+  },
+  "js/copilot/rich-card-renderer.js": {
+    "mtime": 1781094840.9308236,
+    "ast_hash": "b6999559811073c20a93151482c5a3a4",
+    "semantic_hash": "b6999559811073c20a93151482c5a3a4"
+  },
+  "js/copilot/simulation-result-card.js": {
+    "mtime": 1781094772.1148195,
+    "ast_hash": "70b151815337391ab5c4e54eca4d325f",
+    "semantic_hash": "70b151815337391ab5c4e54eca4d325f"
+  },
+  "js/copilot/software-factory-card.js": {
+    "mtime": 1781094794.110821,
+    "ast_hash": "fcaf5fb2c7d990db5a38714ba3f8469c",
+    "semantic_hash": "fcaf5fb2c7d990db5a38714ba3f8469c"
+  },
+  "test/unit/chat-canvas.test.js": {
+    "mtime": 1781094933.558829,
+    "ast_hash": "eecf4fe82650cda572de66251ac0f2c4",
+    "semantic_hash": "eecf4fe82650cda572de66251ac0f2c4"
+  },
+  "references/HYPERKERNEL_CHAT_CANVAS.md": {
+    "mtime": 1781095051.4348361,
+    "ast_hash": "feb29928f5dce75bde6fd3d369685690",
+    "semantic_hash": "feb29928f5dce75bde6fd3d369685690"
+  },
+  "js/ui/app-mode.js": {
+    "mtime": 1781095419.174858,
+    "ast_hash": "2ba198e864deba4eeea5b7503b5ec4c8",
+    "semantic_hash": "2ba198e864deba4eeea5b7503b5ec4c8"
+  },
+  "js/ui/field-mode-home.js": {
+    "mtime": 1781096123.4148998,
+    "ast_hash": "7a891dbe5095ca5391a254796bd3df1e",
+    "semantic_hash": ""
+  },
+  "test/unit/field-mode.test.js": {
+    "mtime": 1781096160.1429021,
+    "ast_hash": "fe232a166545ae3991d0010800afbed5",
+    "semantic_hash": ""
+  },
+  "references/HYPERKERNEL_FIELD_MODE.md": {
+    "mtime": 1781095650.842872,
+    "ast_hash": "a1773193a4c18a14889d06175211ae85",
+    "semantic_hash": "a1773193a4c18a14889d06175211ae85"
+  },
+  "js/measurements/field-brain.js": {
+    "mtime": 1781096075.110897,
+    "ast_hash": "70eeae1f2364a3990c78c333fec021e7",
+    "semantic_hash": ""
+  },
+  "js/measurements/field-capture-session.js": {
+    "mtime": 1781096217.0069056,
+    "ast_hash": "dc323d516e45570123f84a877c33b581",
+    "semantic_hash": ""
+  },
+  "test/unit/field-capture-session.test.js": {
+    "mtime": 1781096183.2909036,
+    "ast_hash": "7d267afa53165162774af449296c0eb5",
+    "semantic_hash": ""
+  },
+  "references/HYPERKERNEL_FIELD_BRAIN.md": {
+    "mtime": 1781096283.0429094,
+    "ast_hash": "52de89be5cc424a41b1157d1eeee93ce",
     "semantic_hash": ""
   },
   "/home/user/aaa-hyperkernel/.eslintrc.json": {
@@ -2994,6 +3574,131 @@
     "ast_hash": "b7351fecb44048be67519b2e74dfc16b",
     "semantic_hash": "b7351fecb44048be67519b2e74dfc16b"
   },
+  "/home/user/aaa-hyperkernel/js/copilot/chat-canvas.js": {
+    "mtime": 1781094877.878826,
+    "ast_hash": "2c05828a1cb9a319b29ce8d7f7e7aeea",
+    "semantic_hash": "2c05828a1cb9a319b29ce8d7f7e7aeea"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/chat-intent-router.js": {
+    "mtime": 1781094740.4748178,
+    "ast_hash": "3e4fe21e81925318aa6b16d8b91b0c00",
+    "semantic_hash": "3e4fe21e81925318aa6b16d8b91b0c00"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/chat-message-store.js": {
+    "mtime": 1781094710.962816,
+    "ast_hash": "1b6261bf072118c80a45500d565b5c80",
+    "semantic_hash": "1b6261bf072118c80a45500d565b5c80"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/copilot-dashboard-readmodel.js": {
+    "mtime": 1781093945.5427704,
+    "ast_hash": "78e145ac3ab60ba06556b23e2f4e57e8",
+    "semantic_hash": "78e145ac3ab60ba06556b23e2f4e57e8"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/copilot-goal-interface.js": {
+    "mtime": 1781093911.3347685,
+    "ast_hash": "6806175f0b827c84c1fac1297faede05",
+    "semantic_hash": "6806175f0b827c84c1fac1297faede05"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/copilot-governance-gate.js": {
+    "mtime": 1781093810.9347625,
+    "ast_hash": "6b42223941fc67ffc1a0e89bf9965251",
+    "semantic_hash": "6b42223941fc67ffc1a0e89bf9965251"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/copilot-intent-router.js": {
+    "mtime": 1781094969.8188314,
+    "ast_hash": "94822805de77c714240adfd9739efe21",
+    "semantic_hash": "94822805de77c714240adfd9739efe21"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/copilot-memory-retriever.js": {
+    "mtime": 1781093823.3547633,
+    "ast_hash": "fa7780826629a6a46868bf37c6ccaadf",
+    "semantic_hash": "fa7780826629a6a46868bf37c6ccaadf"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/copilot-simulation-interface.js": {
+    "mtime": 1781094973.4948316,
+    "ast_hash": "2e28be84dd18236cbd2f32f27fb669ac",
+    "semantic_hash": "2e28be84dd18236cbd2f32f27fb669ac"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/copilot-ui.js": {
+    "mtime": 1781094894.966827,
+    "ast_hash": "603dcbfb5a0fe7fec1cea25a9cdb3f1c",
+    "semantic_hash": "603dcbfb5a0fe7fec1cea25a9cdb3f1c"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/council-query-engine.js": {
+    "mtime": 1781093792.6747613,
+    "ast_hash": "4b321ceafb7827f8dfad57feeb60c250",
+    "semantic_hash": "4b321ceafb7827f8dfad57feeb60c250"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/executive-briefing-card.js": {
+    "mtime": 1781094762.266819,
+    "ast_hash": "4e96f9d6338d7d512561926f85c3c16c",
+    "semantic_hash": "4e96f9d6338d7d512561926f85c3c16c"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/executive-copilot.js": {
+    "mtime": 1781094122.498781,
+    "ast_hash": "1d09568fcb726afdc2c84fce8c771a66",
+    "semantic_hash": "1d09568fcb726afdc2c84fce8c771a66"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/executive-synthesizer.js": {
+    "mtime": 1781093866.3947659,
+    "ast_hash": "c8e6d1122337c55ace7f29190ad49bbb",
+    "semantic_hash": "c8e6d1122337c55ace7f29190ad49bbb"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/goal-progress-card.js": {
+    "mtime": 1781094781.27882,
+    "ast_hash": "62f5ed2d4763503895da9fd5e0d8d3a4",
+    "semantic_hash": "62f5ed2d4763503895da9fd5e0d8d3a4"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/governance-approval-card.js": {
+    "mtime": 1781094806.0268216,
+    "ast_hash": "bb2460d99541309f240d935a8e41948d",
+    "semantic_hash": "bb2460d99541309f240d935a8e41948d"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/morning-briefing-engine.js": {
+    "mtime": 1781093929.9067695,
+    "ast_hash": "12e6168783cf378e2cebc8c018c86cb9",
+    "semantic_hash": "12e6168783cf378e2cebc8c018c86cb9"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/offline-chat-queue.js": {
+    "mtime": 1781094727.3228168,
+    "ast_hash": "877f71265388969fb086955a5b028605",
+    "semantic_hash": "877f71265388969fb086955a5b028605"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/rich-card-renderer.js": {
+    "mtime": 1781094840.9308236,
+    "ast_hash": "b6999559811073c20a93151482c5a3a4",
+    "semantic_hash": "b6999559811073c20a93151482c5a3a4"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/simulation-result-card.js": {
+    "mtime": 1781094772.1148195,
+    "ast_hash": "70b151815337391ab5c4e54eca4d325f",
+    "semantic_hash": "70b151815337391ab5c4e54eca4d325f"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/sms-command-router.js": {
+    "mtime": 1781094257.638789,
+    "ast_hash": "ab446ccfc46464ec632f9b07f85c8ba8",
+    "semantic_hash": "ab446ccfc46464ec632f9b07f85c8ba8"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/sms-copilot-adapter.js": {
+    "mtime": 1781094363.2747953,
+    "ast_hash": "bf5b65ab63027b5fd6e2ab9bcdc14478",
+    "semantic_hash": "bf5b65ab63027b5fd6e2ab9bcdc14478"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/sms-response-formatter.js": {
+    "mtime": 1781094275.53079,
+    "ast_hash": "18700f944def8434bf28a134352c9404",
+    "semantic_hash": "18700f944def8434bf28a134352c9404"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/software-factory-card.js": {
+    "mtime": 1781094794.110821,
+    "ast_hash": "fcaf5fb2c7d990db5a38714ba3f8469c",
+    "semantic_hash": "fcaf5fb2c7d990db5a38714ba3f8469c"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/voice-input-adapter.js": {
+    "mtime": 1781093963.5707715,
+    "ast_hash": "39154df04a34d2735ec1f08fd9079e7b",
+    "semantic_hash": "39154df04a34d2735ec1f08fd9079e7b"
+  },
   "/home/user/aaa-hyperkernel/js/core/aaa-cloud.js": {
     "mtime": 1781065386.5072985,
     "ast_hash": "f63ec4b4870439267df9dc5c8a8dfbfd",
@@ -3104,6 +3809,21 @@
     "ast_hash": "cdc4e33193a966bb909b2a585d681a41",
     "semantic_hash": "cdc4e33193a966bb909b2a585d681a41"
   },
+  "/home/user/aaa-hyperkernel/js/epistemology/belief-registry.js": {
+    "mtime": 1781093378.2227368,
+    "ast_hash": "95dfca67f03a07e5a9d43529a0f89b2f",
+    "semantic_hash": "95dfca67f03a07e5a9d43529a0f89b2f"
+  },
+  "/home/user/aaa-hyperkernel/js/epistemology/knowledge-compounding-engine.js": {
+    "mtime": 1781093303.5147324,
+    "ast_hash": "ff6a748161374866b01b18942ea973e7",
+    "semantic_hash": "ff6a748161374866b01b18942ea973e7"
+  },
+  "/home/user/aaa-hyperkernel/js/epistemology/scientific-discovery-council.js": {
+    "mtime": 1781093278.4667308,
+    "ast_hash": "5c5095af0fc533cec205d56eaa61b949",
+    "semantic_hash": "5c5095af0fc533cec205d56eaa61b949"
+  },
   "/home/user/aaa-hyperkernel/js/genesis/agent-factory.js": {
     "mtime": 1781068471.1064262,
     "ast_hash": "794e9d98baf0b18b0681d85f75380f24",
@@ -3114,30 +3834,70 @@
     "ast_hash": "5587f309c808ac9c62880b76e2a666a6",
     "semantic_hash": "5587f309c808ac9c62880b76e2a666a6"
   },
+  "/home/user/aaa-hyperkernel/js/genesis/banned-capability-registry.js": {
+    "mtime": 1781086052.3305519,
+    "ast_hash": "41d7456391bf777195671dd4f05eb970",
+    "semantic_hash": "41d7456391bf777195671dd4f05eb970"
+  },
   "/home/user/aaa-hyperkernel/js/genesis/capability-gap-detector.js": {
     "mtime": 1781068133.0664234,
     "ast_hash": "d65d0c14734fc0c2c4498f266afc1359",
     "semantic_hash": "d65d0c14734fc0c2c4498f266afc1359"
+  },
+  "/home/user/aaa-hyperkernel/js/genesis/capability-ledger.js": {
+    "mtime": 1781085632.6505613,
+    "ast_hash": "1be0f44005d3df08acb56e3515a39075",
+    "semantic_hash": "1be0f44005d3df08acb56e3515a39075"
+  },
+  "/home/user/aaa-hyperkernel/js/genesis/capability-marketplace-dashboard.js": {
+    "mtime": 1781086117.3265502,
+    "ast_hash": "7eb8d852bf2f11b920191192debcdfb7",
+    "semantic_hash": "7eb8d852bf2f11b920191192debcdfb7"
   },
   "/home/user/aaa-hyperkernel/js/genesis/capability-registry.js": {
     "mtime": 1781068108.7824233,
     "ast_hash": "6fc69263d8c9dbe4e67ff24e4a946d81",
     "semantic_hash": "6fc69263d8c9dbe4e67ff24e4a946d81"
   },
+  "/home/user/aaa-hyperkernel/js/genesis/capability-reputation-store.js": {
+    "mtime": 1781085680.2945604,
+    "ast_hash": "6b21013efc67dd5ff305200322685266",
+    "semantic_hash": "6b21013efc67dd5ff305200322685266"
+  },
+  "/home/user/aaa-hyperkernel/js/genesis/capability-roi-engine.js": {
+    "mtime": 1781085658.1185608,
+    "ast_hash": "2e14afc9d08146288133263c260cc055",
+    "semantic_hash": "2e14afc9d08146288133263c260cc055"
+  },
   "/home/user/aaa-hyperkernel/js/genesis/ephemeral-agent-runtime.js": {
     "mtime": 1781069130.5024319,
     "ast_hash": "32ce764ffec5f8bb3410123ab5c40586",
     "semantic_hash": "32ce764ffec5f8bb3410123ab5c40586"
+  },
+  "/home/user/aaa-hyperkernel/js/genesis/failure-pattern-detector.js": {
+    "mtime": 1781085711.1105597,
+    "ast_hash": "c6eaf46a7653b31056c243eb549731fa",
+    "semantic_hash": "c6eaf46a7653b31056c243eb549731fa"
   },
   "/home/user/aaa-hyperkernel/js/genesis/genesis-council.js": {
     "mtime": 1781085894.2065554,
     "ast_hash": "37f7538016c125dd7c75c95c721911c6",
     "semantic_hash": "37f7538016c125dd7c75c95c721911c6"
   },
+  "/home/user/aaa-hyperkernel/js/genesis/goal-capability-bridge.js": {
+    "mtime": 1781093655.5987532,
+    "ast_hash": "69153c02bc126e5d11a12d460b46a2ba",
+    "semantic_hash": "69153c02bc126e5d11a12d460b46a2ba"
+  },
   "/home/user/aaa-hyperkernel/js/genesis/promotion-engine.js": {
     "mtime": 1781085837.8065567,
     "ast_hash": "b4a440e1e1f2fe7aac1bbe14779f7d5a",
     "semantic_hash": "b4a440e1e1f2fe7aac1bbe14779f7d5a"
+  },
+  "/home/user/aaa-hyperkernel/js/genesis/promotion-scorer.js": {
+    "mtime": 1781085767.9465582,
+    "ast_hash": "2fafcd8e4eb644b313cb8aa02c1cecf2",
+    "semantic_hash": "2fafcd8e4eb644b313cb8aa02c1cecf2"
   },
   "/home/user/aaa-hyperkernel/js/genesis/spawn-policy.js": {
     "mtime": 1781068203.094424,
@@ -3148,6 +3908,11 @@
     "mtime": 1781069134.2624319,
     "ast_hash": "122b34b659577f7d70bd670b67866e67",
     "semantic_hash": "122b34b659577f7d70bd670b67866e67"
+  },
+  "/home/user/aaa-hyperkernel/js/genesis/tool-forge.js": {
+    "mtime": 1781069118.2544317,
+    "ast_hash": "dba78b8bd4e37c0c5a7143be44c81e50",
+    "semantic_hash": "dba78b8bd4e37c0c5a7143be44c81e50"
   },
   "/home/user/aaa-hyperkernel/js/governance/agent-outcomes.js": {
     "mtime": 1781065386.5104003,
@@ -3214,6 +3979,56 @@
     "ast_hash": "82b6d14f207f8403812f0335475cdd9d",
     "semantic_hash": "82b6d14f207f8403812f0335475cdd9d"
   },
+  "/home/user/aaa-hyperkernel/js/innovation/adjacency-mapper.js": {
+    "mtime": 1781092369.8346767,
+    "ast_hash": "8e095fe3ec0f41ecf7377ba8b6756dbd",
+    "semantic_hash": "8e095fe3ec0f41ecf7377ba8b6756dbd"
+  },
+  "/home/user/aaa-hyperkernel/js/innovation/automation-discovery-engine.js": {
+    "mtime": 1781092463.8186824,
+    "ast_hash": "3814373ab8309790e1434719ea3cfb6c",
+    "semantic_hash": "3814373ab8309790e1434719ea3cfb6c"
+  },
+  "/home/user/aaa-hyperkernel/js/innovation/business-model-simulator.js": {
+    "mtime": 1781092426.9586802,
+    "ast_hash": "eb4503a81836dcdc4483e60764eae276",
+    "semantic_hash": "eb4503a81836dcdc4483e60764eae276"
+  },
+  "/home/user/aaa-hyperkernel/js/innovation/experiment-registry.js": {
+    "mtime": 1781092480.6746833,
+    "ast_hash": "2cd1e70df38bfe95ac2cc108283744a8",
+    "semantic_hash": "2cd1e70df38bfe95ac2cc108283744a8"
+  },
+  "/home/user/aaa-hyperkernel/js/innovation/experiment-scorecard.js": {
+    "mtime": 1781092492.918684,
+    "ast_hash": "2c6af350aa78f99ff32b0bbf2f8b6612",
+    "semantic_hash": "2c6af350aa78f99ff32b0bbf2f8b6612"
+  },
+  "/home/user/aaa-hyperkernel/js/innovation/innovation-council.js": {
+    "mtime": 1781092513.3346853,
+    "ast_hash": "1371e7f6d0e882dbe81e6ccfa0718a39",
+    "semantic_hash": "1371e7f6d0e882dbe81e6ccfa0718a39"
+  },
+  "/home/user/aaa-hyperkernel/js/innovation/innovation-dashboard.js": {
+    "mtime": 1781092524.782686,
+    "ast_hash": "2184e802572195c6330a636f4e9394e5",
+    "semantic_hash": "2184e802572195c6330a636f4e9394e5"
+  },
+  "/home/user/aaa-hyperkernel/js/innovation/opportunity-registry.js": {
+    "mtime": 1781092385.7226777,
+    "ast_hash": "7ef7a28da1f4077c04d97a07b309dfc3",
+    "semantic_hash": "7ef7a28da1f4077c04d97a07b309dfc3"
+  },
+  "/home/user/aaa-hyperkernel/js/innovation/technology-scout-engine.js": {
+    "mtime": 1781092446.5386813,
+    "ast_hash": "29e05c81ec14a74bfe569f74c1e2850f",
+    "semantic_hash": "29e05c81ec14a74bfe569f74c1e2850f"
+  },
+  "/home/user/aaa-hyperkernel/js/innovation/venture-discovery-engine.js": {
+    "mtime": 1781092402.9906788,
+    "ast_hash": "57d6d057842f2933750ecdb11431e09c",
+    "semantic_hash": "57d6d057842f2933750ecdb11431e09c"
+  },
   "/home/user/aaa-hyperkernel/js/intelligence/agent-council.js": {
     "mtime": 1781065386.5184002,
     "ast_hash": "55afdba5ec8e9294f30a50a6a80fcb4c",
@@ -3249,6 +4064,16 @@
     "ast_hash": "c476bb55a3bf0806bc7f9e8145dc4b8f",
     "semantic_hash": "c476bb55a3bf0806bc7f9e8145dc4b8f"
   },
+  "/home/user/aaa-hyperkernel/js/intelligence/causal-hypothesis-store.js": {
+    "mtime": 1781091167.2946053,
+    "ast_hash": "398f9acc410a0dad01d5cd68e948d42d",
+    "semantic_hash": "398f9acc410a0dad01d5cd68e948d42d"
+  },
+  "/home/user/aaa-hyperkernel/js/intelligence/causal-learning-engine.js": {
+    "mtime": 1781091145.318604,
+    "ast_hash": "a14f07f2dcf2e244cda14597ca2fccb8",
+    "semantic_hash": "a14f07f2dcf2e244cda14597ca2fccb8"
+  },
   "/home/user/aaa-hyperkernel/js/intelligence/debate-engine.js": {
     "mtime": 1780633642.6239355,
     "ast_hash": "c775821a8d08d218704606d075b4db47",
@@ -3274,6 +4099,11 @@
     "ast_hash": "c3ea209f9d74548d1e654cec88ea6702",
     "semantic_hash": "c3ea209f9d74548d1e654cec88ea6702"
   },
+  "/home/user/aaa-hyperkernel/js/intelligence/goal-engine.js": {
+    "mtime": 1781092833.4547043,
+    "ast_hash": "0b21876880b6157e5ec349977e87c83f",
+    "semantic_hash": "0b21876880b6157e5ec349977e87c83f"
+  },
   "/home/user/aaa-hyperkernel/js/intelligence/governance-registry.js": {
     "mtime": 1781065386.5184002,
     "ast_hash": "e75b293c421b9291d897a96dedc5bac9",
@@ -3293,6 +4123,11 @@
     "mtime": 1780633642.6239355,
     "ast_hash": "e7956def06ae121b9afb40c1a77a05a4",
     "semantic_hash": "e7956def06ae121b9afb40c1a77a05a4"
+  },
+  "/home/user/aaa-hyperkernel/js/intelligence/intelligence-scorecard.js": {
+    "mtime": 1781091218.7146084,
+    "ast_hash": "34b0dbfeb4ee7a0043cea8e15d41ecea",
+    "semantic_hash": "34b0dbfeb4ee7a0043cea8e15d41ecea"
   },
   "/home/user/aaa-hyperkernel/js/intelligence/knowledge-fabric.js": {
     "mtime": 1781065386.5224004,
@@ -3329,6 +4164,11 @@
     "ast_hash": "88bfb8d523c4939fab91162943010a49",
     "semantic_hash": "88bfb8d523c4939fab91162943010a49"
   },
+  "/home/user/aaa-hyperkernel/js/intelligence/prediction-actual-comparator.js": {
+    "mtime": 1781091395.7586188,
+    "ast_hash": "2e0cc8d9458a9233789446de7efa72c2",
+    "semantic_hash": "2e0cc8d9458a9233789446de7efa72c2"
+  },
   "/home/user/aaa-hyperkernel/js/intelligence/prediction-closure.js": {
     "mtime": 1781065386.5224004,
     "ast_hash": "f7dcaebaca4826847c8fb004dae7a1d0",
@@ -3359,15 +4199,55 @@
     "ast_hash": "3c1719a33e0959ed02c34f2b9979a89d",
     "semantic_hash": "3c1719a33e0959ed02c34f2b9979a89d"
   },
+  "/home/user/aaa-hyperkernel/js/intelligence/resource-allocator.js": {
+    "mtime": 1781092861.762706,
+    "ast_hash": "4a833eff4ee199a3788272c1171b69d3",
+    "semantic_hash": "4a833eff4ee199a3788272c1171b69d3"
+  },
+  "/home/user/aaa-hyperkernel/js/intelligence/signal-derivation-engine.js": {
+    "mtime": 1781091433.8586211,
+    "ast_hash": "7d02cd57e1d655c6907b49d80e245a76",
+    "semantic_hash": "7d02cd57e1d655c6907b49d80e245a76"
+  },
+  "/home/user/aaa-hyperkernel/js/intelligence/signal-freshness-sentinel.js": {
+    "mtime": 1781091013.582596,
+    "ast_hash": "7bcfeb69d800bb76ba2351aa726c7cd5",
+    "semantic_hash": "7bcfeb69d800bb76ba2351aa726c7cd5"
+  },
+  "/home/user/aaa-hyperkernel/js/intelligence/signal-quality-scorecard.js": {
+    "mtime": 1781091198.002607,
+    "ast_hash": "78fa6ce8c8c788febc191a8e4e2787be",
+    "semantic_hash": "78fa6ce8c8c788febc191a8e4e2787be"
+  },
+  "/home/user/aaa-hyperkernel/js/intelligence/signal-registry.js": {
+    "mtime": 1781090996.8545952,
+    "ast_hash": "295933b61712843542f48ef7cc903d1f",
+    "semantic_hash": "295933b61712843542f48ef7cc903d1f"
+  },
   "/home/user/aaa-hyperkernel/js/intelligence/supervisor-council.js": {
     "mtime": 1780633642.6239355,
     "ast_hash": "c59e2aceb1a755875b90ecca7f70abac",
     "semantic_hash": "c59e2aceb1a755875b90ecca7f70abac"
   },
+  "/home/user/aaa-hyperkernel/js/intelligence/teleological-schema.js": {
+    "mtime": 1781092791.750702,
+    "ast_hash": "8705cf24c52ee31723e55e79330fc0aa",
+    "semantic_hash": "8705cf24c52ee31723e55e79330fc0aa"
+  },
   "/home/user/aaa-hyperkernel/js/intelligence/vector-memory.js": {
     "mtime": 1781065386.5264003,
     "ast_hash": "f242287f8de671e88d8bf69dc67bfc19",
     "semantic_hash": "f242287f8de671e88d8bf69dc67bfc19"
+  },
+  "/home/user/aaa-hyperkernel/js/intelligence/world-model.js": {
+    "mtime": 1781091434.9266212,
+    "ast_hash": "13d427044d0c7cfb947edc076fabd0a7",
+    "semantic_hash": "13d427044d0c7cfb947edc076fabd0a7"
+  },
+  "/home/user/aaa-hyperkernel/js/intelligence/world-state-ledger.js": {
+    "mtime": 1781091037.3625975,
+    "ast_hash": "8c97f1fce52dfa00a2a47648828badac",
+    "semantic_hash": "8c97f1fce52dfa00a2a47648828badac"
   },
   "/home/user/aaa-hyperkernel/js/leads/lead-store.js": {
     "mtime": 1781065386.5264003,
@@ -3393,6 +4273,16 @@
     "mtime": 1780633642.6239355,
     "ast_hash": "4d005e9fb31a4fd8077cebd9bf49a8f1",
     "semantic_hash": "4d005e9fb31a4fd8077cebd9bf49a8f1"
+  },
+  "/home/user/aaa-hyperkernel/js/measurements/field-brain.js": {
+    "mtime": 1781096075.110897,
+    "ast_hash": "70eeae1f2364a3990c78c333fec021e7",
+    "semantic_hash": "70eeae1f2364a3990c78c333fec021e7"
+  },
+  "/home/user/aaa-hyperkernel/js/measurements/field-capture-session.js": {
+    "mtime": 1781096217.0069056,
+    "ast_hash": "dc323d516e45570123f84a877c33b581",
+    "semantic_hash": "dc323d516e45570123f84a877c33b581"
   },
   "/home/user/aaa-hyperkernel/js/measurements/measurement-ai-assistant.js": {
     "mtime": 1781065386.5298831,
@@ -3429,10 +4319,160 @@
     "ast_hash": "9ede89f807944e05556a1a2be603df2d",
     "semantic_hash": "9ede89f807944e05556a1a2be603df2d"
   },
+  "/home/user/aaa-hyperkernel/js/revenue/authority-builder.js": {
+    "mtime": 1781092682.8426955,
+    "ast_hash": "6bcfdb33361e0119d29e2f3bcaae4cad",
+    "semantic_hash": "6bcfdb33361e0119d29e2f3bcaae4cad"
+  },
+  "/home/user/aaa-hyperkernel/js/revenue/budget-physics-engine.js": {
+    "mtime": 1781092682.9786954,
+    "ast_hash": "39908ea1834bcee817780b768181a8fd",
+    "semantic_hash": "39908ea1834bcee817780b768181a8fd"
+  },
+  "/home/user/aaa-hyperkernel/js/revenue/competitor-intelligence.js": {
+    "mtime": 1781091997.3866546,
+    "ast_hash": "2a64083132a4791e00a7cea3c8b4a335",
+    "semantic_hash": "2a64083132a4791e00a7cea3c8b4a335"
+  },
+  "/home/user/aaa-hyperkernel/js/revenue/council-governance.js": {
+    "mtime": 1781092843.166705,
+    "ast_hash": "7f8fbbbbfb8c78ba9d32f696aaecb6e8",
+    "semantic_hash": "7f8fbbbbfb8c78ba9d32f696aaecb6e8"
+  },
+  "/home/user/aaa-hyperkernel/js/revenue/creative-evolution-engine.js": {
+    "mtime": 1781092067.0106587,
+    "ast_hash": "65bbbdd44148b816d986eb92ecd50d1c",
+    "semantic_hash": "65bbbdd44148b816d986eb92ecd50d1c"
+  },
+  "/home/user/aaa-hyperkernel/js/revenue/demand-pulse-engine.js": {
+    "mtime": 1781092684.2906954,
+    "ast_hash": "e443f7ab98c1d9e0cff59214c7abeb1e",
+    "semantic_hash": "e443f7ab98c1d9e0cff59214c7abeb1e"
+  },
+  "/home/user/aaa-hyperkernel/js/revenue/followup-intelligence.js": {
+    "mtime": 1781092236.3546689,
+    "ast_hash": "0c7e6626c60b0e615f49367e73ef0d6c",
+    "semantic_hash": "0c7e6626c60b0e615f49367e73ef0d6c"
+  },
+  "/home/user/aaa-hyperkernel/js/revenue/margin-guardian.js": {
+    "mtime": 1781092176.7546654,
+    "ast_hash": "ba0f2c9b929a5d60ac2fbc7cd77f4a3d",
+    "semantic_hash": "ba0f2c9b929a5d60ac2fbc7cd77f4a3d"
+  },
+  "/home/user/aaa-hyperkernel/js/revenue/market-intelligence.js": {
+    "mtime": 1781092011.7746556,
+    "ast_hash": "eb8ddc0407a98b0cb52b64b77c12fb91",
+    "semantic_hash": "eb8ddc0407a98b0cb52b64b77c12fb91"
+  },
+  "/home/user/aaa-hyperkernel/js/revenue/neighborhood-opportunity-engine.js": {
+    "mtime": 1781091981.4466536,
+    "ast_hash": "8089bf2c85ee7d9c0a437bd31a397e0b",
+    "semantic_hash": "8089bf2c85ee7d9c0a437bd31a397e0b"
+  },
+  "/home/user/aaa-hyperkernel/js/revenue/objection-forecast-engine.js": {
+    "mtime": 1781092191.2706661,
+    "ast_hash": "af2ae19ed238a9ac7056946318bc775c",
+    "semantic_hash": "af2ae19ed238a9ac7056946318bc775c"
+  },
+  "/home/user/aaa-hyperkernel/js/revenue/proof-assembly-engine.js": {
+    "mtime": 1781092111.5826614,
+    "ast_hash": "d04ea3dfa13aa9b245da0960c7add79e",
+    "semantic_hash": "d04ea3dfa13aa9b245da0960c7add79e"
+  },
+  "/home/user/aaa-hyperkernel/js/revenue/referral-engine.js": {
+    "mtime": 1781092685.7106955,
+    "ast_hash": "f9e6e442205ab2cbb806843bca7f0a24",
+    "semantic_hash": "f9e6e442205ab2cbb806843bca7f0a24"
+  },
+  "/home/user/aaa-hyperkernel/js/revenue/reputation-engine.js": {
+    "mtime": 1781092261.9666703,
+    "ast_hash": "7be6f773430262947d97c143fb15cf11",
+    "semantic_hash": "7be6f773430262947d97c143fb15cf11"
+  },
+  "/home/user/aaa-hyperkernel/js/revenue/revenue-dashboard.js": {
+    "mtime": 1781092322.122674,
+    "ast_hash": "a80fe20f277c16e12ccc1deea92a102d",
+    "semantic_hash": "a80fe20f277c16e12ccc1deea92a102d"
+  },
+  "/home/user/aaa-hyperkernel/js/revenue/revenue-intelligence-council.js": {
+    "mtime": 1781092307.414673,
+    "ast_hash": "eca52c4c85da362ff0c4534ec583d858",
+    "semantic_hash": "eca52c4c85da362ff0c4534ec583d858"
+  },
+  "/home/user/aaa-hyperkernel/js/revenue/review-velocity-engine.js": {
+    "mtime": 1781092248.5626695,
+    "ast_hash": "57944ea50fc4b8b7cbf9b7178508fd0e",
+    "semantic_hash": "57944ea50fc4b8b7cbf9b7178508fd0e"
+  },
+  "/home/user/aaa-hyperkernel/js/revenue/search-intent-engine.js": {
+    "mtime": 1781092048.1586576,
+    "ast_hash": "aa7d60eb484f677dd420007b742e4e4b",
+    "semantic_hash": "aa7d60eb484f677dd420007b742e4e4b"
+  },
+  "/home/user/aaa-hyperkernel/js/revenue/silence-analyzer.js": {
+    "mtime": 1781092207.438667,
+    "ast_hash": "5fdd24ca1dabac42e598ae4f9eefde66",
+    "semantic_hash": "5fdd24ca1dabac42e598ae4f9eefde66"
+  },
+  "/home/user/aaa-hyperkernel/js/revenue/timing-engine.js": {
+    "mtime": 1781092219.2386677,
+    "ast_hash": "5ddb0b6cebae66b76cf1167af33aeb16",
+    "semantic_hash": "5ddb0b6cebae66b76cf1167af33aeb16"
+  },
+  "/home/user/aaa-hyperkernel/js/revenue/trust-gap-engine.js": {
+    "mtime": 1781092098.0786607,
+    "ast_hash": "90037294ac8d7c96a94340fee18a78fc",
+    "semantic_hash": "90037294ac8d7c96a94340fee18a78fc"
+  },
+  "/home/user/aaa-hyperkernel/js/revenue/win-probability-engine.js": {
+    "mtime": 1781092158.9066641,
+    "ast_hash": "053e774abf9ba0c2f6878cba488015f5",
+    "semantic_hash": "053e774abf9ba0c2f6878cba488015f5"
+  },
   "/home/user/aaa-hyperkernel/js/scheduling/schedule-store.js": {
     "mtime": 1780633642.629047,
     "ast_hash": "7d4211a37c28e64189d39b243930a033",
     "semantic_hash": "7d4211a37c28e64189d39b243930a033"
+  },
+  "/home/user/aaa-hyperkernel/js/simulation/counterfactual-runner.js": {
+    "mtime": 1781091229.122609,
+    "ast_hash": "84f30600fd85c4efb22ada15e8ca99a9",
+    "semantic_hash": "84f30600fd85c4efb22ada15e8ca99a9"
+  },
+  "/home/user/aaa-hyperkernel/js/simulation/monte-carlo-engine.js": {
+    "mtime": 1781089775.352004,
+    "ast_hash": "8e2c622db4c3f29fa0644f622971da30",
+    "semantic_hash": "8e2c622db4c3f29fa0644f622971da30"
+  },
+  "/home/user/aaa-hyperkernel/js/simulation/outcome-estimator.js": {
+    "mtime": 1781089754.440003,
+    "ast_hash": "d5612217eacb66a6e63ec14e7d7290e0",
+    "semantic_hash": "d5612217eacb66a6e63ec14e7d7290e0"
+  },
+  "/home/user/aaa-hyperkernel/js/simulation/policy-simulator.js": {
+    "mtime": 1781089841.268008,
+    "ast_hash": "9154e171f4ca11359d310a0c7befafda",
+    "semantic_hash": "9154e171f4ca11359d310a0c7befafda"
+  },
+  "/home/user/aaa-hyperkernel/js/simulation/scenario-engine.js": {
+    "mtime": 1781089723.9120011,
+    "ast_hash": "3e1e3a3430ae8409fc329dc9d086650a",
+    "semantic_hash": "3e1e3a3430ae8409fc329dc9d086650a"
+  },
+  "/home/user/aaa-hyperkernel/js/simulation/simulation-governance.js": {
+    "mtime": 1781089882.5800104,
+    "ast_hash": "13fed860bae97e46fab84a907c6bfd3b",
+    "semantic_hash": "13fed860bae97e46fab84a907c6bfd3b"
+  },
+  "/home/user/aaa-hyperkernel/js/simulation/simulation-ledger.js": {
+    "mtime": 1781089692.551999,
+    "ast_hash": "beba4d50bebc4b3594b48485073703d7",
+    "semantic_hash": "beba4d50bebc4b3594b48485073703d7"
+  },
+  "/home/user/aaa-hyperkernel/js/simulation/strategy-scorecard.js": {
+    "mtime": 1781089825.336007,
+    "ast_hash": "47b26e2f74064c23769986a3e67af1ef",
+    "semantic_hash": "47b26e2f74064c23769986a3e67af1ef"
   },
   "/home/user/aaa-hyperkernel/js/transport/providers.js": {
     "mtime": 1781065386.5304003,
@@ -3478,6 +4518,11 @@
     "mtime": 1781065386.5322297,
     "ast_hash": "07c1cb714b88341455fa0384b5a98215",
     "semantic_hash": "07c1cb714b88341455fa0384b5a98215"
+  },
+  "/home/user/aaa-hyperkernel/js/ui/app-mode.js": {
+    "mtime": 1781095419.174858,
+    "ast_hash": "2ba198e864deba4eeea5b7503b5ec4c8",
+    "semantic_hash": "2ba198e864deba4eeea5b7503b5ec4c8"
   },
   "/home/user/aaa-hyperkernel/js/ui/assisted-drafts-ui.js": {
     "mtime": 1781065386.5344002,
@@ -3544,6 +4589,11 @@
     "ast_hash": "9cd2d81ed93c886af0c846445c1881d7",
     "semantic_hash": "9cd2d81ed93c886af0c846445c1881d7"
   },
+  "/home/user/aaa-hyperkernel/js/ui/field-mode-home.js": {
+    "mtime": 1781096123.4148998,
+    "ast_hash": "7a891dbe5095ca5391a254796bd3df1e",
+    "semantic_hash": "7a891dbe5095ca5391a254796bd3df1e"
+  },
   "/home/user/aaa-hyperkernel/js/ui/financial-intelligence-suite-ui.js": {
     "mtime": 1781065386.5344002,
     "ast_hash": "ec57b26e9b8c83344a88181209e8a25b",
@@ -3580,9 +4630,9 @@
     "semantic_hash": "23819498c1e3b3a09630f35e879aa960"
   },
   "/home/user/aaa-hyperkernel/js/ui/job-list-ui.js": {
-    "mtime": 1781065386.5384004,
-    "ast_hash": "70d311121ebc15efa6c97df5b238987a",
-    "semantic_hash": "70d311121ebc15efa6c97df5b238987a"
+    "mtime": 1781095490.1988623,
+    "ast_hash": "4e30c289b6c6dc94cc89bd56fb7ca057",
+    "semantic_hash": "4e30c289b6c6dc94cc89bd56fb7ca057"
   },
   "/home/user/aaa-hyperkernel/js/ui/knowledge-os-ui.js": {
     "mtime": 1781065386.5384004,
@@ -3880,9 +4930,9 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "/home/user/aaa-hyperkernel/test/run.js": {
-    "mtime": 1781089932.3400135,
-    "ast_hash": "51fc04e77130d12eb0a45e5e0f26fd96",
-    "semantic_hash": "51fc04e77130d12eb0a45e5e0f26fd96"
+    "mtime": 1781096189.1589038,
+    "ast_hash": "131f9c3c7ef309a4989a8c5d0782cb2c",
+    "semantic_hash": "131f9c3c7ef309a4989a8c5d0782cb2c"
   },
   "/home/user/aaa-hyperkernel/test/smoke/boot.test.js": {
     "mtime": 1781065386.5464003,
@@ -4004,10 +5054,20 @@
     "ast_hash": "9777e2406b0e4c3e52875e3d37937a37",
     "semantic_hash": "9777e2406b0e4c3e52875e3d37937a37"
   },
+  "/home/user/aaa-hyperkernel/test/unit/capability-economy.test.js": {
+    "mtime": 1781086016.4945526,
+    "ast_hash": "cc18eb72b4a0825801de417e84f26bcd",
+    "semantic_hash": "cc18eb72b4a0825801de417e84f26bcd"
+  },
   "/home/user/aaa-hyperkernel/test/unit/capture-sequencer.test.js": {
     "mtime": 1780633642.6515408,
     "ast_hash": "5cad8c1471cfcaeb3e50f1874d4006d0",
     "semantic_hash": "5cad8c1471cfcaeb3e50f1874d4006d0"
+  },
+  "/home/user/aaa-hyperkernel/test/unit/chat-canvas.test.js": {
+    "mtime": 1781094933.558829,
+    "ast_hash": "eecf4fe82650cda572de66251ac0f2c4",
+    "semantic_hash": "eecf4fe82650cda572de66251ac0f2c4"
   },
   "/home/user/aaa-hyperkernel/test/unit/closure.test.js": {
     "mtime": 1780633642.6515408,
@@ -4029,10 +5089,20 @@
     "ast_hash": "002cadfc7aeca1a6581abdc0efb195b5",
     "semantic_hash": "002cadfc7aeca1a6581abdc0efb195b5"
   },
+  "/home/user/aaa-hyperkernel/test/unit/copilot.test.js": {
+    "mtime": 1781094069.7427778,
+    "ast_hash": "459a3830c3122b09b0373c6430070d97",
+    "semantic_hash": "459a3830c3122b09b0373c6430070d97"
+  },
   "/home/user/aaa-hyperkernel/test/unit/crew-tools.test.js": {
     "mtime": 1780633642.6515408,
     "ast_hash": "a6af50e2923e72a2860477cd7a5e348b",
     "semantic_hash": "a6af50e2923e72a2860477cd7a5e348b"
+  },
+  "/home/user/aaa-hyperkernel/test/unit/epistemology.test.js": {
+    "mtime": 1781093354.2507353,
+    "ast_hash": "4203b6b4f7ae72768c6bb8f09b3b9179",
+    "semantic_hash": "4203b6b4f7ae72768c6bb8f09b3b9179"
   },
   "/home/user/aaa-hyperkernel/test/unit/estimator-agent.test.js": {
     "mtime": 1780633642.6515408,
@@ -4079,6 +5149,16 @@
     "ast_hash": "e71db1b3443e542d5498f5caee779485",
     "semantic_hash": "e71db1b3443e542d5498f5caee779485"
   },
+  "/home/user/aaa-hyperkernel/test/unit/field-capture-session.test.js": {
+    "mtime": 1781096183.2909036,
+    "ast_hash": "7d267afa53165162774af449296c0eb5",
+    "semantic_hash": "7d267afa53165162774af449296c0eb5"
+  },
+  "/home/user/aaa-hyperkernel/test/unit/field-mode.test.js": {
+    "mtime": 1781096160.1429021,
+    "ast_hash": "fe232a166545ae3991d0010800afbed5",
+    "semantic_hash": "fe232a166545ae3991d0010800afbed5"
+  },
   "/home/user/aaa-hyperkernel/test/unit/financial-intelligence-suite-ui.test.js": {
     "mtime": 1781065386.5544002,
     "ast_hash": "038545dd1259131b139732c882d60c15",
@@ -4103,6 +5183,11 @@
     "mtime": 1781068482.8624263,
     "ast_hash": "58c4c249b02abcb293ff8bfc1d0ec3e4",
     "semantic_hash": "58c4c249b02abcb293ff8bfc1d0ec3e4"
+  },
+  "/home/user/aaa-hyperkernel/test/unit/goal-capability-bridge.test.js": {
+    "mtime": 1781093628.3787515,
+    "ast_hash": "89e82dfc8a1c249c9b1138f831050300",
+    "semantic_hash": "89e82dfc8a1c249c9b1138f831050300"
   },
   "/home/user/aaa-hyperkernel/test/unit/governance-alert.test.js": {
     "mtime": 1781065386.5544002,
@@ -4188,6 +5273,11 @@
     "mtime": 1780633642.6515408,
     "ast_hash": "619d3be2c05027993997f691e05024cd",
     "semantic_hash": "619d3be2c05027993997f691e05024cd"
+  },
+  "/home/user/aaa-hyperkernel/test/unit/innovation-council.test.js": {
+    "mtime": 1781092623.0146918,
+    "ast_hash": "03ac6d5243d3f69519214b21ddf69df0",
+    "semantic_hash": "03ac6d5243d3f69519214b21ddf69df0"
   },
   "/home/user/aaa-hyperkernel/test/unit/knowledge-fabric.test.js": {
     "mtime": 1781065386.5584004,
@@ -4429,6 +5519,11 @@
     "ast_hash": "eed89fe566ba1bfc044e93726b43437a",
     "semantic_hash": "eed89fe566ba1bfc044e93726b43437a"
   },
+  "/home/user/aaa-hyperkernel/test/unit/revenue-council.test.js": {
+    "mtime": 1781092580.8706894,
+    "ast_hash": "613eefabb2356d0f574f5216ee5233a5",
+    "semantic_hash": "613eefabb2356d0f574f5216ee5233a5"
+  },
   "/home/user/aaa-hyperkernel/test/unit/review-governance.test.js": {
     "mtime": 1781065386.5704002,
     "ast_hash": "9e1fc26bb2e3ffdd69c8e43f45a8677e",
@@ -4464,10 +5559,30 @@
     "ast_hash": "d321feec1a9c2d88eea6d94cf49d352c",
     "semantic_hash": "d321feec1a9c2d88eea6d94cf49d352c"
   },
+  "/home/user/aaa-hyperkernel/test/unit/simulation-council.test.js": {
+    "mtime": 1781089927.4200132,
+    "ast_hash": "a93125fd6fb668a6987c009ff78c04bd",
+    "semantic_hash": "a93125fd6fb668a6987c009ff78c04bd"
+  },
+  "/home/user/aaa-hyperkernel/test/unit/sms-copilot.test.js": {
+    "mtime": 1781094335.2267935,
+    "ast_hash": "00d57c2819017c8bfd28708e32132f8d",
+    "semantic_hash": "00d57c2819017c8bfd28708e32132f8d"
+  },
   "/home/user/aaa-hyperkernel/test/unit/supabase-governance.test.js": {
     "mtime": 1781065386.5704002,
     "ast_hash": "5a2512c964dda626ddade5eca5ab4ede",
     "semantic_hash": "5a2512c964dda626ddade5eca5ab4ede"
+  },
+  "/home/user/aaa-hyperkernel/test/unit/teleological.test.js": {
+    "mtime": 1781092900.8067083,
+    "ast_hash": "5d4b91c2026c6f677033ac96804e76e8",
+    "semantic_hash": "5d4b91c2026c6f677033ac96804e76e8"
+  },
+  "/home/user/aaa-hyperkernel/test/unit/tool-forge.test.js": {
+    "mtime": 1781069242.3424327,
+    "ast_hash": "f075e96da59ca572eb6df98c6b776272",
+    "semantic_hash": "f075e96da59ca572eb6df98c6b776272"
   },
   "/home/user/aaa-hyperkernel/test/unit/transcribe.test.js": {
     "mtime": 1780633642.6515408,
@@ -4524,6 +5639,11 @@
     "ast_hash": "735abbe6080079f45584555abdf560bb",
     "semantic_hash": "735abbe6080079f45584555abdf560bb"
   },
+  "/home/user/aaa-hyperkernel/test/unit/world-model.test.js": {
+    "mtime": 1781091374.3466177,
+    "ast_hash": "e288db2f957d78e7127104f1eed4a28a",
+    "semantic_hash": "e288db2f957d78e7127104f1eed4a28a"
+  },
   "/home/user/aaa-hyperkernel/.github/workflows/ci.yml": {
     "mtime": 1781065386.4984002,
     "ast_hash": "bcb23f3351da368880f4a17525a0e5d4",
@@ -4533,6 +5653,11 @@
     "mtime": 1781065822.233937,
     "ast_hash": "82efb97a359f5c7290bf2513d14686be",
     "semantic_hash": "82efb97a359f5c7290bf2513d14686be"
+  },
+  "/home/user/aaa-hyperkernel/COUNCILS-REVENUE-INNOVATION.md": {
+    "mtime": 1781092724.630698,
+    "ast_hash": "bd0e3ca51883a9f4410ef66b5ba54cfa",
+    "semantic_hash": "bd0e3ca51883a9f4410ef66b5ba54cfa"
   },
   "/home/user/aaa-hyperkernel/GENESIS.md": {
     "mtime": 1781086080.814551,
@@ -4589,6 +5714,21 @@
     "ast_hash": "597289d3bd77ad253718bf5e87a94ab2",
     "semantic_hash": "597289d3bd77ad253718bf5e87a94ab2"
   },
+  "/home/user/aaa-hyperkernel/SIMULATION.md": {
+    "mtime": 1781089988.7120168,
+    "ast_hash": "fb3d2d3194681593f6be5a6ba64acf1b",
+    "semantic_hash": "fb3d2d3194681593f6be5a6ba64acf1b"
+  },
+  "/home/user/aaa-hyperkernel/TELEOLOGICAL.md": {
+    "mtime": 1781092959.270712,
+    "ast_hash": "7fc3f302e27ecd6b5dc19667721abd7d",
+    "semantic_hash": "7fc3f302e27ecd6b5dc19667721abd7d"
+  },
+  "/home/user/aaa-hyperkernel/WORLDMODEL.md": {
+    "mtime": 1781091508.3066256,
+    "ast_hash": "2db46ebd7cecd7a9f6833cd3f519cbac",
+    "semantic_hash": "2db46ebd7cecd7a9f6833cd3f519cbac"
+  },
   "/home/user/aaa-hyperkernel/docs/legal-intelligence-division.md": {
     "mtime": 1781065386.4984002,
     "ast_hash": "a05c445968a04b820f5480227dd2a8cc",
@@ -4605,9 +5745,9 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "/home/user/aaa-hyperkernel/index.html": {
-    "mtime": 1781089941.436014,
-    "ast_hash": "1fc33bf3ec7f3215abf647b4635a137a",
-    "semantic_hash": "1fc33bf3ec7f3215abf647b4635a137a"
+    "mtime": 1781096223.5949059,
+    "ast_hash": "86d06304bcc79a8a4e4369577669fa64",
+    "semantic_hash": "86d06304bcc79a8a4e4369577669fa64"
   },
   "/home/user/aaa-hyperkernel/netlify/functions/RESEARCH.md": {
     "mtime": 1780633642.6350634,
@@ -4624,6 +5764,26 @@
     "ast_hash": "f0c828ee55ca12b87776b4283e7c919b",
     "semantic_hash": "f0c828ee55ca12b87776b4283e7c919b"
   },
+  "/home/user/aaa-hyperkernel/references/HYPERKERNEL_CHAT_CANVAS.md": {
+    "mtime": 1781095051.4348361,
+    "ast_hash": "feb29928f5dce75bde6fd3d369685690",
+    "semantic_hash": "feb29928f5dce75bde6fd3d369685690"
+  },
+  "/home/user/aaa-hyperkernel/references/HYPERKERNEL_EXECUTIVE_COPILOT.md": {
+    "mtime": 1781094171.7587838,
+    "ast_hash": "3a677110dbdc4c18d7205f9a74069dd5",
+    "semantic_hash": "3a677110dbdc4c18d7205f9a74069dd5"
+  },
+  "/home/user/aaa-hyperkernel/references/HYPERKERNEL_FIELD_BRAIN.md": {
+    "mtime": 1781096283.0429094,
+    "ast_hash": "52de89be5cc424a41b1157d1eeee93ce",
+    "semantic_hash": "52de89be5cc424a41b1157d1eeee93ce"
+  },
+  "/home/user/aaa-hyperkernel/references/HYPERKERNEL_FIELD_MODE.md": {
+    "mtime": 1781095650.842872,
+    "ast_hash": "a1773193a4c18a14889d06175211ae85",
+    "semantic_hash": "a1773193a4c18a14889d06175211ae85"
+  },
   "/home/user/aaa-hyperkernel/test/README.md": {
     "mtime": 1780633642.6438167,
     "ast_hash": "1ac2a30bbc5e5b3f24d46e19d085c891",
@@ -4638,105 +5798,5 @@
     "mtime": 1780633642.6022215,
     "ast_hash": "7ee0240fba70752122eb8585edb525ea",
     "semantic_hash": "7ee0240fba70752122eb8585edb525ea"
-  },
-  "/home/user/aaa-hyperkernel/js/genesis/banned-capability-registry.js": {
-    "mtime": 1781086052.3305519,
-    "ast_hash": "41d7456391bf777195671dd4f05eb970",
-    "semantic_hash": "41d7456391bf777195671dd4f05eb970"
-  },
-  "/home/user/aaa-hyperkernel/js/genesis/capability-ledger.js": {
-    "mtime": 1781085632.6505613,
-    "ast_hash": "1be0f44005d3df08acb56e3515a39075",
-    "semantic_hash": "1be0f44005d3df08acb56e3515a39075"
-  },
-  "/home/user/aaa-hyperkernel/js/genesis/capability-marketplace-dashboard.js": {
-    "mtime": 1781086117.3265502,
-    "ast_hash": "7eb8d852bf2f11b920191192debcdfb7",
-    "semantic_hash": "7eb8d852bf2f11b920191192debcdfb7"
-  },
-  "/home/user/aaa-hyperkernel/js/genesis/capability-reputation-store.js": {
-    "mtime": 1781085680.2945604,
-    "ast_hash": "6b21013efc67dd5ff305200322685266",
-    "semantic_hash": "6b21013efc67dd5ff305200322685266"
-  },
-  "/home/user/aaa-hyperkernel/js/genesis/capability-roi-engine.js": {
-    "mtime": 1781085658.1185608,
-    "ast_hash": "2e14afc9d08146288133263c260cc055",
-    "semantic_hash": "2e14afc9d08146288133263c260cc055"
-  },
-  "/home/user/aaa-hyperkernel/js/genesis/failure-pattern-detector.js": {
-    "mtime": 1781085711.1105597,
-    "ast_hash": "c6eaf46a7653b31056c243eb549731fa",
-    "semantic_hash": "c6eaf46a7653b31056c243eb549731fa"
-  },
-  "/home/user/aaa-hyperkernel/js/genesis/promotion-scorer.js": {
-    "mtime": 1781085767.9465582,
-    "ast_hash": "2fafcd8e4eb644b313cb8aa02c1cecf2",
-    "semantic_hash": "2fafcd8e4eb644b313cb8aa02c1cecf2"
-  },
-  "/home/user/aaa-hyperkernel/js/genesis/tool-forge.js": {
-    "mtime": 1781069118.2544317,
-    "ast_hash": "dba78b8bd4e37c0c5a7143be44c81e50",
-    "semantic_hash": "dba78b8bd4e37c0c5a7143be44c81e50"
-  },
-  "/home/user/aaa-hyperkernel/test/unit/capability-economy.test.js": {
-    "mtime": 1781086016.4945526,
-    "ast_hash": "cc18eb72b4a0825801de417e84f26bcd",
-    "semantic_hash": "cc18eb72b4a0825801de417e84f26bcd"
-  },
-  "/home/user/aaa-hyperkernel/test/unit/tool-forge.test.js": {
-    "mtime": 1781069242.3424327,
-    "ast_hash": "f075e96da59ca572eb6df98c6b776272",
-    "semantic_hash": "f075e96da59ca572eb6df98c6b776272"
-  },
-  "/home/user/aaa-hyperkernel/js/simulation/counterfactual-runner.js": {
-    "mtime": 1781089804.6600058,
-    "ast_hash": "9de6770d8a53d798acad91c6a5412874",
-    "semantic_hash": "9de6770d8a53d798acad91c6a5412874"
-  },
-  "/home/user/aaa-hyperkernel/js/simulation/monte-carlo-engine.js": {
-    "mtime": 1781089775.352004,
-    "ast_hash": "8e2c622db4c3f29fa0644f622971da30",
-    "semantic_hash": "8e2c622db4c3f29fa0644f622971da30"
-  },
-  "/home/user/aaa-hyperkernel/js/simulation/outcome-estimator.js": {
-    "mtime": 1781089754.440003,
-    "ast_hash": "d5612217eacb66a6e63ec14e7d7290e0",
-    "semantic_hash": "d5612217eacb66a6e63ec14e7d7290e0"
-  },
-  "/home/user/aaa-hyperkernel/js/simulation/policy-simulator.js": {
-    "mtime": 1781089841.268008,
-    "ast_hash": "9154e171f4ca11359d310a0c7befafda",
-    "semantic_hash": "9154e171f4ca11359d310a0c7befafda"
-  },
-  "/home/user/aaa-hyperkernel/js/simulation/scenario-engine.js": {
-    "mtime": 1781089723.9120011,
-    "ast_hash": "3e1e3a3430ae8409fc329dc9d086650a",
-    "semantic_hash": "3e1e3a3430ae8409fc329dc9d086650a"
-  },
-  "/home/user/aaa-hyperkernel/js/simulation/simulation-governance.js": {
-    "mtime": 1781089882.5800104,
-    "ast_hash": "13fed860bae97e46fab84a907c6bfd3b",
-    "semantic_hash": "13fed860bae97e46fab84a907c6bfd3b"
-  },
-  "/home/user/aaa-hyperkernel/js/simulation/simulation-ledger.js": {
-    "mtime": 1781089692.551999,
-    "ast_hash": "beba4d50bebc4b3594b48485073703d7",
-    "semantic_hash": "beba4d50bebc4b3594b48485073703d7"
-  },
-  "/home/user/aaa-hyperkernel/js/simulation/strategy-scorecard.js": {
-    "mtime": 1781089825.336007,
-    "ast_hash": "47b26e2f74064c23769986a3e67af1ef",
-    "semantic_hash": "47b26e2f74064c23769986a3e67af1ef"
-  },
-  "/home/user/aaa-hyperkernel/test/unit/simulation-council.test.js": {
-    "mtime": 1781089927.4200132,
-    "ast_hash": "a93125fd6fb668a6987c009ff78c04bd",
-    "semantic_hash": "a93125fd6fb668a6987c009ff78c04bd"
-  },
-  "/home/user/aaa-hyperkernel/SIMULATION.md": {
-    "mtime": 1781089988.7120168,
-    "ast_hash": "fb3d2d3194681593f6be5a6ba64acf1b",
-    "semantic_hash": "fb3d2d3194681593f6be5a6ba64acf1b"
   }
 }

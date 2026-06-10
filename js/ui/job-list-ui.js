@@ -135,15 +135,19 @@
 
     // ---- bottom tab bar ---------------------------------------------------
     _mountTabBar() {
-      if (document.getElementById('aaa-tabbar')) return;
+      const existing = document.getElementById('aaa-tabbar');
       const ui = UI();
       const mk = (tab, icon, label) => ui.el('button', {
         className: 'aaa-tab', attrs: { type: 'button', 'data-tab': tab, 'aria-label': label },
         on: { click: () => this._switchTab(tab) }
       }, [ui.el('span', { className: 'aaa-tab__icon', text: icon }), ui.el('span', { text: label })]);
-      const bar = ui.el('nav', { id: 'aaa-tabbar', className: 'aaa-tabbar' }, [
-        mk('jobs', '🗂', 'Jobs'), mk('agents', '🧠', 'AI Agents'), mk('business', '📊', 'Business')
-      ]);
+      // Mode-aware nav (Field: Measure/Jobs/Chat/More · Executive: Focus/Jobs/Chat/Business).
+      // Falls back to the classic three tabs if the mode controller isn't loaded.
+      const items = (global.AAA_APP_MODE && global.AAA_APP_MODE.navItems)
+        ? global.AAA_APP_MODE.navItems()
+        : [{ tab: 'jobs', icon: '🗂', label: 'Jobs' }, { tab: 'agents', icon: '🧠', label: 'AI Agents' }, { tab: 'business', icon: '📊', label: 'Business' }];
+      if (existing) existing.remove();
+      const bar = ui.el('nav', { id: 'aaa-tabbar', className: 'aaa-tabbar' }, items.map((i) => mk(i.tab, i.icon, i.label)));
       document.body.appendChild(bar);
     },
     _switchTab(tab) {
@@ -162,8 +166,53 @@
       if (containerId) this.containerId = containerId;
       const root = document.getElementById(this.containerId);
       if (!root) return;
+      // Land in the mode's home tab on first paint (Field Mode → Measure).
+      if (!this._landed) { this._landed = true; if (global.AAA_APP_MODE && global.AAA_APP_MODE.landingTab) this.tab = global.AAA_APP_MODE.landingTab(); }
       this._mountTabBar();
       this._highlightTab();
+
+      // Field Mode home — the money action, one tap in.
+      if (this.tab === 'measure') {
+        this._setActiveVoiceJob(null);
+        root.innerHTML = '';
+        const main = UI().el('main', { className: 'aaa-main' });
+        root.appendChild(main);
+        if (global.AAA_FIELD_MODE_HOME && global.AAA_FIELD_MODE_HOME.mount) await global.AAA_FIELD_MODE_HOME.mount(main);
+        return;
+      }
+      // Chat Canvas.
+      if (this.tab === 'chat') {
+        this._setActiveVoiceJob(null);
+        root.innerHTML = '';
+        root.appendChild(this._header('<span class="aaa-title-mark">AAA</span> Chat', null));
+        const main = UI().el('main', { className: 'aaa-main' });
+        root.appendChild(main);
+        if (global.AAA_COPILOT_UI && global.AAA_COPILOT_UI.mountChat) global.AAA_COPILOT_UI.mountChat(main);
+        return;
+      }
+      // Executive Mode landing — "what should I focus on?".
+      if (this.tab === 'focus') {
+        this._setActiveVoiceJob(null);
+        root.innerHTML = '';
+        root.appendChild(this._header('<span class="aaa-title-mark">AAA</span> Focus', null));
+        const main = UI().el('main', { className: 'aaa-main' });
+        root.appendChild(main);
+        if (global.AAA_COPILOT_UI && global.AAA_COPILOT_UI.mountChat) global.AAA_COPILOT_UI.mountChat(main);
+        return;
+      }
+      // More — owner tools + the Field/Executive mode switch.
+      if (this.tab === 'more') {
+        this._setActiveVoiceJob(null);
+        root.innerHTML = '';
+        root.appendChild(this._header('<span class="aaa-title-mark">AAA</span> More', null));
+        const main = UI().el('main', { className: 'aaa-main' });
+        root.appendChild(main);
+        const ui = UI();
+        if (global.AAA_APP_MODE) main.appendChild(ui.button({ label: 'Switch to ' + (global.AAA_APP_MODE.get() === 'field' ? 'Executive' : 'Field') + ' Mode', icon: '🔀', variant: 'primary', full: true, onClick: () => { global.AAA_APP_MODE.toggle(); this._landed = false; this.render(); } }));
+        main.appendChild(ui.button({ label: 'AI Team', icon: '🧠', variant: 'secondary', full: true, onClick: () => this._switchTab('agents') }));
+        main.appendChild(ui.button({ label: 'Business', icon: '📊', variant: 'secondary', full: true, onClick: () => this._switchTab('business') }));
+        return;
+      }
 
       if (this.tab === 'agents') {
         this._setActiveVoiceJob(null);

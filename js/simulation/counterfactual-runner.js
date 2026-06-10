@@ -64,6 +64,20 @@
       if (!sc.ok) return sc;
       const snap = o.snapshot || await this.snapshot();
       const baseline = scenarios().baseline(snap);
+      // World Model integration: overlay live, freshness-protected signals onto
+      // the baseline. Only `usable` signals (fresh / adequately-degraded) are
+      // applied — stale/blocked/insufficient signals are withheld by the World
+      // Model, so a simulation can never be silently driven by stale state.
+      const signalsApplied = [];
+      if (o.worldModel || (o.useWorldModel && global.AAA_WORLD_MODEL)) {
+        const wm = o.worldModel || (await global.AAA_WORLD_MODEL.snapshot({ minConfidence: o.minSignalConfidence }));
+        const usable = (wm && wm.usable) || {};
+        const MAP = { close_rate: 'closeRate', gross_margin: 'margin', crew_utilization: 'utilization', response_time: 'responseTime', callback_rate: 'callbacks' };
+        Object.keys(MAP).forEach((sig) => {
+          if (usable[sig] && usable[sig].value != null) { baseline[MAP[sig]] = usable[sig].value; signalsApplied.push({ signal: sig, field: MAP[sig], value: usable[sig].value, confidence: usable[sig].confidence, status: usable[sig].status }); }
+        });
+        baseline.signalsApplied = signalsApplied;
+      }
       // drop_zip can compute its share from the snapshot if not supplied.
       if (sc.scenario.kind === 'drop_zip' && sc.scenario.params.share == null) {
         const share = scenarios().zipShare(snap, sc.scenario.params.zip);
