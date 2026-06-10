@@ -880,8 +880,8 @@
     "semantic_hash": "23819498c1e3b3a09630f35e879aa960"
   },
   "js/ui/job-list-ui.js": {
-    "mtime": 1781108763.8517394,
-    "ast_hash": "be45c358b92e406f75a4633a32564930",
+    "mtime": 1781109703.7077951,
+    "ast_hash": "e9faade855efbca163ca85e37963f438",
     "semantic_hash": ""
   },
   "js/ui/knowledge-os-ui.js": {
@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1781108812.7077422,
-    "ast_hash": "c73fba39a65fd2521389c977d303f032",
+    "mtime": 1781109736.6277971,
+    "ast_hash": "f5884001c01e687dc02a6aa0e78a2c7a",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
@@ -1180,8 +1180,8 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "test/run.js": {
-    "mtime": 1781106729.3828852,
-    "ast_hash": "80402bc11d1a524ef3ef87666c1743b4",
+    "mtime": 1781109805.4518013,
+    "ast_hash": "788d4d2eaf060cda115932a18c2e60d3",
     "semantic_hash": ""
   },
   "test/smoke/boot.test.js": {
@@ -1895,8 +1895,8 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "index.html": {
-    "mtime": 1781106729.3504093,
-    "ast_hash": "5dc0f653c14cad212f402b9675e5a195",
+    "mtime": 1781109708.6997955,
+    "ast_hash": "7df3bbdfa12ded1db314e07c5d75effd",
     "semantic_hash": ""
   },
   "netlify/functions/RESEARCH.md": {
@@ -3195,9 +3195,9 @@
     "semantic_hash": "feb29928f5dce75bde6fd3d369685690"
   },
   "js/ui/app-mode.js": {
-    "mtime": 1781099272.2066503,
-    "ast_hash": "2ba198e864deba4eeea5b7503b5ec4c8",
-    "semantic_hash": "2ba198e864deba4eeea5b7503b5ec4c8"
+    "mtime": 1781109705.1077952,
+    "ast_hash": "4204440eb354356741675153bdf69b46",
+    "semantic_hash": ""
   },
   "js/ui/field-mode-home.js": {
     "mtime": 1781106729.3828852,
@@ -3377,6 +3377,16 @@
   "references/FIELD_ROOM_SCAN_ENGINE.md": {
     "mtime": 1781103078.656841,
     "ast_hash": "8aa97e221f235a3c6f2e51feb7838596",
+    "semantic_hash": ""
+  },
+  "js/ui/command-deck-ui.js": {
+    "mtime": 1781109653.4637923,
+    "ast_hash": "03a82872c9385925955335b3be761bfa",
+    "semantic_hash": ""
+  },
+  "test/unit/command-deck.test.js": {
+    "mtime": 1781109790.5558004,
+    "ast_hash": "a72431661f6038c3fec37c70406b8d87",
     "semantic_hash": ""
   }
 }
