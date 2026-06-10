@@ -45,7 +45,7 @@ module.exports = async function run() {
   delete G.AAA_VOICE_HUD_UI;
 
   // ===== start routing (honest: no DOM / no engine → not routed, no throw) =====
-  const started = HOME.start({});
+  const started = await HOME.start({});
   t.ok('start measurement reports honestly when no engine/DOM is present', started.ok === false || started.routed === false);
   const q = HOME.startQuick('scan_room', {});
   t.ok('an unavailable quick action does not pretend to run', q.ok === false && q.reason === 'unavailable');

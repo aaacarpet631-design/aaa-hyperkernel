@@ -59,14 +59,18 @@
       };
     },
 
-    /** Begin a measurement session (job-optional — measure first, attach later). */
-    start(opts) {
+    /**
+     * Begin a job-optional Field Capture Session (measure rooms first, attach to
+     * a job later), then open the measurement HUD bound to it when present.
+     */
+    async start(opts) {
       const o = opts || {};
+      let sessionId = null;
+      const fcs = global.AAA_FIELD_CAPTURE_SESSION;
+      if (fcs && fcs.start) { try { const s = await fcs.start({ customerId: o.customerId || null, jobId: o.jobId || null }); sessionId = s && s.id; } catch (_) {} }
       const hud = global.AAA_MEASUREMENT_HUD_UI;
-      if (hud && hud.boot && typeof document !== 'undefined') { hud.boot({ jobId: o.jobId || null, customerId: o.customerId || null }); return { ok: true, routed: true, via: 'measurement_hud' }; }
-      const cap = global.AAA_CAPTURE_SEQUENCER;
-      if (cap) return { ok: true, routed: !!(typeof document !== 'undefined'), via: 'capture_sequencer', note: typeof document === 'undefined' ? 'no_dom' : null };
-      return { ok: false, routed: false, reason: 'measurement_unavailable' };
+      if (hud && hud.boot && typeof document !== 'undefined') { hud.boot({ jobId: o.jobId || null, customerId: o.customerId || null, fieldSessionId: sessionId }); return { ok: true, routed: true, via: 'measurement_hud', sessionId: sessionId }; }
+      return { ok: !!sessionId, routed: false, via: sessionId ? 'field_capture_session' : null, sessionId: sessionId, reason: sessionId ? (typeof document === 'undefined' ? 'no_dom' : 'no_hud') : 'measurement_unavailable' };
     },
 
     /** Run a quick action by id; routes to the real engine when present. */
