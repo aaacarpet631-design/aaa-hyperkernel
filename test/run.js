@@ -67,6 +67,7 @@ const SUITES = [
   'unit/field-mode.test.js',
   'unit/field-capture-session.test.js',
   'unit/seam-layout-optimizer.test.js',
+  'unit/room-scan-engine.test.js',
   'unit/bluetooth-bridge.test.js',
   'unit/event-stream-ui.test.js',
   'unit/privacy.test.js',
