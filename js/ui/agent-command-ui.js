@@ -132,6 +132,7 @@
     async mount(el, opts) {
       if (typeof document === 'undefined') return { mounted: false, reason: 'no_dom' };
       const root = el || document.body;
+      const o = opts || {};
       const m = await this.renderModel(opts);
       const wrap = document.createElement('div'); wrap.className = 'ac-root';
 
@@ -176,9 +177,13 @@
               '</section>';
             }).join(''));
 
-      // back → Executive home tab. Null-safe on stubs.
+      // back → close the enclosing sheet when the host gave us a handle (the
+      // deck drill-down), else fall back to the Executive home tab.
       wrap.querySelectorAll('.ac-back').forEach(function (b) {
-        b.onclick = function () { if (global.AAA_JOB_LIST_UI && global.AAA_JOB_LIST_UI._switchTab) global.AAA_JOB_LIST_UI._switchTab('focus'); };
+        b.onclick = function () {
+          if (typeof o.onClose === 'function') { o.onClose(); return; }
+          if (global.AAA_JOB_LIST_UI && global.AAA_JOB_LIST_UI._switchTab) global.AAA_JOB_LIST_UI._switchTab('focus');
+        };
       });
 
       root.appendChild(wrap);

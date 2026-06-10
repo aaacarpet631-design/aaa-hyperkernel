@@ -51,7 +51,10 @@
       if (route.intent === 'unknown' && global.AAA_COMPANY_BRAIN && global.AAA_COMPANY_BRAIN.ask) {
         try {
           const brain = await global.AAA_COMPANY_BRAIN.ask(text);
-          if (brain && brain.ok && brain.intent !== 'unknown') {
+          // Only pre-empt the copilot when the brain actually brings evidence —
+          // a recognized intent with zero findings means it couldn't answer
+          // from data, so let the copilot path handle it.
+          if (brain && brain.ok && brain.intent !== 'unknown' && brain.answer && Array.isArray(brain.answer.findings) && brain.answer.findings.length) {
             const lines = (brain.answer.findings || []).map(function (f) {
               return '• ' + f.claim + (f.evidence ? ' (' + f.evidence.source + ' · n=' + f.evidence.sample + ')' : '');
             });

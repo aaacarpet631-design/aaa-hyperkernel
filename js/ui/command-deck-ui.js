@@ -173,22 +173,36 @@
       let oppItems, probabilityNote;
       if (scored && scored.ok && scored.items && scored.items.length) {
         const METHOD_LABEL = { segment_blend: 'this quote’s outcome history (segment blend)', overall_rate: 'company win rate', uninformed_prior: 'an uninformed prior — record outcomes to calibrate' };
+        const methods = {};
         oppItems = scored.items.slice(0, 3).map(function (d) {
           const q = byQuoteId[d.quoteId] || {};
           const key = serviceKey(q);
           const label = q.customerName || key || 'Quote';
+          const method = (d.basis && d.basis.method) || 'unknown';
+          methods[method] = true;
+          // A prior is a placeholder, not a measurement — mark it on the card
+          // itself so a zero-history quote can never wear a confident "50%".
+          const uninformed = method === 'uninformed_prior';
+          const probLine = d.probabilityPct == null ? 'close probability unknown'
+            : (uninformed ? '≈' + d.probabilityPct + '% — no outcome history yet' : d.probabilityPct + '% close probability');
           return {
             quoteId: d.quoteId, amount: d.amount, customer: q.customerName || null,
             service: key, label: label, status: q.status || null,
-            probabilityPct: d.probabilityPct,
-            probabilitySource: METHOD_LABEL[d.basis && d.basis.method] || 'outcome history',
+            probabilityPct: d.probabilityPct, uninformed: uninformed,
+            probabilitySource: METHOD_LABEL[method] || 'outcome history',
+            probabilityLine: probLine,
             expectedValue: d.expectedValue,
             action: d.recommendedAction ? d.recommendedAction.label : null,
             urgency: d.urgency || null, scoreConfidence: d.confidence || null,
-            display: fmtMoney(d.amount) + ' — ' + label + ' — ' + (d.probabilityPct != null ? d.probabilityPct + '% close probability' : 'close probability unknown')
+            display: fmtMoney(d.amount) + ' — ' + label + ' — ' + probLine
           };
         });
-        probabilityNote = 'Probability from ' + oppItems[0].probabilitySource + '.';
+        // Footnote covers every method on screen, not just the top item's.
+        const noteParts = [];
+        if (methods.segment_blend) noteParts.push('per-quote outcome history (segment blend)');
+        if (methods.overall_rate) noteParts.push('company win rate');
+        probabilityNote = noteParts.length ? 'Probability from ' + noteParts.join(' and ') + '.' : null;
+        if (methods.uninformed_prior) probabilityNote = (probabilityNote ? probabilityNote + ' ' : '') + '≈ marks quotes with no outcome history yet — record outcomes to calibrate.';
         const radar = { items: oppItems, empty: false, emptyLabel: 'No open opportunities yet.', probabilityNote: probabilityNote };
         return this._assembleModel(pulse, supervisor, feed, network, radar);
       }
@@ -216,6 +230,33 @@
     /** Assemble the five sections into the deck model. */
     _assembleModel(pulse, supervisor, feed, network, radar) {
       return { generatedAt: nowMs(), pulse: pulse, supervisor: supervisor, feed: feed, network: network, radar: radar };
+    },
+
+    /** Open the Agent Command drill-down for a swarm in a bottom sheet. */
+    openTeam(teamId) {
+      if (typeof document === 'undefined') return { opened: false, reason: 'no_dom' };
+      const ac = global.AAA_AGENT_COMMAND, kit = global.AAA_UI;
+      if (ac && ac.mount && kit && kit.sheet) {
+        const s = kit.sheet({ title: 'Agent Command' });
+        document.body.appendChild(s.overlay);
+        ac.mount(s.body, { teamId: teamId, onClose: s.close });
+        return { opened: true, via: 'sheet' };
+      }
+      if (global.AAA_JOB_LIST_UI && global.AAA_JOB_LIST_UI._switchTab) { global.AAA_JOB_LIST_UI._switchTab('agents'); return { opened: true, via: 'agents_tab' }; }
+      return { opened: false, reason: 'no_target' };
+    },
+
+    /** Open the Digital Twin living-model surface in a bottom sheet. */
+    openTwin() {
+      if (typeof document === 'undefined') return { opened: false, reason: 'no_dom' };
+      const twin = global.AAA_DIGITAL_TWIN_UI, kit = global.AAA_UI;
+      if (twin && typeof twin.mount === 'function' && kit && kit.sheet) {
+        const s = kit.sheet({ title: 'Digital Twin' });
+        document.body.appendChild(s.overlay);
+        twin.mount(s.body);
+        return { opened: true, via: 'sheet' };
+      }
+      return { opened: false, reason: 'no_target' };
     },
 
     /** Render the Command Deck into a DOM element (DOM-guarded). */
@@ -288,7 +329,7 @@
                 return '<div class="cd-opp" data-quote="' + esc(i.quoteId) + '">' +
                   '<div class="cd-opp__amount">' + esc(fmtMoney(i.amount)) + '</div>' +
                   '<div class="cd-opp__who">' + esc(i.label) + '</div>' +
-                  '<div class="cd-opp__prob">' + esc(i.probabilityPct != null ? i.probabilityPct + '% close probability' : 'close probability unknown') + '</div>' +
+                  '<div class="cd-opp__prob">' + esc(i.probabilityLine || (i.probabilityPct != null ? i.probabilityPct + '% close probability' : 'close probability unknown')) + '</div>' +
                   (i.action ? '<div class="cd-opp__action">' + (i.urgency === 'now' ? '🔥 ' : '') + esc(i.action) + '</div>' : '') +
                   '</div>';
               }).join('') + (m.radar.probabilityNote ? '<div class="cd-note">' + esc(m.radar.probabilityNote) + '</div>' : '')) +
@@ -305,20 +346,15 @@
         b.onclick = function () { if (global.AAA_JOB_LIST_UI && global.AAA_JOB_LIST_UI._switchTab) global.AAA_JOB_LIST_UI._switchTab('chat'); };
       });
       wrap.querySelectorAll('.cd-swarm').forEach(function (b) {
-        b.onclick = function () {
-          const ac = global.AAA_AGENT_COMMAND, kit = global.AAA_UI;
-          if (ac && ac.mount && kit && kit.sheet) { const s = kit.sheet({ title: 'Agent Command' }); ac.mount(s.body, { teamId: b.getAttribute('data-team') }); return; }
-          if (global.AAA_JOB_LIST_UI && global.AAA_JOB_LIST_UI._switchTab) global.AAA_JOB_LIST_UI._switchTab('agents');
-        };
+        b.onclick = function () { Deck.openTeam(b.getAttribute('data-team')); };
       });
       // Digital Twin entry — only when the living-model surface is loaded
       // (business-digital-twin-ui's planner sheet alone has no mount()).
-      const twin = global.AAA_DIGITAL_TWIN_UI;
-      if (twin && typeof twin.mount === 'function' && global.AAA_UI && global.AAA_UI.sheet) {
+      if (global.AAA_DIGITAL_TWIN_UI && typeof global.AAA_DIGITAL_TWIN_UI.mount === 'function' && global.AAA_UI && global.AAA_UI.sheet) {
         const tw = document.createElement('button');
         tw.className = 'cd-twin'; tw.type = 'button';
         tw.textContent = '🧬 Digital Twin — live model & forecast';
-        tw.onclick = function () { const s = global.AAA_UI.sheet({ title: 'Digital Twin' }); twin.mount(s.body); };
+        tw.onclick = function () { Deck.openTwin(); };
         wrap.appendChild(tw);
       }
 

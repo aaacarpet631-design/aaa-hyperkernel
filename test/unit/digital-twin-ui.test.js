@@ -148,6 +148,13 @@ module.exports = async function run() {
     global.document = savedDoc;
     t.ok('mount() without a document honestly reports no_dom', noDom.mounted === false && noDom.reason === 'no_dom');
 
+    // ===== shared-global merge survives either load order =====
+    // business-digital-twin-ui (planner) and this surface share one global;
+    // load the planner AFTER the surface (worst case) and prove no clobber.
+    load('js/ui/business-digital-twin-ui.js');
+    t.ok('planner + living-model surface coexist on the shared global (no clobber)',
+      ['render', 'renderResult', 'open', 'renderModel', 'mount'].every((k) => typeof G.AAA_DIGITAL_TWIN_UI[k] === 'function'));
+
     return t.report();
   } finally {
     delete global.document; // hygiene (suite is process-isolated anyway)

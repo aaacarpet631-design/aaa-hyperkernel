@@ -125,6 +125,40 @@ module.exports = async function run() {
     t.ok('probability note names the scorer basis (segment blend)',
       /segment blend/.test(ms.radar.probabilityNote));
 
+    // ===== drill-downs actually reach the DOM (the debate's BLOCKER) =========
+    // Sheets were once built but never appended to the document, so swarm taps
+    // and the Twin button did nothing on a real phone while every Node suite
+    // stayed green. These guards exercise the attach path directly.
+    let closed = 0; const acMounts = []; let twinMounts = 0;
+    G.AAA_UI = { sheet: () => ({ overlay: makeEl(), body: makeEl(), close: () => { closed++; } }) };
+    G.AAA_AGENT_COMMAND = { mount: (el2, o2) => { acMounts.push(o2 || {}); } };
+    const beforeLen = global.document.body.children.length;
+    const ot = DECK.openTeam('sales');
+    t.ok('openTeam attaches its sheet overlay to the document', ot.opened === true && ot.via === 'sheet' && global.document.body.children.length === beforeLen + 1);
+    t.ok('openTeam hands Agent Command the team and a working close handle',
+      acMounts.length === 1 && acMounts[0].teamId === 'sales' && typeof acMounts[0].onClose === 'function' && (acMounts[0].onClose(), closed === 1));
+    G.AAA_DIGITAL_TWIN_UI = { mount: () => { twinMounts++; } };
+    const otw = DECK.openTwin();
+    t.ok('openTwin attaches its sheet and mounts the living model', otw.opened === true && global.document.body.children.length === beforeLen + 2 && twinMounts === 1);
+    delete G.AAA_UI;
+    let switched = null; G.AAA_JOB_LIST_UI = { _switchTab: (tab) => { switched = tab; } };
+    t.ok('without the UI kit, openTeam falls back to the AI Team tab', DECK.openTeam('sales').via === 'agents_tab' && switched === 'agents');
+    delete G.AAA_JOB_LIST_UI; delete G.AAA_AGENT_COMMAND; delete G.AAA_DIGITAL_TWIN_UI;
+
+    // ===== a zero-history quote can never wear a confident percentage ========
+    const savedScorer = G.AAA_OPPORTUNITY_SCORER;
+    G.AAA_OPPORTUNITY_SCORER = { scoreAll: async () => ({ ok: true, items: [
+      { quoteId: 'q1', amount: 5000, probabilityPct: 50, expectedValue: 2500, basis: { method: 'uninformed_prior' }, recommendedAction: { id: 'send_quote', label: 'Send the quote' }, urgency: 'today', confidence: 'low' },
+      { quoteId: 'q2', amount: 450, probabilityPct: 38, expectedValue: 169, basis: { method: 'segment_blend' }, recommendedAction: { id: 'call_now', label: 'Call now — follow-up due' }, urgency: 'now', confidence: 'low' }
+    ], rankedBy: 'expectedValue' }) };
+    const mu = await DECK.renderModel();
+    t.ok('uninformed-prior items are marked on the card, not shown as a confident %',
+      mu.radar.items[0].uninformed === true && /≈50% — no outcome history yet/.test(mu.radar.items[0].display));
+    t.ok('informed items keep the plain percentage', mu.radar.items[1].uninformed === false && /38% close probability/.test(mu.radar.items[1].display));
+    t.ok('the footnote explains every method on screen, not just the top item',
+      /segment blend/.test(mu.radar.probabilityNote) && /≈ marks quotes with no outcome history yet/.test(mu.radar.probabilityNote));
+    G.AAA_OPPORTUNITY_SCORER = savedScorer;
+
     // ===== mount: DOM-guarded, never throws into a stub element =====
     const el = makeEl();
     let mountErr = null, mounted = null;

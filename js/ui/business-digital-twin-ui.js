@@ -105,5 +105,7 @@
     render(sheet.body);
   }
 
-  global.AAA_DIGITAL_TWIN_UI = { render: render, renderResult: renderResult, open: open };
+  // Merge: the living-model surface (digital-twin-ui.js) shares this global,
+  // so neither module may clobber the other regardless of load order.
+  global.AAA_DIGITAL_TWIN_UI = Object.assign(global.AAA_DIGITAL_TWIN_UI || {}, { render: render, renderResult: renderResult, open: open });
 })(typeof window !== 'undefined' ? window : this);

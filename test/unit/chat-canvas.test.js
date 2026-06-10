@@ -92,5 +92,25 @@ module.exports = async function run() {
   t.ok('assistant messages carry rendered card HTML', model.messages.some(function (m) { return m.role === 'assistant' && typeof m.cardHtml === 'string'; }));
   t.eq('mountChat is a no-op without a DOM', UI.mountChat().mounted, false);
 
+  // ===== Company Brain hook: evidence-cited answers on the unknown route =====
+  let brainAsks = 0;
+  G2.AAA_COMPANY_BRAIN = { ask: async () => { brainAsks++; return { ok: true, intent: 'win_rate', confidence: 'medium', answer: { headline: 'Close rate is 50% (2 of 4)', findings: [{ claim: 'Overall close rate is 50%', evidence: { source: 'outcome-learning', metric: 'winRate', value: 0.5, sample: 4 } }], caveat: null } }; } };
+  const brainAns = await G2.AAA_CHAT_CANVAS.send('xyzzy gibberish quux', {});
+  t.ok('an unknown-route question is answered by the Company Brain with citations',
+    brainAsks === 1 && brainAns.intent === 'company_brain.win_rate' && /Close rate is 50%/.test(brainAns.card.summary) && /outcome-learning · n=4/.test(brainAns.card.summary));
+  // a recognized intent with ZERO findings must not pre-empt the copilot
+  G2.AAA_COMPANY_BRAIN = { ask: async () => ({ ok: true, intent: 'win_rate', confidence: 'low', answer: { headline: 'No win-rate data recorded yet.', findings: [], caveat: 'No outcomes yet.' } }) };
+  const noEvidence = await G2.AAA_CHAT_CANVAS.send('xyzzy gibberish quux', {});
+  t.ok('a brain answer with no findings falls through to the copilot path', String(noEvidence.intent).indexOf('company_brain') === -1);
+  // the brain never sees offline messages (queue check comes first)
+  G2.AAA_OFFLINE_CHAT_QUEUE.setOnline(false);
+  brainAsks = 0;
+  G2.AAA_COMPANY_BRAIN = { ask: async () => { brainAsks++; return { ok: true, intent: 'win_rate', confidence: 'low', answer: { headline: 'x', findings: [{ claim: 'c', evidence: { source: 's', metric: 'm', value: 1, sample: 1 } }], caveat: null } }; } };
+  const offBrain = await G2.AAA_CHAT_CANVAS.send('xyzzy gibberish quux', {});
+  t.ok('offline messages queue without consulting the brain', offBrain.queued === true && brainAsks === 0);
+  G2.AAA_OFFLINE_CHAT_QUEUE.setOnline(true);
+  await G2.AAA_CHAT_CANVAS.replayQueue({});
+  delete G2.AAA_COMPANY_BRAIN;
+
   return t.report();
 };

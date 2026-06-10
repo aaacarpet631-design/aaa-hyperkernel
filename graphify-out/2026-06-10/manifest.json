@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1781109736.6277971,
-    "ast_hash": "f5884001c01e687dc02a6aa0e78a2c7a",
+    "mtime": 1781110900.5718663,
+    "ast_hash": "f88b6489eeb038f6bca0becea9ab80eb",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
@@ -1180,8 +1180,8 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "test/run.js": {
-    "mtime": 1781109805.4518013,
-    "ast_hash": "788d4d2eaf060cda115932a18c2e60d3",
+    "mtime": 1781110925.279868,
+    "ast_hash": "18b5881c59e07e81f2574c358d6435b9",
     "semantic_hash": ""
   },
   "test/smoke/boot.test.js": {
@@ -1895,8 +1895,8 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "index.html": {
-    "mtime": 1781109708.6997955,
-    "ast_hash": "7df3bbdfa12ded1db314e07c5d75effd",
+    "mtime": 1781110866.6118643,
+    "ast_hash": "323bfee05bfa35446e5f2412b8845d80",
     "semantic_hash": ""
   },
   "netlify/functions/RESEARCH.md": {
@@ -3135,9 +3135,9 @@
     "semantic_hash": "3a677110dbdc4c18d7205f9a74069dd5"
   },
   "js/copilot/chat-canvas.js": {
-    "mtime": 1781099272.1831641,
-    "ast_hash": "2c05828a1cb9a319b29ce8d7f7e7aeea",
-    "semantic_hash": "2c05828a1cb9a319b29ce8d7f7e7aeea"
+    "mtime": 1781110989.9158716,
+    "ast_hash": "e653f89d7a8e030db8557bdc492fe4e0",
+    "semantic_hash": ""
   },
   "js/copilot/chat-intent-router.js": {
     "mtime": 1781099272.183771,
@@ -3380,13 +3380,13 @@
     "semantic_hash": ""
   },
   "js/ui/command-deck-ui.js": {
-    "mtime": 1781109653.4637923,
-    "ast_hash": "03a82872c9385925955335b3be761bfa",
+    "mtime": 1781110975.3358707,
+    "ast_hash": "020fa2de95e96619dbddda3e682e9e30",
     "semantic_hash": ""
   },
   "test/unit/command-deck.test.js": {
-    "mtime": 1781109790.5558004,
-    "ast_hash": "a72431661f6038c3fec37c70406b8d87",
+    "mtime": 1781111088.9398775,
+    "ast_hash": "88e287bf7ba8cf44432f2c38941934bf",
     "semantic_hash": ""
   },
   "js/intelligence/opportunity-scorer.js": {
