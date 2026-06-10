@@ -23,7 +23,7 @@
       { tab: 'more', icon: '⋯', label: 'More' }
     ],
     executive: [
-      { tab: 'focus', icon: '🎯', label: 'Focus' },
+      { tab: 'focus', icon: '🛰', label: 'Command' },
       { tab: 'jobs', icon: '🗂', label: 'Jobs' },
       { tab: 'chat', icon: '💬', label: 'Chat' },
       { tab: 'business', icon: '📊', label: 'Business' }

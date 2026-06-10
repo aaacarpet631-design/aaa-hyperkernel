@@ -199,14 +199,14 @@
         if (global.AAA_COPILOT_UI && global.AAA_COPILOT_UI.mountChat) global.AAA_COPILOT_UI.mountChat(main);
         return;
       }
-      // Executive Mode landing — "what should I focus on?".
+      // Executive Mode landing — the Command Deck (decisions + money, live).
       if (this.tab === 'focus') {
         this._setActiveVoiceJob(null);
         root.innerHTML = '';
-        root.appendChild(this._header('<span class="aaa-title-mark">AAA</span> Focus', null));
+        root.appendChild(this._header('<span class="aaa-title-mark">AAA</span> Command', null));
         const main = UI().el('main', { className: 'aaa-main' });
         root.appendChild(main);
-        if (global.AAA_COPILOT_UI && global.AAA_COPILOT_UI.mountChat) global.AAA_COPILOT_UI.mountChat(main);
+        if (global.AAA_COMMAND_DECK && global.AAA_COMMAND_DECK.mount) await global.AAA_COMMAND_DECK.mount(main);
         return;
       }
       // More — owner tools + the Field/Executive mode switch.
