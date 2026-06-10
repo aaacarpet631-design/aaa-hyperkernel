@@ -50,8 +50,22 @@
       return { name: name, spawns: spawns, succeeded: succeeded, successRate: spawns ? succeeded / spawns : 0, savedMs: savedMs, savedUsd: savedUsd, allLowRisk: allLowRisk };
     },
 
-    /** Rules 1–4 against real runs → { eligible, stats, failed:[] }. */
+    /**
+     * Eligibility → { eligible, stats, failed:[] }. When the Capability Economy
+     * scorer is loaded it is the authority (six rules over the immutable
+     * ledger); otherwise this falls back to the built-in four-rule stats so the
+     * foundry still works standalone.
+     */
     async evaluate(name) {
+      const scorer = global.AAA_PROMOTION_SCORER;
+      const ledg = global.AAA_CAPABILITY_LEDGER;
+      if (scorer && ledg) {
+        const entry = (await ledg.entries({ name: name }))[0];
+        if (entry) {
+          const sc = await scorer.score(entry.signature);
+          return { eligible: sc.eligible, stats: sc.reputation, failed: sc.failed, signature: entry.signature, checks: sc.checks, scored: true };
+        }
+      }
       const s = await this.stats(name);
       const failed = [];
       if (s.spawns < MIN_SPAWNS) failed.push('spawned ' + s.spawns + '/' + MIN_SPAWNS + ' times');
@@ -61,16 +75,24 @@
       return { eligible: failed.length === 0, stats: s, failed: failed };
     },
 
-    /** Open a promotion proposal (only when eligible — no vanity proposals). */
+    /**
+     * Open a promotion proposal (only when eligible — no vanity proposals).
+     * Emits CAPABILITY_PROMOTION_PROPOSED so promotion is never silent, and
+     * refuses a banned capability outright.
+     */
     async propose(name, need) {
+      const sig = (global.AAA_CAPABILITY_LEDGER && need) ? global.AAA_CAPABILITY_LEDGER.signatureOf(need.action, need.entity, need.context) : null;
+      if (sig && global.AAA_BANNED_CAPABILITIES && await global.AAA_BANNED_CAPABILITIES.isBanned(sig)) return { ok: false, error: 'CAPABILITY_BANNED', signature: sig };
       const ev = await this.evaluate(name);
       if (!ev.eligible) return { ok: false, error: 'NOT_ELIGIBLE', failed: ev.failed };
       const id = ids() ? ids().createId('promo') : 'promo_' + Date.now();
       const rec = {
-        id: id, workspaceId: ws(), name: name, status: 'pending_governance',
-        need: need || null, stats: ev.stats, proposedAt: nowISO(), decidedAt: null, reason: null
+        id: id, workspaceId: ws(), name: name, signature: sig || ev.signature || null, status: 'pending_governance',
+        need: need || null, stats: ev.stats, checks: ev.checks || null, proposedAt: nowISO(), decidedAt: null, reason: null
       };
       await data().put(PROPOSALS, id, rec);
+      try { if (global.AAA_EVENT_BUS) await global.AAA_EVENT_BUS.publish('capability.promotion_proposed', { name: name, signature: rec.signature, proposalId: id }, { source: 'genesis' }); } catch (_) {}
+      try { if (ledger() && ledger().append) await ledger().append('genesis.promotion_proposed', { proposalId: id, name: name, signature: rec.signature }); } catch (_) {}
       return { ok: true, proposal: rec };
     },
 

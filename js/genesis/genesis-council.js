@@ -50,6 +50,7 @@
     b.define('genesis.spawned', { version: 1, description: 'The Genesis Council spawned an ephemeral agent.', schema: { type: 'object', required: ['agentId', 'name'], properties: { agentId: { type: 'string' }, name: { type: 'string' }, triggerEvent: { type: 'string' } } } });
     b.define('genesis.terminated', { version: 1, description: 'An ephemeral agent run was closed.', schema: { type: 'object', required: ['runId'], properties: { runId: { type: 'string' }, agentId: { type: 'string' }, outcome: { type: 'string' } } } });
     b.define('genesis.promoted', { version: 1, description: 'An ephemeral agent was promoted to permanent.', schema: { type: 'object', required: ['name'], properties: { name: { type: 'string' }, signature: { type: 'string' } } } });
+    b.define('capability.promotion_proposed', { version: 1, description: 'A capability cleared the promotion scorer and awaits governance approval.', schema: { type: 'object', required: ['name'], properties: { name: { type: 'string' }, signature: { type: 'string' }, proposalId: { type: 'string' } } } });
   }
 
   const Council = {
@@ -73,6 +74,20 @@
       if (!inspect.need) return { spawned: false, reason: 'no_need' };
 
       // 4. splice DNA → spec
+      // 3.5. banned/quarantined capabilities never reach the factory.
+      const banReg = global.AAA_BANNED_CAPABILITIES;
+      const ledg = global.AAA_CAPABILITY_LEDGER;
+      const sig = ledg ? ledg.signatureOf(inspect.need.action, inspect.need.entity, inspect.need.context) : null;
+      if (banReg && sig) {
+        if (await banReg.isBanned(sig)) return { spawned: false, banned: true, signature: sig, reason: 'capability is banned' };
+        if (await banReg.isQuarantined(sig) && !o.councilApproved) {
+          const qid = newId('hold');
+          const qhold = { id: qid, workspaceId: ws(), signature: sig, need: inspect.need, gapId: inspect.gap ? inspect.gap.id : null, payload: payload || {}, status: 'held', reasons: ['capability is quarantined — human approval required'], heldAt: nowISO() };
+          await data().put(HOLDS, qid, qhold);
+          return { spawned: false, quarantined: true, held: qhold };
+        }
+      }
+
       const spliced = factory().splice(Object.assign({ triggerEvent: eventType }, inspect.need));
       if (!spliced.ok) return { spawned: false, denied: true, reasons: spliced.issues || [spliced.error] };
       const spec = spliced.spec;
@@ -104,8 +119,13 @@
 
       // 10. terminate: scrub and close
       const closed = await termination().close(run.id);
+      const finalRun = closed.ok ? closed.run : run;
 
-      return { spawned: true, spec: spec, run: closed.ok ? closed.run : run, promotion: evald };
+      // Capability Economy: every run becomes an immutable ledger entry (the
+      // substrate the scorer / ROI / failure detector / dashboard read).
+      try { if (global.AAA_CAPABILITY_LEDGER) await global.AAA_CAPABILITY_LEDGER.record(spec, finalRun, { domain: o.domain }); } catch (_) {}
+
+      return { spawned: true, spec: spec, run: finalRun, promotion: evald };
     },
 
     /**
@@ -121,7 +141,11 @@
       const hold = await data().get(HOLDS, holdId);
       if (!hold || hold.status !== 'held') return { ok: false, error: 'NOT_HELD' };
       await data().put(HOLDS, holdId, Object.assign({}, hold, { status: 'released', releasedAt: nowISO(), reason: reason }));
-      const result = await this._spawnAndRun(hold.spec, hold.payload, hold.gapId ? { id: hold.gapId } : null, {});
+      // A risk hold carries a fully spliced spec; a quarantine hold carries the
+      // need and is re-dispatched with council approval (which clears the gate).
+      const result = hold.spec
+        ? await this._spawnAndRun(hold.spec, hold.payload, hold.gapId ? { id: hold.gapId } : null, {})
+        : await this.handleEvent(hold.need.triggerEvent, hold.payload, { councilApproved: true });
       return { ok: true, result: result };
     },
 

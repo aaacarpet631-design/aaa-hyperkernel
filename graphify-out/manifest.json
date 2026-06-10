@@ -3110,9 +3110,9 @@
     "semantic_hash": "794e9d98baf0b18b0681d85f75380f24"
   },
   "/home/user/aaa-hyperkernel/js/genesis/agent-template-schema.js": {
-    "mtime": 1781068083.006423,
-    "ast_hash": "003bbf3bec970469aa11d981e9d969ec",
-    "semantic_hash": "003bbf3bec970469aa11d981e9d969ec"
+    "mtime": 1781069136.6224318,
+    "ast_hash": "5587f309c808ac9c62880b76e2a666a6",
+    "semantic_hash": "5587f309c808ac9c62880b76e2a666a6"
   },
   "/home/user/aaa-hyperkernel/js/genesis/capability-gap-detector.js": {
     "mtime": 1781068133.0664234,
@@ -3125,19 +3125,19 @@
     "semantic_hash": "6fc69263d8c9dbe4e67ff24e4a946d81"
   },
   "/home/user/aaa-hyperkernel/js/genesis/ephemeral-agent-runtime.js": {
-    "mtime": 1781068247.8544245,
-    "ast_hash": "3645dc6619e640b551778bcc98722e7c",
-    "semantic_hash": "3645dc6619e640b551778bcc98722e7c"
+    "mtime": 1781069130.5024319,
+    "ast_hash": "32ce764ffec5f8bb3410123ab5c40586",
+    "semantic_hash": "32ce764ffec5f8bb3410123ab5c40586"
   },
   "/home/user/aaa-hyperkernel/js/genesis/genesis-council.js": {
-    "mtime": 1781068332.9664252,
-    "ast_hash": "6ccebe7dce5522db949eb5f9d3c1c458",
-    "semantic_hash": "6ccebe7dce5522db949eb5f9d3c1c458"
+    "mtime": 1781085894.2065554,
+    "ast_hash": "37f7538016c125dd7c75c95c721911c6",
+    "semantic_hash": "37f7538016c125dd7c75c95c721911c6"
   },
   "/home/user/aaa-hyperkernel/js/genesis/promotion-engine.js": {
-    "mtime": 1781068277.1864247,
-    "ast_hash": "d2dda387c4c4f6c4caf34e6ee7bf435c",
-    "semantic_hash": "d2dda387c4c4f6c4caf34e6ee7bf435c"
+    "mtime": 1781085837.8065567,
+    "ast_hash": "b4a440e1e1f2fe7aac1bbe14779f7d5a",
+    "semantic_hash": "b4a440e1e1f2fe7aac1bbe14779f7d5a"
   },
   "/home/user/aaa-hyperkernel/js/genesis/spawn-policy.js": {
     "mtime": 1781068203.094424,
@@ -3145,9 +3145,9 @@
     "semantic_hash": "016ee32efef294280fa3f6c00d730c80"
   },
   "/home/user/aaa-hyperkernel/js/genesis/termination-engine.js": {
-    "mtime": 1781068480.9464264,
-    "ast_hash": "953e0ef9b5eef191047cca74bb7b0139",
-    "semantic_hash": "953e0ef9b5eef191047cca74bb7b0139"
+    "mtime": 1781069134.2624319,
+    "ast_hash": "122b34b659577f7d70bd670b67866e67",
+    "semantic_hash": "122b34b659577f7d70bd670b67866e67"
   },
   "/home/user/aaa-hyperkernel/js/governance/agent-outcomes.js": {
     "mtime": 1781065386.5104003,
@@ -3880,9 +3880,9 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "/home/user/aaa-hyperkernel/test/run.js": {
-    "mtime": 1781068430.4184258,
-    "ast_hash": "c385c6ddfffc0f746cf895df66c1760f",
-    "semantic_hash": "c385c6ddfffc0f746cf895df66c1760f"
+    "mtime": 1781085953.914554,
+    "ast_hash": "104064f08fa03ca8a255739ff83fcc61",
+    "semantic_hash": "104064f08fa03ca8a255739ff83fcc61"
   },
   "/home/user/aaa-hyperkernel/test/smoke/boot.test.js": {
     "mtime": 1781065386.5464003,
@@ -4535,9 +4535,9 @@
     "semantic_hash": "82efb97a359f5c7290bf2513d14686be"
   },
   "/home/user/aaa-hyperkernel/GENESIS.md": {
-    "mtime": 1781068522.4664266,
-    "ast_hash": "a7178f91024f78178d40eb14ec9de526",
-    "semantic_hash": "a7178f91024f78178d40eb14ec9de526"
+    "mtime": 1781086080.814551,
+    "ast_hash": "42b28d82594b505bd09e224daeb0d1c0",
+    "semantic_hash": "42b28d82594b505bd09e224daeb0d1c0"
   },
   "/home/user/aaa-hyperkernel/GOVERNANCE.md": {
     "mtime": 1781065386.4984002,
@@ -4605,9 +4605,9 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "/home/user/aaa-hyperkernel/index.html": {
-    "mtime": 1781068486.2984264,
-    "ast_hash": "25a639b573e3ee68ec520587998bb3aa",
-    "semantic_hash": "25a639b573e3ee68ec520587998bb3aa"
+    "mtime": 1781086061.8985517,
+    "ast_hash": "41f9fd33e1760e402529e977b3ff32e0",
+    "semantic_hash": "41f9fd33e1760e402529e977b3ff32e0"
   },
   "/home/user/aaa-hyperkernel/netlify/functions/RESEARCH.md": {
     "mtime": 1780633642.6350634,
@@ -4638,5 +4638,55 @@
     "mtime": 1780633642.6022215,
     "ast_hash": "7ee0240fba70752122eb8585edb525ea",
     "semantic_hash": "7ee0240fba70752122eb8585edb525ea"
+  },
+  "/home/user/aaa-hyperkernel/js/genesis/banned-capability-registry.js": {
+    "mtime": 1781086052.3305519,
+    "ast_hash": "41d7456391bf777195671dd4f05eb970",
+    "semantic_hash": "41d7456391bf777195671dd4f05eb970"
+  },
+  "/home/user/aaa-hyperkernel/js/genesis/capability-ledger.js": {
+    "mtime": 1781085632.6505613,
+    "ast_hash": "1be0f44005d3df08acb56e3515a39075",
+    "semantic_hash": "1be0f44005d3df08acb56e3515a39075"
+  },
+  "/home/user/aaa-hyperkernel/js/genesis/capability-marketplace-dashboard.js": {
+    "mtime": 1781086117.3265502,
+    "ast_hash": "7eb8d852bf2f11b920191192debcdfb7",
+    "semantic_hash": "7eb8d852bf2f11b920191192debcdfb7"
+  },
+  "/home/user/aaa-hyperkernel/js/genesis/capability-reputation-store.js": {
+    "mtime": 1781085680.2945604,
+    "ast_hash": "6b21013efc67dd5ff305200322685266",
+    "semantic_hash": "6b21013efc67dd5ff305200322685266"
+  },
+  "/home/user/aaa-hyperkernel/js/genesis/capability-roi-engine.js": {
+    "mtime": 1781085658.1185608,
+    "ast_hash": "2e14afc9d08146288133263c260cc055",
+    "semantic_hash": "2e14afc9d08146288133263c260cc055"
+  },
+  "/home/user/aaa-hyperkernel/js/genesis/failure-pattern-detector.js": {
+    "mtime": 1781085711.1105597,
+    "ast_hash": "c6eaf46a7653b31056c243eb549731fa",
+    "semantic_hash": "c6eaf46a7653b31056c243eb549731fa"
+  },
+  "/home/user/aaa-hyperkernel/js/genesis/promotion-scorer.js": {
+    "mtime": 1781085767.9465582,
+    "ast_hash": "2fafcd8e4eb644b313cb8aa02c1cecf2",
+    "semantic_hash": "2fafcd8e4eb644b313cb8aa02c1cecf2"
+  },
+  "/home/user/aaa-hyperkernel/js/genesis/tool-forge.js": {
+    "mtime": 1781069118.2544317,
+    "ast_hash": "dba78b8bd4e37c0c5a7143be44c81e50",
+    "semantic_hash": "dba78b8bd4e37c0c5a7143be44c81e50"
+  },
+  "/home/user/aaa-hyperkernel/test/unit/capability-economy.test.js": {
+    "mtime": 1781086016.4945526,
+    "ast_hash": "cc18eb72b4a0825801de417e84f26bcd",
+    "semantic_hash": "cc18eb72b4a0825801de417e84f26bcd"
+  },
+  "/home/user/aaa-hyperkernel/test/unit/tool-forge.test.js": {
+    "mtime": 1781069242.3424327,
+    "ast_hash": "f075e96da59ca572eb6df98c6b776272",
+    "semantic_hash": "f075e96da59ca572eb6df98c6b776272"
   }
 }

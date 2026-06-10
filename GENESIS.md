@@ -162,3 +162,35 @@ photo.uploaded {photoId, jobId, tags:[bleach, stain]}
 ```
 
 Run it: `npm test` (suite `genesis-foundry`).
+
+## The Capability Economy — from agent factory to evolutionary system
+
+Spawning agents and tools is only half an organism; the other half is deciding
+**which temporary capabilities deserve permanence, which stay ephemeral, and
+which are banned.** Seven modules turn every Genesis run into measurable
+enterprise intelligence (ledger → scoring → governance first; the dashboard is
+pure data, no cosmetic UI).
+
+| Module | Global | Role |
+|---|---|---|
+| `capability-ledger.js` | `AAA_CAPABILITY_LEDGER` | append-only entry per run (DNA, trigger, agent/tool spec, result, confidence, risk, cost, latency, approval, rollback, graph facts) + append-only outcome overlay |
+| `capability-reputation-store.js` | `AAA_CAPABILITY_REPUTATION` | live track record per signature (spawns, success/rollback rate, avg risk/cost/latency/confidence) + dated snapshots |
+| `capability-roi-engine.js` | `AAA_CAPABILITY_ROI` | seven ROI dimensions (labor time, callback risk, quote accuracy, close rate, material waste, scheduling, response time) + money lines; no-data → `null`, never 0 |
+| `failure-pattern-detector.js` | `AAA_FAILURE_DETECTOR` | the immune system — seven demotion/ban signatures (hallucinated tools, invalid graph writes, cost recursion, repeated rejection, unsafe drafts, failed rollback, policy violation) |
+| `banned-capability-registry.js` | `AAA_BANNED_CAPABILITIES` | ban / quarantine / lift (reversible, audited); `autoEnforce()` applies the detector's verdicts |
+| `promotion-scorer.js` | `AAA_PROMOTION_SCORER` | the six-rule gate (≥5 spawns, ≥80% success, ≤5% rollback, avg risk ≤ threshold, measurable benefit, no unresolved violations) |
+| `capability-marketplace-dashboard.js` | `AAA_CAPABILITY_DASHBOARD` | read model: top candidates, risky, banned, costliest, highest-ROI, most-spawned DNA, totals |
+
+**Governance.** Promotion is never silent: an eligible capability emits a
+`capability.promotion_proposed` event and parks a pending proposal; only a
+human with `MANAGE_GOVERNANCE` and a written reason mutates the permanent
+registry (`promotion-engine`, now backed by the scorer). A **banned** capability
+is refused at the council door before the factory runs; a **quarantined** one is
+held for human approval — both states are audited and reversible. Demotion is
+the mirror of promotion: the detector flags, `autoEnforce` bans/quarantines, and
+the next matching event is refused.
+
+Proven in `test/unit/capability-economy.test.js` (35 assertions): immutable
+history, ROI calculation, the six-rule eligibility gate, governance-approval
+requirement, quarantine hold/release, banned-capability refusal, and the
+dashboard read model.
