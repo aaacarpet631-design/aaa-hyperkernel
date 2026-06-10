@@ -93,9 +93,21 @@
       await data().put(EPHEMERAL, runId, { id: runId, workspaceId: ws(), agentId: spec.agentId, input: input || {}, createdAt: nowISO() });
 
       const task = 'Perform exactly one task: ' + spec.action + ' ' + spec.targetEntity + ' (' + spec.context + ') for trigger ' + spec.triggerEvent + '. Then stop.';
+      // Tool Forge: compile this run's bound, single-use toolset and hand the
+      // agent the invoke seam — the only interface it has to the world.
+      const forge = global.AAA_TOOL_FORGE;
+      let toolkit = null;
+      if (forge) {
+        const forged = await forge.forgeFor(spec, runId);
+        toolkit = {
+          tools: forged.map((tl) => ({ id: tl.id, name: tl.name, protocol: tl.protocol, target: tl.target, action: tl.action, inputSchema: tl.inputSchema })),
+          invoke: (toolId, args) => forge.invoke(toolId, args, { agentId: spec.agentId, runId: runId }),
+          request: (def, ro) => forge.request(spec, def, Object.assign({ runId: runId }, ro || {}))
+        };
+      }
       const exec = EXECUTOR || { name: 'proxy', run: proxyExecutor };
       let result;
-      try { result = await exec.run(spec, task, input || {}); }
+      try { result = await exec.run(spec, task, input || {}, toolkit); }
       catch (e) { result = { ok: false, error: 'EXECUTOR_THREW: ' + (e && e.message) }; }
 
       const elapsed = now() - startedAt;

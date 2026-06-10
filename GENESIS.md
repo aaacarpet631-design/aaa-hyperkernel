@@ -108,6 +108,44 @@ so the next matching event is *handled*, not *spawned for*. Termination's
 `rollback()` executes the spec's rollback plan: graph facts are tombstoned
 (`retracted: true`), never erased.
 
+## The Tool Forge — dynamic interface generation (Tool DNA)
+
+Dynamic agents bolted to static tools just move the bottleneck, so tool
+generation mirrors agent generation (`js/genesis/tool-forge.js`,
+`AAA_TOOL_FORGE`). There is no repository of OpenAPI specs; tools are
+synthesized from **Tool DNA**:
+
+| Vector | Registry |
+|---|---|
+| Protocol | `GraphQL · REST · Cypher · Local_RPC · BLE_Telemetry` |
+| Target | `KnowledgeGraph · PWALedger · SquarespaceWebhook · HardwareSensor` |
+| Action | `Mutate · Query · Validate · Revert · Hash` |
+
+When the runtime spawns a Class C specialist it calls `forgeFor(spec, runId)`:
+a microscopic, schema-strict toolset **bound to that agent and run** — a
+ledger mutator per allowed write collection (single-use), a graph query, a
+validator, a hasher. The executor receives only `{tools, invoke, request}`;
+`invoke()` mechanically enforces binding (another agent's call →
+`TOOL_NOT_YOURS`), discard state, the invocation budget (`TOOL_EXHAUSTED` on
+the second swing of a single-use wrench), and args-vs-`inputSchema`
+(`INVALID_ARGS`). The agent cannot hallucinate a capability: unknown DNA is
+unrequestable (`INVALID_TOOL_DNA`), and protocols without a registered driver
+return `TOOL_TARGET_UNBOUND` — telemetry is never simulated. Hardware/external
+drivers plug in through `registerHandler(protocol, target, fn)` (the governed
+seam used for e.g. Roberts-stapler burn-rate or Crain-knife maintenance reads).
+
+**BYOT** (bring-your-own-tool): a running agent may request a tool it lacks.
+`Local_RPC` requests forge immediately; external protocols are **held
+fail-closed** until a human approves with a ≥ 20-char written reason. Every
+forged bridge is written to the Knowledge Graph (`agent —forged→ tool`), and
+every forge / invocation / discard is audited.
+
+**One deliberate divergence** from the "delete the code before a human even
+realizes there was a gap" framing: at termination the run's tools are
+*discarded* — they refuse to execute forever — but their definitions and
+invocation logs are immutable audit state. Nothing in this kernel dissolves
+silently; that is kernel invariant #4, and it outranks the aesthetic.
+
 ## First demonstration (in `test/unit/genesis-foundry.test.js`, 51 assertions)
 
 ```

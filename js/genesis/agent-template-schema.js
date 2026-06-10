@@ -47,7 +47,7 @@
   const PROTECTED_WRITES = [
     'payroll', 'legal_contracts', 'contracts', 'rate_card', 'prices',
     'refunds', 'governance_audit', 'event_log', 'agent_registry',
-    'capability_signatures', 'genesis_runs'
+    'capability_signatures', 'genesis_runs', 'forged_tools', 'tool_invocations'
   ];
 
   const RISK_LEVELS = ['low', 'medium', 'high'];

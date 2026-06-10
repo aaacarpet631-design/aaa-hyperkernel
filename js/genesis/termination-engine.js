@@ -41,7 +41,11 @@
       if (!run) return { ok: false, error: 'RUN_NOT_FOUND' };
       if (run.closedAt) return { ok: true, run: run, already: true };
       const scrubbed = await scrub(runId);
-      const upd = Object.assign({}, run, { closedAt: nowISO(), terminationReason: o.reason || run.status, contextScrubbed: scrubbed });
+      // The Tool Forge discards every tool bound to this run (mirror of the
+      // agent's own termination — the wrench dissolves with the hand).
+      let toolsDiscarded = 0;
+      try { if (global.AAA_TOOL_FORGE) toolsDiscarded = (await global.AAA_TOOL_FORGE.discardFor(runId)).discarded; } catch (_) {}
+      const upd = Object.assign({}, run, { closedAt: nowISO(), terminationReason: o.reason || run.status, contextScrubbed: scrubbed, toolsDiscarded: toolsDiscarded });
       await data().put(RUNS, runId, upd);
       try { if (ledger() && ledger().append) await ledger().append('genesis.terminated', { runId: runId, agentId: run.agentId, name: run.name, outcome: run.status, scrubbed: scrubbed }); } catch (_) {}
       try { if (global.AAA_EVENT_BUS) await global.AAA_EVENT_BUS.publish('genesis.terminated', { runId: runId, agentId: run.agentId, outcome: run.status }, { source: 'genesis' }); } catch (_) {}
