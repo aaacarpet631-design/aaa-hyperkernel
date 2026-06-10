@@ -49,6 +49,7 @@ const SUITES = [
   'unit/security.test.js',
   'unit/security-ui.test.js',
   'unit/event-bus.test.js',
+  'unit/spatial-event-ledger.test.js',
   'unit/event-taxonomy.test.js',
   'unit/genesis-foundry.test.js',
   'unit/tool-forge.test.js',

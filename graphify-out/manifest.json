@@ -4930,9 +4930,9 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "/home/user/aaa-hyperkernel/test/run.js": {
-    "mtime": 1781099578.7269022,
-    "ast_hash": "57dbd6dbeee1c3f47afd0a2ded7d1737",
-    "semantic_hash": "57dbd6dbeee1c3f47afd0a2ded7d1737"
+    "mtime": 1781100206.2801623,
+    "ast_hash": "d005d5b01350fb586d0cba1aca8e15fb",
+    "semantic_hash": "d005d5b01350fb586d0cba1aca8e15fb"
   },
   "/home/user/aaa-hyperkernel/test/smoke/boot.test.js": {
     "mtime": 1781099272.2125432,
@@ -5745,9 +5745,9 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "/home/user/aaa-hyperkernel/index.html": {
-    "mtime": 1781099633.3983054,
-    "ast_hash": "f2f5ba91c15b7c87d175b0b30be45670",
-    "semantic_hash": "f2f5ba91c15b7c87d175b0b30be45670"
+    "mtime": 1781100246.215215,
+    "ast_hash": "02c708c271712396d90a71f931941d4d",
+    "semantic_hash": "02c708c271712396d90a71f931941d4d"
   },
   "/home/user/aaa-hyperkernel/netlify/functions/RESEARCH.md": {
     "mtime": 1780633642.6350634,
@@ -5839,49 +5839,19 @@
     "ast_hash": "564ff5e855858261b3eb6747e41c8788",
     "semantic_hash": "564ff5e855858261b3eb6747e41c8788"
   },
-  "/home/user/aaa-hyperkernel/js/field/room-polygon-store.js": {
-    "mtime": 1781099435.1936958,
-    "ast_hash": "4803d9218bb16cca9867861dc9f54199",
-    "semantic_hash": "4803d9218bb16cca9867861dc9f54199"
+  "/home/user/aaa-hyperkernel/js/core/spatial-event-ledger.js": {
+    "mtime": 1781100141.9617379,
+    "ast_hash": "b7c102af1a8e8131661a387719bdaf36",
+    "semantic_hash": "b7c102af1a8e8131661a387719bdaf36"
   },
-  "/home/user/aaa-hyperkernel/js/field/room-scan-engine.js": {
-    "mtime": 1781099480.3696985,
-    "ast_hash": "5aac02afd0473b57a1dc5840285b498a",
-    "semantic_hash": "5aac02afd0473b57a1dc5840285b498a"
+  "/home/user/aaa-hyperkernel/test/unit/spatial-event-ledger.test.js": {
+    "mtime": 1781100223.8257427,
+    "ast_hash": "bab6aaaec74084c54d8b708de7bb1e7d",
+    "semantic_hash": "bab6aaaec74084c54d8b708de7bb1e7d"
   },
-  "/home/user/aaa-hyperkernel/js/field/room-scan-ui.js": {
-    "mtime": 1781099533.9377017,
-    "ast_hash": "9de0bc045873928f63af7978b6c32696",
-    "semantic_hash": "9de0bc045873928f63af7978b6c32696"
-  },
-  "/home/user/aaa-hyperkernel/js/field/scan-anomaly-flags.js": {
-    "mtime": 1781099396.6856935,
-    "ast_hash": "d5d4e089b845043745de637fd566e0a7",
-    "semantic_hash": "d5d4e089b845043745de637fd566e0a7"
-  },
-  "/home/user/aaa-hyperkernel/js/field/scan-confidence-engine.js": {
-    "mtime": 1781099421.481695,
-    "ast_hash": "a2a70bb7f89845f7d18b10a36e42d5c5",
-    "semantic_hash": "a2a70bb7f89845f7d18b10a36e42d5c5"
-  },
-  "/home/user/aaa-hyperkernel/js/field/scan-normalizer.js": {
-    "mtime": 1781099341.5696902,
-    "ast_hash": "7dc64792efd35fd6786f9e4218588ce5",
-    "semantic_hash": "7dc64792efd35fd6786f9e4218588ce5"
-  },
-  "/home/user/aaa-hyperkernel/js/field/scan-to-capture-adapter.js": {
-    "mtime": 1781099506.2337,
-    "ast_hash": "3577ba94a6d5b6778dfb9c4d10836e29",
-    "semantic_hash": "3577ba94a6d5b6778dfb9c4d10836e29"
-  },
-  "/home/user/aaa-hyperkernel/test/unit/room-scan-engine.test.js": {
-    "mtime": 1781099613.7017064,
-    "ast_hash": "948e7c7a783019077d594cb3f4465370",
-    "semantic_hash": "948e7c7a783019077d594cb3f4465370"
-  },
-  "/home/user/aaa-hyperkernel/references/FIELD_ROOM_SCAN_ENGINE.md": {
-    "mtime": 1781099689.593711,
-    "ast_hash": "8aa97e221f235a3c6f2e51feb7838596",
-    "semantic_hash": "8aa97e221f235a3c6f2e51feb7838596"
+  "/home/user/aaa-hyperkernel/references/HYPERKERNEL_SPATIAL_LEDGER.md": {
+    "mtime": 1781100294.2097468,
+    "ast_hash": "693f7c1f1c323915a9b8e2904e66f102",
+    "semantic_hash": "693f7c1f1c323915a9b8e2904e66f102"
   }
 }
