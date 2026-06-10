@@ -20,7 +20,7 @@ const { makeRunner, setupEnv, load } = require('../helpers/harness');
 function makeEl() {
   const e = {
     _text: '', style: {}, className: '', value: '', children: [],
-    classList: { _s: {}, add(c) { this._s[c] = true; }, remove(c) { delete this._s[c]; }, contains(c) { return !!this._s[c]; } },
+    classList: { _s: {}, add(c) { this._s[c] = true; }, remove(c) { delete this._s[c]; }, contains(c) { return !!this._s[c]; }, toggle(c, on) { const v = on === undefined ? !this._s[c] : !!on; if (v) this._s[c] = true; else delete this._s[c]; return v; } },
     setAttribute() {}, getAttribute() { return null; },
     addEventListener() {}, removeEventListener() {},
     appendChild(c) { e.children.push(c); return c; },
@@ -88,6 +88,17 @@ module.exports = async function run() {
     G.AAA_VISION_HUD_UI = { boot: function () { visionBooted++; } };
     const rScan = HOME.startQuick('scan_room', {});
     t.ok('scan_room still routes via boot()', rScan.routed === true && rScan.entry === 'boot' && visionBooted === 1);
+
+    // ===== Bug 4: floating voice FAB must not cover the Chat composer's Send ==
+    // The Chat/Focus canvases own the bottom-right corner with their own Send
+    // button; the FAB lives in the same corner, so it has to step aside there.
+    load('js/ui/job-list-ui.js');
+    const APP = G.AAA_JOB_LIST_UI;
+    t.ok('job list exposes the FAB visibility toggle', typeof APP._setVoiceFabHidden === 'function');
+    APP._setVoiceFabHidden(true);
+    t.ok('on chat-style tabs the FAB is hidden so it cannot cover Send', doc.body.classList.contains('hk-hide-voice-fab'));
+    APP._setVoiceFabHidden(false);
+    t.ok('on every other tab the FAB stays visible for voice logging', !doc.body.classList.contains('hk-hide-voice-fab'));
 
     return t.report();
   } finally {

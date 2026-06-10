@@ -132,6 +132,12 @@
       const v = global.AAA_VOICE_HUD_UI;
       if (v && v.updateJobId) v.updateJobId(jobId);
     },
+    // Toggle the floating voice FAB. Hidden on chat-style tabs whose composer owns
+    // the bottom-right corner, shown everywhere else (jobs/measure voice logging).
+    _setVoiceFabHidden(hide) {
+      if (typeof document === 'undefined' || !document.body) return;
+      document.body.classList.toggle('hk-hide-voice-fab', !!hide);
+    },
 
     // ---- bottom tab bar ---------------------------------------------------
     _mountTabBar() {
@@ -170,6 +176,9 @@
       if (!this._landed) { this._landed = true; if (global.AAA_APP_MODE && global.AAA_APP_MODE.landingTab) this.tab = global.AAA_APP_MODE.landingTab(); }
       this._mountTabBar();
       this._highlightTab();
+      // The Chat/Focus canvases have their own Send button in the same bottom-right
+      // corner as the floating voice FAB, so hide the FAB there to stop it covering Send.
+      this._setVoiceFabHidden(this.tab === 'chat' || this.tab === 'focus');
 
       // Field Mode home — the money action, one tap in.
       if (this.tab === 'measure') {
