@@ -148,6 +148,10 @@
       }
     }
     const recommended = money(Math.max(candidate, marginFloor)); // HARD RULE #1
+    // FLOOR_CLAMPED: the recommendation is sitting on the floor because the
+    // market evidence pulled toward or below it — the supervisor has no room down.
+    const floorClamped = recommended === money(marginFloor) && band != null && bandMid != null && bandMid <= marginFloor;
+    if (floorClamped) flags.push('FLOOR_CLAMPED');
     const rLow = money(Math.max(low, recommended * 0.97));
     const rHigh = money(Math.min(high, recommended * 1.03));
 
@@ -183,7 +187,7 @@
         material: { cost: materialCost },
         anchor: { price: anchorPrice, effective: anchorEff, version: (inputs.anchor && inputs.anchor.version) || null, source: (inputs.anchor && inputs.anchor.source) || null, active: !(inputs.anchor && inputs.anchor.active === false) },
         marginFloor: marginFloor,
-        signal: { n: n, won: won.length, lost: lost.length, winRate: winRate != null ? r3(winRate) : null, winningBand: band, signalConfidence: r3(signalConfidence) },
+        signal: { n: n, won: won.length, lost: lost.length, winRate: winRate != null ? r3(winRate) : null, winningBand: band, lostBand: lost.length ? { low: Math.min.apply(null, lost), high: Math.max.apply(null, lost) } : null, signalConfidence: r3(signalConfidence) },
         context: { flags: (inputs.context && inputs.context.flags) || [], sopRefs: (inputs.context && inputs.context.sopRefs) || [] },
         weighting: { anchorConfidence: r3(anchorConfidence), agreement: r3(agreement), method: 'recommended = anchor + signalConfidence*(target-anchor), clamped to [floor, anchor+uplift]; floor is a hard constraint, never averaged' }
       }
@@ -224,6 +228,73 @@
         }
       } catch (_) { /* ledger best-effort; the decision still stands */ }
       return d;
+    },
+
+    // The four supervisor actions; only 'accept'/'adjust' approve a price.
+    ACTIONS: ['accept', 'adjust', 'rescope', 'decline'],
+
+    /**
+     * Record a human supervisor's decision on a resolved pricing decision and
+     * write it to the immutable ledger. This is where the card's Accept /
+     * Adjust / Send-back / Decline buttons land.
+     *
+     * HARD RULE: no action may approve a price below the margin floor. An
+     * 'adjust' below the floor (or above the allowed range) is REFUSED — no
+     * approval is recorded. 'accept' is floor-safe by construction; we re-assert
+     * it anyway (defense in depth). 'rescope'/'decline' approve no price.
+     *
+     * opts: { action, price (for adjust), actor, reason, meta }
+     * Returns { ok, approvalId, ledgerRef, action, approved, approvedPrice, marginFloor } or { ok:false, error }.
+     */
+    async recordApproval(decision, opts) {
+      opts = opts || {};
+      if (!decision || decision.ok === false || !decision.evidence) return { ok: false, error: 'INVALID_DECISION' };
+      const action = String(opts.action || '').toLowerCase();
+      if (this.ACTIONS.indexOf(action) === -1) return { ok: false, error: 'UNKNOWN_ACTION' };
+
+      const floor = num(decision.evidence.marginFloor);
+      const allowedHigh = decision.feasibleRange && decision.feasibleRange.high != null ? num(decision.feasibleRange.high) : null;
+      let approved = false;
+      let approvedPrice = null;
+
+      if (action === 'accept') {
+        approvedPrice = num(decision.recommended);
+        approved = true;
+      } else if (action === 'adjust') {
+        approvedPrice = num(opts.price);
+        if (approvedPrice == null) return { ok: false, error: 'PRICE_REQUIRED' };
+        if (floor != null && approvedPrice < floor) return { ok: false, error: 'BELOW_MARGIN_FLOOR', marginFloor: floor }; // HARD RULE
+        if (allowedHigh != null && approvedPrice > allowedHigh) return { ok: false, error: 'ABOVE_ALLOWED_RANGE', allowedHigh: allowedHigh };
+        approvedPrice = money(approvedPrice);
+        approved = true;
+      }
+      // Defense in depth: an approving action can NEVER sit below the floor.
+      if (approved && floor != null && approvedPrice != null && approvedPrice < floor) {
+        return { ok: false, error: 'BELOW_MARGIN_FLOOR', marginFloor: floor };
+      }
+
+      const meta = (decision.evidence && decision.evidence.meta) || (opts.meta) || {};
+      const approvalId = (ids() && ids().createId) ? ids().createId('papr') : ('papr_' + now());
+      const result = { ok: true, approvalId: approvalId, action: action, approved: approved, approvedPrice: approvedPrice, marginFloor: floor };
+      try {
+        if (ledger() && ledger().append) {
+          const entry = await ledger().append('pricing_approval', {
+            approvalId: approvalId,
+            decisionId: decision.decisionId || null,
+            decisionLedgerRef: decision.ledgerRef || null,
+            action: action, approved: approved,
+            approvedPrice: approvedPrice, marginFloor: floor,
+            recommended: num(decision.recommended), unprofitableToWin: decision.unprofitableToWin === true,
+            actor: opts.actor || (meta && meta.actor) || null,
+            subjectType: (opts.meta && opts.meta.subjectType) || meta.subjectType || null,
+            subjectId: (opts.meta && opts.meta.subjectId) || meta.subjectId || null,
+            reason: opts.reason ? String(opts.reason).slice(0, 280) : null,
+            at: now()
+          });
+          result.ledgerRef = entry ? entry.id : null;
+        }
+      } catch (_) { /* ledger best-effort; the human decision still stands */ }
+      return result;
     }
   };
 
