@@ -4930,9 +4930,9 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "/home/user/aaa-hyperkernel/test/run.js": {
-    "mtime": 1781096189.1589038,
-    "ast_hash": "131f9c3c7ef309a4989a8c5d0782cb2c",
-    "semantic_hash": "131f9c3c7ef309a4989a8c5d0782cb2c"
+    "mtime": 1781097413.16257,
+    "ast_hash": "0ff6692d963af1f922af44dfdd89676b",
+    "semantic_hash": "0ff6692d963af1f922af44dfdd89676b"
   },
   "/home/user/aaa-hyperkernel/test/smoke/boot.test.js": {
     "mtime": 1781065386.5464003,
@@ -5745,9 +5745,9 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "/home/user/aaa-hyperkernel/index.html": {
-    "mtime": 1781096223.5949059,
-    "ast_hash": "86d06304bcc79a8a4e4369577669fa64",
-    "semantic_hash": "86d06304bcc79a8a4e4369577669fa64"
+    "mtime": 1781097471.5945735,
+    "ast_hash": "d670a407b1bfbb8dd940b26f17006c9b",
+    "semantic_hash": "d670a407b1bfbb8dd940b26f17006c9b"
   },
   "/home/user/aaa-hyperkernel/netlify/functions/RESEARCH.md": {
     "mtime": 1780633642.6350634,
@@ -5798,5 +5798,45 @@
     "mtime": 1780633642.6022215,
     "ast_hash": "7ee0240fba70752122eb8585edb525ea",
     "semantic_hash": "7ee0240fba70752122eb8585edb525ea"
+  },
+  "/home/user/aaa-hyperkernel/js/field/cut-list-generator.js": {
+    "mtime": 1781097452.0345724,
+    "ast_hash": "56a57b1f32f637dfa8e15123524a190b",
+    "semantic_hash": "56a57b1f32f637dfa8e15123524a190b"
+  },
+  "/home/user/aaa-hyperkernel/js/field/layout-constraint-engine.js": {
+    "mtime": 1781097241.83456,
+    "ast_hash": "7a79c20809998977b12650dcc3742530",
+    "semantic_hash": "7a79c20809998977b12650dcc3742530"
+  },
+  "/home/user/aaa-hyperkernel/js/field/layout-plan-store.js": {
+    "mtime": 1781097318.3505645,
+    "ast_hash": "06d0d583ab968c42f3082d26dd26ae06",
+    "semantic_hash": "06d0d583ab968c42f3082d26dd26ae06"
+  },
+  "/home/user/aaa-hyperkernel/js/field/layout-risk-analyzer.js": {
+    "mtime": 1781097304.3425636,
+    "ast_hash": "cc1a68486137acc4b2b6585edd5a927b",
+    "semantic_hash": "cc1a68486137acc4b2b6585edd5a927b"
+  },
+  "/home/user/aaa-hyperkernel/js/field/layout-ui.js": {
+    "mtime": 1781097372.3305676,
+    "ast_hash": "e13a4b3203133f895faa5ed8fa1b606c",
+    "semantic_hash": "e13a4b3203133f895faa5ed8fa1b606c"
+  },
+  "/home/user/aaa-hyperkernel/js/field/seam-layout-optimizer.js": {
+    "mtime": 1781097349.6705663,
+    "ast_hash": "d0f03cfc5cf4e4f51caf1240e3aadca3",
+    "semantic_hash": "d0f03cfc5cf4e4f51caf1240e3aadca3"
+  },
+  "/home/user/aaa-hyperkernel/test/unit/seam-layout-optimizer.test.js": {
+    "mtime": 1781097406.6185696,
+    "ast_hash": "130855e2f92056cb0f47a93dbdc8ac8c",
+    "semantic_hash": "130855e2f92056cb0f47a93dbdc8ac8c"
+  },
+  "/home/user/aaa-hyperkernel/references/FIELD_SEAM_LAYOUT_OPTIMIZER.md": {
+    "mtime": 1781097525.4825766,
+    "ast_hash": "564ff5e855858261b3eb6747e41c8788",
+    "semantic_hash": "564ff5e855858261b3eb6747e41c8788"
   }
 }
