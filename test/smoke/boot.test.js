@@ -86,7 +86,7 @@ module.exports = function run() {
   ['AAA_CONFIG', 'AAA_RBAC', 'AAA_RUNTIME_GATEWAY', 'AAA_EVENTS',
     'AAA_MEASUREMENT_QUOTE', 'AAA_ACCOUNTING', 'AAA_CONTRACTS', 'AAA_SCHEDULING',
     'AAA_CREW_STORE', 'AAA_TOOL_STORE', 'AAA_PORTAL_LINKS', 'AAA_QUICKBOOKS_ONLINE',
-    'AAA_UI', 'AAA_BUSINESS', 'AAA_LEADS'].forEach((g) => {
+    'AAA_UI', 'AAA_BUSINESS', 'AAA_LEADS', 'AAA_EVAL_GOLDEN', 'AAA_OUTCOME_SPINE'].forEach((g) => {
     t.ok('global defined: ' + g, typeof win[g] !== 'undefined');
   });
 

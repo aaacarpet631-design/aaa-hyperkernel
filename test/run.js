@@ -101,6 +101,8 @@ const SUITES = [
   'unit/scheduling.test.js',
   'unit/contracts.test.js',
   'unit/leads.test.js',
+  'unit/eval-golden.test.js',
+  'unit/outcome-spine.test.js',
   'unit/quickbooks-online.test.js',
   'unit/portal-links.test.js',
   'unit/voice.test.js',
