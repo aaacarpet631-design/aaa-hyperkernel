@@ -155,5 +155,52 @@ module.exports = async function run() {
   const n4 = await INBOX.buildFollowUpDecision({ quoteId: 'h1' });
   t.ok('a resolved (won) quote is not eligible', n4.ok === false && n4.reason === 'NO_ELIGIBLE_QUOTE');
 
+  // ===== listDecisions: the ranked, approve-able feed ========================
+  // qf5: urgent and the BIGGEST EV (0.5 × $9,999 → 5000) but NO phone anywhere
+  // → skipped honestly, and the skip must not consume the limit.
+  await seed('qf5', { status: 'follow_up_due', customerTotal: 9999, customerName: 'GhostPhone', serviceType: ['ghost'] });
+  const ld = await INBOX.listDecisions();
+  t.ok('listDecisions ranks the urgent quotes by expectedValue desc (qf2 $1000 then qf1 $169)',
+    ld.ok === true && ld.count === 2 && ld.decisions.length === 2 &&
+    ld.decisions[0].trigger.payload.quoteId === 'qf2' && ld.decisions[1].trigger.payload.quoteId === 'qf1');
+  t.ok('every returned decision is a schema-valid card',
+    ld.decisions.every((c) => INBOX.validateDecisionSchema(c).valid === true));
+  t.eq('totalImpactUSD sums expectedValueUSD across the returned decisions (1000 + 169)', ld.totalImpactUSD, 1169);
+  t.ok('non-urgent quotes stay out of the feed (qf4 has a bigger EV but urgency this_week)',
+    ld.decisions.every((c) => c.trigger.payload.quoteId !== 'qf4'));
+  t.ok('an urgent quote with no phone is skipped, not an error (qf5 absent)',
+    ld.decisions.every((c) => c.trigger.payload.quoteId !== 'qf5'));
+  t.eq('feed cards use the same construction path (qf1 recipient via AAA_CUSTOMER_STORE)',
+    ld.decisions[1].proposal.payload.recipient, '7025550192');
+  const ld1 = await INBOX.listDecisions({ limit: 1 });
+  t.ok('limit caps RETURNED cards — the unbuildable qf5 does not consume it (top card is qf2)',
+    ld1.ok === true && ld1.count === 1 && ld1.decisions.length === 1 &&
+    ld1.decisions[0].trigger.payload.quoteId === 'qf2' && ld1.totalImpactUSD === 1000);
+
+  // no eligible (urgent) quotes → an honest empty, NOT an error
+  const savedScoreAll = G.AAA_OPPORTUNITY_SCORER.scoreAll;
+  G.AAA_OPPORTUNITY_SCORER.scoreAll = async () => ({ ok: true, items: [
+    { ok: true, quoteId: 'qf4', probability: 0.5, probabilityPct: 50, expectedValue: 2500, amount: 5000,
+      basis: { method: 'overall_rate' }, recommendedAction: { id: 'follow_up', label: 'Follow up' }, urgency: 'this_week', confidence: 'low' }
+  ], rankedBy: 'expectedValue' });
+  const ldEmpty = await INBOX.listDecisions();
+  t.ok('no eligible quotes → { ok:true, count:0, totalImpactUSD:0 } honest empty',
+    ldEmpty.ok === true && ldEmpty.count === 0 && ldEmpty.decisions.length === 0 && ldEmpty.totalImpactUSD === 0 && !ldEmpty.reason);
+  G.AAA_OPPORTUNITY_SCORER.scoreAll = savedScoreAll;
+
+  // null-safe degradations — never a throw
+  const ldsc = G.AAA_OPPORTUNITY_SCORER; delete G.AAA_OPPORTUNITY_SCORER;
+  let ldNoSc = null, ldThrew = null;
+  try { ldNoSc = await INBOX.listDecisions(); } catch (e) { ldThrew = e; }
+  G.AAA_OPPORTUNITY_SCORER = ldsc;
+  t.ok('no scorer → { ok:false, reason:NO_SCORER } with zeroed totals, no throw',
+    ldThrew === null && ldNoSc.ok === false && ldNoSc.reason === 'NO_SCORER' &&
+    ldNoSc.count === 0 && ldNoSc.decisions.length === 0 && ldNoSc.totalImpactUSD === 0);
+  const ldq = G.AAA_QUOTES; delete G.AAA_QUOTES;
+  const ldNoQ = await INBOX.listDecisions();
+  G.AAA_QUOTES = ldq;
+  t.ok('no quote store → ok:false NO_SCORER, no throw',
+    ldNoQ.ok === false && ldNoQ.reason === 'NO_SCORER' && ldNoQ.decisions.length === 0);
+
   return t.report();
 };

@@ -880,8 +880,8 @@
     "semantic_hash": "23819498c1e3b3a09630f35e879aa960"
   },
   "js/ui/job-list-ui.js": {
-    "mtime": 1781113009.0199916,
-    "ast_hash": "4e20be7af6eb926185b566fd2f26c0c0",
+    "mtime": 1781132539.1020892,
+    "ast_hash": "d14aadd1ff04abf2288a95eacfa219c8",
     "semantic_hash": ""
   },
   "js/ui/knowledge-os-ui.js": {
@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1781131155.0309546,
-    "ast_hash": "e325d251e01ef98ebd06e5fe019fea41",
+    "mtime": 1781132551.4985707,
+    "ast_hash": "21ff30f6bc298f0e368cbcafec6b6c5c",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
@@ -1180,8 +1180,8 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "test/run.js": {
-    "mtime": 1781131148.5317738,
-    "ast_hash": "77c9208cb5fbdc17d7597b7cf08a1187",
+    "mtime": 1781132546.7580888,
+    "ast_hash": "ab16b660dd6a70c655ad1ab7be543b26",
     "semantic_hash": ""
   },
   "test/smoke/boot.test.js": {
@@ -1895,8 +1895,8 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "index.html": {
-    "mtime": 1781131147.095774,
-    "ast_hash": "4940d516e288dc6d73323c93716638d8",
+    "mtime": 1781132545.582089,
+    "ast_hash": "c76af60f20eba3d65b5cf01d3e55ef7c",
     "semantic_hash": ""
   },
   "netlify/functions/RESEARCH.md": {
@@ -3430,8 +3430,8 @@
     "semantic_hash": ""
   },
   "js/intelligence/decision-inbox.js": {
-    "mtime": 1781130845.4597807,
-    "ast_hash": "f3b6150a9c230c1f27db451c6141c397",
+    "mtime": 1781132172.6820974,
+    "ast_hash": "243d4319d4d0c6d70e53341c5ae4a696",
     "semantic_hash": ""
   },
   "js/ui/decision-card-ui.js": {
@@ -3445,8 +3445,18 @@
     "semantic_hash": ""
   },
   "test/unit/decision-inbox.test.js": {
-    "mtime": 1781130942.3997786,
-    "ast_hash": "7274f6c32272a3c2023b0fb42b3674a6",
+    "mtime": 1781132327.094094,
+    "ast_hash": "33465f2e10fc6276e30521644e20d4ab",
+    "semantic_hash": ""
+  },
+  "js/ui/decision-inbox-ui.js": {
+    "mtime": 1781132280.050095,
+    "ast_hash": "2760c492ad8c3cb713b8e48942af029b",
+    "semantic_hash": ""
+  },
+  "test/unit/decision-inbox-ui.test.js": {
+    "mtime": 1781132381.4620926,
+    "ast_hash": "b8b923579637c6555abcee3f20d92c55",
     "semantic_hash": ""
   }
 }

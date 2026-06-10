@@ -206,7 +206,10 @@
         root.appendChild(this._header('<span class="aaa-title-mark">AAA</span> Command', null));
         const main = UI().el('main', { className: 'aaa-main' });
         root.appendChild(main);
-        if (global.AAA_COMMAND_DECK && global.AAA_COMMAND_DECK.mount) await global.AAA_COMMAND_DECK.mount(main);
+        // Feed-first Decision Inbox is the landing; fall back to the full
+        // Command Deck if it isn't loaded, so the screen is never blank.
+        if (global.AAA_DECISION_INBOX_UI && global.AAA_DECISION_INBOX_UI.mount) await global.AAA_DECISION_INBOX_UI.mount(main);
+        else if (global.AAA_COMMAND_DECK && global.AAA_COMMAND_DECK.mount) await global.AAA_COMMAND_DECK.mount(main);
         return;
       }
       // More — owner tools + the Field/Executive mode switch.

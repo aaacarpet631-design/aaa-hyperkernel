@@ -41,6 +41,8 @@
   const TEMPLATE_ID = 'followup_sms_v1';
   const OPEN_STATUSES = ['draft', 'reviewed', 'sent', 'follow_up_due'];
   const ELIGIBLE_URGENCY = { now: true, today: true };
+  // Recommended actions that are actionable as a follow-up Decision Card.
+  const ELIGIBLE_ACTIONS = { call_now: true, follow_up: true, send_quote: true };
 
   function quotes() { return global.AAA_QUOTES; }
   function customers() { return global.AAA_CUSTOMER_STORE; }
@@ -84,6 +86,44 @@
     return null;
   }
 
+  /**
+   * Shared per-quote card constructor — buildFollowUpDecision and
+   * listDecisions both land here, so every card on every surface is built the
+   * exact same way (same recipient resolution, same honest rationale, same
+   * schema). Caller guarantees `quote` is an OPEN quote and `score` is an
+   * ok scorer decision for it.
+   * @returns {{ok:true, card:Object}} | {{ok:false, reason:'NO_RECIPIENT'}}
+   */
+  async function buildCardFromScored(quote, score) {
+    const recipient = await recipientFor(quote);
+    if (!recipient) return { ok: false, reason: 'NO_RECIPIENT' };
+
+    const customerName = quote.customerName || null;
+    const card = {
+      decisionId: newId('dec'),
+      schemaVersion: SCHEMA_VERSION,
+      trigger: {
+        event: quote.status === 'follow_up_due' ? 'quote.follow_up_due' : 'quote.open_idle',
+        timestamp: nowISO(),
+        payload: { quoteId: quote.quoteId || quote.id || null, customerId: quote.customerId || null, customerName: customerName }
+      },
+      agent: AGENT,
+      proposal: {
+        actionType: 'SEND_COMMUNICATION',
+        channel: 'SMS',
+        templateId: TEMPLATE_ID,
+        metrics: {
+          expectedValueUSD: score.expectedValue,   // probability × customerTotal, from the scorer
+          confidenceScore: score.probability,      // 0..1, from the scorer
+          rationale: rationaleFor(score)           // honest, from score.basis
+        },
+        payload: { recipient: recipient, body: bodyFor(customerName) }
+      },
+      governance: { status: 'AWAITING_APPROVAL', policy: 'MANUAL_REVIEW_REQUIRED' }
+    };
+    return { ok: true, card: card };
+  }
+
   const Inbox = {
     /* dryRun is informational only — dispatch() does NOT consult it. There is
      * no live path in this module at all, so flipping this flag changes
@@ -124,35 +164,62 @@
         }
         if (!score || !score.ok) return { ok: false, reason: 'SCORE_FAILED' };
 
-        const recipient = await recipientFor(quote);
-        if (!recipient) return { ok: false, reason: 'NO_RECIPIENT' };
-
-        const customerName = quote.customerName || null;
-        const card = {
-          decisionId: newId('dec'),
-          schemaVersion: SCHEMA_VERSION,
-          trigger: {
-            event: quote.status === 'follow_up_due' ? 'quote.follow_up_due' : 'quote.open_idle',
-            timestamp: nowISO(),
-            payload: { quoteId: quote.quoteId || quote.id || null, customerId: quote.customerId || null, customerName: customerName }
-          },
-          agent: AGENT,
-          proposal: {
-            actionType: 'SEND_COMMUNICATION',
-            channel: 'SMS',
-            templateId: TEMPLATE_ID,
-            metrics: {
-              expectedValueUSD: score.expectedValue,   // probability × customerTotal, from the scorer
-              confidenceScore: score.probability,      // 0..1, from the scorer
-              rationale: rationaleFor(score)           // honest, from score.basis
-            },
-            payload: { recipient: recipient, body: bodyFor(customerName) }
-          },
-          governance: { status: 'AWAITING_APPROVAL', policy: 'MANUAL_REVIEW_REQUIRED' }
-        };
-        return { ok: true, card: card };
+        return await buildCardFromScored(quote, score);
       } catch (e) {
         return { ok: false, reason: String((e && e.message) || e) };
+      }
+    },
+
+    /**
+     * List every approve-able follow-up decision, ranked by expected value —
+     * the feed source for the Decision Inbox home surface. Each scored OPEN
+     * quote whose recommended action is an urgent follow-up (call_now /
+     * follow_up / send_quote at urgency 'now'/'today') becomes a full Decision
+     * Card via the SAME construction path buildFollowUpDecision uses; only
+     * schema-valid cards are returned. Build + rank ONLY: nothing here
+     * dispatches, and dispatch() itself stays dry-run — nothing is ever sent.
+     * @param {Object} [opts] { limit } max cards returned (default 6)
+     * @returns {{ ok:boolean, decisions:Object[], totalImpactUSD:number,
+     *            count:number, reason?:string }} never throws; no scorer or
+     *   quote store → { ok:false, reason:'NO_SCORER' }; no eligible quotes →
+     *   an honest { ok:true, count:0 } empty, not an error.
+     */
+    async listDecisions(opts) {
+      const none = { ok: false, decisions: [], totalImpactUSD: 0, count: 0 };
+      try {
+        const o = opts || {};
+        const limit = isNum(o.limit) && o.limit > 0 ? Math.floor(o.limit) : 6;
+        const sc = scorer();
+        const qs = quotes();
+        if (!sc || typeof sc.scoreAll !== 'function' || !qs || typeof qs.get !== 'function') {
+          return Object.assign({}, none, { reason: 'NO_SCORER' });
+        }
+        const all = await sc.scoreAll();
+        if (!all || !all.ok || !Array.isArray(all.items)) return Object.assign({}, none, { reason: 'NO_SCORER' });
+
+        // Urgent follow-ups only, ranked by expected value desc (scoreAll is
+        // already ranked — re-sort defensively so the contract can't drift).
+        const eligible = all.items.filter(function (d) {
+          return d && d.ok && ELIGIBLE_URGENCY[d.urgency] &&
+            d.recommendedAction && ELIGIBLE_ACTIONS[d.recommendedAction.id];
+        }).sort(function (a, b) { return (isNum(b.expectedValue) ? b.expectedValue : 0) - (isNum(a.expectedValue) ? a.expectedValue : 0); });
+
+        const decisions = [];
+        let totalImpactUSD = 0;
+        for (const item of eligible) {
+          if (decisions.length >= limit) break; // cap counts RETURNED cards
+          let quote = null;
+          try { quote = await qs.get(item.quoteId); } catch (_) { quote = null; }
+          if (!quote || OPEN_STATUSES.indexOf(quote.status) === -1) continue;
+          const built = await buildCardFromScored(quote, item);
+          if (!built.ok) continue; // e.g. NO_RECIPIENT — skipped honestly
+          if (!Inbox.validateDecisionSchema(built.card).valid) continue;
+          decisions.push(built.card);
+          totalImpactUSD += built.card.proposal.metrics.expectedValueUSD;
+        }
+        return { ok: true, decisions: decisions, totalImpactUSD: totalImpactUSD, count: decisions.length };
+      } catch (e) {
+        return Object.assign({}, none, { reason: String((e && e.message) || e) });
       }
     },
 
