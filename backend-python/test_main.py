@@ -119,6 +119,66 @@ class TestErrorHandling(unittest.TestCase):
         self.assertEqual(resp["error"], "SERVER_ERROR")
         self.assertIn("disk on fire", resp["detail"])
 
+    def test_storage_exception_does_not_leak_stack_trace(self):
+        """A storage failure returns the message only — never a traceback,
+        file path, or line number that would expose internals."""
+        class ExplodingStore(MemoryStorage):
+            def save(self, *a, **k):
+                raise RuntimeError("disk on fire")
+
+        status, resp, _ = call(
+            "POST", "/backup", headers=AUTH, body={"payload": {"x": 1}}, store=ExplodingStore()
+        )
+        self.assertEqual(status, 500)
+        detail = resp["detail"]
+        for artifact in ("Traceback (most recent call last)", 'File "', ".py", "line "):
+            self.assertNotIn(artifact, detail, f"stack-trace artifact leaked: {artifact!r}")
+        # The whole response, serialized, must not carry a traceback either.
+        self.assertNotIn("Traceback", json.dumps(resp))
+
+
+class TestNoWriteWithoutAuth(unittest.TestCase):
+    """An unauthenticated/forged request must never reach storage."""
+
+    class WriteTrackingStorage(MemoryStorage):
+        def __init__(self):
+            super().__init__()
+            self.saves = []
+            self.downloads = []
+
+        def save(self, name, data, content_type="application/json"):
+            self.saves.append(name)
+            super().save(name, data, content_type)
+
+        def download(self, name):
+            self.downloads.append(name)
+            return super().download(name)
+
+    def _assert_untouched(self, store):
+        self.assertEqual(store.saves, [], "unauthorized request wrote to storage")
+        self.assertEqual(store.downloads, [], "unauthorized request read from storage")
+        self.assertEqual(store.objects, {})
+
+    def test_missing_token_writes_nothing(self):
+        store = self.WriteTrackingStorage()
+        status, resp, _ = call("POST", "/backup", headers={}, body={"payload": {"jobs": [1]}}, store=store)
+        self.assertEqual(status, 401)
+        self._assert_untouched(store)
+
+    def test_wrong_token_writes_nothing(self):
+        store = self.WriteTrackingStorage()
+        status, _, _ = call("POST", "/backup", headers={"x-app-token": "wrong"}, body={"payload": {"jobs": [1]}}, store=store)
+        self.assertEqual(status, 401)
+        self._assert_untouched(store)
+
+    def test_no_server_token_writes_nothing(self):
+        env = dict(ENV)
+        env.pop("APP_TOKEN")
+        store = self.WriteTrackingStorage()
+        status, _, _ = call("POST", "/backup", headers=AUTH, body={"payload": {"jobs": [1]}}, env=env, store=store)
+        self.assertEqual(status, 401)
+        self._assert_untouched(store)
+
 
 if __name__ == "__main__":
     unittest.main()
