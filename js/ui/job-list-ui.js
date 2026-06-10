@@ -27,6 +27,12 @@
     async boot() {
       this.storage = global.AAA_LOCAL_FIRST_STORAGE;
       await this._seedIfEmpty();
+      // Open work-first: every cold launch lands in Field Mode on START
+      // MEASUREMENT (laser → capture → quote), never the executive Command
+      // deck — which has no Measure tab. Executive is one tap away via
+      // More → Switch to Executive Mode when you want to check the business.
+      if (global.AAA_APP_MODE && global.AAA_APP_MODE.set) global.AAA_APP_MODE.set('field');
+      this._landed = false;
       this._mountVoiceHud();
       if (!this._focusBound) {
         global.addEventListener('focus', () => this.render());

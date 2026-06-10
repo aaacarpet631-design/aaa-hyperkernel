@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1781133581.0475118,
-    "ast_hash": "dfbf04808bb64a2f6ad2621cebf7e062",
+    "mtime": 1781134028.6555212,
+    "ast_hash": "bacd3173eb48827c66b594eb2513adca",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
@@ -1180,8 +1180,8 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "test/run.js": {
-    "mtime": 1781133576.1660655,
-    "ast_hash": "3bda3cdb62407994718f613dd69339ed",
+    "mtime": 1781134633.5005758,
+    "ast_hash": "1c841885f02f2b54c763c6987e0d4ae3",
     "semantic_hash": ""
   },
   "test/smoke/boot.test.js": {
@@ -3467,6 +3467,11 @@
   "test/unit/decision-bundle-ui.test.js": {
     "mtime": 1781133424.1260688,
     "ast_hash": "587c4785a786125d8809a03fd2308345",
+    "semantic_hash": ""
+  },
+  "test/static/css-contracts.test.js": {
+    "mtime": 1781134697.2845743,
+    "ast_hash": "cbbe496a1b465c9cbbcd65e24c7a2870",
     "semantic_hash": ""
   }
 }
