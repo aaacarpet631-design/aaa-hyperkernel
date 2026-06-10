@@ -30,5 +30,23 @@
         ]
       }
     ]
+  },
+  "extraKnownMarketplaces": {
+    "openai-codex": {
+      "source": {
+        "source": "directory",
+        "path": "./.claude/marketplaces/openai-codex"
+      }
+    },
+    "agricidaniel-claude-obsidian": {
+      "source": {
+        "source": "directory",
+        "path": "./.claude/marketplaces/claude-obsidian"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "codex@openai-codex": true,
+    "claude-obsidian@agricidaniel-claude-obsidian": true
   }
 }
