@@ -184,7 +184,30 @@
   function startBluetoothCapture() { state.draft = blankDraft('bluetooth'); state.armField = 'length'; go('capture'); }
   function startManualCapture() { state.draft = blankDraft('manual'); state.armField = null; go('capture'); }
   function blankDraft(source) {
-    return { roomName: '', length: '', width: '', squareFeet: '', linearFeet: '', stairsCount: '', notes: '', source: source, manualOverride: false };
+    return { roomName: '', length: '', width: '', squareFeet: '', linearFeet: '', linearYards: '', stairsCount: '', notes: '', source: source, manualOverride: false };
+  }
+
+  // AAA carpet ships on a 12-ft broadloom roll; reuse the layout engine's roll
+  // width when it's loaded so there's a single source of truth.
+  function rollWidthFt() { const E = global.AAA_LAYOUT_CONSTRAINT_ENGINE; return (E && E.ROLL_WIDTH_FT) || 12; }
+  function round2(n) { return Math.round(n * 100) / 100; }
+
+  // Recompute the derived fields from whatever the tech has entered.
+  //   square feet : L×W is authoritative; otherwise fall back to a linear run
+  //                 off the 12-ft roll (linear ft × roll width). A manual
+  //                 square-feet override always wins.
+  //   linear yards: always linear ft ÷ 3 (3 ft to the yard).
+  function recalc(d, inputs) {
+    const l = parseFloat(d.length), w = parseFloat(d.width), lf = parseFloat(d.linearFeet);
+    if (!d.manualOverride) {
+      let sq = null;
+      if (isFinite(l) && isFinite(w)) sq = l * w;
+      else if (isFinite(lf)) sq = lf * rollWidthFt();
+      d.squareFeet = sq == null ? '' : String(round2(sq));
+      if (inputs.squareFeet) inputs.squareFeet.value = d.squareFeet;
+    }
+    d.linearYards = isFinite(lf) ? String(round2(lf / 3)) : '';
+    if (inputs.linearYards) inputs.linearYards.value = d.linearYards;
   }
 
   function renderCapture(body) {
@@ -225,35 +248,34 @@
       ['roomName', 'Room name', 'text', 'e.g. Living room'],
       ['length', 'Length (ft)', 'number', '0'],
       ['width', 'Width (ft)', 'number', '0'],
-      ['squareFeet', 'Square feet (auto)', 'number', 'auto from L×W'],
-      ['linearFeet', 'Linear feet', 'number', 'for stretch/repair'],
+      ['squareFeet', 'Square feet (auto)', 'number', 'auto from L×W or linear ft'],
+      ['linearFeet', 'Linear feet', 'number', 'for stretch / repair / roll order'],
+      ['linearYards', 'Linear yards (auto)', 'number', 'auto from linear ft'],
       ['stairsCount', 'Stairs', 'number', '0']
     ];
+    const derived = { linearYards: true }; // read-only, computed for the tech
     const inputs = {};
     fields.forEach(([key, label, type, ph]) => {
-      const input = ui.el('input', { className: 'aaa-input', attrs: { type: type, placeholder: ph, inputmode: type === 'number' ? 'decimal' : 'text' } });
+      const attrs = { type: type, placeholder: ph, inputmode: type === 'number' ? 'decimal' : 'text' };
+      if (derived[key]) attrs.readonly = 'readonly';
+      const input = ui.el('input', { className: 'aaa-input' + (derived[key] ? ' aaa-input--readonly' : ''), attrs: attrs });
       input.value = d[key];
       input.addEventListener('input', () => {
         d[key] = input.value;
         if (key === 'squareFeet') d.manualOverride = true;
-        if ((key === 'length' || key === 'width') && !d.manualOverride) {
-          const l = parseFloat(d.length), w = parseFloat(d.width);
-          if (isFinite(l) && isFinite(w)) { d.squareFeet = String(Math.round(l * w * 100) / 100); inputs.squareFeet.value = d.squareFeet; }
-        }
+        if (key === 'length' || key === 'width' || key === 'linearFeet') recalc(d, inputs);
       });
       inputs[key] = input;
       const wrap = ui.el('div', { className: 'aaa-form' }, [ui.el('label', { className: 'aaa-field-label', text: label }), input]);
-      // In BLE mode, each numeric field gets an "arm" button so a trigger-pull fills it.
-      if (bt && type === 'number' && key !== 'squareFeet') {
+      // In BLE mode, each typed numeric field gets an "arm" button so a
+      // trigger-pull fills it. Auto/derived fields never get one.
+      if (bt && type === 'number' && key !== 'squareFeet' && !derived[key]) {
         wrap.appendChild(ui.button({ label: 'Use laser → ' + label, size: 'sm', variant: state.armField === key ? 'success' : 'ghost', onClick: () => {
           const reading = ble().takeReading();
           if (!reading) { toast(body, 'No reading yet — pull the laser trigger first.', '#F59E0B'); return; }
           d[key] = String(reading.feet);
           input.value = d[key];
-          if ((key === 'length' || key === 'width') && !d.manualOverride) {
-            const l = parseFloat(d.length), w = parseFloat(d.width);
-            if (isFinite(l) && isFinite(w)) { d.squareFeet = String(Math.round(l * w * 100) / 100); inputs.squareFeet.value = d.squareFeet; }
-          }
+          if (key === 'length' || key === 'width' || key === 'linearFeet') recalc(d, inputs);
           toast(body, label + ' set to ' + reading.feet + ' ft', '#10B981');
         } }));
       }

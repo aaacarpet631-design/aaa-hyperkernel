@@ -63,7 +63,13 @@
       if (!state.currentJobId) {
         setStatus('No active job', '#D97706');
         els.transcript.textContent = diag() ? diag().message('NO_ACTIVE_JOB') : 'Open a job first.';
-        renderActions(['type', 'close']);
+        const body = makeBody();
+        body.appendChild(actionsRow([
+          button('⌨ Type Note', 'primary', runManual),
+          button('Close', 'ghost', function () { hideOverlay(0); })
+        ]));
+        els.overlay.appendChild(body);
+        els.body = body;
         show();
         return;
       }
@@ -241,11 +247,22 @@
     }
     function permLabel(p) { return p === 'granted' ? 'Allowed' : p === 'denied' ? 'Blocked' : p === 'prompt' ? 'Will ask' : 'Unknown'; }
 
+    // boot() is wiring-only (attaches the FAB handler at startup); open()
+    // actually launches the voice flow, the same entry as tapping the mic.
+    function boot(opts) {
+      state.currentJobId = (opts && opts.jobId) || null;
+      if (!state.initialized) { initDOM(); state.initialized = true; }
+    }
+    function open(opts) {
+      boot(opts);
+      if (!els.overlay) return { ok: false, reason: 'no_dom' };
+      handleClick();
+      return { ok: true };
+    }
+
     return {
-      boot: function (opts) {
-        state.currentJobId = (opts && opts.jobId) || null;
-        if (!state.initialized) { initDOM(); state.initialized = true; }
-      },
+      boot: boot,
+      open: open,
       updateJobId: function (jobId) { state.currentJobId = jobId; },
       // Exposed for tests / programmatic open.
       _showDiagnostic: showDiagnostic

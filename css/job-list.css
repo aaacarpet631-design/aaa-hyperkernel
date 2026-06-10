@@ -280,6 +280,8 @@ html, body {
 .aaa-input:focus { border-color: var(--red); }
 .aaa-input::placeholder { color: #6b6b73; }
 .aaa-input--error { border-color: var(--danger); }
+/* Derived/auto fields (e.g. linear yards) — read-only, visibly dimmed. */
+.aaa-input--readonly { opacity: 0.7; cursor: default; }
 .aaa-textarea { min-height: 84px; resize: vertical; font-family: inherit; }
 
 /* Loading */
