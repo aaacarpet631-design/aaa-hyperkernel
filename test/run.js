@@ -63,6 +63,7 @@ const SUITES = [
   'unit/copilot.test.js',
   'unit/sms-copilot.test.js',
   'unit/chat-canvas.test.js',
+  'unit/field-mode.test.js',
   'unit/event-stream-ui.test.js',
   'unit/privacy.test.js',
   'unit/privacy-dashboard-ui.test.js',

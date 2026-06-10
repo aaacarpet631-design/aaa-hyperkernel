@@ -3580,9 +3580,9 @@
     "semantic_hash": "23819498c1e3b3a09630f35e879aa960"
   },
   "/home/user/aaa-hyperkernel/js/ui/job-list-ui.js": {
-    "mtime": 1781065386.5384004,
-    "ast_hash": "70d311121ebc15efa6c97df5b238987a",
-    "semantic_hash": "70d311121ebc15efa6c97df5b238987a"
+    "mtime": 1781095490.1988623,
+    "ast_hash": "4e30c289b6c6dc94cc89bd56fb7ca057",
+    "semantic_hash": "4e30c289b6c6dc94cc89bd56fb7ca057"
   },
   "/home/user/aaa-hyperkernel/js/ui/knowledge-os-ui.js": {
     "mtime": 1781065386.5384004,
@@ -3880,9 +3880,9 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "/home/user/aaa-hyperkernel/test/run.js": {
-    "mtime": 1781094942.1988297,
-    "ast_hash": "955d79ef2ba7a67b5ed4b61c50060ffe",
-    "semantic_hash": "955d79ef2ba7a67b5ed4b61c50060ffe"
+    "mtime": 1781095533.7228649,
+    "ast_hash": "29d842bd5dfc60023f32c3c0c9f23d78",
+    "semantic_hash": "29d842bd5dfc60023f32c3c0c9f23d78"
   },
   "/home/user/aaa-hyperkernel/test/smoke/boot.test.js": {
     "mtime": 1781065386.5464003,
@@ -4605,9 +4605,9 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "/home/user/aaa-hyperkernel/index.html": {
-    "mtime": 1781095009.5668337,
-    "ast_hash": "a144c8058bb4e34564d54ec7c30ae3c7",
-    "semantic_hash": "a144c8058bb4e34564d54ec7c30ae3c7"
+    "mtime": 1781095505.9028633,
+    "ast_hash": "2ae9bab1849993b7e9b3e96521a38ad1",
+    "semantic_hash": "2ae9bab1849993b7e9b3e96521a38ad1"
   },
   "/home/user/aaa-hyperkernel/netlify/functions/RESEARCH.md": {
     "mtime": 1780633642.6350634,
@@ -5178,5 +5178,25 @@
     "mtime": 1781095051.4348361,
     "ast_hash": "feb29928f5dce75bde6fd3d369685690",
     "semantic_hash": "feb29928f5dce75bde6fd3d369685690"
+  },
+  "/home/user/aaa-hyperkernel/js/ui/app-mode.js": {
+    "mtime": 1781095419.174858,
+    "ast_hash": "2ba198e864deba4eeea5b7503b5ec4c8",
+    "semantic_hash": "2ba198e864deba4eeea5b7503b5ec4c8"
+  },
+  "/home/user/aaa-hyperkernel/js/ui/field-mode-home.js": {
+    "mtime": 1781095619.56687,
+    "ast_hash": "9bd150e502a83c6ddb79a2984fb4a672",
+    "semantic_hash": "9bd150e502a83c6ddb79a2984fb4a672"
+  },
+  "/home/user/aaa-hyperkernel/test/unit/field-mode.test.js": {
+    "mtime": 1781095527.1068645,
+    "ast_hash": "1dd16379f00ccc5249fe11288030870a",
+    "semantic_hash": "1dd16379f00ccc5249fe11288030870a"
+  },
+  "/home/user/aaa-hyperkernel/references/HYPERKERNEL_FIELD_MODE.md": {
+    "mtime": 1781095650.842872,
+    "ast_hash": "a1773193a4c18a14889d06175211ae85",
+    "semantic_hash": "a1773193a4c18a14889d06175211ae85"
   }
 }
