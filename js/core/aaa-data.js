@@ -30,7 +30,15 @@
     // ---- local-first entity access (source of truth) --------------------
     async list(collection) { return store().getAll(collection); },
     async get(collection, id) { return store().get(collection, id); },
-    async put(collection, id, value) { return store().put(collection, id, value); },
+    async put(collection, id, value) {
+      const r = await store().put(collection, id, value);
+      // Governance cloud persistence (additive, best-effort, non-blocking).
+      try {
+        const gs = global.AAA_GOVERNANCE_SYNC;
+        if (gs && gs.isCollection(collection) && gs.ready()) gs.mirror(collection, id, value);
+      } catch (_) {}
+      return r;
+    },
 
     listJobs() { return this.list('jobs'); },
     listCustomers() { return this.list('customers'); },
@@ -44,6 +52,9 @@
       }, extra || {});
       await store().put('outcomes', id, rec);
       this._mirrorOutcome(rec); // best-effort
+      // Governance instrumentation (additive, non-blocking): lets the bridge
+      // auto-attach this outcome to any pending agent decisions for the job.
+      try { if (global.AAA_EVENTS) global.AAA_EVENTS.emit('outcome.recorded', rec); } catch (_) {}
       return rec;
     },
 

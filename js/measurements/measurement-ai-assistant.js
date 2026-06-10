@@ -53,9 +53,12 @@
       if (!this.isReady()) {
         return { ok: true, mode: 'local', review: local, note: 'AI not configured — showing local checks only.' };
       }
+      // Governed prompt: use the registry's active version when one exists,
+      // otherwise the hardcoded SYSTEM prompt (unchanged behavior by default).
+      const system = global.AAA_PROMPT_REGISTRY ? await global.AAA_PROMPT_REGISTRY.resolve('estimator', SYSTEM) : SYSTEM;
       const res = await data().callAgent({
         agent: 'measurement_assistant', model: 'claude-opus-4-8', max_tokens: 900,
-        system: SYSTEM,
+        system: system,
         output_config: { format: { type: 'json_schema', schema: REVIEW_SCHEMA } },
         messages: [{ role: 'user', content:
           'JOB CONTEXT: ' + JSON.stringify(context || {}) +
@@ -71,7 +74,24 @@
       parsed.reviewRequired = true; // enforce, regardless of model output
       // Fold in local hard-warnings so nothing the deterministic checks caught is lost.
       parsed.unrealistic = dedupe((parsed.unrealistic || []).concat(local.unrealistic));
-      return { ok: true, mode: 'ai', review: parsed };
+
+      // Governance measurement (Phase 2): record the estimator's review as a
+      // measured decision so the job's real outcome (won/lost) can attach to it.
+      // Advisory-only and non-blocking — the human still confirms pricing.
+      let decisionId = null;
+      const ctx = context || {};
+      if (global.AAA_GOVERNANCE_BRIDGE) {
+        try {
+          const md = await global.AAA_GOVERNANCE_BRIDGE.measure('estimator', {
+            agentId: 'measurement_assistant', subjectType: 'job', subjectId: ctx.jobId || null,
+            jobId: ctx.jobId || null, customerId: ctx.customerId || null,
+            confidence: parsed.quoteConfidence, recommendation: parsed.repairVsReplace || parsed.fieldNotesSummary || 'measurement review',
+            sourceModule: 'measurement-ai-assistant'
+          });
+          if (md && md.decision) decisionId = md.decision.decisionId;
+        } catch (_) { /* additive */ }
+      }
+      return { ok: true, mode: 'ai', review: parsed, governanceDecisionId: decisionId };
     },
 
     /** Deterministic, offline checks — always run, no network needed. */

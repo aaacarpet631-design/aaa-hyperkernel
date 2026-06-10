@@ -76,6 +76,10 @@
       if (!agent) return { ok: false, error: 'UNKNOWN_AGENT', roleId: roleId };
       if (!this.isReady()) return { ok: false, error: 'AI_NOT_CONFIGURED', roleId: roleId };
 
+      // Governed prompt: use the registry's active version for this role when
+      // one exists, otherwise the agent's built-in system prompt (unchanged).
+      const system = global.AAA_PROMPT_REGISTRY ? await global.AAA_PROMPT_REGISTRY.resolve(roleId, agent.system) : agent.system;
+
       // Task-aware model routing (adds the Haiku tier for cheap task kinds);
       // with no taskKind this returns the agent's declared model unchanged.
       const routed = router() ? router().forAgent(agent.model, opts && opts.taskKind) : { model: agent.model, reason: 'no router' };
@@ -84,7 +88,7 @@
         agent: roleId,
         model: routed.model,
         max_tokens: 700,
-        system: agent.system,
+        system: system,
         output_config: { format: { type: 'json_schema', schema: reg.DECISION_SCHEMA } },
         messages: [{ role: 'user', content: buildUserPrompt(task, context) }]
       });
@@ -157,11 +161,12 @@
 
       // CEO synthesis over the collected opinions.
       const ceo = reg.get('ceo');
+      const ceoSystem = global.AAA_PROMPT_REGISTRY ? await global.AAA_PROMPT_REGISTRY.resolve('ceo', ceo.system) : ceo.system;
       const synthRes = await data().callAgent({
         agent: 'ceo',
         model: ceo.model,
         max_tokens: 800,
-        system: ceo.system,
+        system: ceoSystem,
         output_config: { format: { type: 'json_schema', schema: reg.DECISION_SCHEMA } },
         messages: [{ role: 'user', content:
           'MEETING TOPIC:\n' + topic +

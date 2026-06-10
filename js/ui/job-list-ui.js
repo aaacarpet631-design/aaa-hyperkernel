@@ -365,10 +365,29 @@
       s.body.innerHTML = '';
       if (!res || !res.ok) { s.body.appendChild(ui.el('p', { className: 'aaa-dialog__message', text: 'Could not prepare a review request.' })); return; }
       const rec = res.review;
+
+      // Content-safety gate (fail-closed): an AI-drafted message that was
+      // blocked (flagged unsafe) or queued (couldn't be verified) does NOT get
+      // one-tap send. No direct override here — the human must open the
+      // Governance review flow, where an Admin can override with justification.
+      if (rec.status === 'blocked' || rec.status === 'queued') {
+        s.body.appendChild(this._safetyBanner(rec));
+        s.body.appendChild(ui.el('label', { className: 'aaa-field-label', text: 'Drafted message (held for review — not sent)' }));
+        s.body.appendChild(ui.el('div', { className: 'aaa-input aaa-textarea', style: { whiteSpace: 'pre-wrap', opacity: '0.85' }, text: rec.message || '' }));
+        const reviewBtn = ui.button({ label: '🛡 Review Safety Decision', variant: 'secondary', full: true, onClick: () => { s.close(); this._governanceReview(rec); } });
+        s.body.appendChild(reviewBtn);
+        return;
+      }
+
       const msg = ui.el('textarea', { className: 'aaa-input aaa-textarea' });
       msg.value = rec.message || '';
       s.body.appendChild(ui.el('label', { className: 'aaa-field-label', text: 'Message (edit if you like)' }));
       s.body.appendChild(msg);
+      // Unobtrusive governance measurement indicator on this agent-drafted output.
+      if (rec.governanceDecisionId && global.AAA_GOV_BADGE) {
+        const b = global.AAA_GOV_BADGE.badge(rec.governanceDecisionId);
+        if (b) s.body.appendChild(b);
+      }
 
       function links() { return engine.links(Object.assign({}, rec, { message: msg.value })); }
       const smsA = ui.el('a', { className: 'aaa-btn aaa-btn--primary aaa-btn--full', text: '✉ Send via SMS', attrs: { role: 'button' } });
@@ -383,6 +402,124 @@
       } });
       s.body.appendChild(smsA); s.body.appendChild(mailA); s.body.appendChild(copyBtn);
       if (!rec.phone) s.body.appendChild(ui.el('p', { className: 'aaa-empty', text: 'No phone on file — add one to the customer for one-tap SMS.' }));
+    },
+
+    /** Admin banner explaining why an AI-drafted review message was held. */
+    _safetyBanner(rec) {
+      const ui = UI();
+      const sf = rec.safety || {};
+      const blocked = rec.status === 'blocked';
+      const color = blocked ? 'var(--red)' : 'var(--warning)';
+      const title = blocked
+        ? '⛔ Blocked by content safety'
+        : '⏳ Held for review — safety could not be verified';
+      const reason = blocked
+        ? ('Flagged unsafe' + (sf.categories && sf.categories.length ? ' (' + sf.categories.join(', ') + ')' : '') + '.')
+        : ('Verdict: ' + (sf.verdict || 'unknown') + (sf.error ? ' — ' + sf.error : '') + '. Not auto-sent.');
+      const when = sf.checkedAt ? new Date(sf.checkedAt).toLocaleString() : '';
+      return ui.el('div', {
+        attrs: { role: 'alert' },
+        style: {
+          border: '1px solid ' + color, borderLeft: '4px solid ' + color,
+          background: 'rgba(0,0,0,0.03)', borderRadius: '8px',
+          padding: '10px 12px', margin: '0 0 12px 0'
+        }
+      }, [
+        ui.el('strong', { text: title, style: { color: color, display: 'block', marginBottom: '4px' } }),
+        ui.el('p', { className: 'aaa-dialog__message', text: reason, style: { margin: '0 0 4px 0' } }),
+        ui.el('p', { className: 'aaa-empty', text: 'Model: ' + (sf.model || 'content-safety') + (when ? ' · ' + when : '') + ' · ref ' + (sf.messageContextId || rec.id), style: { margin: '0', fontSize: '11px' } })
+      ]);
+    },
+
+    /**
+     * Governance review & override flow. Shows the full safety verdict and,
+     * for an Admin (owner), a justified-override path that merely UNLOCKS the
+     * Send button — the human must then explicitly send. Everything is audited
+     * by AAA_GOVERNANCE_ENGINE; this UI only presents it.
+     */
+    async _governanceReview(rec) {
+      const ui = UI();
+      const gov = global.AAA_GOVERNANCE_ENGINE;
+      const sf = rec.safety || {};
+      const s = ui.sheet({ title: 'Review Safety Decision', subtitle: (rec.customerName || 'Customer') + ' · ' + (rec.status === 'blocked' ? 'Blocked' : 'Queued') });
+      document.body.appendChild(s.overlay);
+      s.body.appendChild(this._safetyBanner(rec));
+
+      // Full decision detail: draft, verdict, categories, raw, model, time.
+      const caseRec = (gov && gov.getCase && sf.governanceCaseId) ? await gov.getCase(sf.governanceCaseId) : null;
+      const detail = (k, v) => ui.el('div', { className: 'aaa-list-sub', html: '<strong>' + k + ':</strong> ' + (v == null || v === '' ? '—' : String(v).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]))) });
+      s.body.appendChild(ui.el('label', { className: 'aaa-field-label', text: 'Original draft' }));
+      s.body.appendChild(ui.el('div', { className: 'aaa-input aaa-textarea', style: { whiteSpace: 'pre-wrap' }, text: rec.message || '' }));
+      s.body.appendChild(detail('Verdict', sf.verdict));
+      s.body.appendChild(detail('Categories', (sf.categories || []).join(', ')));
+      s.body.appendChild(detail('Model', sf.model));
+      s.body.appendChild(detail('Decision', sf.decision + (sf.error ? ' (' + sf.error + ')' : '')));
+      s.body.appendChild(detail('Checked at', sf.checkedAt ? new Date(sf.checkedAt).toLocaleString() : ''));
+      s.body.appendChild(detail('Message ref', sf.messageContextId || rec.id));
+      s.body.appendChild(detail('Raw response', typeof sf.raw === 'string' ? sf.raw : JSON.stringify(sf.raw || {})));
+
+      const sendHost = ui.el('div', {});
+      const canOverride = !!(gov && gov.canOverride && gov.canOverride());
+
+      // Already overridden? Go straight to the (still explicit) send controls.
+      if (caseRec && caseRec.status === 'overridden') {
+        s.body.appendChild(ui.el('p', { className: 'aaa-dialog__message', text: 'Override on record. Sending is unlocked but still manual.' }));
+        this._renderSendControls(sendHost, rec, caseRec.id);
+        s.body.appendChild(sendHost);
+        return;
+      }
+
+      if (!canOverride) {
+        s.body.appendChild(ui.el('p', { className: 'aaa-empty', text: 'Only an Admin (Owner) can override this decision. It will remain held for review.' }));
+        return;
+      }
+      if (!gov || !sf.governanceCaseId) {
+        s.body.appendChild(ui.el('p', { className: 'aaa-empty', text: 'Governance record unavailable — cannot override here.' }));
+        return;
+      }
+
+      // Admin override: mandatory justification (min chars), then unlock send.
+      s.body.appendChild(ui.el('label', { className: 'aaa-field-label', text: 'Override justification (required, min ' + gov.MIN_REASON + ' characters)' }));
+      const reason = ui.el('textarea', { className: 'aaa-input aaa-textarea', attrs: { placeholder: 'Explain why this message is safe to send despite the flag…' } });
+      s.body.appendChild(reason);
+      const counter = ui.el('p', { className: 'aaa-empty', text: '0 / ' + gov.MIN_REASON });
+      s.body.appendChild(counter);
+      const overrideBtn = ui.button({ label: 'Override & unlock Send', variant: 'danger', full: true, disabled: true });
+      const msg = ui.el('p', { className: 'aaa-dialog__message' });
+      reason.addEventListener('input', () => {
+        const n = reason.value.trim().length;
+        counter.textContent = n + ' / ' + gov.MIN_REASON;
+        overrideBtn.disabled = n < gov.MIN_REASON;
+      });
+      overrideBtn.addEventListener('click', async () => {
+        overrideBtn.disabled = true; msg.textContent = 'Recording override…';
+        const res = await gov.requestOverride(sf.governanceCaseId, { reason: reason.value });
+        if (!res || !res.ok) { msg.textContent = res && res.error === 'JUSTIFICATION_REQUIRED' ? 'A longer justification is required.' : ('Override failed: ' + ((res && res.error) || 'unknown')); overrideBtn.disabled = false; return; }
+        reason.disabled = true; overrideBtn.style.display = 'none';
+        msg.textContent = '✅ Override recorded and audited. Sending is unlocked — you must still send manually.';
+        if (res.alert) s.body.appendChild(ui.el('p', { className: 'aaa-empty', text: '⚠ ' + res.alert.message }));
+        this._renderSendControls(sendHost, rec, sf.governanceCaseId);
+      });
+      s.body.appendChild(overrideBtn);
+      s.body.appendChild(msg);
+      s.body.appendChild(sendHost);
+    },
+
+    /** Device-native send buttons that record an explicit, audited Send. */
+    _renderSendControls(host, rec, caseId) {
+      const ui = UI();
+      const engine = global.AAA_REVIEW_REQUEST_ENGINE;
+      host.innerHTML = '';
+      const links = engine.links(rec);
+      const markSent = async (channel) => {
+        await engine.markSent(rec.id, channel);
+        try { if (global.AAA_GOVERNANCE_ENGINE && global.AAA_GOVERNANCE_ENGINE.recordSent) await global.AAA_GOVERNANCE_ENGINE.recordSent(caseId, { channel: channel }); } catch (_) {}
+      };
+      const smsA = ui.el('a', { className: 'aaa-btn aaa-btn--primary aaa-btn--full', text: '✉ Send via SMS', attrs: { role: 'button', href: links.sms } });
+      const mailA = ui.el('a', { className: 'aaa-btn aaa-btn--secondary aaa-btn--full', text: '✉ Send via Email', attrs: { role: 'button', href: links.email } });
+      smsA.addEventListener('click', () => markSent('sms'));
+      mailA.addEventListener('click', () => markSent('email'));
+      host.appendChild(smsA); host.appendChild(mailA);
     },
 
     async _recordOutcome(jobId, result) {

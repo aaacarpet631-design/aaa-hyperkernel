@@ -216,6 +216,55 @@ drop policy if exists wm_self on public.workspace_members;
 create policy wm_self on public.workspace_members
   using (user_id = auth.uid() or public.is_member(workspace_id));
 
+-- ---- Governance subsystem (schemaless mirror) ------------------------------
+-- One JSONB table holds every governance collection (decisions, outcomes,
+-- scorecards, escalations, the audit ledger, the prompt registry, …), keyed by
+-- (workspace_id, collection, doc_id) — the Postgres equivalent of the Firestore
+-- workspace subcollections. Server-enforced integrity mirrors firestore.rules.
+create table if not exists public.governance_store (
+  workspace_id uuid not null references public.workspaces(id) on delete cascade,
+  collection   text not null,
+  doc_id       text not null,
+  data         jsonb not null default '{}'::jsonb,
+  updated_at   timestamptz not null default now(),
+  primary key (workspace_id, collection, doc_id)
+);
+create index if not exists idx_governance_store_ws_col on public.governance_store(workspace_id, collection);
+
+create or replace function public.is_owner(ws uuid) returns boolean
+language sql stable as $$
+  select exists (
+    select 1 from public.workspace_members m
+    where m.workspace_id = ws and m.user_id = auth.uid() and m.role = 'owner'
+  );
+$$;
+
+alter table public.governance_store enable row level security;
+
+-- Members read everything in their workspace (runtime prompt resolution, dashboards).
+drop policy if exists gov_select on public.governance_store;
+create policy gov_select on public.governance_store for select
+  using (public.is_member(workspace_id));
+
+-- Members may append; only the owner may create prompt-registry rows.
+drop policy if exists gov_insert on public.governance_store;
+create policy gov_insert on public.governance_store for insert
+  with check (public.is_member(workspace_id)
+    and (collection <> 'gov_prompt_registry' or public.is_owner(workspace_id)));
+
+-- The audit ledger is append-only (no updates); the prompt registry is owner-write.
+drop policy if exists gov_update on public.governance_store;
+create policy gov_update on public.governance_store for update
+  using (public.is_member(workspace_id) and collection <> 'governance_audit'
+    and (collection <> 'gov_prompt_registry' or public.is_owner(workspace_id)))
+  with check (public.is_member(workspace_id) and collection <> 'governance_audit'
+    and (collection <> 'gov_prompt_registry' or public.is_owner(workspace_id)));
+
+-- Only the owner may delete, and never from the immutable ledger.
+drop policy if exists gov_delete on public.governance_store;
+create policy gov_delete on public.governance_store for delete
+  using (public.is_owner(workspace_id) and collection <> 'governance_audit');
+
 -- NOTE: server-side agents write via the claude-proxy edge function using the
 -- service-role key, which bypasses RLS. Browser clients must be signed in
 -- (Supabase Auth) and a member of the workspace. See SETUP.md.

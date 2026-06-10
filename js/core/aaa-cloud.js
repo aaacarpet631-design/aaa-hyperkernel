@@ -37,10 +37,10 @@
     },
     isConfigured() { return this.provider() != null; },
 
-    async callProxy(payload) {
+    async callProxy(payload, url) {
       const p = this.provider();
-      if (p === 'firebase') return global.AAA_FIREBASE.callProxy(payload);
-      if (p === 'supabase') return global.AAA_SUPABASE.callProxy(payload);
+      if (p === 'firebase') return global.AAA_FIREBASE.callProxy(payload, url);
+      if (p === 'supabase') return global.AAA_SUPABASE.callProxy(payload, url);
       return { ok: false, error: 'PROXY_NOT_CONFIGURED' };
     },
 
@@ -50,6 +50,29 @@
       if (p === 'firebase') return global.AAA_FIREBASE.upsertEntity(collection, clientId, Object.assign({ clientId: clientId }, entity));
       if (p === 'supabase') return global.AAA_SUPABASE.upsert(collection, [supabaseRow(collection, clientId, entity)], 'workspace_id,client_id');
       return { ok: false, error: 'NOT_CONFIGURED' };
+    },
+
+    /** List a workspace-scoped collection (for governance hydrate/pull). Firebase only. */
+    async listEntities(collection) {
+      const p = this.provider();
+      if (p === 'firebase') return global.AAA_FIREBASE.listEntities(collection);
+      return { ok: false, error: 'NOT_SUPPORTED', provider: p };
+    },
+
+    /** Mirror one governance record up (Firestore subcollection or Supabase governance_store). */
+    async upsertGovernance(collection, id, rec) {
+      const p = this.provider();
+      if (p === 'firebase') return global.AAA_FIREBASE.upsertEntity(collection, id, rec);
+      if (p === 'supabase') return global.AAA_SUPABASE.upsertGovernance(collection, id, rec);
+      return { ok: false, error: 'NOT_CONFIGURED' };
+    },
+
+    /** Read a governance collection back (Firestore subcollection or Supabase governance_store). */
+    async listGovernance(collection) {
+      const p = this.provider();
+      if (p === 'firebase') return global.AAA_FIREBASE.listEntities(collection);
+      if (p === 'supabase') return global.AAA_SUPABASE.listGovernance(collection);
+      return { ok: false, error: 'NOT_SUPPORTED', provider: p };
     },
 
     /** Append an event (auto-id) — for logs / kpi snapshots. */
