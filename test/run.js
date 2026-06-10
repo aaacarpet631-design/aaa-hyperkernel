@@ -18,6 +18,7 @@ const SUITES = [
   'unit/eval-golden.test.js',
   'unit/outcome-spine.test.js',
   'unit/pricing.test.js',
+  'unit/price-book.test.js',
   'unit/huepar-s60.test.js',
   'unit/capture-sequencer.test.js',
   'unit/bluetooth-connect.test.js',
