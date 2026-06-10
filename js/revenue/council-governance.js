@@ -22,7 +22,7 @@
   'use strict';
 
   const COLLECTION = 'council_recommendations';
-  const DOMAINS = ['revenue', 'innovation'];
+  const DOMAINS = ['revenue', 'innovation', 'strategy'];
 
   function cfg() { return global.AAA_CONFIG || {}; }
   function data() { return global.AAA_DATA; }
@@ -44,6 +44,7 @@
     const recSchema = { type: 'object', required: ['recId'], properties: { recId: { type: 'string' }, council: { type: 'string' }, action: { type: 'string' } } };
     b.define('revenue.recommendation_proposed', { version: 1, description: 'Revenue Council recommendation awaiting governance.', schema: recSchema });
     b.define('innovation.recommendation_proposed', { version: 1, description: 'Innovation Council recommendation awaiting governance.', schema: recSchema });
+    b.define('strategy.recommendation_proposed', { version: 1, description: 'Teleological goal-pursuit recommendation awaiting governance.', schema: recSchema });
     b.define('policy.change_approved', { version: 1, description: 'A council recommendation was approved by a human.', schema: { type: 'object', required: ['recId'], properties: { recId: { type: 'string' }, domain: { type: 'string' } } } });
     b.define('policy.change_applied', { version: 1, description: 'An approved council change was applied to production.', schema: { type: 'object', required: ['recId'], properties: { recId: { type: 'string' }, domain: { type: 'string' } } } });
   }

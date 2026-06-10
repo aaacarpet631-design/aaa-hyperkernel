@@ -1,21 +1,22 @@
 # Graph Report - .  (2026-06-10)
 
 ## Corpus Check
-- Large corpus: 563 files · ~493,593 words. Semantic extraction will be expensive (many Claude tokens). Consider running on a subfolder.
+- Large corpus: 603 files · ~512,586 words. Semantic extraction will be expensive (many Claude tokens). Consider running on a subfolder.
 
 ## Summary
-- 4467 nodes · 8831 edges · 305 communities (272 shown, 33 thin omitted)
+- 4785 nodes · 9355 edges · 343 communities (305 shown, 38 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 34 edges (avg confidence: 0.81)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
 - [[_COMMUNITY_Unit Audit Ledger|Unit Audit Ledger]]
 - [[_COMMUNITY_Intelligence Prediction Closure|Intelligence Prediction Closure]]
-- [[_COMMUNITY_Accounting Expense Classifier|Accounting Expense Classifier]]
 - [[_COMMUNITY_Intelligence Vector Memory|Intelligence Vector Memory]]
-- [[_COMMUNITY_Unit Content Safety|Unit Content Safety]]
+- [[_COMMUNITY_Intelligence Executive Council|Intelligence Executive Council]]
+- [[_COMMUNITY_Unit Review Safety|Unit Review Safety]]
 - [[_COMMUNITY_Asyncapi Events|Asyncapi Events]]
 - [[_COMMUNITY_Transport Transport Core|Transport Transport Core]]
+- [[_COMMUNITY_Accounting Expense Classifier|Accounting Expense Classifier]]
 - [[_COMMUNITY_Core Privacy|Core Privacy]]
 - [[_COMMUNITY_Unit Bluetooth Connect|Unit Bluetooth Connect]]
 - [[_COMMUNITY_Command Center|Command Center]]
@@ -33,7 +34,6 @@
 - [[_COMMUNITY_Intelligence Outcome Intelligence|Intelligence Outcome Intelligence]]
 - [[_COMMUNITY_Core Event|Core Event]]
 - [[_COMMUNITY_Governance Governance Escalation|Governance Governance Escalation]]
-- [[_COMMUNITY_Intelligence Executive Council|Intelligence Executive Council]]
 - [[_COMMUNITY_Intelligence Financial Intelligence|Intelligence Financial Intelligence]]
 - [[_COMMUNITY_Intelligence Governance Registry|Intelligence Governance Registry]]
 - [[_COMMUNITY_Intelligence Proposal Engine|Intelligence Proposal Engine]]
@@ -69,8 +69,11 @@
 - [[_COMMUNITY_Functions Governance Alert|Functions Governance Alert]]
 - [[_COMMUNITY_Genesis Genesis Council|Genesis Genesis Council]]
 - [[_COMMUNITY_Intelligence Eval Golden|Intelligence Eval Golden]]
+- [[_COMMUNITY_Intelligence Goal Engine|Intelligence Goal Engine]]
+- [[_COMMUNITY_Revenue Council Governance|Revenue Council Governance]]
 - [[_COMMUNITY_Simulation Simulation Governance|Simulation Simulation Governance]]
 - [[_COMMUNITY_Governance Registry|Governance Registry]]
+- [[_COMMUNITY_Accounting Controller Agent|Accounting Controller Agent]]
 - [[_COMMUNITY_Genesis Banned Capability|Genesis Banned Capability]]
 - [[_COMMUNITY_Ai Sidekick Voice|Ai Sidekick Voice]]
 - [[_COMMUNITY_Contracts Contract Store|Contracts Contract Store]]
@@ -95,7 +98,6 @@
 - [[_COMMUNITY_Intelligence Intelligence Collectors|Intelligence Intelligence Collectors]]
 - [[_COMMUNITY_Leads Lead Store|Leads Lead Store]]
 - [[_COMMUNITY_Package Scripts Test|Package Scripts Test]]
-- [[_COMMUNITY_Providers Private Gpu|Providers Private Gpu]]
 - [[_COMMUNITY_Simulation Simulation Ledger|Simulation Simulation Ledger]]
 - [[_COMMUNITY_Transport Transport Adapters|Transport Transport Adapters]]
 - [[_COMMUNITY_Replay Sandbox|Replay Sandbox]]
@@ -127,10 +129,13 @@
 - [[_COMMUNITY_Pricing Optimizer|Pricing Optimizer]]
 - [[_COMMUNITY_Transport Inbox|Transport Inbox]]
 - [[_COMMUNITY_Core Runtime|Core Runtime]]
+- [[_COMMUNITY_Innovation Experiment Registry|Innovation Experiment Registry]]
+- [[_COMMUNITY_Innovation Opportunity Registry|Innovation Opportunity Registry]]
 - [[_COMMUNITY_Intelligence Analyst Rankings|Intelligence Analyst Rankings]]
 - [[_COMMUNITY_Intelligence Intelligence Meetings|Intelligence Intelligence Meetings]]
 - [[_COMMUNITY_Intelligence Intelligence Pipeline|Intelligence Intelligence Pipeline]]
 - [[_COMMUNITY_Intelligence Prediction Actual|Intelligence Prediction Actual]]
+- [[_COMMUNITY_Revenue Creative Evolution|Revenue Creative Evolution]]
 - [[_COMMUNITY_Scheduling Schedule Store|Scheduling Schedule Store]]
 - [[_COMMUNITY_Agent Council|Agent Council]]
 - [[_COMMUNITY_Agent Evaluation|Agent Evaluation]]
@@ -141,9 +146,11 @@
 - [[_COMMUNITY_Agents Challenge Protocol|Agents Challenge Protocol]]
 - [[_COMMUNITY_Functions Governance Verify|Functions Governance Verify]]
 - [[_COMMUNITY_Genesis Capability Registry|Genesis Capability Registry]]
+- [[_COMMUNITY_Innovation Technology Scout|Innovation Technology Scout]]
 - [[_COMMUNITY_Intelligence Signal Derivation|Intelligence Signal Derivation]]
 - [[_COMMUNITY_Intelligence Supervisor Council|Intelligence Supervisor Council]]
 - [[_COMMUNITY_Legal Legal Risk|Legal Legal Risk]]
+- [[_COMMUNITY_Revenue Competitor Intelligence|Revenue Competitor Intelligence]]
 - [[_COMMUNITY_Business Digital|Business Digital]]
 - [[_COMMUNITY_Closure Hud|Closure Hud]]
 - [[_COMMUNITY_Privacy Dashboard|Privacy Dashboard]]
@@ -169,6 +176,7 @@
 - [[_COMMUNITY_Core Local First|Core Local First]]
 - [[_COMMUNITY_Genesis Failure Pattern|Genesis Failure Pattern]]
 - [[_COMMUNITY_Genesis Spawn Policy|Genesis Spawn Policy]]
+- [[_COMMUNITY_Innovation Business Model|Innovation Business Model]]
 - [[_COMMUNITY_Portal Proxy Index|Portal Proxy Index]]
 - [[_COMMUNITY_Providers Nvidia Nemotron|Providers Nvidia Nemotron]]
 - [[_COMMUNITY_Qbo Proxy Package|Qbo Proxy Package]]
@@ -182,6 +190,7 @@
 - [[_COMMUNITY_Schedule|Schedule]]
 - [[_COMMUNITY_Transport Dashboard|Transport Dashboard]]
 - [[_COMMUNITY_Agents Supervisor|Agents Supervisor]]
+- [[_COMMUNITY_Innovation Venture Discovery|Innovation Venture Discovery]]
 - [[_COMMUNITY_Intelligence Ai Operations|Intelligence Ai Operations]]
 - [[_COMMUNITY_Intelligence Debate Engine|Intelligence Debate Engine]]
 - [[_COMMUNITY_Intelligence Intelligence Scorecard|Intelligence Intelligence Scorecard]]
@@ -197,6 +206,10 @@
 - [[_COMMUNITY_Functions Package Dependencies|Functions Package Dependencies]]
 - [[_COMMUNITY_Governance Governance Sync|Governance Governance Sync]]
 - [[_COMMUNITY_Manifest|Manifest]]
+- [[_COMMUNITY_Revenue Demand Pulse|Revenue Demand Pulse]]
+- [[_COMMUNITY_Revenue Market Intelligence|Revenue Market Intelligence]]
+- [[_COMMUNITY_Revenue Silence Analyzer|Revenue Silence Analyzer]]
+- [[_COMMUNITY_Revenue Win Probability|Revenue Win Probability]]
 - [[_COMMUNITY_Services Raw Reading|Services Raw Reading]]
 - [[_COMMUNITY_Transport Template Registry|Transport Template Registry]]
 - [[_COMMUNITY_Kit|Kit]]
@@ -208,7 +221,12 @@
 - [[_COMMUNITY_Portal Proxy Package|Portal Proxy Package]]
 - [[_COMMUNITY_Genesis Capability Marketplace|Genesis Capability Marketplace]]
 - [[_COMMUNITY_Genesis Termination Engine|Genesis Termination Engine]]
+- [[_COMMUNITY_Innovation Innovation Council|Innovation Innovation Council]]
 - [[_COMMUNITY_Nemotron Proxy Index|Nemotron Proxy Index]]
+- [[_COMMUNITY_Revenue Margin Guardian|Revenue Margin Guardian]]
+- [[_COMMUNITY_Revenue Neighborhood Opportunity|Revenue Neighborhood Opportunity]]
+- [[_COMMUNITY_Revenue Search Intent|Revenue Search Intent]]
+- [[_COMMUNITY_Revenue Trust Gap|Revenue Trust Gap]]
 - [[_COMMUNITY_Rules Firebase Emulators|Rules Firebase Emulators]]
 - [[_COMMUNITY_Simulation Monte Carlo|Simulation Monte Carlo]]
 - [[_COMMUNITY_Quote Win|Quote Win]]
@@ -216,7 +234,11 @@
 - [[_COMMUNITY_Agents Agent Marketplace|Agents Agent Marketplace]]
 - [[_COMMUNITY_Customers Customer Store|Customers Customer Store]]
 - [[_COMMUNITY_Genesis Agent Factory|Genesis Agent Factory]]
+- [[_COMMUNITY_Innovation Automation Discovery|Innovation Automation Discovery]]
 - [[_COMMUNITY_Intelligence Signal Quality|Intelligence Signal Quality]]
+- [[_COMMUNITY_Revenue Referral Engine|Revenue Referral Engine]]
+- [[_COMMUNITY_Revenue Reputation Engine|Revenue Reputation Engine]]
+- [[_COMMUNITY_Revenue Review Velocity|Revenue Review Velocity]]
 - [[_COMMUNITY_Rules Rules Test|Rules Rules Test]]
 - [[_COMMUNITY_Services Measurement Parser|Services Measurement Parser]]
 - [[_COMMUNITY_Transport Providers|Transport Providers]]
@@ -230,6 +252,9 @@
 - [[_COMMUNITY_Functions Sync|Functions Sync]]
 - [[_COMMUNITY_Functions Transport Webhook|Functions Transport Webhook]]
 - [[_COMMUNITY_Governance Governance Bridge|Governance Governance Bridge]]
+- [[_COMMUNITY_Intelligence Resource Allocator|Intelligence Resource Allocator]]
+- [[_COMMUNITY_Revenue Revenue Dashboard|Revenue Revenue Dashboard]]
+- [[_COMMUNITY_Revenue Timing Engine|Revenue Timing Engine]]
 - [[_COMMUNITY_Simulation Strategy Scorecard|Simulation Strategy Scorecard]]
 - [[_COMMUNITY_Test Run Rules|Test Run Rules]]
 - [[_COMMUNITY_Hermes Console|Hermes Console]]
@@ -256,6 +281,7 @@
 - [[_COMMUNITY_Unit Replay Sandbox|Unit Replay Sandbox]]
 - [[_COMMUNITY_Unit Security|Unit Security]]
 - [[_COMMUNITY_Unit Sensing|Unit Sensing]]
+- [[_COMMUNITY_Unit Teleological Test|Unit Teleological Test]]
 - [[_COMMUNITY_Unit Transport Dashboard|Unit Transport Dashboard]]
 - [[_COMMUNITY_Unit Transport Inbox|Unit Transport Inbox]]
 - [[_COMMUNITY_Unit Vector Memory|Unit Vector Memory]]
@@ -266,34 +292,45 @@
 - [[_COMMUNITY_Functions Transport Send|Functions Transport Send]]
 - [[_COMMUNITY_Genesis Capability Roi|Genesis Capability Roi]]
 - [[_COMMUNITY_Governance Governance Integrity|Governance Governance Integrity]]
+- [[_COMMUNITY_Innovation Adjacency Mapper|Innovation Adjacency Mapper]]
+- [[_COMMUNITY_Intelligence Teleological Schema|Intelligence Teleological Schema]]
+- [[_COMMUNITY_Revenue Authority Builder|Revenue Authority Builder]]
+- [[_COMMUNITY_Revenue Proof Assembly|Revenue Proof Assembly]]
 - [[_COMMUNITY_Test Package|Test Package]]
 - [[_COMMUNITY_Governance Badge|Governance Badge]]
 - [[_COMMUNITY_Unit Capability Economy|Unit Capability Economy]]
 - [[_COMMUNITY_Unit Estimator|Unit Estimator]]
 - [[_COMMUNITY_Unit Financial Intelligence|Unit Financial Intelligence]]
+- [[_COMMUNITY_Unit Innovation Council|Unit Innovation Council]]
 - [[_COMMUNITY_Unit Legal War|Unit Legal War]]
 - [[_COMMUNITY_Unit Outcome Learning|Unit Outcome Learning]]
 - [[_COMMUNITY_Unit Pricing Optimizer|Unit Pricing Optimizer]]
 - [[_COMMUNITY_Unit Quote Lifecycle|Unit Quote Lifecycle]]
+- [[_COMMUNITY_Unit Revenue Council|Unit Revenue Council]]
 - [[_COMMUNITY_Agents Marketing Intel|Agents Marketing Intel]]
 - [[_COMMUNITY_Claude Proxy Index|Claude Proxy Index]]
 - [[_COMMUNITY_Functions Vision|Functions Vision]]
 - [[_COMMUNITY_Genesis Agent Template|Genesis Agent Template]]
+- [[_COMMUNITY_Innovation Innovation Dashboard|Innovation Innovation Dashboard]]
 - [[_COMMUNITY_Intelligence Causal Learning|Intelligence Causal Learning]]
 - [[_COMMUNITY_Intelligence Signal Freshness|Intelligence Signal Freshness]]
+- [[_COMMUNITY_Revenue Budget Physics|Revenue Budget Physics]]
+- [[_COMMUNITY_Revenue Followup Intelligence|Revenue Followup Intelligence]]
+- [[_COMMUNITY_Revenue Objection Forecast|Revenue Objection Forecast]]
 - [[_COMMUNITY_Unit Calibration Runtime|Unit Calibration Runtime]]
+- [[_COMMUNITY_Unit Content Safety|Unit Content Safety]]
 - [[_COMMUNITY_Unit Genesis Foundry|Unit Genesis Foundry]]
 - [[_COMMUNITY_Unit Governance Bridge|Unit Governance Bridge]]
-- [[_COMMUNITY_Unit Governance Business|Unit Governance Business]]
-- [[_COMMUNITY_Unit Governance Sync|Unit Governance Sync]]
-- [[_COMMUNITY_Unit Hermes Gateway|Unit Hermes Gateway]]
+- [[_COMMUNITY_Unit Prediction Closure|Unit Prediction Closure]]
 - [[_COMMUNITY_Unit Simulation Council|Unit Simulation Council]]
-- [[_COMMUNITY_Unit Transport Scheduler|Unit Transport Scheduler]]
+- [[_COMMUNITY_Unit World Model|Unit World Model]]
 - [[_COMMUNITY_Firestore Indexes|Firestore Indexes]]
 - [[_COMMUNITY_Functions Claude|Functions Claude]]
 - [[_COMMUNITY_Functions Receipt Blob|Functions Receipt Blob]]
 - [[_COMMUNITY_Hyperkernel Five Primitives|Hyperkernel Five Primitives]]
+- [[_COMMUNITY_Innovation Experiment Scorecard|Innovation Experiment Scorecard]]
 - [[_COMMUNITY_Simulation Policy Simulator|Simulation Policy Simulator]]
+- [[_COMMUNITY_Unit Private Gpu|Unit Private Gpu]]
 - [[_COMMUNITY_Sw|Sw]]
 - [[_COMMUNITY_Test Run One|Test Run One]]
 - [[_COMMUNITY_Claude Graphify Convention|Claude Graphify Convention]]
@@ -304,9 +341,9 @@
 - [[_COMMUNITY_Job List|Job List]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `makeRunner()` - 133 edges
-2. `setupEnv()` - 130 edges
-3. `load()` - 125 edges
+1. `makeRunner()` - 136 edges
+2. `setupEnv()` - 133 edges
+3. `load()` - 128 edges
 4. `render()` - 30 edges
 5. `read()` - 24 edges
 6. `U()` - 17 edges
@@ -335,7 +372,7 @@
 - **HyperKernel Phase-1 founding architecture** — hyperkernel_event_taxonomy, hyperkernel_derived_graph, hyperkernel_five_primitives, hyperkernel_provenance, hyperkernel_closure_loops, hyperkernel_council_structure, hyperkernel_agent_lifecycle, hyperkernel_memory_lifecycle, hyperkernel_audit_architecture, hyperkernel_kernel_invariants, hyperkernel_hyperkernel [EXTRACTED 1.00]
 - **Bluetooth laser measurement pipeline (capture to quote)** — services_raw_reading_log_rawbluetoothreadinglog, services_measurement_parser_measurementparser, services_generic_ble_adapter_genericblemeasurementadapter, services_device_adapter_registry_deviceadapterregistry, services_huepar_s60_adapter_aaa_huepar_s60_adapter, hooks_use_bluetooth_connection_aaa_bluetooth, storage_measurement_store, measurements_measurement_ai_assistant, integrations_measurement_to_quote [EXTRACTED 1.00]
 
-## Communities (305 total, 33 thin omitted)
+## Communities (343 total, 38 thin omitted)
 
 ### Community 0 - "Unit Audit Ledger"
 Cohesion: 0.03
@@ -343,19 +380,19 @@ Nodes (69): load(), makeClock(), makeConfig(), makeData(), makeEvents(), makeIds
 
 ### Community 1 - "Intelligence Prediction Closure"
 Cohesion: 0.05
-Nodes (67): acct(), _agedReceivables(), analyze(), bySeverity(), _cashflow(), classifier(), clock(), data() (+59 more)
+Nodes (63): append(), bands(), calibrationSummary(), cfg(), clock(), close(), _closedPredictionIds(), closures() (+55 more)
 
-### Community 2 - "Accounting Expense Classifier"
-Cohesion: 0.07
-Nodes (59): AAA_ACCOUNTING (books, P&L, job costing), accuracy(), cfg(), classify(), clock(), correct(), data(), getOne() (+51 more)
-
-### Community 3 - "Intelligence Vector Memory"
+### Community 2 - "Intelligence Vector Memory"
 Cohesion: 0.08
 Nodes (43): Memory Lifecycle (capture, normalize, index, recall, score, decay), cfg(), clock(), data(), ingest(), insights(), listQuotes(), mean() (+35 more)
 
-### Community 4 - "Unit Content Safety"
+### Community 3 - "Intelligence Executive Council"
+Cohesion: 0.08
+Nodes (42): AAA_QUICKBOOKS_ONLINE (proxy-routed client), act(), cfg(), clamp(), clock(), _context(), data(), deliberate() (+34 more)
+
+### Community 4 - "Unit Review Safety"
 Cohesion: 0.04
-Nodes (21): makeRunner(), { makeRunner }, { makeRunner, setupEnv, load }, { makeRunner, setupEnv, load }, { makeRunner, setupEnv, load }, { makeRunner }, { makeRunner, setupEnv, load }, { makeRunner, setupEnv, load } (+13 more)
+Nodes (22): makeRunner(), { makeRunner }, { makeRunner, setupEnv, load }, { makeRunner, setupEnv, load }, { makeRunner, setupEnv, load }, { makeRunner }, { makeRunner, setupEnv, load }, { makeRunner, setupEnv, load } (+14 more)
 
 ### Community 5 - "Asyncapi Events"
 Cohesion: 0.05
@@ -365,77 +402,77 @@ Nodes (46): asyncapi, channels, comm.inbound, comm.notification, job.closed, quo
 Cohesion: 0.13
 Nodes (44): adapters(), analytics(), applyStatusEvent(), _attachOutbound(), biz(), cfg(), clock(), closeThread() (+36 more)
 
-### Community 7 - "Core Privacy"
+### Community 7 - "Accounting Expense Classifier"
+Cohesion: 0.10
+Nodes (39): AAA_ACCOUNTING (books, P&L, job costing), accuracy(), cfg(), classify(), clock(), correct(), data(), getOne() (+31 more)
+
+### Community 8 - "Core Privacy"
 Cohesion: 0.13
 Nodes (41): _adminGated(), approveErasure(), cfg(), classify(), clock(), data(), ensureConfig(), ensureKey() (+33 more)
 
-### Community 8 - "Unit Bluetooth Connect"
+### Community 9 - "Unit Bluetooth Connect"
 Cohesion: 0.05
 Nodes (25): ROOT, fs, { makeRunner, ROOT }, makeWindow(), path, vm, cp, fs (+17 more)
 
-### Community 9 - "Command Center"
+### Community 10 - "Command Center"
 Cohesion: 0.11
 Nodes (38): architectFlow(), auditFlow(), data(), empty(), esc(), fmtPct(), improveFlow(), kv() (+30 more)
 
-### Community 10 - "Core Security"
+### Community 11 - "Core Security"
 Cohesion: 0.14
 Nodes (40): _adminGated(), approvals(), base32Decode(), canonicalAudit(), cfg(), clock(), configure(), currentSession() (+32 more)
 
-### Community 11 - "Governance Prompt Registry"
+### Community 12 - "Governance Prompt Registry"
 Cohesion: 0.16
 Nodes (36): actor(), adapter(), applyVersion(), approveVersion(), audit(), canApprove(), cfg(), checksum() (+28 more)
 
-### Community 12 - "Quotes Quote Store"
+### Community 13 - "Quotes Quote Store"
 Cohesion: 0.12
 Nodes (31): addSupervisorNote(), archive(), cfg(), clock(), createDraft(), customerView(), data(), events() (+23 more)
 
-### Community 13 - "Screens Measurement Hud"
+### Community 14 - "Screens Measurement Hud"
 Cohesion: 0.19
 Nodes (35): ai(), applyToJob(), autoPanel(), blankDraft(), ble(), boot(), esc(), events() (+27 more)
 
-### Community 14 - "Transport Transport Store"
+### Community 15 - "Transport Transport Store"
 Cohesion: 0.14
 Nodes (31): appendHistory(), applyStatusEvent(), approve(), cancel(), cfg(), clock(), data(), draft() (+23 more)
 
-### Community 15 - "Intelligence Dashboard"
+### Community 16 - "Intelligence Dashboard"
 Cohesion: 0.17
 Nodes (34): alertResult(), collectors(), council(), councilFlow(), div(), empty(), esc(), evolution() (+26 more)
 
-### Community 16 - "Intelligence Calibration Registry"
+### Community 17 - "Intelligence Calibration Registry"
 Cohesion: 0.13
 Nodes (30): activeVersion(), _applyTuning(), approve(), cfg(), clamp(), clock(), closure(), compare() (+22 more)
 
-### Community 17 - "Intelligence Native Model"
+### Community 18 - "Intelligence Native Model"
 Cohesion: 0.14
 Nodes (31): accuracy(), activeModel(), candidates(), cfg(), clock(), data(), evaluate(), featurize() (+23 more)
 
-### Community 18 - "Accounting Receipt Intake"
+### Community 19 - "Accounting Receipt Intake"
 Cohesion: 0.13
 Nodes (26): addressTokens(), approveAndPost(), assignJob(), cfg(), classifier(), clock(), data(), _findDuplicate() (+18 more)
 
-### Community 19 - "Storage Measurement Store"
+### Community 20 - "Storage Measurement Store"
 Cohesion: 0.13
 Nodes (26): buildQuote(), cfg(), estimateMinutes(), priceService(), rates(), toReceipt(), cfg(), cloud() (+18 more)
 
-### Community 20 - "Core Config"
+### Community 21 - "Core Config"
 Cohesion: 0.12
 Nodes (29): accessToken(), aiProvider(), all(), autoAgents(), businessName(), firebaseApiKey(), firebaseAuthToken(), firebaseFunctionUrl() (+21 more)
 
-### Community 21 - "Intelligence Outcome Intelligence"
+### Community 22 - "Intelligence Outcome Intelligence"
 Cohesion: 0.15
 Nodes (26): agentTrend(), bus(), cfg(), clock(), data(), ensure(), events(), extractPatterns() (+18 more)
 
-### Community 22 - "Core Event"
+### Community 23 - "Core Event"
 Cohesion: 0.13
 Nodes (24): analytics(), bridge(), canonical(), cfg(), chainHash(), clock(), contracts(), cyrb53() (+16 more)
 
-### Community 23 - "Governance Governance Escalation"
+### Community 24 - "Governance Governance Escalation"
 Cohesion: 0.18
 Nodes (28): acknowledge(), actor(), audit(), auditPayload(), cfg(), clock(), computePriority(), cooldownElapsed() (+20 more)
-
-### Community 24 - "Intelligence Executive Council"
-Cohesion: 0.12
-Nodes (22): act(), cfg(), clamp(), clock(), _context(), data(), deliberate(), gateway() (+14 more)
 
 ### Community 25 - "Intelligence Financial Intelligence"
 Cohesion: 0.15
@@ -577,803 +614,931 @@ Nodes (21): approveHold(), bus(), cfg(), clock(), data(), defineContracts(), det
 Cohesion: 0.16
 Nodes (17): clamp01(), gradeContains(), gradeJsonSchema(), gradeNumericMape(), gradeSafetyLabel(), hydrate(), isNum(), isSafeLabel() (+9 more)
 
-### Community 60 - "Simulation Simulation Governance"
+### Community 60 - "Intelligence Goal Engine"
+Cohesion: 0.19
+Nodes (20): calculateStateDelta(), cfg(), clock(), currentVector(), data(), defineGoal(), evaluateTotalSystemEffect(), flag() (+12 more)
+
+### Community 61 - "Revenue Council Governance"
+Cohesion: 0.25
+Nodes (21): apply(), approve(), audit(), bus(), canApprove(), cfg(), clock(), data() (+13 more)
+
+### Community 62 - "Simulation Simulation Governance"
 Cohesion: 0.22
 Nodes (21): accuracyOverTime(), approve(), audit(), bus(), calibration(), canApprove(), cfg(), clock() (+13 more)
 
-### Community 61 - "Governance Registry"
+### Community 63 - "Governance Registry"
 Cohesion: 0.24
 Nodes (21): actor(), artifactRow(), btn(), chip(), contentStr(), diffDrawer(), diffLines(), doTransition() (+13 more)
 
-### Community 62 - "Genesis Banned Capability"
+### Community 64 - "Accounting Controller Agent"
+Cohesion: 0.20
+Nodes (18): acct(), _agedReceivables(), analyze(), bySeverity(), _cashflow(), classifier(), clock(), data() (+10 more)
+
+### Community 65 - "Genesis Banned Capability"
 Cohesion: 0.23
 Nodes (20): audit(), autoEnforce(), ban(), canManage(), cfg(), clock(), data(), detector() (+12 more)
 
-### Community 63 - "Ai Sidekick Voice"
+### Community 66 - "Ai Sidekick Voice"
 Cohesion: 0.19
 Nodes (15): cfg(), diag(), getSpeechRecognition(), logErr(), notes(), recorder(), saveRecording(), saveTextLog() (+7 more)
 
-### Community 64 - "Contracts Contract Store"
+### Community 67 - "Contracts Contract Store"
 Cohesion: 0.21
 Nodes (16): cfg(), clock(), create(), createFromJob(), data(), get(), ids(), list() (+8 more)
 
-### Community 65 - "Functions Nemotron Translate"
+### Community 68 - "Functions Nemotron Translate"
 Cohesion: 0.13
 Nodes (15): config, fromResponse(), resolveModel(), base, empty, img, req, resp (+7 more)
 
-### Community 66 - "Intelligence Outcome Spine"
+### Community 69 - "Intelligence Outcome Spine"
 Cohesion: 0.18
 Nodes (17): Learning Closure Loops (estimate, recommendation, prediction), applyOverlay(), blank(), classifyResult(), data(), finalize(), govOutcomes(), lc() (+9 more)
 
-### Community 67 - "Ai Assisted Draft"
+### Community 70 - "Ai Assisted Draft"
 Cohesion: 0.25
 Nodes (17): approve(), cfg(), clock(), data(), draft(), edit(), gateway(), get() (+9 more)
 
-### Community 68 - "Core Event"
+### Community 71 - "Core Event"
 Cohesion: 0.11
 Nodes (14): AAA_EVENT_BUS (durable hash-chained event bus), AAA_AGENT_OUTCOMES (Agent Outcome Registry), AAA_AGENT_SCORECARDS, AAA_AUDIT_LEDGER, AAA_GOVERNANCE_BRIDGE (automatic measurement), AAA_GOVERNANCE_INTEGRITY (on-device self-audit), AAA_GOVERNANCE_LEARNING (Learning Command Center), AAA_GOVERNANCE_SUPERVISOR (+6 more)
 
-### Community 69 - "Core Firebase"
+### Community 72 - "Core Firebase"
 Cohesion: 0.30
 Nodes (18): authHeaders(), callProxy(), cfg(), configured(), currentUser(), decodeFields(), decodeValue(), docBase() (+10 more)
 
-### Community 70 - "Genesis Ephemeral Agent"
+### Community 73 - "Genesis Ephemeral Agent"
 Cohesion: 0.22
 Nodes (17): cfg(), clock(), data(), execute(), executor(), graphFacts(), ids(), ledger() (+9 more)
 
-### Community 71 - "Intelligence Outcome Learning"
+### Community 74 - "Intelligence Outcome Learning"
 Cohesion: 0.16
 Nodes (10): aggregate(), avgField(), avgIntField(), finalizeGroup(), _followUp(), groupBy(), mean(), num() (+2 more)
 
-### Community 72 - "Intelligence World State"
+### Community 75 - "Intelligence World State"
 Cohesion: 0.22
 Nodes (18): append(), cfg(), clamp01(), clock(), data(), deepFreeze(), deriveCurrentReadModel(), getRawLedger() (+10 more)
 
-### Community 73 - "Estimator"
+### Community 76 - "Estimator"
 Cohesion: 0.25
 Nodes (17): addRoom(), canQuote(), canSeeMargins(), chip(), data(), empty(), esc(), estimator() (+9 more)
 
-### Community 74 - "Receipt Intake"
+### Community 77 - "Receipt Intake"
 Cohesion: 0.28
 Nodes (17): approve(), assignJob(), captureRow(), chip(), classifier(), data(), empty(), esc() (+9 more)
 
-### Community 75 - "Accounting Quickbooks Online"
+### Community 78 - "Accounting Quickbooks Online"
 Cohesion: 0.27
 Nodes (17): acct(), authUrl(), cfg(), connect(), disconnect(), fb(), flag(), handleRedirect() (+9 more)
 
-### Community 76 - "Agents Action Safety"
+### Community 79 - "Agents Action Safety"
 Cohesion: 0.12
 Nodes (18): AAA_ACTION_GATE (Action Safety Gate), AAA_AGENT_OS (agent runtime), DECISION_SCHEMA (enforced decision shape), AAA_MODEL_ROUTER (task-aware model selection), Agent Lifecycle (define to evolve/retire under contract), Autonomy Bounded by Reversibility, Council Structure (adversarial debate venues), Honest by Construction (+10 more)
 
-### Community 77 - "Agents Agent Automation"
+### Community 80 - "Agents Agent Automation"
 Cohesion: 0.27
 Nodes (16): active(), cfg(), _ctx(), data(), enabled(), esc(), _escalate(), _job() (+8 more)
 
-### Community 78 - "Agents Prompt Architect"
+### Community 81 - "Agents Prompt Architect"
 Cohesion: 0.25
 Nodes (15): cfg(), clock(), cloudUpsert(), data(), design(), extractJson(), get(), isReady() (+7 more)
 
-### Community 79 - "Agents Self Improvement"
+### Community 82 - "Agents Self Improvement"
 Cohesion: 0.30
 Nodes (15): analyze(), cfg(), clock(), data(), getTuning(), improveAgent(), improveAll(), isReady() (+7 more)
 
-### Community 80 - "Crew Tool Store"
+### Community 83 - "Crew Tool Store"
 Cohesion: 0.29
 Nodes (16): add(), cfg(), checkIn(), checkOut(), clock(), data(), get(), ids() (+8 more)
 
-### Community 81 - "Genesis Promotion Engine"
+### Community 84 - "Genesis Promotion Engine"
 Cohesion: 0.24
 Nodes (17): approve(), canApprove(), cfg(), clock(), data(), evaluate(), ids(), ledger() (+9 more)
 
-### Community 82 - "Governance Governance Notifier"
+### Community 85 - "Governance Governance Notifier"
 Cohesion: 0.20
 Nodes (14): audit(), buildPayload(), cfg(), dashboardUrl(), emailSend(), endpoint(), escalations(), events() (+6 more)
 
-### Community 83 - "Intelligence Intelligence Collectors"
+### Community 86 - "Intelligence Intelligence Collectors"
 Cohesion: 0.26
 Nodes (14): ai(), all(), customer(), data(), jobService(), load(), marketing(), mean() (+6 more)
 
-### Community 84 - "Leads Lead Store"
+### Community 87 - "Leads Lead Store"
 Cohesion: 0.26
 Nodes (16): boot(), clean(), clock(), createLead(), data(), emit(), events(), getLead() (+8 more)
 
-### Community 85 - "Package Scripts Test"
+### Community 88 - "Package Scripts Test"
 Cohesion: 0.11
 Nodes (17): dependencies, @anthropic-ai/sdk, @netlify/blobs, description, devDependencies, eslint, name, private (+9 more)
 
-### Community 86 - "Providers Private Gpu"
-Cohesion: 0.22
-Nodes (14): breakerState(), build(), clock(), endpoint(), fetcher(), health(), install(), now() (+6 more)
-
-### Community 87 - "Simulation Simulation Ledger"
+### Community 89 - "Simulation Simulation Ledger"
 Cohesion: 0.28
 Nodes (17): actuals(), cfg(), clock(), data(), get(), ids(), mine(), newId() (+9 more)
 
-### Community 88 - "Transport Transport Adapters"
+### Community 90 - "Transport Transport Adapters"
 Cohesion: 0.14
 Nodes (8): for(), ids(), inboundAdapter(), localAdapter(), newId(), register(), reset(), valid()
 
-### Community 89 - "Replay Sandbox"
+### Community 91 - "Replay Sandbox"
 Cohesion: 0.29
 Nodes (16): actor(), arr(), decisionStr(), empty(), engine(), esc(), fmt(), open() (+8 more)
 
-### Community 90 - "Ai Model Call"
+### Community 92 - "Ai Model Call"
 Cohesion: 0.23
 Nodes (16): cfg(), checksum(), clock(), data(), hash32(), ids(), metrics(), mine() (+8 more)
 
-### Community 91 - "Eslintrc Rules No"
+### Community 93 - "Eslintrc Rules No"
 Cohesion: 0.12
 Nodes (16): env, browser, es2022, extends, ignorePatterns, overrides, parserOptions, ecmaVersion (+8 more)
 
-### Community 92 - "Functions Private Gpu"
+### Community 94 - "Functions Private Gpu"
 Cohesion: 0.13
 Nodes (10): TIMEOUT_MS, empty, eq(), ok(), out, req, req2, T (+2 more)
 
-### Community 93 - "Intelligence Causal Hypothesis"
+### Community 95 - "Intelligence Causal Hypothesis"
 Cohesion: 0.26
 Nodes (15): appendEvidence(), bus(), cfg(), clock(), create(), data(), evidence(), get() (+7 more)
 
-### Community 94 - "Intelligence Evolution Engine"
+### Community 96 - "Intelligence Evolution Engine"
 Cohesion: 0.26
 Nodes (16): architect(), clock(), createAnalyst(), data(), debate(), div(), evolve(), gatherSignals() (+8 more)
 
-### Community 95 - "Models Measurement Models"
+### Community 97 - "Models Measurement Models"
 Cohesion: 0.21
 Nodes (11): cfg(), clamp01(), clock(), ids(), intOrZero(), newDevice(), newId(), newSession() (+3 more)
 
-### Community 96 - "Portal Portal Link"
+### Community 98 - "Portal Portal Link"
 Cohesion: 0.24
 Nodes (14): cfg(), clock(), create(), data(), flag(), get(), list(), makeToken() (+6 more)
 
-### Community 97 - "Legal War"
+### Community 99 - "Legal War"
 Cohesion: 0.25
 Nodes (13): contractsApi(), disclaimerBanner(), division(), gateway(), kv(), legal(), note(), open() (+5 more)
 
-### Community 98 - "Agents Review Request"
+### Community 100 - "Agents Review Request"
 Cohesion: 0.30
 Nodes (14): cfg(), clock(), cloudUpsert(), data(), firstName(), generateMessage(), ids(), links() (+6 more)
 
-### Community 99 - "Core Cloud"
+### Community 101 - "Core Cloud"
 Cohesion: 0.28
 Nodes (15): callProxy(), canSignIn(), cfg(), currentUser(), insertEvent(), isConfigured(), listEntities(), listGovernance() (+7 more)
 
-### Community 100 - "Functions Sense Normalize"
+### Community 102 - "Functions Sense Normalize"
 Cohesion: 0.15
 Nodes (12): json(), MISSED, normalize(), answered, eq(), lead, miss, { normalize } (+4 more)
 
-### Community 101 - "Genesis Capability Gap"
+### Community 103 - "Genesis Capability Gap"
 Cohesion: 0.22
 Nodes (13): bus(), cfg(), clock(), data(), deriveNeed(), gaps(), ids(), inspect() (+5 more)
 
-### Community 102 - "Genesis Capability Reputation"
+### Community 104 - "Genesis Capability Reputation"
 Cohesion: 0.26
 Nodes (15): all(), avg(), cfg(), clock(), data(), failures(), history(), ids() (+7 more)
 
-### Community 103 - "Intelligence Provenance Store"
+### Community 105 - "Intelligence Provenance Store"
 Cohesion: 0.23
 Nodes (14): First-Class Provenance (five answerable questions), cfg(), clock(), data(), forSubject(), get(), ids(), latestFor() (+6 more)
 
-### Community 104 - "Intelligence World Model"
+### Community 106 - "Intelligence World Model"
 Cohesion: 0.28
 Nodes (14): bus(), clock(), deepFreeze(), defineContracts(), derivation(), install(), ledger(), nowISO() (+6 more)
 
-### Community 105 - "Simulation Counterfactual Runner"
+### Community 107 - "Simulation Counterfactual Runner"
 Cohesion: 0.27
 Nodes (15): calibrationVersion(), canonical(), cfg(), clock(), cyrb(), data(), ledger(), monte() (+7 more)
 
-### Community 106 - "Business"
+### Community 108 - "Business"
 Cohesion: 0.29
 Nodes (13): chip(), data(), empty(), esc(), expenseForm(), exploreGraph(), paymentForm(), quickbooksExport() (+5 more)
 
-### Community 107 - "Challenge"
+### Community 109 - "Challenge"
 Cohesion: 0.32
 Nodes (14): confMove(), data(), esc(), listInto(), load(), note(), open(), openTranscript() (+6 more)
 
-### Community 108 - "Prediction Ledger"
+### Community 110 - "Prediction Ledger"
 Cohesion: 0.24
 Nodes (12): build(), data(), kv(), note(), open(), pct(), reg(), renderInto() (+4 more)
 
-### Community 109 - "Provenance"
+### Community 111 - "Provenance"
 Cohesion: 0.32
 Nodes (15): arr(), builder(), council(), empty(), esc(), open(), openTrace(), optimizer() (+7 more)
 
-### Community 110 - "Agents Research Brain"
+### Community 112 - "Agents Research Brain"
 Cohesion: 0.26
 Nodes (14): ask(), cfg(), clock(), data(), endpoint(), get(), ids(), list() (+6 more)
 
-### Community 111 - "Ai Voice Diagnostics"
+### Community 113 - "Ai Voice Diagnostics"
 Cohesion: 0.28
 Nodes (13): assess(), clock(), data(), deviceInfo(), getSpeechRecognition(), ids(), isOnline(), isSecure() (+5 more)
 
-### Community 112 - "Ai Voice Note"
+### Community 114 - "Ai Voice Note"
 Cohesion: 0.32
 Nodes (14): appendJobLog(), cfg(), clock(), create(), currentUser(), data(), get(), ids() (+6 more)
 
-### Community 113 - "Crew Crew Store"
+### Community 115 - "Crew Crew Store"
 Cohesion: 0.32
 Nodes (14): add(), cfg(), clock(), data(), get(), ids(), list(), mine() (+6 more)
 
-### Community 114 - "Portal Proxy Test"
+### Community 116 - "Portal Proxy Test"
 Cohesion: 0.19
 Nodes (12): buildView(), linkLive(), publicContract(), publicInvoice(), { linkLive, publicContract, publicInvoice, buildView }, partial, pc, raw (+4 more)
 
-### Community 115 - "Pricing Optimizer"
+### Community 117 - "Pricing Optimizer"
 Cohesion: 0.30
 Nodes (13): chip(), empty(), esc(), learning(), open(), opt(), pct(), rbac() (+5 more)
 
-### Community 116 - "Transport Inbox"
+### Community 118 - "Transport Inbox"
 Cohesion: 0.34
 Nodes (13): actor(), canSend(), chip(), core(), empty(), esc(), open(), openThread() (+5 more)
 
-### Community 117 - "Core Runtime"
+### Community 119 - "Core Runtime"
 Cohesion: 0.31
 Nodes (13): _audit(), canHuman(), cfg(), clock(), cloud(), data(), events(), ids() (+5 more)
 
-### Community 118 - "Intelligence Analyst Rankings"
+### Community 120 - "Innovation Experiment Registry"
+Cohesion: 0.31
+Nodes (12): cfg(), clock(), create(), data(), get(), ids(), list(), mine() (+4 more)
+
+### Community 121 - "Innovation Opportunity Registry"
+Cohesion: 0.34
+Nodes (13): cfg(), clock(), data(), get(), history(), ids(), list(), mine() (+5 more)
+
+### Community 122 - "Intelligence Analyst Rankings"
 Cohesion: 0.31
 Nodes (12): clock(), compute(), data(), history(), ids(), loadMaps(), mean(), newId() (+4 more)
 
-### Community 119 - "Intelligence Intelligence Meetings"
+### Community 123 - "Intelligence Intelligence Meetings"
 Cohesion: 0.31
 Nodes (13): clock(), collectors(), data(), div(), due(), ids(), last(), list() (+5 more)
 
-### Community 120 - "Intelligence Intelligence Pipeline"
+### Community 124 - "Intelligence Intelligence Pipeline"
 Cohesion: 0.30
 Nodes (12): clock(), collectors(), data(), debate(), div(), ids(), list(), newId() (+4 more)
 
-### Community 121 - "Intelligence Prediction Actual"
+### Community 125 - "Intelligence Prediction Actual"
 Cohesion: 0.27
 Nodes (13): cfg(), clock(), data(), deepFreeze(), deltas(), getAverageAccuracy(), ids(), logComparison() (+5 more)
 
-### Community 122 - "Scheduling Schedule Store"
+### Community 126 - "Revenue Creative Evolution"
+Cohesion: 0.31
+Nodes (13): addVariant(), cfg(), clock(), data(), ids(), mine(), newId(), nowISO() (+5 more)
+
+### Community 127 - "Scheduling Schedule Store"
 Cohesion: 0.31
 Nodes (13): allConflicts(), calendar(), clock(), conflictsForDay(), data(), dayKey(), duration(), forDay() (+5 more)
 
-### Community 123 - "Agent Council"
+### Community 128 - "Agent Council"
 Cohesion: 0.42
 Nodes (13): act(), chip(), council(), empty(), esc(), open(), openMeeting(), quotes() (+5 more)
 
-### Community 124 - "Agent Evaluation"
+### Community 129 - "Agent Evaluation"
 Cohesion: 0.37
 Nodes (13): accColor(), chip(), empty(), esc(), LAB(), open(), openCard(), pctv() (+5 more)
 
-### Community 125 - "Calibration"
+### Community 130 - "Calibration"
 Cohesion: 0.38
 Nodes (13): chip(), empty(), esc(), fmtRate(), historyDrawer(), open(), proposalCard(), rbac() (+5 more)
 
-### Community 126 - "Crew"
+### Community 131 - "Crew"
 Cohesion: 0.33
 Nodes (13): addCrewForm(), addToolForm(), checkOutForm(), crew(), esc(), go(), open(), render() (+5 more)
 
-### Community 127 - "Executive Council"
+### Community 132 - "Executive Council"
 Cohesion: 0.41
 Nodes (13): act(), actor(), C(), chip(), empty(), esc(), open(), openReview() (+5 more)
 
-### Community 128 - "Quote Lifecycle"
+### Community 133 - "Quote Lifecycle"
 Cohesion: 0.43
 Nodes (13): chip(), empty(), esc(), money(), open(), openDetail(), rbac(), render() (+5 more)
 
-### Community 129 - "Agents Challenge Protocol"
+### Community 134 - "Agents Challenge Protocol"
 Cohesion: 0.33
 Nodes (12): agentOS(), cfg(), challenge(), data(), debate(), deliberate(), division(), isReady() (+4 more)
 
-### Community 130 - "Functions Governance Verify"
+### Community 135 - "Functions Governance Verify"
 Cohesion: 0.23
 Nodes (8): auditEntries(), buildAlert(), config, baseOf(), canonical(), config, sha256hex(), verifyShaChain()
 
-### Community 131 - "Genesis Capability Registry"
+### Community 136 - "Genesis Capability Registry"
 Cohesion: 0.31
 Nodes (12): canHandle(), cfg(), clock(), data(), ids(), key(), mine(), nowISO() (+4 more)
 
-### Community 132 - "Intelligence Signal Derivation"
+### Community 137 - "Innovation Technology Scout"
+Cohesion: 0.29
+Nodes (12): cfg(), clock(), data(), ids(), mine(), newId(), nowISO(), num() (+4 more)
+
+### Community 138 - "Intelligence Signal Derivation"
 Cohesion: 0.24
 Nodes (9): clock(), conf(), data(), deriveAll(), deriveFromEvents(), ledger(), list(), mean() (+1 more)
 
-### Community 133 - "Intelligence Supervisor Council"
+### Community 139 - "Intelligence Supervisor Council"
 Cohesion: 0.33
 Nodes (11): clock(), convene(), data(), div(), ids(), linkOutcome(), list(), mean() (+3 more)
 
-### Community 134 - "Legal Legal Risk"
+### Community 140 - "Legal Legal Risk"
 Cohesion: 0.32
 Nodes (11): assess(), assessJob(), clamp(), companyRisk(), complianceStatus(), compose(), contractsApi(), data() (+3 more)
 
-### Community 135 - "Business Digital"
+### Community 141 - "Revenue Competitor Intelligence"
+Cohesion: 0.29
+Nodes (12): cfg(), clamp01(), clock(), data(), ids(), mean(), mine(), newId() (+4 more)
+
+### Community 142 - "Business Digital"
 Cohesion: 0.44
 Nodes (12): chip(), empty(), esc(), money(), open(), rbac(), render(), renderResult() (+4 more)
 
-### Community 136 - "Closure Hud"
+### Community 143 - "Closure Hud"
 Cohesion: 0.33
 Nodes (11): blankChecks(), boot(), closeJob(), ensureOverlay(), gatedClose(), handleForceClose(), handleSafeClose(), hideOverlay() (+3 more)
 
-### Community 137 - "Privacy Dashboard"
+### Community 144 - "Privacy Dashboard"
 Cohesion: 0.35
 Nodes (11): actor(), canAdmin(), chip(), empty(), esc(), open(), P(), rbac() (+3 more)
 
-### Community 138 - "Proposal Review"
+### Community 145 - "Proposal Review"
 Cohesion: 0.42
 Nodes (12): actor(), chip(), E(), empty(), esc(), open(), openProposal(), rbac() (+4 more)
 
-### Community 139 - "Security Center"
+### Community 146 - "Security Center"
 Cohesion: 0.35
 Nodes (11): actor(), canAdmin(), chip(), empty(), esc(), open(), rbac(), render() (+3 more)
 
-### Community 140 - "Accounting Quickbooks Export"
+### Community 147 - "Accounting Quickbooks Export"
 Cohesion: 0.36
 Nodes (8): acct(), cfg(), expensesCsv(), exportAll(), file(), invoicesCsv(), paymentsCsv(), toCsv()
 
-### Community 141 - "Agents Escalation Policy"
+### Community 148 - "Agents Escalation Policy"
 Cohesion: 0.30
 Nodes (10): assess(), cfg(), challenge(), data(), hasSevereEstimate(), _logEscalation(), maxEstimateValue(), mentionsExposure() (+2 more)
 
-### Community 142 - "Genesis Promotion Scorer"
+### Community 149 - "Genesis Promotion Scorer"
 Cohesion: 0.32
 Nodes (11): banned(), candidates(), cfg(), flag(), MAX_ROLLBACK(), MIN_SPAWNS(), MIN_SUCCESS(), num() (+3 more)
 
-### Community 143 - "Governance Governance Supervisor"
+### Community 150 - "Governance Governance Supervisor"
 Cohesion: 0.29
 Nodes (9): audit(), baseAnalyzer(), cards(), clock(), data(), ledger(), now(), recommendations() (+1 more)
 
-### Community 144 - "Legal Legal Division"
+### Community 151 - "Legal Legal Division"
 Cohesion: 0.32
 Nodes (9): advise(), cfg(), data(), escalateToAttorney(), extractJson(), isReady(), legal(), risk() (+1 more)
 
-### Community 145 - "Services Huepar S60"
+### Community 152 - "Services Huepar S60"
 Cohesion: 0.32
 Nodes (9): _angles(), bytesFromHex(), createHueparS60Adapter(), _distance(), parse(), parseFrame(), signedTenths(), _toBytes() (+1 more)
 
-### Community 146 - "Test Intelligence Smoke"
+### Community 153 - "Test Intelligence Smoke"
 Cohesion: 0.17
 Nodes (6): data, __dirname, mem, root, sandbox, store
 
-### Community 147 - "Assisted Drafts"
+### Community 154 - "Assisted Drafts"
 Cohesion: 0.39
 Nodes (11): actor(), canUse(), chip(), empty(), esc(), open(), Q(), rbac() (+3 more)
 
-### Community 148 - "Learning Feedback"
+### Community 155 - "Learning Feedback"
 Cohesion: 0.39
 Nodes (11): card(), chip(), closure(), drawer(), empty(), esc(), open(), rbac() (+3 more)
 
-### Community 149 - "Model Governance"
+### Community 156 - "Model Governance"
 Cohesion: 0.38
 Nodes (11): actor(), chip(), empty(), esc(), open(), R(), rbac(), REG() (+3 more)
 
-### Community 150 - "Native Model"
+### Community 157 - "Native Model"
 Cohesion: 0.39
 Nodes (11): actor(), chip(), empty(), esc(), M(), open(), rbac(), render() (+3 more)
 
-### Community 151 - "Owner Copilot"
+### Community 158 - "Owner Copilot"
 Cohesion: 0.41
 Nodes (11): chip(), CP(), empty(), esc(), money(), open(), rbac(), render() (+3 more)
 
-### Community 152 - "Vector Memory"
+### Community 159 - "Vector Memory"
 Cohesion: 0.44
 Nodes (11): canUse(), chip(), empty(), esc(), open(), rbac(), render(), runQuery() (+3 more)
 
-### Community 153 - "Agents Agent Os"
+### Community 160 - "Agents Agent Os"
 Cohesion: 0.44
 Nodes (10): buildUserPrompt(), data(), extractJson(), gate(), isReady(), parseDecision(), registry(), router() (+2 more)
 
-### Community 154 - "Ai Content Safety"
+### Community 161 - "Ai Content Safety"
 Cohesion: 0.38
 Nodes (10): cfg(), check(), checkResponse(), _classify(), cloud(), isReady(), lc(), normCats() (+2 more)
 
-### Community 155 - "Ai Model Registry"
+### Community 162 - "Ai Model Registry"
 Cohesion: 0.27
 Nodes (6): cfg(), flag(), keys(), list(), providerCandidates(), tasks()
 
-### Community 156 - "Core Supabase"
+### Community 163 - "Core Supabase"
 Cohesion: 0.51
 Nodes (10): callProxy(), cfg(), configured(), headers(), insert(), listGovernance(), rest(), select() (+2 more)
 
-### Community 157 - "Core Local First"
+### Community 164 - "Core Local First"
 Cohesion: 0.29
 Nodes (7): boot(), _flush(), hasLocalStorage(), put(), queueMutation(), remove(), setMutations()
 
-### Community 158 - "Genesis Failure Pattern"
+### Community 165 - "Genesis Failure Pattern"
 Cohesion: 0.36
 Nodes (10): cfg(), data(), flag(), ledger(), mine(), num(), pattern(), scan() (+2 more)
 
-### Community 159 - "Genesis Spawn Policy"
+### Community 166 - "Genesis Spawn Policy"
 Cohesion: 0.40
 Nodes (10): canRunAgents(), cfg(), evaluate(), govern(), ledger(), maxCostCap(), maxRuntimeCap(), num() (+2 more)
 
-### Community 160 - "Portal Proxy Index"
+### Community 167 - "Innovation Business Model"
+Cohesion: 0.35
+Nodes (10): cfg(), clock(), data(), flag(), list(), nowMs(), num(), runner() (+2 more)
+
+### Community 168 - "Portal Proxy Index"
 Cohesion: 0.18
 Nodes (4): admin, db, functions, { linkLive, buildView }
 
-### Community 161 - "Providers Nvidia Nemotron"
+### Community 169 - "Providers Nvidia Nemotron"
 Cohesion: 0.36
 Nodes (9): cfg(), clock(), flag(), hash32(), invoke(), normalize(), now(), shortHash() (+1 more)
 
-### Community 162 - "Qbo Proxy Package"
+### Community 170 - "Qbo Proxy Package"
 Cohesion: 0.18
 Nodes (10): description, engines, node, main, name, scripts, deploy, serve (+2 more)
 
-### Community 163 - "Rules Package Devdependencies"
+### Community 171 - "Rules Package Devdependencies"
 Cohesion: 0.18
 Nodes (10): description, devDependencies, @firebase/rules-unit-testing, firebase-tools, name, private, scripts, test (+2 more)
 
-### Community 164 - "Test Run"
+### Community 172 - "Test Run"
 Cohesion: 0.20
 Nodes (9): cp, EXTERNAL, path, results, runSuite(), scrub(), SUITES, totalFail (+1 more)
 
-### Community 165 - "Financial Intelligence"
+### Community 173 - "Financial Intelligence"
 Cohesion: 0.42
 Nodes (10): chip(), empty(), esc(), FI(), money(), open(), rbac(), render() (+2 more)
 
-### Community 166 - "Financial Intelligence"
+### Community 174 - "Financial Intelligence"
 Cohesion: 0.44
 Nodes (10): chip(), controller(), empty(), esc(), findingRow(), money(), open(), render() (+2 more)
 
-### Community 167 - "Knowledge Os"
+### Community 175 - "Knowledge Os"
 Cohesion: 0.45
 Nodes (10): canUse(), empty(), esc(), K(), open(), rbac(), render(), renderAnswer() (+2 more)
 
-### Community 168 - "Outcome Intelligence"
+### Community 176 - "Outcome Intelligence"
 Cohesion: 0.40
 Nodes (9): chip(), empty(), esc(), OI(), open(), rbac(), render(), title() (+1 more)
 
-### Community 169 - "Reliability Command"
+### Community 177 - "Reliability Command"
 Cohesion: 0.42
 Nodes (10): actor(), chip(), empty(), esc(), open(), R(), rbac(), render() (+2 more)
 
-### Community 170 - "Schedule"
+### Community 178 - "Schedule"
 Cohesion: 0.33
 Nodes (6): assignForm(), crew(), open(), render(), sched(), U()
 
-### Community 171 - "Transport Dashboard"
+### Community 179 - "Transport Dashboard"
 Cohesion: 0.44
 Nodes (10): canSend(), chip(), empty(), esc(), open(), rbac(), render(), title() (+2 more)
 
-### Community 172 - "Agents Supervisor"
+### Community 180 - "Agents Supervisor"
 Cohesion: 0.33
 Nodes (5): data(), mean(), metrics(), persistDecision(), scoreOutcome()
 
-### Community 173 - "Intelligence Ai Operations"
+### Community 181 - "Innovation Venture Discovery"
+Cohesion: 0.36
+Nodes (8): adjacency(), clock(), discover(), discoverAndRegister(), market(), nowMs(), registry(), world()
+
+### Community 182 - "Intelligence Ai Operations"
 Cohesion: 0.42
 Nodes (7): actionQueue(), arr(), clock(), digest(), nowISO(), quiet(), summary()
 
-### Community 174 - "Intelligence Debate Engine"
+### Community 183 - "Intelligence Debate Engine"
 Cohesion: 0.40
 Nodes (9): clock(), data(), div(), get(), ids(), list(), newId(), now() (+1 more)
 
-### Community 175 - "Intelligence Intelligence Scorecard"
+### Community 184 - "Intelligence Intelligence Scorecard"
 Cohesion: 0.36
 Nodes (8): causal(), clock(), comparator(), evaluate(), governanceCompliance(), graphCompleteness(), nowMs(), quality()
 
-### Community 176 - "Measurements Measurement Ai"
+### Community 185 - "Measurements Measurement Ai"
 Cohesion: 0.40
 Nodes (8): cfg(), data(), dedupe(), isReady(), _localChecks(), models(), parseJson(), review()
 
-### Community 177 - "Portal Proxy Package"
+### Community 186 - "Portal Proxy Package"
 Cohesion: 0.20
 Nodes (9): description, engines, node, main, name, scripts, deploy, test (+1 more)
 
-### Community 178 - "Providers Private Gpu"
+### Community 187 - "Providers Private Gpu"
 Cohesion: 0.38
 Nodes (8): cfg(), clock(), flag(), hash32(), invoke(), now(), shortHash(), stub()
 
-### Community 179 - "Simulation Scenario Engine"
+### Community 188 - "Simulation Scenario Engine"
 Cohesion: 0.29
 Nodes (5): baseline(), cfg(), flag(), mean(), num()
 
-### Community 180 - "Transport Transport Scheduler"
+### Community 189 - "Transport Transport Scheduler"
 Cohesion: 0.38
 Nodes (9): acknowledgeMissedCall(), cfg(), clock(), completionMs(), contactFor(), data(), nowMs(), runReviewRequests() (+1 more)
 
-### Community 181 - "Ai Operations"
+### Community 190 - "Ai Operations"
 Cohesion: 0.47
 Nodes (9): chip(), empty(), esc(), open(), OPS(), rbac(), render(), title() (+1 more)
 
-### Community 182 - "Contracts"
+### Community 191 - "Contracts"
 Cohesion: 0.44
 Nodes (9): data(), esc(), makeSignaturePad(), open(), openContract(), renderList(), shareContract(), store() (+1 more)
 
-### Community 183 - "Event Stream"
+### Community 192 - "Event Stream"
 Cohesion: 0.47
 Nodes (9): bus(), chip(), empty(), esc(), open(), rbac(), render(), title() (+1 more)
 
-### Community 184 - "Core Rbac"
+### Community 193 - "Core Rbac"
 Cohesion: 0.42
 Nodes (7): can(), cfg(), events(), label(), require(), role(), setRole()
 
-### Community 185 - "Functions Package Dependencies"
+### Community 194 - "Functions Package Dependencies"
 Cohesion: 0.22
 Nodes (8): dependencies, firebase-functions, description, engines, node, main, name, private
 
-### Community 186 - "Governance Governance Sync"
+### Community 195 - "Governance Governance Sync"
 Cohesion: 0.44
 Nodes (7): cloud(), data(), hydrate(), idOf(), mirror(), pull(), push()
 
-### Community 187 - "Manifest"
+### Community 196 - "Manifest"
 Cohesion: 0.22
 Nodes (8): background_color, display, icons, name, orientation, short_name, start_url, theme_color
 
-### Community 188 - "Services Raw Reading"
+### Community 197 - "Revenue Demand Pulse"
+Cohesion: 0.42
+Nodes (8): clock(), data(), list(), nowMs(), pulse(), seasonal(), weatherImpact(), world()
+
+### Community 198 - "Revenue Market Intelligence"
+Cohesion: 0.42
+Nodes (8): assess(), clock(), competitor(), demand(), mean(), neighborhood(), nowMs(), r3()
+
+### Community 199 - "Revenue Silence Analyzer"
+Cohesion: 0.44
+Nodes (8): cfg(), clock(), flag(), ghosting(), lc(), nowMs(), num(), stageOf()
+
+### Community 200 - "Revenue Win Probability"
+Cohesion: 0.36
+Nodes (7): band(), data(), fabric(), list(), num(), svc(), winProbability()
+
+### Community 201 - "Services Raw Reading"
 Cohesion: 0.33
 Nodes (5): clock(), nowISO(), record(), toAscii(), toHex()
 
-### Community 190 - "Kit"
+### Community 203 - "Kit"
 Cohesion: 0.36
 Nodes (6): el(), hexToRgba(), progressBar(), sheet(), spinner(), statusBadge()
 
-### Community 191 - "Agents Job Notes"
+### Community 204 - "Agents Job Notes"
 Cohesion: 0.54
 Nodes (7): analyze(), cfg(), data(), extract(), isReady(), notes(), parseJson()
 
-### Community 192 - "Agents Model Router"
+### Community 205 - "Agents Model Router"
 Cohesion: 0.50
 Nodes (6): decorate(), effortFor(), forAgent(), isKnownModel(), normalizeKind(), route()
 
-### Community 193 - "Core Knowledge Graph"
+### Community 206 - "Core Knowledge Graph"
 Cohesion: 0.39
 Nodes (6): build(), data(), insights(), node(), stats(), Derived Knowledge Graph (projection, not graph database)
 
-### Community 194 - "Core Sync Engine"
+### Community 207 - "Core Sync Engine"
 Cohesion: 0.50
 Nodes (7): endpoint(), init(), isOnline(), pull(), scheduleFlush(), _snapshot(), syncNow()
 
-### Community 195 - "Firebase"
+### Community 208 - "Firebase"
 Cohesion: 0.25
 Nodes (7): firestore, indexes, rules, hosting, ignore, public, firebase
 
-### Community 196 - "Portal Proxy Package"
+### Community 209 - "Portal Proxy Package"
 Cohesion: 0.25
 Nodes (8): functions, source, dependencies, firebase-admin, firebase-functions, dependencies, firebase-admin, firebase-functions
 
-### Community 197 - "Genesis Capability Marketplace"
+### Community 210 - "Genesis Capability Marketplace"
 Cohesion: 0.46
 Nodes (7): banned(), failures(), reputation(), roi(), scorer(), top(), view()
 
-### Community 198 - "Genesis Termination Engine"
+### Community 211 - "Genesis Termination Engine"
 Cohesion: 0.61
 Nodes (7): clock(), close(), data(), ledger(), nowISO(), rollback(), scrub()
 
-### Community 199 - "Nemotron Proxy Index"
+### Community 212 - "Innovation Innovation Council"
+Cohesion: 0.32
+Nodes (3): propose(), simulateModel(), validateOpportunity()
+
+### Community 213 - "Nemotron Proxy Index"
 Cohesion: 0.32
 Nodes (4): CORS, resolveModel(), toOpenAIContent(), toRequest()
 
-### Community 200 - "Rules Firebase Emulators"
+### Community 214 - "Revenue Margin Guardian"
+Cohesion: 0.39
+Nodes (6): assess(), data(), list(), median(), num(), svc()
+
+### Community 215 - "Revenue Neighborhood Opportunity"
+Cohesion: 0.39
+Nodes (5): byZip(), data(), list(), mean(), opportunityIndex()
+
+### Community 217 - "Revenue Search Intent"
+Cohesion: 0.46
+Nodes (7): baselineCloseRate(), classify(), clock(), clusterKeywords(), marketing(), nowMs(), world()
+
+### Community 218 - "Revenue Trust Gap"
+Cohesion: 0.39
+Nodes (6): assess(), clock(), data(), list(), nowMs(), world()
+
+### Community 219 - "Rules Firebase Emulators"
 Cohesion: 0.25
 Nodes (7): emulators, firestore, singleProjectMode, ui, firestore, port, enabled
 
-### Community 201 - "Simulation Monte Carlo"
+### Community 220 - "Simulation Monte Carlo"
 Cohesion: 0.36
 Nodes (4): estimator(), hashSeed(), mulberry32(), run()
 
-### Community 202 - "Quote Win"
+### Community 221 - "Quote Win"
 Cohesion: 0.50
 Nodes (7): chip(), color(), esc(), model(), rbac(), renderInto(), U()
 
-### Community 203 - "Unit Pricing Optimizer"
+### Community 222 - "Unit Pricing Optimizer"
 Cohesion: 0.29
 Nodes (4): BASE, iso(), { makeRunner, setupEnv, load }, seed()
 
-### Community 205 - "Customers Customer Store"
+### Community 224 - "Customers Customer Store"
 Cohesion: 0.48
 Nodes (5): add(), get(), list(), remove(), _storageOrThrow()
 
-### Community 206 - "Genesis Agent Factory"
+### Community 225 - "Genesis Agent Factory"
 Cohesion: 0.52
 Nodes (6): ids(), nameFor(), pairKey(), slugTokens(), splice(), template()
 
-### Community 207 - "Intelligence Signal Quality"
+### Community 226 - "Innovation Automation Discovery"
+Cohesion: 0.52
+Nodes (5): analyze(), cfg(), clamp01(), flag(), num()
+
+### Community 227 - "Intelligence Signal Quality"
 Cohesion: 0.48
 Nodes (5): clock(), ledger(), nowMs(), registry(), score()
 
-### Community 208 - "Rules Rules Test"
+### Community 228 - "Revenue Referral Engine"
+Cohesion: 0.38
+Nodes (4): data(), forCustomer(), list(), opportunities()
+
+### Community 229 - "Revenue Reputation Engine"
+Cohesion: 0.43
+Nodes (5): assess(), clock(), data(), list(), nowMs()
+
+### Community 230 - "Revenue Review Velocity"
+Cohesion: 0.43
+Nodes (5): assess(), clock(), data(), list(), nowMs()
+
+### Community 231 - "Rules Rules Test"
 Cohesion: 0.33
 Nodes (6): check(), fs, { initializeTestEnvironment, assertSucceeds, assertFails }, main(), path, { setDoc, getDoc, updateDoc, deleteDoc, doc }
 
-### Community 209 - "Services Measurement Parser"
+### Community 232 - "Services Measurement Parser"
 Cohesion: 0.48
 Nodes (5): ok(), parse(), _parseBinary(), parseText(), _readAscii()
 
-### Community 211 - "Unit Assisted Drafts"
+### Community 234 - "Unit Assisted Drafts"
 Cohesion: 0.33
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 212 - "Unit Quote Win"
+### Community 235 - "Unit Quote Win"
 Cohesion: 0.33
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 213 - "Agents Action Safety"
+### Community 236 - "Agents Action Safety"
 Cohesion: 0.53
 Nodes (4): assess(), categoriesFor(), textOf(), toolOf()
 
-### Community 214 - "Ai Sidekick Context"
+### Community 237 - "Ai Sidekick Context"
 Cohesion: 0.60
 Nodes (5): detectArrival(), getCurrentPositionSafe(), haversineDistanceMeters(), pollArrival(), toRadians()
 
-### Community 215 - "Core Data"
+### Community 238 - "Core Data"
 Cohesion: 0.40
 Nodes (6): AAA_DATA (shared memory + callAgent funnel), Server-Side Claude Proxy (Firebase claudeProxy / Supabase claude-proxy), AAA_GOVERNANCE_SYNC (cloud persistence), Bluetooth Laser Measurement Layer, Firebase Cloud Backend Setup, Supabase Backend Setup (shared memory + AI proxy)
 
-### Community 216 - "Functions Index"
+### Community 239 - "Functions Index"
 Cohesion: 0.33
 Nodes (5): ANTHROPIC_API_KEY, { defineSecret }, nemo, NVIDIA_API_KEY, { onRequest }
 
-### Community 219 - "Functions Transport Webhook"
+### Community 242 - "Functions Transport Webhook"
 Cohesion: 0.47
 Nodes (4): config, json(), normTwilio(), parse()
 
-### Community 220 - "Governance Governance Bridge"
+### Community 243 - "Governance Governance Bridge"
 Cohesion: 0.60
 Nodes (5): attach(), events(), init(), measure(), reg()
 
-### Community 222 - "Simulation Strategy Scorecard"
+### Community 244 - "Intelligence Resource Allocator"
+Cohesion: 0.67
+Nodes (5): allocateDetailed(), allocateResourcesForGoal(), distance(), goalEngine(), num()
+
+### Community 245 - "Revenue Revenue Dashboard"
+Cohesion: 0.67
+Nodes (5): clock(), nowISO(), nowMs(), sig(), view()
+
+### Community 246 - "Revenue Timing Engine"
+Cohesion: 0.47
+Nodes (4): bestWindow(), data(), list(), topIndex()
+
+### Community 248 - "Simulation Strategy Scorecard"
 Cohesion: 0.47
 Nodes (3): dashboard(), governance(), ledger()
 
-### Community 223 - "Test Run Rules"
+### Community 249 - "Test Run Rules"
 Cohesion: 0.33
 Nodes (5): cp, dir, fs, path, r
 
-### Community 224 - "Hermes Console"
+### Community 250 - "Hermes Console"
 Cohesion: 0.60
 Nodes (5): bubble(), esc(), hermes(), render(), U()
 
-### Community 225 - "Unit Agent Council"
+### Community 251 - "Unit Agent Council"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 226 - "Unit Agent Evaluation"
+### Community 252 - "Unit Agent Evaluation"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 227 - "Unit Ai Operations"
+### Community 253 - "Unit Ai Operations"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 228 - "Unit Business Digital"
+### Community 254 - "Unit Business Digital"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 229 - "Unit Calibration"
+### Community 255 - "Unit Calibration"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 230 - "Unit Event Stream"
+### Community 256 - "Unit Event Stream"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 231 - "Unit Executive Council"
+### Community 257 - "Unit Executive Council"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 232 - "Unit Financial Intelligence"
+### Community 258 - "Unit Financial Intelligence"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 233 - "Unit Governance Registry"
+### Community 259 - "Unit Governance Registry"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 234 - "Unit Knowledge Os"
+### Community 260 - "Unit Knowledge Os"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 235 - "Unit Learning Fabric"
+### Community 261 - "Unit Learning Fabric"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 236 - "Unit Learning Feedback"
+### Community 262 - "Unit Learning Feedback"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 237 - "Unit Model Governance"
+### Community 263 - "Unit Model Governance"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 238 - "Unit Native Model"
+### Community 264 - "Unit Native Model"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 239 - "Unit Outcome Intelligence"
+### Community 265 - "Unit Outcome Intelligence"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 240 - "Unit Owner Copilot"
+### Community 266 - "Unit Owner Copilot"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 241 - "Unit Privacy Dashboard"
+### Community 267 - "Unit Privacy Dashboard"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 242 - "Unit Proposal Review"
+### Community 268 - "Unit Proposal Review"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 243 - "Unit Provenance"
+### Community 269 - "Unit Provenance"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 244 - "Unit Reliability"
+### Community 270 - "Unit Reliability"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 245 - "Unit Replay Sandbox"
+### Community 271 - "Unit Replay Sandbox"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 246 - "Unit Security"
+### Community 272 - "Unit Security"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 247 - "Unit Sensing"
+### Community 273 - "Unit Sensing"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 248 - "Unit Transport Dashboard"
+### Community 274 - "Unit Teleological Test"
+Cohesion: 0.33
+Nodes (3): CURRENT, GOAL, { makeRunner, setupEnv, load }
+
+### Community 275 - "Unit Transport Dashboard"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 249 - "Unit Transport Inbox"
+### Community 276 - "Unit Transport Inbox"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 250 - "Unit Vector Memory"
+### Community 277 - "Unit Vector Memory"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
-### Community 251 - "Icons Icon 192"
+### Community 278 - "Icons Icon 192"
 Cohesion: 0.50
 Nodes (5): Web App Manifest (AAA HyperKernel), AAA HyperKernel Progressive Web App, PWA Icon 192x192 (fully transparent placeholder, no artwork), HyperKernel PWA App Icon (512x512), White glyph on transparent background (exact shape indiscernible against white viewer background)
 
-### Community 252 - "Ai Sidekick Closure"
+### Community 279 - "Ai Sidekick Closure"
 Cohesion: 0.80
 Nodes (4): auditJobFile(), photoEvidence(), verifyPhotos(), verifySyncStatus()
 
-### Community 253 - "Ai Sidekick Vision"
+### Community 280 - "Ai Sidekick Vision"
 Cohesion: 0.70
 Nodes (4): analyzeCarpetDamage(), captureAndAnalyze(), fileToBase64(), visionEndpoint()
 
-### Community 255 - "Data Eval Golden"
+### Community 282 - "Data Eval Golden"
 Cohesion: 0.40
 Nodes (4): cases, _comment, synthetic, version
 
-### Community 256 - "Functions Transport Send"
+### Community 283 - "Functions Transport Send"
 Cohesion: 0.60
 Nodes (4): config, json(), sendEmail(), sendSms()
 
-### Community 257 - "Genesis Capability Roi"
+### Community 284 - "Genesis Capability Roi"
 Cohesion: 0.70
 Nodes (3): compute(), leaderboard(), ledger()
 
-### Community 258 - "Governance Governance Integrity"
+### Community 285 - "Governance Governance Integrity"
 Cohesion: 0.70
 Nodes (4): check(), escalation(), ledger(), selfAudit()
 
-### Community 260 - "Test Package"
+### Community 291 - "Test Package"
 Cohesion: 0.40
 Nodes (4): description, name, private, type
 
-### Community 261 - "Governance Badge"
+### Community 292 - "Governance Badge"
 Cohesion: 0.70
 Nodes (4): esc(), openDrawer(), reg(), ui()
 
-### Community 264 - "Unit Capability Economy"
+### Community 295 - "Unit Capability Economy"
 Cohesion: 0.40
 Nodes (3): BADOUT, GOOD, { makeRunner, setupEnv, load }
 
-### Community 268 - "Unit Outcome Learning"
+### Community 298 - "Unit Innovation Council"
+Cohesion: 0.50
+Nodes (3): iso(), { makeRunner, setupEnv, load }, seed()
+
+### Community 300 - "Unit Outcome Learning"
 Cohesion: 0.50
 Nodes (4): BASE, iso(), { makeRunner, setupEnv, load }, seed()
 
-### Community 269 - "Unit Pricing Optimizer"
+### Community 301 - "Unit Pricing Optimizer"
 Cohesion: 0.50
 Nodes (4): BASE, iso(), { makeRunner, setupEnv, load }, seed()
 
-### Community 271 - "Agents Marketing Intel"
+### Community 303 - "Unit Revenue Council"
+Cohesion: 0.50
+Nodes (3): iso(), { makeRunner, setupEnv, load }, seed()
+
+### Community 304 - "Agents Marketing Intel"
 Cohesion: 0.83
 Nodes (3): channelStats(), data(), review()
 
-### Community 274 - "Genesis Agent Template"
+### Community 307 - "Genesis Agent Template"
 Cohesion: 0.83
 Nodes (3): typeOf(), validate(), validateAgainst()
 
-### Community 290 - "Hyperkernel Five Primitives"
+### Community 308 - "Innovation Innovation Dashboard"
+Cohesion: 0.83
+Nodes (3): clock(), nowISO(), view()
+
+### Community 312 - "Revenue Budget Physics"
+Cohesion: 0.83
+Nodes (3): allocate(), marketing(), num()
+
+### Community 313 - "Revenue Followup Intelligence"
+Cohesion: 0.83
+Nodes (3): sequence(), silence(), timing()
+
+### Community 314 - "Revenue Objection Forecast"
+Cohesion: 0.83
+Nodes (3): forecast(), num(), trust()
+
+### Community 326 - "Hyperkernel Five Primitives"
 Cohesion: 0.67
 Nodes (3): Five Closed Primitives (Entity, Relationship, Event, Decision, Memory), AAA HyperKernel (operational intelligence layer), Kernel Invariants (10 rules every change must preserve)
 
@@ -1382,24 +1547,24 @@ Nodes (3): Five Closed Primitives (Entity, Relationship, Event, Decision, Memory
   /home/user/aaa-hyperkernel/icons/icon-512.png · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **404 isolated node(s):** `root`, `browser`, `es2022`, `ecmaVersion`, `sourceType` (+399 more)
+- **409 isolated node(s):** `root`, `browser`, `es2022`, `ecmaVersion`, `sourceType` (+404 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **33 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **38 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **What is the exact relationship between `HyperKernel PWA App Icon (512x512)` and `White glyph on transparent background (exact shape indiscernible against white viewer background)`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
-- **Why does `F()` connect `Intelligence Prediction Closure` to `Agents Pricing Optimizer`, `Providers Private Gpu`, `Transport Transport Store`?**
+- **Why does `makeRunner()` connect `Unit Review Safety` to `Unit Audit Ledger`, `Unit Event Stream`, `Unit Executive Council`, `Unit Financial Intelligence`, `Unit Governance Registry`, `Unit Knowledge Os`, `Unit Learning Fabric`, `Unit Learning Feedback`, `Unit Model Governance`, `Unit Bluetooth Connect`, `Unit Native Model`, `Unit Outcome Intelligence`, `Unit Owner Copilot`, `Unit Privacy Dashboard`, `Unit Proposal Review`, `Unit Provenance`, `Unit Reliability`, `Unit Replay Sandbox`, `Unit Security`, `Unit Sensing`, `Unit Teleological Test`, `Unit Transport Dashboard`, `Unit Transport Inbox`, `Unit Vector Memory`, `Unit Capability Economy`, `Unit Estimator`, `Unit Financial Intelligence`, `Unit Innovation Council`, `Unit Legal War`, `Unit Outcome Learning`, `Unit Pricing Optimizer`, `Unit Quote Lifecycle`, `Unit Revenue Council`, `Unit Calibration Runtime`, `Unit Content Safety`, `Unit Genesis Foundry`, `Unit Governance Bridge`, `Unit Prediction Closure`, `Unit Simulation Council`, `Unit World Model`, `Unit Private Gpu`, `Unit Pricing Optimizer`, `Unit Assisted Drafts`, `Unit Quote Win`, `Unit Agent Council`, `Unit Agent Evaluation`, `Unit Ai Operations`, `Unit Business Digital`, `Unit Calibration`?**
+  _High betweenness centrality (0.003) - this node is a cross-community bridge._
+- **Why does `setupEnv()` connect `Unit Audit Ledger` to `Unit Event Stream`, `Unit Executive Council`, `Unit Financial Intelligence`, `Unit Governance Registry`, `Unit Review Safety`, `Unit Knowledge Os`, `Unit Learning Fabric`, `Unit Learning Feedback`, `Unit Model Governance`, `Unit Bluetooth Connect`, `Unit Native Model`, `Unit Outcome Intelligence`, `Unit Owner Copilot`, `Unit Privacy Dashboard`, `Unit Proposal Review`, `Unit Provenance`, `Unit Reliability`, `Unit Replay Sandbox`, `Unit Security`, `Unit Sensing`, `Unit Teleological Test`, `Unit Transport Dashboard`, `Unit Transport Inbox`, `Unit Vector Memory`, `Unit Capability Economy`, `Unit Estimator`, `Unit Financial Intelligence`, `Unit Innovation Council`, `Unit Legal War`, `Unit Outcome Learning`, `Unit Pricing Optimizer`, `Unit Quote Lifecycle`, `Unit Revenue Council`, `Unit Calibration Runtime`, `Unit Content Safety`, `Unit Genesis Foundry`, `Unit Governance Bridge`, `Unit Prediction Closure`, `Unit Simulation Council`, `Core Rbac`, `Unit World Model`, `Unit Private Gpu`, `Unit Pricing Optimizer`, `Unit Assisted Drafts`, `Unit Quote Win`, `Unit Agent Council`, `Unit Agent Evaluation`, `Unit Ai Operations`, `Unit Business Digital`, `Unit Calibration`?**
+  _High betweenness centrality (0.002) - this node is a cross-community bridge._
+- **Why does `load()` connect `Unit Audit Ledger` to `Unit Event Stream`, `Unit Executive Council`, `Unit Financial Intelligence`, `Unit Governance Registry`, `Unit Review Safety`, `Unit Knowledge Os`, `Unit Learning Fabric`, `Unit Learning Feedback`, `Unit Model Governance`, `Unit Bluetooth Connect`, `Unit Native Model`, `Unit Outcome Intelligence`, `Unit Owner Copilot`, `Unit Privacy Dashboard`, `Unit Proposal Review`, `Unit Provenance`, `Unit Reliability`, `Unit Replay Sandbox`, `Unit Security`, `Unit Sensing`, `Unit Teleological Test`, `Unit Transport Dashboard`, `Unit Transport Inbox`, `Unit Vector Memory`, `Unit Capability Economy`, `Unit Estimator`, `Unit Financial Intelligence`, `Unit Innovation Council`, `Unit Legal War`, `Unit Outcome Learning`, `Unit Pricing Optimizer`, `Unit Quote Lifecycle`, `Unit Revenue Council`, `Unit Calibration Runtime`, `Unit Content Safety`, `Unit Genesis Foundry`, `Unit Governance Bridge`, `Unit Prediction Closure`, `Unit Simulation Council`, `Core Rbac`, `Unit World Model`, `Unit Private Gpu`, `Unit Pricing Optimizer`, `Unit Assisted Drafts`, `Unit Quote Win`, `Unit Agent Council`, `Unit Agent Evaluation`, `Unit Ai Operations`, `Unit Business Digital`, `Unit Calibration`?**
   _High betweenness centrality (0.002) - this node is a cross-community bridge._
 - **What connects `root`, `browser`, `es2022` to the rest of the system?**
-  _409 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _414 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Unit Audit Ledger` be split into smaller, more focused modules?**
-  _Cohesion score 0.025903673790997735 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.02564102564102564 - nodes in this community are weakly interconnected._
 - **Should `Intelligence Prediction Closure` be split into smaller, more focused modules?**
-  _Cohesion score 0.05028305028305028 - nodes in this community are weakly interconnected._
-- **Should `Accounting Expense Classifier` be split into smaller, more focused modules?**
-  _Cohesion score 0.06758832565284179 - nodes in this community are weakly interconnected._
-- **Should `Intelligence Vector Memory` be split into smaller, more focused modules?**
-  _Cohesion score 0.0784313725490196 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05153153153153153 - nodes in this community are weakly interconnected._
