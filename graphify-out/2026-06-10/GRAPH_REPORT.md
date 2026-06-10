@@ -1,16 +1,16 @@
 # Graph Report - aaa-hyperkernel  (2026-06-10)
 
 ## Corpus Check
-- 680 files · ~573,565 words
+- 680 files · ~574,599 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 7374 nodes · 13013 edges · 581 communities (520 shown, 61 thin omitted)
+- 7376 nodes · 13017 edges · 582 communities (521 shown, 61 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 34 edges (avg confidence: 0.81)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `9fe4f168`
+- Built from commit: `4e5cf495`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -530,6 +530,7 @@
 - [[_COMMUNITY_Community 528|Community 528]]
 - [[_COMMUNITY_Community 529|Community 529]]
 - [[_COMMUNITY_Community 530|Community 530]]
+- [[_COMMUNITY_Community 531|Community 531]]
 - [[_COMMUNITY_Community 532|Community 532]]
 - [[_COMMUNITY_Community 533|Community 533]]
 - [[_COMMUNITY_Community 534|Community 534]]
@@ -580,14 +581,14 @@
 ## Surprising Connections (you probably didn't know these)
 - `AAA_LEGAL_RISK (deterministic legal risk engine)` --semantically_similar_to--> `Override Drift Detection (pattern alerts)`  [INFERRED] [semantically similar]
   js/legal/legal-risk-engine.js → GOVERNANCE.md
-- `Customer Portal Page (portal.html)` --references--> `$()`  [EXTRACTED]
-  portal.html → js/portal/portal-app.js
-- `Honest-by-construction` --rationale_for--> `AAA_AGENT_OS (agent runtime)`  [EXTRACTED]
-  HYPERKERNEL.md → js/agents/agent-os.js
 - `Honest-by-construction` --rationale_for--> `AAA_INTEL_PIPELINE (six-layer pipeline runner)`  [INFERRED]
   HYPERKERNEL.md → js/intelligence/intelligence-pipeline.js
 - `Legal Intelligence Division (CLIO agent org)` --references--> `DECISION_SCHEMA (enforced decision shape)`  [EXTRACTED]
   docs/legal-intelligence-division.md → js/agents/agent-registry.js
+- `Customer Portal Page (portal.html)` --references--> `$()`  [EXTRACTED]
+  portal.html → js/portal/portal-app.js
+- `Huepar S60 Provisional Protocol (experimental/huepar-s60-v1)` --rationale_for--> `AAA_HUEPAR_S60_ADAPTER`  [EXTRACTED]
+  SETUP-BLUETOOTH-MEASUREMENT.md → js/bluetooth/services/huepar-s60-adapter.js
 
 ## Import Cycles
 - None detected.
@@ -597,15 +598,15 @@
 - **HyperKernel Phase-1 founding architecture** — hyperkernel_event_taxonomy, hyperkernel_derived_graph, hyperkernel_five_primitives, hyperkernel_provenance, hyperkernel_closure_loops, hyperkernel_council_structure, hyperkernel_agent_lifecycle, hyperkernel_memory_lifecycle, hyperkernel_audit_architecture, hyperkernel_kernel_invariants, hyperkernel_hyperkernel [EXTRACTED 1.00]
 - **Bluetooth laser measurement pipeline (capture to quote)** — services_raw_reading_log_rawbluetoothreadinglog, services_measurement_parser_measurementparser, services_generic_ble_adapter_genericblemeasurementadapter, services_device_adapter_registry_deviceadapterregistry, services_huepar_s60_adapter_aaa_huepar_s60_adapter, hooks_use_bluetooth_connection_aaa_bluetooth, storage_measurement_store, measurements_measurement_ai_assistant, integrations_measurement_to_quote [EXTRACTED 1.00]
 
-## Communities (581 total, 61 thin omitted)
+## Communities (582 total, 61 thin omitted)
 
 ### Community 0 - "Unit Audit Ledger"
 Cohesion: 0.02
 Nodes (96): load(), makeClock(), makeConfig(), makeData(), makeEvents(), makeIds(), makeRunner(), path (+88 more)
 
 ### Community 1 - "Intelligence Vector Memory"
-Cohesion: 0.08
-Nodes (43): Memory Lifecycle (capture, normalize, index, recall, score, decay), cfg(), clock(), data(), ingest(), insights(), listQuotes(), mean() (+35 more)
+Cohesion: 0.14
+Nodes (22): allowed(), cfg(), clock(), data(), embed(), feature(), hash32(), index() (+14 more)
 
 ### Community 2 - "Intelligence Executive Council"
 Cohesion: 0.08
@@ -616,8 +617,8 @@ Cohesion: 0.05
 Nodes (46): asyncapi, channels, comm.inbound, comm.notification, job.closed, quote.created, quote.sent, recommendation.created (+38 more)
 
 ### Community 4 - "Transport Transport Core"
-Cohesion: 0.13
-Nodes (44): adapters(), analytics(), applyStatusEvent(), _attachOutbound(), biz(), cfg(), clock(), closeThread() (+36 more)
+Cohesion: 0.07
+Nodes (65): Memory Lifecycle (capture, normalize, index, recall, score, decay), cfg(), clock(), data(), ingest(), insights(), listQuotes(), mean() (+57 more)
 
 ### Community 5 - "Core Privacy"
 Cohesion: 0.13
@@ -872,8 +873,8 @@ Cohesion: 0.21
 Nodes (16): cfg(), clock(), create(), createFromJob(), data(), get(), ids(), list() (+8 more)
 
 ### Community 68 - "Functions Nemotron Translate"
-Cohesion: 0.13
-Nodes (15): config, fromResponse(), resolveModel(), base, empty, img, req, resp (+7 more)
+Cohesion: 0.10
+Nodes (20): ANTHROPIC_API_KEY, { defineSecret }, nemo, NVIDIA_API_KEY, { onRequest }, config, fromResponse(), resolveModel() (+12 more)
 
 ### Community 69 - "Measurements Field Capture"
 Cohesion: 0.25
@@ -1100,8 +1101,8 @@ Cohesion: 0.30
 Nodes (13): cfg(), clock(), data(), enqueue(), ids(), isOnline(), mine(), newId() (+5 more)
 
 ### Community 125 - "Core Runtime"
-Cohesion: 0.31
-Nodes (13): _audit(), canHuman(), cfg(), clock(), cloud(), data(), events(), ids() (+5 more)
+Cohesion: 0.22
+Nodes (17): AAA_RBAC, _audit(), canHuman(), cfg(), clock(), cloud(), data(), events() (+9 more)
 
 ### Community 126 - "Field Layout Plan"
 Cohesion: 0.27
@@ -1248,8 +1249,8 @@ Cohesion: 0.29
 Nodes (9): audit(), baseAnalyzer(), cards(), clock(), data(), ledger(), now(), recommendations() (+1 more)
 
 ### Community 162 - "Hyperkernel Council Structure"
-Cohesion: 0.12
-Nodes (17): Council Structure (adversarial debate venues), AAA Analysis Division — Autonomous Intelligence Org, Action Safety Gate (`AAA_ACTION_GATE`), Analyst Rankings (`AAA_RANKINGS`), AAA_DEBATE (Critic -> Risk -> Supervisor debate engine), AAA_EVOLUTION (Evolution Engine), Executive Intelligence Dashboard (`AAA_INTEL_DASHBOARD`), AAA_MEETINGS (cadenced intelligence meetings) (+9 more)
+Cohesion: 0.18
+Nodes (10): AAA Analysis Division — Autonomous Intelligence Org, Action Safety Gate (`AAA_ACTION_GATE`), Executive Intelligence Dashboard (`AAA_INTEL_DASHBOARD`), Internal debate (`AAA_DEBATE`), Meetings (`AAA_MEETINGS`), Model Router (`AAA_MODEL_ROUTER`), Self-evolution (`AAA_EVOLUTION`), Tests (+2 more)
 
 ### Community 163 - "Legal Legal Division"
 Cohesion: 0.32
@@ -1296,8 +1297,8 @@ Cohesion: 0.44
 Nodes (11): canUse(), chip(), empty(), esc(), open(), rbac(), render(), runQuery() (+3 more)
 
 ### Community 174 - "Docs Legal Intelligence"
-Cohesion: 0.18
-Nodes (11): AAA_ACTION_GATE (Action Safety Gate), AAA_AGENT_OS (agent runtime), DECISION_SCHEMA (enforced decision shape), AAA_MODEL_ROUTER (task-aware model selection), Legal Intelligence Division (CLIO agent org), legal_records Versioned Append-Only Memory, Override Drift Detection (pattern alerts), Agent Lifecycle (define to evolve/retire under contract) (+3 more)
+Cohesion: 0.22
+Nodes (9): AAA_ACTION_GATE (Action Safety Gate), AAA_AGENT_OS (agent runtime), DECISION_SCHEMA (enforced decision shape), AAA_MODEL_ROUTER (task-aware model selection), 6. Learning loops, Agent Lifecycle (define to evolve/retire under contract), Autonomy Bounded by Reversibility, Honest-by-construction (+1 more)
 
 ### Community 175 - "Agents Agent Os"
 Cohesion: 0.44
@@ -1332,8 +1333,8 @@ Cohesion: 0.40
 Nodes (10): canRunAgents(), cfg(), evaluate(), govern(), ledger(), maxCostCap(), maxRuntimeCap(), num() (+2 more)
 
 ### Community 183 - "Governance Agent Outcomes"
-Cohesion: 0.20
-Nodes (11): AAA_AGENT_OUTCOMES (Agent Outcome Registry), AAA_AGENT_SCORECARDS, AAA_AUDIT_LEDGER, AAA_GOVERNANCE_BRIDGE (automatic measurement), AAA_GOVERNANCE_INTEGRITY (on-device self-audit), AAA_GOVERNANCE_LEARNING (Learning Command Center), AAA_GOVERNANCE_SUPERVISOR, Hash-Chained Immutable Audit Trail (+3 more)
+Cohesion: 0.11
+Nodes (14): AAA_EVENT_BUS (durable hash-chained event bus), AAA_AGENT_OUTCOMES (Agent Outcome Registry), AAA_AGENT_SCORECARDS, AAA_AUDIT_LEDGER, AAA_GOVERNANCE_BRIDGE (automatic measurement), AAA_GOVERNANCE_INTEGRITY (on-device self-audit), AAA_GOVERNANCE_LEARNING (Learning Command Center), AAA_GOVERNANCE_SUPERVISOR (+6 more)
 
 ### Community 184 - "Innovation Business Model"
 Cohesion: 0.35
@@ -1404,8 +1405,8 @@ Cohesion: 0.38
 Nodes (9): ask(), briefing(), gate(), goal(), memory(), query(), router(), sim() (+1 more)
 
 ### Community 201 - "Functions Governance Alert"
-Cohesion: 0.20
-Nodes (4): ALLOWED, config, AAA_GOVERNANCE_ESCALATION, AAA_GOVERNANCE_NOTIFIER
+Cohesion: 0.12
+Nodes (12): AAA_REVIEW_REQUEST_ENGINE, AAA_CONTENT_SAFETY (Nemotron content-safety guardrail), ALLOWED, config, Override Drift Detection (pattern alerts), Fail-Closed Override Policy, AAA_GOVERNANCE_ENGINE, AAA_GOVERNANCE_ESCALATION (+4 more)
 
 ### Community 202 - "Innovation Venture Discovery"
 Cohesion: 0.36
@@ -1464,8 +1465,8 @@ Cohesion: 0.22
 Nodes (8): dependencies, firebase-functions, description, engines, node, main, name, private
 
 ### Community 216 - "Functions Private Gpu"
-Cohesion: 0.13
-Nodes (10): TIMEOUT_MS, 6. Learning loops, Honest-by-construction, The three closure loops, AAA_ANALYSIS_DIVISION (six teams), AAA_INTEL_COLLECTORS (deterministic data rollups), AAA_INTEL_PIPELINE (six-layer pipeline runner), Six-Layer Intelligence Pipeline (+2 more)
+Cohesion: 0.25
+Nodes (3): TIMEOUT_MS, AAA_PRIVATE_GPU_TRANSPORT, Governed Private GPU Model Provider (P24)
 
 ### Community 217 - "Governance Governance Sync"
 Cohesion: 0.44
@@ -1516,8 +1517,8 @@ Cohesion: 0.50
 Nodes (7): briefing(), clock(), discovery(), nowISO(), nowMs(), ok(), query()
 
 ### Community 230 - "Core Event"
-Cohesion: 0.25
-Nodes (3): AAA_EVENT_BUS (durable hash-chained event bus), Dual Event Bus (synchronous reactions + durable hash-chained truth), 25-Event Business Taxonomy
+Cohesion: 0.20
+Nodes (11): Council Structure (adversarial debate venues), AAA_ANALYSIS_DIVISION (six teams), Analyst Rankings (`AAA_RANKINGS`), AAA_DEBATE (Critic -> Risk -> Supervisor debate engine), AAA_EVOLUTION (Evolution Engine), AAA_INTEL_COLLECTORS (deterministic data rollups), AAA_MEETINGS (cadenced intelligence meetings), AAA_INTEL_PIPELINE (six-layer pipeline runner) (+3 more)
 
 ### Community 231 - "Core Knowledge Graph"
 Cohesion: 0.39
@@ -1669,7 +1670,7 @@ Nodes (5): esc(), html(), mount(), optimizer(), renderModel()
 
 ### Community 271 - "Functions Index"
 Cohesion: 0.33
-Nodes (5): ANTHROPIC_API_KEY, { defineSecret }, nemo, NVIDIA_API_KEY, { onRequest }
+Nodes (6): 4. Primitive schemas, Decision, Entity, Event, Memory, Relationship
 
 ### Community 274 - "Functions Transport Webhook"
 Cohesion: 0.47
@@ -1964,8 +1965,8 @@ Cohesion: 0.38
 Nodes (9): data(), esc(), has(), hhmm(), mount(), openTeam(), quiet(), renderModel() (+1 more)
 
 ### Community 368 - "Unit Review Safety"
-Cohesion: 0.25
-Nodes (17): actorLabel(), _assembleModel(), clock(), countUp(), data(), esc(), fmtMoney(), fmtValue() (+9 more)
+Cohesion: 0.22
+Nodes (19): actorLabel(), _assembleModel(), clock(), countUp(), data(), esc(), fmtMoney(), fmtValue() (+11 more)
 
 ### Community 369 - "Unit Transport Scheduler"
 Cohesion: 0.67
@@ -1976,8 +1977,8 @@ Cohesion: 0.05
 Nodes (41): Also install from Community Plugins (not pre-installed), Architecture, `/autoresearch`: autonomous research loop, AutoResearch: program.md, Banner Plugin, `/canvas`: visual layer, claude-obsidian: Self-Organizing AI Second Brain for Obsidian + Claude Code, Commands (+33 more)
 
 ### Community 377 - "Hyperkernel Five Primitives"
-Cohesion: 0.07
-Nodes (28): 10. Audit architecture, 1. The 25 highest-value business events, 2. Event taxonomy, 3. Graph schema, 4. Primitive schemas, 5. Governance model, 7. Council structure, 8. Agent lifecycle (+20 more)
+Cohesion: 0.13
+Nodes (14): 10. Audit architecture, 1. The 25 highest-value business events, 2. Event taxonomy, 7. Council structure, 8. Agent lifecycle, 9. Memory lifecycle, AAA HyperKernel — Founding Architecture (Phase 1), Contract discipline (no drift, no fake success) (+6 more)
 
 ### Community 381 - "Unit Field Capture"
 Cohesion: 0.10
@@ -2519,6 +2520,10 @@ Nodes (3): Audio transcription function (`/api/transcribe`), Configuration, Cont
 Cohesion: 0.29
 Nodes (5): AAA_ACCOUNTING (books, P&L, job costing), AAA_RECEIPT_INTAKE (review queue + posting), config, RECEIPT_SCHEMA, Receipt Intelligence Pipeline (capture, OCR, classify, human review, post)
 
+### Community 531 - "Community 531"
+Cohesion: 0.50
+Nodes (4): 3. Graph schema, Node types, Provenance is a first-class query, Why a derived graph, not a graph database
+
 ### Community 532 - "Community 532"
 Cohesion: 0.50
 Nodes (3): See also, Sources, {{title}}
@@ -2540,8 +2545,8 @@ Cohesion: 0.67
 Nodes (3): installDom(), makeEl(), { makeRunner, setupEnv, load }
 
 ### Community 538 - "Community 538"
-Cohesion: 0.33
-Nodes (7): AAA_REVIEW_REQUEST_ENGINE, AAA_CONTENT_SAFETY (Nemotron content-safety guardrail), AAA_RBAC, Fail-Closed Override Policy, AAA_GOVERNANCE_ENGINE, Fail-Closed Review-Safety Verdict Mapping, NVIDIA Nemotron Provider (hosted, OpenAI-compatible)
+Cohesion: 0.50
+Nodes (4): 5. Governance model, Every action must be six things, Governance record, The governed action pipeline
 
 ### Community 546 - "Community 546"
 Cohesion: 0.67
@@ -2576,4 +2581,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `Unit Audit Ledger` be split into smaller, more focused modules?**
   _Cohesion score 0.02182942142374191 - nodes in this community are weakly interconnected._
 - **Should `Intelligence Vector Memory` be split into smaller, more focused modules?**
-  _Cohesion score 0.0784313725490196 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.14461538461538462 - nodes in this community are weakly interconnected._

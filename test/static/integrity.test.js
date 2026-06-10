@@ -4,7 +4,9 @@
  *  2. every <script src="/js/..."> in index.html resolves to a real file,
  *  3. every '/js/...' entry precached in sw.js resolves to a real file,
  *  4. portal.html exists and references the portal script,
- *  5. the service worker declares a CACHE_NAME version.
+ *  5. the service worker declares a CACHE_NAME version,
+ *  6. PRECACHE parity — every script/stylesheet index.html references is
+ *     precached (offline-first must cover the whole app, not half of it).
  */
 'use strict';
 const fs = require('fs');
@@ -52,6 +54,21 @@ module.exports = function run() {
 
   // 5. sw version present
   t.ok('sw CACHE_NAME present', /CACHE_NAME\s*=\s*'hyperkernel-v\d+'/.test(sw));
+
+  // 6. PRECACHE parity with index.html (both directions for js/css)
+  const preBlock = (sw.match(/const PRECACHE = \[([\s\S]*?)\];/) || [, ''])[1];
+  const precached = new Set((preBlock.match(/'[^']+'/g) || []).map((s) => s.slice(1, -1)));
+  const referenced = []
+    .concat((index.match(/<script src="([^"]+)"/g) || []).map((s) => s.slice(13, -1)))
+    .concat((index.match(/<link rel="stylesheet" href="([^"]+)"/g) || []).map((s) => s.slice(29, -1)));
+  let notPre = 0;
+  referenced.forEach((rel) => { if (!precached.has(rel)) { notPre++; t.ok('not precached: ' + rel, false); } });
+  t.ok('every index.html script/stylesheet is precached (' + referenced.length + ' refs)', notPre === 0);
+  let ghost = 0;
+  precached.forEach((p) => {
+    if ((p.endsWith('.js') || p.endsWith('.css')) && referenced.indexOf(p) === -1) { ghost++; t.ok('precached but not referenced by index.html: ' + p, false); }
+  });
+  t.ok('no ghost js/css precache entries', ghost === 0);
 
   return t.report();
 };

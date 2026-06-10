@@ -785,9 +785,9 @@
     "semantic_hash": "80999179f44965c1924259244e0dd6f3"
   },
   "js/ui/business-digital-twin-ui.js": {
-    "mtime": 1781099272.2066503,
-    "ast_hash": "26a5b7d91d283cb463b5123f2386b8fb",
-    "semantic_hash": "26a5b7d91d283cb463b5123f2386b8fb"
+    "mtime": 1781112102.7359378,
+    "ast_hash": "123a8a72a2ae26cea1376450ced1c141",
+    "semantic_hash": ""
   },
   "js/ui/business-ui.js": {
     "mtime": 1780633642.629047,
@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1781110900.5718663,
-    "ast_hash": "f88b6489eeb038f6bca0becea9ab80eb",
+    "mtime": 1781112233.9199457,
+    "ast_hash": "49f79b74444b7336d71358e841385eb2",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
@@ -3135,8 +3135,8 @@
     "semantic_hash": "3a677110dbdc4c18d7205f9a74069dd5"
   },
   "js/copilot/chat-canvas.js": {
-    "mtime": 1781110989.9158716,
-    "ast_hash": "e653f89d7a8e030db8557bdc492fe4e0",
+    "mtime": 1781112105.751938,
+    "ast_hash": "f746adc6679f73723267fedf453cb113",
     "semantic_hash": ""
   },
   "js/copilot/chat-intent-router.js": {
@@ -3185,9 +3185,9 @@
     "semantic_hash": "fcaf5fb2c7d990db5a38714ba3f8469c"
   },
   "test/unit/chat-canvas.test.js": {
-    "mtime": 1781099272.213686,
-    "ast_hash": "eecf4fe82650cda572de66251ac0f2c4",
-    "semantic_hash": "eecf4fe82650cda572de66251ac0f2c4"
+    "mtime": 1781112228.2879453,
+    "ast_hash": "52aa029c04edf62461d54656d5b4fb9b",
+    "semantic_hash": ""
   },
   "references/HYPERKERNEL_CHAT_CANVAS.md": {
     "mtime": 1781099272.2118452,
@@ -3380,13 +3380,13 @@
     "semantic_hash": ""
   },
   "js/ui/command-deck-ui.js": {
-    "mtime": 1781110975.3358707,
-    "ast_hash": "020fa2de95e96619dbddda3e682e9e30",
+    "mtime": 1781112087.4039369,
+    "ast_hash": "5e5dca0e883a3a2d0b9cfd2d2f21704c",
     "semantic_hash": ""
   },
   "test/unit/command-deck.test.js": {
-    "mtime": 1781111088.9398775,
-    "ast_hash": "88e287bf7ba8cf44432f2c38941934bf",
+    "mtime": 1781112146.6479404,
+    "ast_hash": "60c5c0ee98b1521f3dc4387e87ff4766",
     "semantic_hash": ""
   },
   "js/intelligence/opportunity-scorer.js": {
@@ -3395,8 +3395,8 @@
     "semantic_hash": ""
   },
   "js/ui/agent-command-ui.js": {
-    "mtime": 1781110297.7518306,
-    "ast_hash": "1fdf72bc6d03af3db13bcce416998b5a",
+    "mtime": 1781112045.8199344,
+    "ast_hash": "ba98ae991d6f097fd8b867dc44d49af5",
     "semantic_hash": ""
   },
   "test/unit/agent-command.test.js": {
@@ -3425,8 +3425,8 @@
     "semantic_hash": ""
   },
   "test/unit/digital-twin-ui.test.js": {
-    "mtime": 1781110570.5918467,
-    "ast_hash": "9c1611d7d3dbdb6f905473373bc6e767",
+    "mtime": 1781112219.1559448,
+    "ast_hash": "c145ed80ae6ba9f110be40c5d4d65660",
     "semantic_hash": ""
   }
 }
