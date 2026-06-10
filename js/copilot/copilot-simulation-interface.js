@@ -17,8 +17,8 @@
   // Map phrases → scenario {kind, params}.
   function parse(text) {
     const t = String(text == null ? '' : text).toLowerCase();
-    if (/raise|increase/.test(t) && /price/.test(t)) { const pct = (num(t, 5)) / (t.indexOf('%') !== -1 ? 100 : (num(t, 5) > 1 ? 100 : 1)); return { kind: 'price_change', params: { pct: Math.abs(pct) } }; }
-    if (/lower|drop|cut/.test(t) && /price/.test(t)) { const pct = (num(t, 5)) / 100; return { kind: 'price_change', params: { pct: -Math.abs(pct) } }; }
+    if (/raise|increase/.test(t) && /pric/.test(t)) { const pct = (num(t, 5)) / (t.indexOf('%') !== -1 ? 100 : (num(t, 5) > 1 ? 100 : 1)); return { kind: 'price_change', params: { pct: Math.abs(pct) } }; }
+    if (/lower|drop|cut/.test(t) && /pric/.test(t)) { const pct = (num(t, 5)) / 100; return { kind: 'price_change', params: { pct: -Math.abs(pct) } }; }
     if (/crew|hire/.test(t)) { return { kind: 'add_crew', params: { crews: Math.max(1, Math.round(num(t, 1))) } }; }
     if (/fuel/.test(t)) { const pct = /double/.test(t) ? 1.0 : (num(t, 20) / 100); return { kind: 'fuel_change', params: { pct: pct } }; }
     if (/cpc|ad spend|google|marketing/.test(t)) { const pct = /triple/.test(t) ? 2.0 : /double/.test(t) ? 1.0 : (num(t, 40) / 100); return { kind: 'ad_spend_change', params: { pct: pct } }; }

@@ -3880,9 +3880,9 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "/home/user/aaa-hyperkernel/test/run.js": {
-    "mtime": 1781094341.382794,
-    "ast_hash": "33f5469a86c5a355c71e088abc3dd75b",
-    "semantic_hash": "33f5469a86c5a355c71e088abc3dd75b"
+    "mtime": 1781094942.1988297,
+    "ast_hash": "955d79ef2ba7a67b5ed4b61c50060ffe",
+    "semantic_hash": "955d79ef2ba7a67b5ed4b61c50060ffe"
   },
   "/home/user/aaa-hyperkernel/test/smoke/boot.test.js": {
     "mtime": 1781065386.5464003,
@@ -4605,9 +4605,9 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "/home/user/aaa-hyperkernel/index.html": {
-    "mtime": 1781094365.3827953,
-    "ast_hash": "e9a28219703936cd031f264ed26e69cd",
-    "semantic_hash": "e9a28219703936cd031f264ed26e69cd"
+    "mtime": 1781095009.5668337,
+    "ast_hash": "a144c8058bb4e34564d54ec7c30ae3c7",
+    "semantic_hash": "a144c8058bb4e34564d54ec7c30ae3c7"
   },
   "/home/user/aaa-hyperkernel/netlify/functions/RESEARCH.md": {
     "mtime": 1780633642.6350634,
@@ -5015,9 +5015,9 @@
     "semantic_hash": "6b42223941fc67ffc1a0e89bf9965251"
   },
   "/home/user/aaa-hyperkernel/js/copilot/copilot-intent-router.js": {
-    "mtime": 1781094146.4587824,
-    "ast_hash": "489054d135528db2a1b6f78636e4c278",
-    "semantic_hash": "489054d135528db2a1b6f78636e4c278"
+    "mtime": 1781094969.8188314,
+    "ast_hash": "94822805de77c714240adfd9739efe21",
+    "semantic_hash": "94822805de77c714240adfd9739efe21"
   },
   "/home/user/aaa-hyperkernel/js/copilot/copilot-memory-retriever.js": {
     "mtime": 1781093823.3547633,
@@ -5025,14 +5025,14 @@
     "semantic_hash": "fa7780826629a6a46868bf37c6ccaadf"
   },
   "/home/user/aaa-hyperkernel/js/copilot/copilot-simulation-interface.js": {
-    "mtime": 1781093886.250767,
-    "ast_hash": "dab32c43e7f610bd23afd59b88b82ad6",
-    "semantic_hash": "dab32c43e7f610bd23afd59b88b82ad6"
+    "mtime": 1781094973.4948316,
+    "ast_hash": "2e28be84dd18236cbd2f32f27fb669ac",
+    "semantic_hash": "2e28be84dd18236cbd2f32f27fb669ac"
   },
   "/home/user/aaa-hyperkernel/js/copilot/copilot-ui.js": {
-    "mtime": 1781094027.7747753,
-    "ast_hash": "8f2633ee48080414ce743d998931ea9d",
-    "semantic_hash": "8f2633ee48080414ce743d998931ea9d"
+    "mtime": 1781094894.966827,
+    "ast_hash": "603dcbfb5a0fe7fec1cea25a9cdb3f1c",
+    "semantic_hash": "603dcbfb5a0fe7fec1cea25a9cdb3f1c"
   },
   "/home/user/aaa-hyperkernel/js/copilot/council-query-engine.js": {
     "mtime": 1781093792.6747613,
@@ -5118,5 +5118,65 @@
     "mtime": 1781094171.7587838,
     "ast_hash": "3a677110dbdc4c18d7205f9a74069dd5",
     "semantic_hash": "3a677110dbdc4c18d7205f9a74069dd5"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/chat-canvas.js": {
+    "mtime": 1781094877.878826,
+    "ast_hash": "2c05828a1cb9a319b29ce8d7f7e7aeea",
+    "semantic_hash": "2c05828a1cb9a319b29ce8d7f7e7aeea"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/chat-intent-router.js": {
+    "mtime": 1781094740.4748178,
+    "ast_hash": "3e4fe21e81925318aa6b16d8b91b0c00",
+    "semantic_hash": "3e4fe21e81925318aa6b16d8b91b0c00"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/chat-message-store.js": {
+    "mtime": 1781094710.962816,
+    "ast_hash": "1b6261bf072118c80a45500d565b5c80",
+    "semantic_hash": "1b6261bf072118c80a45500d565b5c80"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/executive-briefing-card.js": {
+    "mtime": 1781094762.266819,
+    "ast_hash": "4e96f9d6338d7d512561926f85c3c16c",
+    "semantic_hash": "4e96f9d6338d7d512561926f85c3c16c"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/goal-progress-card.js": {
+    "mtime": 1781094781.27882,
+    "ast_hash": "62f5ed2d4763503895da9fd5e0d8d3a4",
+    "semantic_hash": "62f5ed2d4763503895da9fd5e0d8d3a4"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/governance-approval-card.js": {
+    "mtime": 1781094806.0268216,
+    "ast_hash": "bb2460d99541309f240d935a8e41948d",
+    "semantic_hash": "bb2460d99541309f240d935a8e41948d"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/offline-chat-queue.js": {
+    "mtime": 1781094727.3228168,
+    "ast_hash": "877f71265388969fb086955a5b028605",
+    "semantic_hash": "877f71265388969fb086955a5b028605"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/rich-card-renderer.js": {
+    "mtime": 1781094840.9308236,
+    "ast_hash": "b6999559811073c20a93151482c5a3a4",
+    "semantic_hash": "b6999559811073c20a93151482c5a3a4"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/simulation-result-card.js": {
+    "mtime": 1781094772.1148195,
+    "ast_hash": "70b151815337391ab5c4e54eca4d325f",
+    "semantic_hash": "70b151815337391ab5c4e54eca4d325f"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/software-factory-card.js": {
+    "mtime": 1781094794.110821,
+    "ast_hash": "fcaf5fb2c7d990db5a38714ba3f8469c",
+    "semantic_hash": "fcaf5fb2c7d990db5a38714ba3f8469c"
+  },
+  "/home/user/aaa-hyperkernel/test/unit/chat-canvas.test.js": {
+    "mtime": 1781094933.558829,
+    "ast_hash": "eecf4fe82650cda572de66251ac0f2c4",
+    "semantic_hash": "eecf4fe82650cda572de66251ac0f2c4"
+  },
+  "/home/user/aaa-hyperkernel/references/HYPERKERNEL_CHAT_CANVAS.md": {
+    "mtime": 1781095051.4348361,
+    "ast_hash": "feb29928f5dce75bde6fd3d369685690",
+    "semantic_hash": "feb29928f5dce75bde6fd3d369685690"
   }
 }

@@ -15,7 +15,7 @@
   // Order matters: earlier intents win ties (most specific first).
   const INTENTS = [
     ['governance_action', { kw: ['approve', 'apply the', 'change the price to', 'set price', 'send the', 'issue refund', 'refund', 'pay ', 'payroll', 'sign contract', 'file taxes', 'schedule the crew', 'dispatch', 'launch the campaign', 'change ad spend'], councils: ['governance'], data: ['council_recommendations'], risk: 'high', governance: true }],
-    ['simulation_request', { kw: ['what happens if', 'what if', 'simulate', 'hire another crew', 'add a crew', 'raise prices', 'lower prices', 'fuel', 'if i raise', 'if we add', 'hurricane', 'cpc'], councils: ['simulation'], data: ['simulation'], risk: 'low', governance: false }],
+    ['simulation_request', { kw: ['what happens if', 'what if', 'simulate', 'simulation', 'run simulation', 'hire another crew', 'add a crew', 'raise prices', 'raise pricing', 'lower prices', 'pricing', 'fuel', 'if i raise', 'if we add', 'hurricane', 'cpc'], councils: ['simulation'], data: ['simulation'], risk: 'low', governance: false }],
     ['goal_request', { kw: ['add $', 'per month', 'increase close', 'increase revenue', 'reduce callbacks', 'grow revenue', 'hit a goal', 'target of', 'i want to', 'how do i add', 'how do i grow'], councils: ['teleological'], data: ['goal'], risk: 'medium', governance: false }],
     ['morning_briefing', { kw: ['morning', 'briefing', 'what should i do today', 'daily', 'start my day', "today's plan"], councils: ['executive'], data: ['briefing'], risk: 'low', governance: false }],
     ['risk_report', { kw: ['risk', 'risks', 'threat', 'threats', 'danger', 'exposure', 'what could go wrong'], councils: ['simulation', 'innovation', 'governance'], data: ['risks'], risk: 'low', governance: false }],

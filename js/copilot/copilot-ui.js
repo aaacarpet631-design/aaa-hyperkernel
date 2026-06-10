@@ -10,6 +10,8 @@
   'use strict';
 
   function copilot() { return global.AAA_EXECUTIVE_COPILOT; }
+  function canvas() { return global.AAA_CHAT_CANVAS; }
+  function cardRenderer() { return global.AAA_RICH_CARD_RENDERER; }
   function briefing() { return global.AAA_MORNING_BRIEFING_ENGINE; }
   function observatory() { return global.AAA_COPILOT_DASHBOARD; }
   function voice() { return global.AAA_VOICE_INPUT_ADAPTER; }
@@ -48,6 +50,34 @@
       const gov = answer && answer.governanceRequired ? '<div class="cp-gov">⚖️ Needs your approval before acting</div>' : '';
       return '<div class="cp-card"><div class="cp-summary">' + esc(a.summary || '') + '</div>' +
         '<div class="cp-meta">confidence ' + conf + '</div>' + gov + missing + '</div>';
+    },
+
+    /** Chat Canvas render model: the thread + rendered card HTML per message. */
+    async chatRenderModel(opts) {
+      const o = opts || {};
+      const thread = canvas() ? await canvas().thread(o.threadId) : [];
+      return {
+        title: 'Talk To My Business',
+        suggestedPrompts: ['How are we doing today?', 'Run simulation: raise repair pricing 5%', 'Create goal: add $50k/month revenue', 'Build a review dashboard', 'What are my biggest risks?'],
+        messages: thread.map(function (m) { return { role: m.role, text: m.text, cardHtml: (m.card && cardRenderer()) ? cardRenderer().html(m.card) : null, card: m.card || null, at: m.at }; })
+      };
+    },
+
+    /** Send through the Chat Canvas (the primary chat path). */
+    async chatSend(text, opts) { return canvas() ? canvas().send(text, opts) : { queued: false, error: 'CANVAS_UNAVAILABLE' }; },
+
+    /** Mount the mobile Chat Canvas into a DOM element (DOM-guarded). */
+    mountChat(el, opts) {
+      if (typeof document === 'undefined') return { mounted: false, reason: 'no_dom' };
+      const root = el || document.body; const self = this;
+      const wrap = document.createElement('div'); wrap.className = 'cc-root';
+      const thread = document.createElement('div'); thread.className = 'cc-thread';
+      const bar = document.createElement('div'); bar.className = 'cc-bar';
+      const input = document.createElement('input'); input.className = 'cc-input'; input.placeholder = 'Ask your business…';
+      const send = document.createElement('button'); send.className = 'cc-send'; send.textContent = 'Send';
+      send.onclick = async function () { const text = input.value; input.value = ''; const r = await self.chatSend(text, opts); const u = document.createElement('div'); u.className = 'cc-msg cc-user'; u.textContent = text; thread.appendChild(u); const a = document.createElement('div'); a.className = 'cc-msg cc-assistant'; a.innerHTML = (r.card && cardRenderer()) ? cardRenderer().html(r.card) : (r.queued ? 'Queued (offline) — will send when back online.' : ''); thread.appendChild(a); thread.scrollTop = thread.scrollHeight; };
+      bar.appendChild(input); bar.appendChild(send); wrap.appendChild(thread); wrap.appendChild(bar); root.appendChild(wrap);
+      return { mounted: true };
     },
 
     /** Mount the UI into a DOM element — only when a document exists. */
