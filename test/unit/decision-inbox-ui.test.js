@@ -2,8 +2,10 @@
  *
  * Guards the re-composition contract: the hero comes from the Command Deck's
  * pulse (Revenue + Active Jobs + AI Confidence, no invented delta), the feed
- * comes from AAA_DECISION_INBOX.listDecisions with each row carrying its FULL
- * card (tap → AAA_DECISION_CARD.open with THAT card — never rebuilt), the
+ * comes from AAA_DECISION_INBOX.listBundles when present — bundle rows FIRST
+ * (tap → AAA_DECISION_BUNDLE.open with THE engine bundle) above loose rows —
+ * falling back to flat listDecisions when absent, each loose row carrying its
+ * FULL card (tap → AAA_DECISION_CARD.open with THAT card — never rebuilt), the
  * Supervisor strip condenses deck priorities into honest risk/opportunity
  * counts, agent chips route to AAA_COMMAND_DECK.openTeam, count 0 renders the
  * honest all-clear, every missing engine degrades without a throw, mount() is
@@ -121,6 +123,8 @@ module.exports = async function run() {
       m.inbox.rows[1].customer === 'Henderson' && m.inbox.rows[1].expectedValue === 169);
     t.ok('each row carries its FULL card object (the UI never rebuilds one)',
       m.inbox.rows[0].card === c1 && m.inbox.rows[1].card === c2 && m.inbox.rows[0].decisionId === 'dec_1');
+    t.ok('BACKWARD-COMPAT: without listBundles the feed falls back to flat rows (bundles present but empty)',
+      Array.isArray(m.inbox.bundles) && m.inbox.bundles.length === 0);
     t.ok('row facts derive from the card: probabilityPct + an action label',
       m.inbox.rows[0].probabilityPct === 50 && m.inbox.rows[1].probabilityPct === 38 &&
       typeof m.inbox.rows[0].actionLabel === 'string' && m.inbox.rows[0].actionLabel.length > 0);
@@ -160,6 +164,47 @@ module.exports = async function run() {
     t.ok('the supervisor strip deep-links to chat', sup.routed === true && switched === 'chat');
     delete G.AAA_JOB_LIST_UI;
     t.ok('without the job list host, the supervisor strip is inert (no throw)', UI.openSupervisor().routed === false);
+
+    // ===== Stage 2 compression: bundle rows above the loose rows ==============
+    const c3 = makeCard('dec_3', 'Trent', 700, 0.7, 'q3');
+    const engineBundle = {
+      id: 'bundle_revenue_recovery', key: 'revenue_recovery', label: 'Revenue Recovery',
+      decisions: [c1, c2], count: 2, totalImpactUSD: 1169, avgConfidencePct: 44
+    };
+    let bundleResult = { ok: true, bundles: [engineBundle], loose: [c3], totalImpactUSD: 1869, count: 3 };
+    G.AAA_DECISION_INBOX.listBundles = async () => bundleResult;
+    const bundleOpens = [];
+    G.AAA_DECISION_BUNDLE = { open: (b) => { bundleOpens.push(b); return { opened: true, sheet: {} }; } };
+
+    const mb = await UI.renderModel();
+    t.ok('with listBundles the model carries bundle rows {id,key,label,count,totalImpactDisplay,avgConfidencePct,bundle}',
+      mb.inbox.bundles.length === 1 && mb.inbox.bundles[0].id === 'bundle_revenue_recovery' &&
+      mb.inbox.bundles[0].key === 'revenue_recovery' && mb.inbox.bundles[0].label === 'Revenue Recovery' &&
+      mb.inbox.bundles[0].count === 2 && mb.inbox.bundles[0].totalImpactDisplay === '+$1,169' &&
+      mb.inbox.bundles[0].avgConfidencePct === 44 && mb.inbox.bundles[0].bundle === engineBundle);
+    t.ok('loose decisions still render as individual rows; count/total span bundled + loose',
+      mb.inbox.rows.length === 1 && mb.inbox.rows[0].customer === 'Trent' && mb.inbox.rows[0].card === c3 &&
+      mb.inbox.count === 3 && mb.inbox.totalImpactDisplay === '+$1,869' && mb.inbox.empty === false);
+    const elB = makeEl();
+    await UI.mount(elB);
+    const bHtml = htmlOf(elB);
+    const bundleIdx = bHtml.indexOf('Revenue Recovery');
+    t.ok('mount renders the bundle row: label · "2 actions" · +$1,169 · 44% avg · Approve All ▶',
+      bundleIdx !== -1 && bHtml.indexOf('2 actions') !== -1 && bHtml.indexOf('+$1,169') !== -1 &&
+      bHtml.indexOf('44% avg') !== -1 && bHtml.indexOf('Approve All ▶') !== -1);
+    t.ok('bundle rows render BEFORE the loose individual rows',
+      bundleIdx !== -1 && bHtml.indexOf('Trent') > bundleIdx);
+    UI.openBundle(mb.inbox.bundles[0]);
+    t.ok('a bundle row tap opens AAA_DECISION_BUNDLE.open with THE engine bundle (never rebuilt)',
+      bundleOpens.length === 1 && bundleOpens[0] === engineBundle);
+    delete G.AAA_DECISION_BUNDLE;
+    t.ok('without the bundle UI a bundle tap is inert, not a throw',
+      UI.openBundle(mb.inbox.bundles[0]).opened === false);
+    bundleResult = { ok: false, reason: 'NO_SCORER', bundles: [], loose: [], totalImpactUSD: 0, count: 0 };
+    const mFail = await UI.renderModel();
+    t.ok('a failed listBundles degrades to the honest empty inbox, never a throw',
+      mFail.inbox.empty === true && mFail.inbox.bundles.length === 0 && mFail.inbox.rows.length === 0 && mFail.inbox.count === 0);
+    delete G.AAA_DECISION_INBOX.listBundles; // back to the flat fallback below
 
     // ===== honest empty state ==================================================
     listResult = { ok: true, decisions: [], totalImpactUSD: 0, count: 0 };

@@ -202,5 +202,142 @@ module.exports = async function run() {
   t.ok('no quote store → ok:false NO_SCORER, no throw',
     ldNoQ.ok === false && ldNoQ.reason === 'NO_SCORER' && ldNoQ.decisions.length === 0);
 
+  // ════════════════ Stage 2 compression: listBundles ════════════════════════
+  const lb = await INBOX.listBundles();
+  t.ok('listBundles groups the 2 same-family decisions into ONE revenue_recovery bundle',
+    lb.ok === true && lb.bundles.length === 1 && lb.bundles[0].key === 'revenue_recovery' &&
+    lb.bundles[0].label === 'Revenue Recovery' && lb.bundles[0].count === 2 &&
+    lb.loose.length === 0 && lb.count === 2);
+  const bun = lb.bundles[0];
+  t.ok('bundle members ranked by expectedValueUSD desc (qf2 $1000 then qf1 $169)',
+    bun.decisions[0].trigger.payload.quoteId === 'qf2' && bun.decisions[1].trigger.payload.quoteId === 'qf1');
+  t.eq('bundle totalImpactUSD sums the member EVs', bun.totalImpactUSD, 1169);
+  t.eq('bundle avgConfidencePct = rounded mean of member confidenceScores',
+    bun.avgConfidencePct,
+    Math.round((bun.decisions[0].proposal.metrics.confidenceScore + bun.decisions[1].proposal.metrics.confidenceScore) / 2 * 100));
+  t.ok('cards carry the source action id (call_now for follow_up_due) and ACTION_BUNDLE maps it',
+    bun.decisions.every((c) => c.trigger.payload.recommendedActionId === 'call_now') &&
+    INBOX.ACTION_BUNDLE.call_now.key === 'revenue_recovery' &&
+    INBOX.ACTION_BUNDLE.follow_up.key === 'revenue_recovery' && INBOX.ACTION_BUNDLE.send_quote.key === 'revenue_recovery');
+  t.eq('top-level totalImpactUSD spans bundles + loose', lb.totalImpactUSD, 1169);
+
+  // a SINGLE decision of a key stays loose — no 1-member bundle
+  const sa2 = G.AAA_OPPORTUNITY_SCORER.scoreAll;
+  const mkItem = (quoteId, probability, expectedValue, actionId) => ({
+    ok: true, quoteId, probability, probabilityPct: Math.round(probability * 100), expectedValue,
+    amount: Math.round(expectedValue / probability), basis: { method: 'overall_rate' },
+    recommendedAction: { id: actionId, label: actionId }, urgency: 'now', confidence: 'low'
+  });
+  G.AAA_OPPORTUNITY_SCORER.scoreAll = async () => ({ ok: true, items: [mkItem('qf2', 0.5, 1000, 'call_now')], rankedBy: 'expectedValue' });
+  const lbSingle = await INBOX.listBundles();
+  t.ok('a singleton of a key stays LOOSE (≥2 forms a bundle)',
+    lbSingle.ok === true && lbSingle.bundles.length === 0 && lbSingle.loose.length === 1 &&
+    lbSingle.loose[0].trigger.payload.quoteId === 'qf2' && lbSingle.count === 1 && lbSingle.totalImpactUSD === 1000);
+
+  // ACTION_BUNDLE is extensible: remap a family → its OWN bundle, impact-ranked
+  await seed('qf6', { status: 'sent', customerTotal: 200, customerName: 'Smalls', serviceType: ['rug2'], customerContact: { phone: '7025550001' } });
+  const savedCallNow = INBOX.ACTION_BUNDLE.call_now;
+  INBOX.ACTION_BUNDLE.call_now = { key: 'call_blitz', label: 'Call Blitz' };
+  G.AAA_OPPORTUNITY_SCORER.scoreAll = async () => ({ ok: true, items: [
+    mkItem('qf4', 0.5, 2500, 'follow_up'), mkItem('qf2', 0.5, 1000, 'follow_up'),
+    mkItem('qf1', 0.375, 169, 'call_now'), mkItem('qf6', 0.5, 100, 'call_now')
+  ], rankedBy: 'expectedValue' });
+  const lbMulti = await INBOX.listBundles({ limit: 10 });
+  t.ok('a remapped action family forms a SECOND bundle, ranked by totalImpactUSD desc',
+    lbMulti.ok === true && lbMulti.bundles.length === 2 &&
+    lbMulti.bundles[0].key === 'revenue_recovery' && lbMulti.bundles[0].totalImpactUSD === 3500 &&
+    lbMulti.bundles[1].key === 'call_blitz' && lbMulti.bundles[1].label === 'Call Blitz' &&
+    lbMulti.bundles[1].totalImpactUSD === 269 && lbMulti.count === 4 && lbMulti.totalImpactUSD === 3769);
+  INBOX.ACTION_BUNDLE.call_now = savedCallNow;
+
+  // honest empty + propagated failure — never a throw
+  G.AAA_OPPORTUNITY_SCORER.scoreAll = async () => ({ ok: true, items: [], rankedBy: 'expectedValue' });
+  const lbEmpty = await INBOX.listBundles();
+  t.ok('no decisions → ok:true with empty bundles + loose',
+    lbEmpty.ok === true && lbEmpty.bundles.length === 0 && lbEmpty.loose.length === 0 &&
+    lbEmpty.count === 0 && lbEmpty.totalImpactUSD === 0 && !lbEmpty.reason);
+  G.AAA_OPPORTUNITY_SCORER.scoreAll = sa2;
+  const lbsc = G.AAA_OPPORTUNITY_SCORER; delete G.AAA_OPPORTUNITY_SCORER;
+  let lbNoSc = null, lbThrew = null;
+  try { lbNoSc = await INBOX.listBundles(); } catch (e) { lbThrew = e; }
+  G.AAA_OPPORTUNITY_SCORER = lbsc;
+  t.ok('no scorer → propagated { ok:false, reason:NO_SCORER } with zeroed empties, no throw',
+    lbThrew === null && lbNoSc.ok === false && lbNoSc.reason === 'NO_SCORER' &&
+    lbNoSc.bundles.length === 0 && lbNoSc.loose.length === 0 && lbNoSc.totalImpactUSD === 0 && lbNoSc.count === 0);
+
+  // ════════════════ approveBundle: N dry-run governed approvals ═════════════
+  // transport spies — Approve All must NEVER touch any send path.
+  let sends = 0;
+  const sendSpy = () => { sends++; return { ok: true }; };
+  G.AAA_TRANSPORT = { send: sendSpy, sendSMS: sendSpy };
+  G.AAA_TRANSPORT_DELIVERY = { send: sendSpy, deliver: sendSpy };
+  G.AAA_SMS = { send: sendSpy };
+  const savedFetch = G.fetch;
+  G.fetch = () => { sends++; return Promise.resolve({ ok: true }); };
+
+  const evBefore = (await G.AAA_EVENT_BUS.log({ type: 'decision.approved' })).length;
+  const audBefore = (await G.AAA_AUDIT_LEDGER.chain()).filter((e) => e.type === 'decision_approved').length;
+  const ab = await INBOX.approveBundle(bun, {});
+  t.ok('approveBundle → { ok:true, dryRun:true, dispatched:false, total:2, approved:2, blocked:0 }',
+    ab.ok === true && ab.dryRun === true && ab.dispatched === false &&
+    ab.total === 2 && ab.approved === 2 && ab.blocked === 0);
+  t.ok('per-member results carry each decisionId with ok:true',
+    ab.results.length === 2 && ab.results[0].decisionId === bun.decisions[0].decisionId &&
+    ab.results[1].decisionId === bun.decisions[1].decisionId && ab.results.every((r) => r.ok === true));
+  const evAfter = await G.AAA_EVENT_BUS.log({ type: 'decision.approved' });
+  t.ok('every member published its own decision.approved event (all dryRun:true)',
+    evAfter.length === evBefore + 2 && evAfter.slice(-2).every((e) => e.payload.dryRun === true));
+  const audAfter = (await G.AAA_AUDIT_LEDGER.chain()).filter((e) => e.type === 'decision_approved');
+  t.ok('every member appended its own audit entry, each dispatched:false',
+    audAfter.length === audBefore + 2 &&
+    audAfter.slice(-2).every((e) => e.payload.dispatched === false && e.payload.dryRun === true));
+  t.eq('ZERO messages sent — no transport/fetch invoked by the batch', sends, 0);
+
+  // the headline guarantee: a bundle of 17 → 17 audit entries, nothing sent,
+  // even when told { live:true } (the HARD GUARD holds at both layers).
+  const seventeen = {
+    id: 'bundle_revenue_recovery', key: 'revenue_recovery', label: 'Revenue Recovery',
+    decisions: Array.from({ length: 17 }, (_, i) => { const c = clone(card); c.decisionId = 'dec_batch_' + i; return c; }),
+    count: 17, totalImpactUSD: 17 * 169, avgConfidencePct: 38
+  };
+  const ev17Before = (await G.AAA_EVENT_BUS.log({ type: 'decision.approved' })).length;
+  const aud17Before = (await G.AAA_AUDIT_LEDGER.chain()).filter((e) => e.type === 'decision_approved').length;
+  const ab17 = await INBOX.approveBundle(seventeen, { live: true }); // live is IGNORED
+  const ev17 = (await G.AAA_EVENT_BUS.log({ type: 'decision.approved' })).length;
+  const aud17 = (await G.AAA_AUDIT_LEDGER.chain()).filter((e) => e.type === 'decision_approved').length;
+  t.ok('a bundle of 17 → 17 dry-run approvals, 17 events, 17 audit entries — dispatched:false despite {live:true}',
+    ab17.ok === true && ab17.dryRun === true && ab17.dispatched === false &&
+    ab17.total === 17 && ab17.approved === 17 && ab17.blocked === 0 && ab17.results.length === 17 &&
+    ev17 === ev17Before + 17 && aud17 === aud17Before + 17);
+  t.eq('still ZERO messages sent after 19 batched approvals', sends, 0);
+
+  // one bad apple doesn't abort the batch
+  const badApple = { key: 'revenue_recovery', label: 'Revenue Recovery',
+    decisions: [clone(bun.decisions[0]), { decisionId: 'junk_card' }, clone(bun.decisions[1])] };
+  const abBad = await INBOX.approveBundle(badApple, {});
+  t.ok('an invalid member is recorded with its reason and the batch CONTINUES (approved 2, blocked 1)',
+    abBad.ok === true && abBad.total === 3 && abBad.approved === 2 && abBad.blocked === 1 &&
+    abBad.results[0].ok === true && abBad.results[2].ok === true &&
+    abBad.results[1].ok === false && !!abBad.results[1].reason);
+
+  // a gate-denied member reports blocked:true; the batch still returns ok:true
+  const gateSave = G.AAA_ACTION_GATE;
+  G.AAA_ACTION_GATE = { assess: () => ({ decision: 'deny', level: 'critical', categories: ['destructive'], reasons: ['bundle test deny'] }) };
+  const abDeny = await INBOX.approveBundle({ decisions: [clone(card)] }, {});
+  G.AAA_ACTION_GATE = gateSave;
+  t.ok('a gate-denied member is counted blocked with blocked:true on its result',
+    abDeny.ok === true && abDeny.approved === 0 && abDeny.blocked === 1 &&
+    abDeny.results[0].blocked === true && abDeny.dispatched === false);
+
+  // null-safety: empty / absent bundle
+  const abNull = await INBOX.approveBundle(null, {});
+  const abEmpty = await INBOX.approveBundle({ decisions: [] }, {});
+  t.ok('empty/absent bundle → { ok:false, reason:EMPTY_BUNDLE }, no throw',
+    abNull.ok === false && abNull.reason === 'EMPTY_BUNDLE' &&
+    abEmpty.ok === false && abEmpty.reason === 'EMPTY_BUNDLE');
+
+  delete G.AAA_TRANSPORT; delete G.AAA_TRANSPORT_DELIVERY; delete G.AAA_SMS;
+  if (savedFetch === undefined) delete G.fetch; else G.fetch = savedFetch;
+
   return t.report();
 };

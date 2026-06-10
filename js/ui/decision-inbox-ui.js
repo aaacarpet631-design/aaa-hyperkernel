@@ -3,10 +3,14 @@
  *
  * Re-composition, not new intelligence: a compact pulse hero (Revenue + Active
  * Jobs + AI Confidence straight from AAA_COMMAND_DECK.renderModel().pulse), a
- * ranked feed of approve-able decisions (AAA_DECISION_INBOX.listDecisions —
- * full schema-v1.0 cards ranked by expected value; tapping a row opens
- * AAA_DECISION_CARD.open with THAT card, whose Approve path is DRY-RUN only),
- * then two condensed one-line strips: Supervisor (risk/opportunity counts
+ * feed of approve-able decisions — BUNDLE rows first (Stage 2 compression via
+ * AAA_DECISION_INBOX.listBundles: ≥2 same-family decisions collapse into one
+ * "Approve All" row that opens AAA_DECISION_BUNDLE.open, whose Approve-All
+ * path is DRY-RUN only), then loose individual rows (full schema-v1.0 cards
+ * ranked by expected value; tapping a row opens AAA_DECISION_CARD.open with
+ * THAT card, also DRY-RUN only). If listBundles is absent (older engine /
+ * load-order drift) the feed falls back to the flat listDecisions rows.
+ * Then two condensed one-line strips: Supervisor (risk/opportunity counts
  * derived from the deck's priorities) and Agent Network (team chips →
  * AAA_COMMAND_DECK.openTeam).
  *
@@ -67,13 +71,13 @@
         empty: !revT && stats.length === 0
       };
 
-      // ---- inbox: the ranked feed of approve-able decisions ---------------
+      // ---- inbox: bundles (Stage 2 compression) above the loose feed -------
+      // Preferred source is listBundles (≥2 same-family decisions collapse
+      // into one "Approve All" row); when the engine predates listBundles we
+      // fall back to the original flat listDecisions feed, so load order can
+      // never break the surface.
       const inboxEngine = global.AAA_DECISION_INBOX;
-      const ld = await quiet(function () {
-        return inboxEngine && typeof inboxEngine.listDecisions === 'function' ? inboxEngine.listDecisions(opts) : null;
-      }, null);
-      const cards = ld && ld.ok && Array.isArray(ld.decisions) ? ld.decisions : [];
-      const rows = cards.map(function (card) {
+      function rowFor(card) {
         const m = (card && card.proposal && card.proposal.metrics) || {};
         const probability = num(m.confidenceScore);
         const ev = num(m.expectedValueUSD);
@@ -87,14 +91,43 @@
           expectedValue: ev,
           card: card // full card — the row opens it without rebuilding
         };
-      });
-      const totalImpactUSD = ld && ld.ok ? num(ld.totalImpactUSD) : 0;
+      }
+      let bundles = [], looseCards = [], totalImpactUSD = 0, decisionCount = 0;
+      if (inboxEngine && typeof inboxEngine.listBundles === 'function') {
+        const lb = await quiet(function () { return inboxEngine.listBundles(opts); }, null);
+        if (lb && lb.ok) {
+          bundles = (Array.isArray(lb.bundles) ? lb.bundles : []).map(function (b) {
+            return {
+              id: b.id,
+              key: b.key,
+              label: b.label,
+              count: num(b.count),
+              totalImpactUSD: num(b.totalImpactUSD),
+              totalImpactDisplay: '+' + fmtMoney(b.totalImpactUSD),
+              avgConfidencePct: Math.round(num(b.avgConfidencePct)),
+              bundle: b // full engine bundle — the row opens it without rebuilding
+            };
+          });
+          looseCards = Array.isArray(lb.loose) ? lb.loose : [];
+          totalImpactUSD = num(lb.totalImpactUSD);
+          decisionCount = num(lb.count);
+        }
+      } else {
+        const ld = await quiet(function () {
+          return inboxEngine && typeof inboxEngine.listDecisions === 'function' ? inboxEngine.listDecisions(opts) : null;
+        }, null);
+        looseCards = ld && ld.ok && Array.isArray(ld.decisions) ? ld.decisions : [];
+        totalImpactUSD = ld && ld.ok ? num(ld.totalImpactUSD) : 0;
+        decisionCount = looseCards.length;
+      }
+      const rows = looseCards.map(rowFor);
       const inbox = {
+        bundles: bundles,
         rows: rows,
-        count: rows.length,
+        count: decisionCount,
         totalImpactUSD: totalImpactUSD,
         totalImpactDisplay: '+' + fmtMoney(totalImpactUSD),
-        empty: rows.length === 0,
+        empty: bundles.length === 0 && rows.length === 0,
         emptyLabel: 'No decisions right now — all clear.'
       };
 
@@ -128,6 +161,14 @@
       }
 
       return { hero: hero, inbox: inbox, supervisor: supervisor, network: network };
+    },
+
+    /** Open a feed bundle row's "Approve All" sheet (it appends its own overlay). */
+    openBundle(entry) {
+      const bundle = entry && entry.bundle ? entry.bundle : entry;
+      const bundleUI = global.AAA_DECISION_BUNDLE;
+      if (!bundle || !bundleUI || typeof bundleUI.open !== 'function') return { opened: false, reason: 'no_bundle_ui' };
+      try { return bundleUI.open(bundle, {}); } catch (_) { return { opened: false, reason: 'open_failed' }; }
     },
 
     /** Open a feed row's Decision Card (the card sheet appends its own overlay). */
@@ -188,6 +229,20 @@
       if (m.inbox.empty) {
         html += '<div class="di-empty">' + esc(m.inbox.emptyLabel) + '</div>';
       } else {
+        // bundle rows FIRST — N homogeneous decisions compressed to one tap
+        if (m.inbox.bundles.length) {
+          html += '<div class="di-bundles">' + m.inbox.bundles.map(function (b, i) {
+            return '<button class="di-bundle" type="button" data-bundle="' + i + '">' +
+              '<span class="di-bundle__top">' +
+                '<span class="di-bundle__label">' + esc(b.label) + '</span>' +
+                '<span class="di-bundle__ev">' + esc(b.totalImpactDisplay) + '</span>' +
+              '</span>' +
+              '<span class="di-bundle__sub">' + esc(b.count) + ' actions · ' + esc(b.avgConfidencePct) + '% avg · ' +
+                '<span class="di-bundle__cta">Approve All ▶</span></span>' +
+              '</button>';
+          }).join('') + '</div>';
+        }
+        // then the loose individual rows
         html += '<div class="di-feed">' + m.inbox.rows.map(function (r, i) {
           return '<button class="di-row" type="button" data-row="' + i + '">' +
             '<span class="di-row__top">' +
@@ -214,7 +269,10 @@
 
       wrap.innerHTML = html;
 
-      // taps (the Decision Card sheet appends its own overlay to document.body)
+      // taps (the bundle/card sheets append their own overlays to document.body)
+      wrap.querySelectorAll('.di-bundle').forEach(function (b) {
+        b.onclick = function () { InboxUI.openBundle(m.inbox.bundles[Number(b.getAttribute('data-bundle'))]); };
+      });
       wrap.querySelectorAll('.di-row').forEach(function (b) {
         b.onclick = function () { InboxUI.openDecision(m.inbox.rows[Number(b.getAttribute('data-row'))]); };
       });

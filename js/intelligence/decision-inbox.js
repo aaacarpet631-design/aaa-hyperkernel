@@ -43,6 +43,15 @@
   const ELIGIBLE_URGENCY = { now: true, today: true };
   // Recommended actions that are actionable as a follow-up Decision Card.
   const ELIGIBLE_ACTIONS = { call_now: true, follow_up: true, send_quote: true };
+  // Stage 2 compression — which BUNDLE an action family rolls into. Today the
+  // whole follow-up family is one bundle; future decision kinds add a row here
+  // (no code surgery). Exposed as Inbox.ACTION_BUNDLE and read LIVE so an
+  // extension (or a test) can register a new family at runtime.
+  const ACTION_BUNDLE = {
+    call_now: { key: 'revenue_recovery', label: 'Revenue Recovery' },
+    follow_up: { key: 'revenue_recovery', label: 'Revenue Recovery' },
+    send_quote: { key: 'revenue_recovery', label: 'Revenue Recovery' }
+  };
 
   function quotes() { return global.AAA_QUOTES; }
   function customers() { return global.AAA_CUSTOMER_STORE; }
@@ -105,7 +114,16 @@
       trigger: {
         event: quote.status === 'follow_up_due' ? 'quote.follow_up_due' : 'quote.open_idle',
         timestamp: nowISO(),
-        payload: { quoteId: quote.quoteId || quote.id || null, customerId: quote.customerId || null, customerName: customerName }
+        payload: {
+          quoteId: quote.quoteId || quote.id || null,
+          customerId: quote.customerId || null,
+          customerName: customerName,
+          // The scorer's source action id (call_now/follow_up/send_quote) —
+          // listBundles groups by this through ACTION_BUNDLE. Extra payload
+          // fields are schema-legal (validateDecisionSchema checks required
+          // keys only) and JSON-clone safe.
+          recommendedActionId: (score.recommendedAction && score.recommendedAction.id) || null
+        }
       },
       agent: AGENT,
       proposal: {
@@ -124,6 +142,27 @@
     return { ok: true, card: card };
   }
 
+  /** EV / confidence off a card, defensively (0 when malformed). */
+  function cardEV(card) {
+    const m = card && card.proposal && card.proposal.metrics;
+    return m && isNum(m.expectedValueUSD) ? m.expectedValueUSD : 0;
+  }
+  function cardConf(card) {
+    const m = card && card.proposal && card.proposal.metrics;
+    return m && isNum(m.confidenceScore) ? m.confidenceScore : 0;
+  }
+
+  /** The bundle family for a card, via the LIVE Inbox.ACTION_BUNDLE map. */
+  function bundleFor(card) {
+    const map = Inbox.ACTION_BUNDLE || {};
+    const actionId = card && card.trigger && card.trigger.payload ? card.trigger.payload.recommendedActionId : null;
+    if (actionId != null) return map[actionId] || null; // unmapped family → loose
+    // Unstamped legacy card: an SMS follow-up proposal IS the follow_up family
+    // by construction (the only proposal kind this module builds).
+    if (card && card.proposal && card.proposal.actionType === 'SEND_COMMUNICATION') return map.follow_up || null;
+    return null;
+  }
+
   const Inbox = {
     /* dryRun is informational only — dispatch() does NOT consult it. There is
      * no live path in this module at all, so flipping this flag changes
@@ -131,6 +170,7 @@
     FLAGS: { cardsEnabled: true, dryRun: true },
     SCHEMA_VERSION: SCHEMA_VERSION,
     AGENT: AGENT,
+    ACTION_BUNDLE: ACTION_BUNDLE,
 
     /**
      * Build a follow-up Decision Card from a real quote + the real scorer.
@@ -220,6 +260,106 @@
         return { ok: true, decisions: decisions, totalImpactUSD: totalImpactUSD, count: decisions.length };
       } catch (e) {
         return Object.assign({}, none, { reason: String((e && e.message) || e) });
+      }
+    },
+
+    /**
+     * Stage 2 compression — group listDecisions() output into homogeneous
+     * "Approve All" bundles. A bundle forms when ≥2 decisions share an
+     * ACTION_BUNDLE key; a singleton of a key stays LOOSE. Grouping only:
+     * nothing here dispatches, and approveBundle/dispatch stay dry-run.
+     * @param {Object} [opts] passed through to listDecisions ({ limit })
+     * @returns {{ ok:boolean,
+     *   bundles:[{ id, key, label, decisions:Object[], count,
+     *              totalImpactUSD, avgConfidencePct }],  // impact desc
+     *   loose:Object[],            // un-bundled cards, EV desc
+     *   totalImpactUSD:number, count:number, reason?:string }}
+     *   count = total decisions across bundles + loose. Never throws; a failed
+     *   listDecisions propagates { ok:false, reason } with zeroed empties.
+     */
+    async listBundles(opts) {
+      const none = { ok: false, bundles: [], loose: [], totalImpactUSD: 0, count: 0 };
+      try {
+        const ld = await Inbox.listDecisions(opts);
+        if (!ld || !ld.ok) return Object.assign({}, none, { reason: (ld && ld.reason) || 'LIST_FAILED' });
+
+        const groups = {};
+        const loose = [];
+        (Array.isArray(ld.decisions) ? ld.decisions : []).forEach(function (card) {
+          const fam = bundleFor(card);
+          if (!fam || !fam.key) { loose.push(card); return; }
+          const g = groups[fam.key] || (groups[fam.key] = { key: fam.key, label: fam.label, decisions: [] });
+          g.decisions.push(card);
+        });
+
+        const bundles = [];
+        Object.keys(groups).forEach(function (key) {
+          const g = groups[key];
+          if (g.decisions.length < 2) { loose.push.apply(loose, g.decisions); return; } // singleton stays loose
+          g.decisions.sort(function (a, b) { return cardEV(b) - cardEV(a); });
+          const total = g.decisions.reduce(function (s, c) { return s + cardEV(c); }, 0);
+          const avg = g.decisions.reduce(function (s, c) { return s + cardConf(c); }, 0) / g.decisions.length;
+          bundles.push({
+            id: 'bundle_' + g.key, // deterministic — one bundle per key per list
+            key: g.key,
+            label: g.label,
+            decisions: g.decisions,
+            count: g.decisions.length,
+            totalImpactUSD: total,
+            avgConfidencePct: Math.round(avg * 100)
+          });
+        });
+        bundles.sort(function (a, b) { return b.totalImpactUSD - a.totalImpactUSD; });
+        loose.sort(function (a, b) { return cardEV(b) - cardEV(a); });
+
+        const count = bundles.reduce(function (s, b) { return s + b.count; }, 0) + loose.length;
+        const totalImpactUSD = bundles.reduce(function (s, b) { return s + b.totalImpactUSD; }, 0) +
+          loose.reduce(function (s, c) { return s + cardEV(c); }, 0);
+        return { ok: true, bundles: bundles, loose: loose, totalImpactUSD: totalImpactUSD, count: count };
+      } catch (e) {
+        return Object.assign({}, none, { reason: String((e && e.message) || e) });
+      }
+    },
+
+    /**
+     * "Approve All" — N dry-run governed approvals, one per bundle member,
+     * each through the EXISTING dispatch() (gate → 'decision.approved' event →
+     * audit record → dispatched:false). A bundle of 17 yields 17 audit entries
+     * and ZERO sent messages. A blocked/invalid member is recorded and the
+     * batch CONTINUES — one bad apple doesn't abort the rest.
+     * ═══════════════ HARD GUARD — DO NOT REMOVE ═══════════════
+     * dispatched is always false and opts.live is DELIBERATELY IGNORED, here
+     * AND inside dispatch() (its own guard). There is no live path.
+     * ═══════════════════════════════════════════════════════════
+     * @returns {{ ok:true, dryRun:true, dispatched:false, total, approved,
+     *   blocked, results:[{decisionId, ok, blocked?, reason?}] }}
+     *         | {{ ok:false, reason:'EMPTY_BUNDLE'|string }} — never throws.
+     */
+    async approveBundle(bundle, opts) {
+      try {
+        const o = opts || {};
+        if (o.live) { /* ignored on purpose — see the HARD GUARD above */ }
+        if (!bundle || !Array.isArray(bundle.decisions) || bundle.decisions.length === 0) {
+          return { ok: false, reason: 'EMPTY_BUNDLE' };
+        }
+        const results = [];
+        let approved = 0, blocked = 0;
+        for (const card of bundle.decisions) {
+          let r;
+          try { r = await Inbox.dispatch(card, {}); } catch (e) { r = { ok: false, reason: String((e && e.message) || e) }; }
+          const entry = { decisionId: (card && card.decisionId) || null, ok: !!(r && r.ok) };
+          if (entry.ok) {
+            approved++;
+          } else {
+            blocked++; // recorded; the batch continues
+            if (r && r.blocked) entry.blocked = true;
+            entry.reason = (r && r.reason) || 'unknown';
+          }
+          results.push(entry);
+        }
+        return { ok: true, dryRun: true, dispatched: false, total: bundle.decisions.length, approved: approved, blocked: blocked, results: results };
+      } catch (e) {
+        return { ok: false, reason: String((e && e.message) || e) };
       }
     },
 
