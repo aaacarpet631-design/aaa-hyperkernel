@@ -3880,9 +3880,9 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "/home/user/aaa-hyperkernel/test/run.js": {
-    "mtime": 1781089932.3400135,
-    "ast_hash": "51fc04e77130d12eb0a45e5e0f26fd96",
-    "semantic_hash": "51fc04e77130d12eb0a45e5e0f26fd96"
+    "mtime": 1781091331.338615,
+    "ast_hash": "8e2f8b7bce9136d73f30b35d9dc756ae",
+    "semantic_hash": "8e2f8b7bce9136d73f30b35d9dc756ae"
   },
   "/home/user/aaa-hyperkernel/test/smoke/boot.test.js": {
     "mtime": 1781065386.5464003,
@@ -4605,9 +4605,9 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "/home/user/aaa-hyperkernel/index.html": {
-    "mtime": 1781089941.436014,
-    "ast_hash": "1fc33bf3ec7f3215abf647b4635a137a",
-    "semantic_hash": "1fc33bf3ec7f3215abf647b4635a137a"
+    "mtime": 1781091446.218622,
+    "ast_hash": "aa447b9a1da488df4e3d20b6aa21ffdf",
+    "semantic_hash": "aa447b9a1da488df4e3d20b6aa21ffdf"
   },
   "/home/user/aaa-hyperkernel/netlify/functions/RESEARCH.md": {
     "mtime": 1780633642.6350634,
@@ -4690,9 +4690,9 @@
     "semantic_hash": "f075e96da59ca572eb6df98c6b776272"
   },
   "/home/user/aaa-hyperkernel/js/simulation/counterfactual-runner.js": {
-    "mtime": 1781089804.6600058,
-    "ast_hash": "9de6770d8a53d798acad91c6a5412874",
-    "semantic_hash": "9de6770d8a53d798acad91c6a5412874"
+    "mtime": 1781091229.122609,
+    "ast_hash": "84f30600fd85c4efb22ada15e8ca99a9",
+    "semantic_hash": "84f30600fd85c4efb22ada15e8ca99a9"
   },
   "/home/user/aaa-hyperkernel/js/simulation/monte-carlo-engine.js": {
     "mtime": 1781089775.352004,
@@ -4738,5 +4738,65 @@
     "mtime": 1781089988.7120168,
     "ast_hash": "fb3d2d3194681593f6be5a6ba64acf1b",
     "semantic_hash": "fb3d2d3194681593f6be5a6ba64acf1b"
+  },
+  "/home/user/aaa-hyperkernel/js/intelligence/causal-hypothesis-store.js": {
+    "mtime": 1781091167.2946053,
+    "ast_hash": "398f9acc410a0dad01d5cd68e948d42d",
+    "semantic_hash": "398f9acc410a0dad01d5cd68e948d42d"
+  },
+  "/home/user/aaa-hyperkernel/js/intelligence/causal-learning-engine.js": {
+    "mtime": 1781091145.318604,
+    "ast_hash": "a14f07f2dcf2e244cda14597ca2fccb8",
+    "semantic_hash": "a14f07f2dcf2e244cda14597ca2fccb8"
+  },
+  "/home/user/aaa-hyperkernel/js/intelligence/intelligence-scorecard.js": {
+    "mtime": 1781091218.7146084,
+    "ast_hash": "34b0dbfeb4ee7a0043cea8e15d41ecea",
+    "semantic_hash": "34b0dbfeb4ee7a0043cea8e15d41ecea"
+  },
+  "/home/user/aaa-hyperkernel/js/intelligence/prediction-actual-comparator.js": {
+    "mtime": 1781091395.7586188,
+    "ast_hash": "2e0cc8d9458a9233789446de7efa72c2",
+    "semantic_hash": "2e0cc8d9458a9233789446de7efa72c2"
+  },
+  "/home/user/aaa-hyperkernel/js/intelligence/signal-derivation-engine.js": {
+    "mtime": 1781091433.8586211,
+    "ast_hash": "7d02cd57e1d655c6907b49d80e245a76",
+    "semantic_hash": "7d02cd57e1d655c6907b49d80e245a76"
+  },
+  "/home/user/aaa-hyperkernel/js/intelligence/signal-freshness-sentinel.js": {
+    "mtime": 1781091013.582596,
+    "ast_hash": "7bcfeb69d800bb76ba2351aa726c7cd5",
+    "semantic_hash": "7bcfeb69d800bb76ba2351aa726c7cd5"
+  },
+  "/home/user/aaa-hyperkernel/js/intelligence/signal-quality-scorecard.js": {
+    "mtime": 1781091198.002607,
+    "ast_hash": "78fa6ce8c8c788febc191a8e4e2787be",
+    "semantic_hash": "78fa6ce8c8c788febc191a8e4e2787be"
+  },
+  "/home/user/aaa-hyperkernel/js/intelligence/signal-registry.js": {
+    "mtime": 1781090996.8545952,
+    "ast_hash": "295933b61712843542f48ef7cc903d1f",
+    "semantic_hash": "295933b61712843542f48ef7cc903d1f"
+  },
+  "/home/user/aaa-hyperkernel/js/intelligence/world-model.js": {
+    "mtime": 1781091434.9266212,
+    "ast_hash": "13d427044d0c7cfb947edc076fabd0a7",
+    "semantic_hash": "13d427044d0c7cfb947edc076fabd0a7"
+  },
+  "/home/user/aaa-hyperkernel/js/intelligence/world-state-ledger.js": {
+    "mtime": 1781091037.3625975,
+    "ast_hash": "8c97f1fce52dfa00a2a47648828badac",
+    "semantic_hash": "8c97f1fce52dfa00a2a47648828badac"
+  },
+  "/home/user/aaa-hyperkernel/test/unit/world-model.test.js": {
+    "mtime": 1781091374.3466177,
+    "ast_hash": "e288db2f957d78e7127104f1eed4a28a",
+    "semantic_hash": "e288db2f957d78e7127104f1eed4a28a"
+  },
+  "/home/user/aaa-hyperkernel/WORLDMODEL.md": {
+    "mtime": 1781091508.3066256,
+    "ast_hash": "2db46ebd7cecd7a9f6833cd3f519cbac",
+    "semantic_hash": "2db46ebd7cecd7a9f6833cd3f519cbac"
   }
 }
