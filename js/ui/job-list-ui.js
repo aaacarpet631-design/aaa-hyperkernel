@@ -270,12 +270,12 @@
 
       const main = ui.el('main', { className: 'aaa-main' });
 
-      // Summary chips
+      // Summary strip — three glass mission tiles (counts from _summarize).
       const s = this._summarize(jobs);
-      main.appendChild(ui.el('section', { className: 'aaa-summary' }, [
-        this._chip(s.inProgress, 'In Progress', '#F59E0B'),
-        this._chip(s.closedToday, 'Closed Today', '#10B981'),
-        this._chip(s.needsAttention, 'Needs Attention', '#DC2626')
+      main.appendChild(ui.el('section', { className: 'jl-summary' }, [
+        this._chip(s.inProgress, 'In Progress', '#F59E0B', 'prog'),
+        this._chip(s.closedToday, 'Closed Today', '#10B981', 'ok'),
+        this._chip(s.needsAttention, 'Needs Attention', '#DC2626', 'attn')
       ]));
 
       if (jobs.length === 0) {
@@ -285,14 +285,24 @@
           ui.el('p', { className: 'aaa-empty-sub', text: 'Tap “New Job” to get started.' })
         ]));
       } else {
-        STATES.forEach((st) => {
-          const group = jobs.filter((j) => (j.currentState || 'QUOTE_OPEN') === st.key);
-          if (group.length === 0) return;
-          const section = ui.el('section', { className: 'aaa-group' });
-          section.appendChild(ui.el('h2', { className: 'aaa-group-title', html:
-            '<span class="aaa-dot" style="background:' + st.color + '"></span>' + st.label +
-            ' <span class="aaa-count">' + group.length + '</span>' }));
-          group.forEach((job) => section.appendChild(this._jobCard(job)));
+        // Hierarchy by urgency, not lifecycle order: what needs the owner NOW
+        // comes first, what's done sits dim at the bottom.
+        const buckets = this._jobBuckets(jobs);
+        const sections = [
+          { label: '⚠ Needs Attention', tone: 'attn', jobs: buckets.attention },
+          { label: 'In Progress', tone: 'prog', jobs: buckets.inProgress },
+          { label: 'Scheduled', tone: 'sched', jobs: buckets.scheduled },
+          { label: 'Closed', tone: 'closed', jobs: buckets.closed }
+        ];
+        sections.forEach((sec) => {
+          if (sec.jobs.length === 0) return;
+          const section = ui.el('section', { className: 'jl-group jl-group--' + sec.tone });
+          section.appendChild(ui.el('h2', { className: 'jl-sec' }, [
+            ui.el('span', { className: 'jl-sec__dot' }),
+            ui.el('span', { className: 'jl-sec__label', text: sec.label }),
+            ui.el('span', { className: 'jl-sec__count', text: String(sec.jobs.length) })
+          ]));
+          sec.jobs.forEach((job) => section.appendChild(this._jobCard(job, sec.tone)));
           main.appendChild(section);
         });
       }
@@ -302,37 +312,62 @@
       root.appendChild(main);
     },
 
-    _chip(value, label, color) {
-      return UI().el('div', { className: 'aaa-chip' }, [
-        UI().el('span', { className: 'aaa-chip__value', text: String(value), style: { color: value > 0 ? color : 'var(--muted)' } }),
-        UI().el('span', { className: 'aaa-chip__label', text: label }),
-        UI().el('div', { className: 'aaa-chip__bar', style: { background: color, opacity: value > 0 ? '0.9' : '0.25' } })
+    /**
+     * Urgency buckets for the list — the SAME rules _summarize uses for the
+     * red count (QUOTE_OPEN, or SCHEDULED past its date), so the "Needs
+     * Attention" tile and the red section always agree. Every job lands in
+     * exactly one bucket; unknown states are dropped, as before.
+     */
+    _jobBuckets(jobs) {
+      const now = Date.now();
+      const b = { attention: [], inProgress: [], scheduled: [], closed: [] };
+      jobs.forEach((j) => {
+        const state = j.currentState || 'QUOTE_OPEN';
+        if (state === 'QUOTE_OPEN') b.attention.push(j);
+        else if (state === 'SCHEDULED') {
+          const t = j.scheduledDate ? new Date(j.scheduledDate).getTime() : NaN;
+          if (isFinite(t) && t < now) b.attention.push(j); // overdue
+          else b.scheduled.push(j);
+        } else if (state === 'IN_PROGRESS') b.inProgress.push(j);
+        else if (state === 'CLOSED') b.closed.push(j);
+      });
+      return b;
+    },
+
+    _chip(value, label, color, tone) {
+      return UI().el('div', { className: 'jl-tile' + (tone ? ' jl-tile--' + tone : '') + (value > 0 ? ' jl-tile--hot' : '') }, [
+        UI().el('span', { className: 'jl-tile__label', text: label }),
+        UI().el('span', { className: 'jl-tile__value', text: String(value), style: { color: value > 0 ? color : 'var(--hk-text-dim, #93a0ba)' } })
       ]);
     },
 
-    _jobCard(job) {
+    _jobCard(job, tone) {
       const ui = UI();
       const st = STATE_MAP[job.currentState] || STATE_MAP.QUOTE_OPEN;
       const logs = Array.isArray(job.logs) ? job.logs.length : 0;
       const estimates = Array.isArray(job.estimates) ? job.estimates.length : 0;
 
-      const top = ui.el('div', { className: 'aaa-card-top' }, [
-        ui.el('span', { className: 'aaa-card-name', text: job.customerName || 'Unnamed job' }),
+      const head = ui.el('div', { className: 'jl-job__head' }, [
+        ui.el('span', { className: 'jl-job__name', text: job.customerName || 'Unnamed job' }),
         ui.statusBadge(st.label, st.color)
       ]);
-      const meta = ui.el('div', { className: 'aaa-card-meta' }, [
-        ui.el('span', { html: job.scheduledDate ? '🗓 ' + esc(formatDate(job.scheduledDate)) : '🗓 No schedule' }),
-        logs ? ui.el('span', { html: '📝 ' + logs }) : null,
-        estimates ? ui.el('span', { html: '📐 ' + estimates }) : null
-      ]);
-      const card = ui.el('button', { className: 'aaa-card', attrs: { type: 'button' }, on: {
+      // One dense, dim line: address · schedule · log/estimate counts (all real).
+      const bits = [];
+      if (job.serviceAddress) bits.push(esc(job.serviceAddress));
+      bits.push(job.scheduledDate ? '🗓 ' + esc(formatDate(job.scheduledDate)) : '🗓 No schedule');
+      if (logs) bits.push('📝 ' + logs);
+      if (estimates) bits.push('📐 ' + estimates);
+      const kids = [head, ui.el('div', { className: 'jl-job__meta', html: bits.join(' <span class="jl-job__sep">·</span> ') })];
+      // Attention cards say WHY — derived from existing fields only.
+      if (tone === 'attn') {
+        const why = (job.currentState || 'QUOTE_OPEN') === 'QUOTE_OPEN'
+          ? 'Quote open — needs scheduling'
+          : 'Overdue — was scheduled ' + formatDate(job.scheduledDate);
+        kids.push(ui.el('div', { className: 'jl-job__why', text: why }));
+      }
+      return ui.el('button', { className: 'jl-job jl-job--' + (tone || 'sched'), attrs: { type: 'button' }, on: {
         click: () => { this.view = { name: 'detail', jobId: job.id }; this.render(); }
-      } }, [
-        top,
-        job.serviceAddress ? ui.el('div', { className: 'aaa-card-sub', text: job.serviceAddress }) : null,
-        meta
-      ]);
-      return card;
+      } }, kids);
     },
 
     async _renderDetail(root) {

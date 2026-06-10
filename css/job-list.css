@@ -293,3 +293,66 @@ html, body {
 }
 @keyframes aaa-spin { to { transform: rotate(360deg); } }
 .aaa-loading__label { margin: 0; color: var(--muted); font-size: 0.9rem; }
+
+/* ============================================================================
+ * Jobs tab — mission-control triage (jl-*). Urgency owns the hierarchy:
+ * what needs the owner NOW sits at the top; done work sits dim at the bottom.
+ * Built in the --hk-* glass language shared with the Command Deck. The legacy
+ * aaa-* classes above stay — other screens (financial, council) still use them.
+ * ==========================================================================*/
+
+/* Summary strip — three compact glass tiles */
+.jl-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.jl-tile {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 12px 12px 11px; border-radius: 14px;
+  background: var(--hk-panel, rgba(20, 26, 38, 0.66));
+  border: 1px solid var(--hk-stroke, rgba(120, 160, 220, 0.16));
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  position: relative; overflow: hidden;
+}
+.jl-tile__label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hk-text-dim, #93a0ba); }
+.jl-tile__value { font-size: 1.7rem; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+/* a hot tile lights its top edge in its tone colour */
+.jl-tile::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: transparent; }
+.jl-tile--hot.jl-tile--prog::before { background: var(--hk-amber, #f5b53d); box-shadow: 0 0 10px var(--hk-amber, #f5b53d); }
+.jl-tile--hot.jl-tile--ok::before { background: var(--hk-green, #2fe08a); box-shadow: 0 0 10px var(--hk-green, #2fe08a); }
+.jl-tile--hot.jl-tile--attn { border-color: rgba(255, 59, 78, 0.4); }
+.jl-tile--hot.jl-tile--attn::before { background: var(--hk-red, #ff3b4e); box-shadow: 0 0 12px var(--hk-red, #ff3b4e); }
+
+/* Section headers — tight small-caps with a tone dot + count badge */
+.jl-group { display: flex; flex-direction: column; gap: 7px; }
+.jl-sec { display: flex; align-items: center; gap: 8px; margin: 2px 0 1px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; color: var(--hk-text-dim, #93a0ba); }
+.jl-sec__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--hk-text-dim, #93a0ba); flex: none; }
+.jl-sec__count { margin-left: auto; font-size: 0.7rem; font-weight: 800; color: var(--hk-text-dim, #93a0ba); font-variant-numeric: tabular-nums; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--hk-stroke-2, rgba(120, 160, 220, 0.28)); }
+.jl-group--attn .jl-sec, .jl-group--attn .jl-sec__count { color: var(--hk-red, #ff3b4e); border-color: rgba(255, 59, 78, 0.35); }
+.jl-group--attn .jl-sec__dot { background: var(--hk-red, #ff3b4e); box-shadow: 0 0 8px var(--hk-red, #ff3b4e); }
+.jl-group--prog .jl-sec__dot { background: var(--hk-amber, #f5b53d); }
+.jl-group--sched .jl-sec__dot { background: var(--hk-cyan-2, #38bdf8); }
+.jl-group--closed .jl-sec, .jl-group--closed .jl-sec__count { color: #5d6b82; }
+.jl-group--closed .jl-sec__dot { background: #3a4860; }
+
+/* Job cards — dense rows with a tone-coded left stripe */
+.jl-job {
+  display: flex; flex-direction: column; gap: 4px; width: 100%; text-align: left;
+  padding: 11px 13px 11px 16px; position: relative; cursor: pointer;
+  border-radius: 13px; color: var(--hk-text, #eaf0fb);
+  background: var(--hk-panel, rgba(20, 26, 38, 0.66));
+  border: 1px solid var(--hk-stroke, rgba(120, 160, 220, 0.16));
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  transition: transform 0.1s ease, border-color 0.2s ease;
+}
+.jl-job::before { content: ""; position: absolute; left: 0; top: 9px; bottom: 9px; width: 3px; border-radius: 3px; background: var(--hk-text-dim, #93a0ba); }
+.jl-job:active { transform: scale(0.99); }
+.jl-job:focus-visible { outline: 2px solid var(--hk-cyan-2, #38bdf8); outline-offset: 2px; }
+.jl-job--attn { border-color: rgba(255, 59, 78, 0.28); background: linear-gradient(100deg, rgba(255, 59, 78, 0.08), transparent 55%), var(--hk-panel, rgba(20, 26, 38, 0.66)); }
+.jl-job--attn::before { background: var(--hk-red, #ff3b4e); box-shadow: 0 0 10px rgba(255, 59, 78, 0.7); }
+.jl-job--prog::before { background: var(--hk-amber, #f5b53d); box-shadow: 0 0 8px rgba(245, 181, 61, 0.5); }
+.jl-job--sched::before { background: var(--hk-cyan-2, #38bdf8); }
+.jl-job--closed { opacity: 0.62; padding-top: 9px; padding-bottom: 9px; }
+.jl-job--closed::before { background: #3a4860; }
+.jl-job__head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.jl-job__name { font-size: 1.02rem; font-weight: 700; line-height: 1.15; }
+.jl-job__meta { font-size: 0.78rem; color: var(--hk-text-dim, #93a0ba); line-height: 1.35; }
+.jl-job__sep { opacity: 0.45; padding: 0 1px; }
+.jl-job__why { font-size: 0.76rem; font-weight: 600; color: var(--hk-red, #ff3b4e); margin-top: 1px; }
