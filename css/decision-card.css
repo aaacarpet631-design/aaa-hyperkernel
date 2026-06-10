@@ -1,0 +1,115 @@
+/*
+ * AAA HyperKernel — Decision Card (Decision Inbox pilot).
+ *
+ * Skin for the one-tap approval sheet: dense card, big tabular expected-value
+ * number in money green, a cyan confidence pill, dim rationale + masked
+ * recipient lines, and two thumb-sized (48px+) actions — Approve in the brand
+ * cyan→green gradient, Reject as a ghost. Uses only the shared --hk-* tokens
+ * from field-mode.css. Mobile-first; renders inside an AAA_UI bottom sheet.
+ */
+
+.dc-card {
+  padding: 4px 2px 0;
+}
+
+/* what fired — small, uppercase, dim */
+.dc-trigger {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hk-text-dim);
+}
+
+/* the money — big, green, tabular */
+.dc-ev {
+  margin-top: 8px;
+  font-size: 38px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+  color: var(--hk-green);
+  text-shadow: 0 0 22px rgba(47, 224, 138, 0.28);
+}
+.dc-ev-label {
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--hk-text-dim);
+}
+
+/* confidence pill */
+.dc-meta { margin-top: 10px; }
+.dc-conf-pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--hk-stroke-2);
+  background: rgba(46, 230, 214, 0.08);
+  color: var(--hk-cyan);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* honest one-liner + masked recipient — both dim, recipient dimmer */
+.dc-rationale {
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--hk-text-dim);
+}
+.dc-recipient {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--hk-text-dim);
+  opacity: 0.8;
+  font-variant-numeric: tabular-nums;
+}
+
+/* two thumb-sized actions */
+.dc-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+.dc-btn {
+  flex: 1;
+  min-height: 48px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.dc-btn:active { transform: scale(0.97); }
+.dc-btn[disabled] { opacity: 0.6; cursor: default; }
+.dc-btn--approve {
+  border: 1px solid var(--hk-stroke-2);
+  background: linear-gradient(135deg, var(--hk-cyan), var(--hk-green));
+  color: var(--hk-bg-1);
+  box-shadow: 0 8px 24px rgba(46, 230, 214, 0.25);
+}
+.dc-btn--approve:hover { box-shadow: 0 8px 28px rgba(46, 230, 214, 0.4); }
+.dc-btn--reject {
+  border: 1px solid var(--hk-stroke-2);
+  background: transparent;
+  color: var(--hk-text-dim);
+}
+.dc-btn--reject:hover { border-color: var(--hk-stroke-2); color: var(--hk-text); }
+
+/* inline status / error line (kept in flow so the sheet doesn't jump) */
+.dc-status {
+  min-height: 18px;
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
+.dc-status--ok { color: var(--hk-green); }
+.dc-status--error { color: var(--hk-red); }

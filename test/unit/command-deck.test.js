@@ -145,6 +145,30 @@ module.exports = async function run() {
     t.ok('without the UI kit, openTeam falls back to the AI Team tab', DECK.openTeam('sales').via === 'agents_tab' && switched === 'agents');
     delete G.AAA_JOB_LIST_UI; delete G.AAA_AGENT_COMMAND; delete G.AAA_DIGITAL_TWIN_UI;
 
+    // ===== Supervisor Report Execute → governed Decision Card (Phase 5) ======
+    // A follow-up priority builds + opens the Decision Card; anything else, a
+    // disabled flag, or a build/validate miss falls back to the chat route.
+    let opened = null, built = 0; switched = null;
+    G.AAA_JOB_LIST_UI = { _switchTab: (tab) => { switched = tab; } };
+    G.AAA_DECISION_INBOX = {
+      FLAGS: { cardsEnabled: true, dryRun: true },
+      buildFollowUpDecision: async () => { built++; return { ok: true, card: { decisionId: 'D1' } }; },
+      validateDecisionSchema: () => ({ valid: true })
+    };
+    G.AAA_DECISION_CARD = { open: (c) => { opened = c; return { opened: true }; } };
+    const ex = await DECK.executePriority('followup');
+    t.ok('a follow-up Execute builds and opens the Decision Card (not chat)', ex.via === 'decision_card' && built === 1 && opened && opened.decisionId === 'D1' && switched === null);
+    const exOther = await DECK.executePriority('cash');
+    t.ok('a non-follow-up Execute falls back to the chat route', exOther.via === 'chat' && switched === 'chat');
+    switched = null; G.AAA_DECISION_INBOX.FLAGS.cardsEnabled = false;
+    const exOff = await DECK.executePriority('followup');
+    t.ok('with the flag off, even a follow-up falls back to chat', exOff.via === 'chat' && switched === 'chat');
+    switched = null; G.AAA_DECISION_INBOX.FLAGS.cardsEnabled = true;
+    G.AAA_DECISION_INBOX.buildFollowUpDecision = async () => ({ ok: false, reason: 'NO_ELIGIBLE_QUOTE' });
+    const exMiss = await DECK.executePriority('followup');
+    t.ok('no eligible quote falls back to chat (never a dead end)', exMiss.via === 'chat' && switched === 'chat');
+    delete G.AAA_JOB_LIST_UI; delete G.AAA_DECISION_INBOX; delete G.AAA_DECISION_CARD;
+
     // ===== a zero-history quote can never wear a confident percentage ========
     const savedScorer = G.AAA_OPPORTUNITY_SCORER;
     G.AAA_OPPORTUNITY_SCORER = { scoreAll: async () => ({ ok: true, items: [

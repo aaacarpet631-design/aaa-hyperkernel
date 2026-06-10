@@ -69,6 +69,8 @@ const SUITES = [
   'unit/field-quick-actions.test.js',
   'unit/command-deck.test.js',
   'unit/opportunity-scorer.test.js',
+  'unit/decision-inbox.test.js',
+  'unit/decision-card-ui.test.js',
   'unit/agent-command.test.js',
   'unit/company-brain.test.js',
   'unit/digital-twin-ui.test.js',

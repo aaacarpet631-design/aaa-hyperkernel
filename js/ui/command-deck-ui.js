@@ -246,6 +246,25 @@
       return { opened: false, reason: 'no_target' };
     },
 
+    /**
+     * Run a Supervisor Report priority. For a follow-up, build a governed
+     * Decision Card (DRY-RUN — Approve runs the safety gate + audit log but
+     * sends nothing) when the Decision Inbox is loaded and its flag is on.
+     * Every other kind, a disabled flag, or any build/validate miss → the
+     * existing chat route, so behavior never regresses.
+     */
+    async executePriority(kind) {
+      const inbox = global.AAA_DECISION_INBOX, card = global.AAA_DECISION_CARD;
+      if (kind === 'followup' && inbox && inbox.FLAGS && inbox.FLAGS.cardsEnabled && card && card.open && typeof document !== 'undefined') {
+        try {
+          const r = await inbox.buildFollowUpDecision({});
+          if (r && r.ok && inbox.validateDecisionSchema(r.card).valid && card.open(r.card, {}).opened) return { routed: true, via: 'decision_card' };
+        } catch (_) { /* fall through to chat */ }
+      }
+      if (global.AAA_JOB_LIST_UI && global.AAA_JOB_LIST_UI._switchTab) { global.AAA_JOB_LIST_UI._switchTab('chat'); return { routed: true, via: 'chat' }; }
+      return { routed: false };
+    },
+
     /** Open the Digital Twin living-model surface in a bottom sheet. */
     openTwin() {
       if (typeof document === 'undefined') return { opened: false, reason: 'no_dom' };
@@ -292,7 +311,7 @@
             : m.supervisor.priorities.map(function (p) {
                 return '<div class="cd-rec"><span class="cd-rec__icon">' + esc(p.icon) + '</span>' +
                   '<span class="cd-rec__label">' + esc(p.label) + '</span>' +
-                  '<button class="cd-rec__exec" type="button" data-exec aria-label="Execute">▶</button></div>';
+                  '<button class="cd-rec__exec" type="button" data-exec data-kind="' + esc(p.kind || '') + '" aria-label="Execute">▶</button></div>';
               }).join('')) +
         '</div>' +
         // 3. Mission Feed
@@ -340,10 +359,11 @@
         const raw = Number(v.getAttribute('data-count'));
         if (isFinite(raw)) countUp(v, raw, v.getAttribute('data-kind'));
       });
-      // Execute → route to chat. Swarm tap → Agent Command drill-down (sheet)
-      // when it's loaded, else the AI Team tab. Null-safe on stubs.
+      // Execute → for a follow-up priority, build a governed Decision Card
+      // (dry-run; nothing is sent) when the inbox is loaded and the flag is on;
+      // anything else, or any failure, falls back to the existing chat route.
       wrap.querySelectorAll('.cd-rec__exec').forEach(function (b) {
-        b.onclick = function () { if (global.AAA_JOB_LIST_UI && global.AAA_JOB_LIST_UI._switchTab) global.AAA_JOB_LIST_UI._switchTab('chat'); };
+        b.onclick = function () { Deck.executePriority(b.getAttribute('data-kind')); };
       });
       wrap.querySelectorAll('.cd-swarm').forEach(function (b) {
         b.onclick = function () { Deck.openTeam(b.getAttribute('data-team')); };
