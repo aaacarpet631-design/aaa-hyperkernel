@@ -49,6 +49,7 @@ const SUITES = [
   'unit/security.test.js',
   'unit/security-ui.test.js',
   'unit/event-bus.test.js',
+  'unit/event-taxonomy.test.js',
   'unit/event-stream-ui.test.js',
   'unit/privacy.test.js',
   'unit/privacy-dashboard-ui.test.js',
