@@ -55,6 +55,8 @@ const SUITES = [
   'unit/capability-economy.test.js',
   'unit/simulation-council.test.js',
   'unit/world-model.test.js',
+  'unit/revenue-council.test.js',
+  'unit/innovation-council.test.js',
   'unit/event-stream-ui.test.js',
   'unit/privacy.test.js',
   'unit/privacy-dashboard-ui.test.js',
