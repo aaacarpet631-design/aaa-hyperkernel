@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1781112233.9199457,
-    "ast_hash": "49f79b74444b7336d71358e841385eb2",
+    "mtime": 1781112424.755957,
+    "ast_hash": "60caee5c4d0972d31453d0a15d2ee65b",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
@@ -1190,9 +1190,9 @@
     "semantic_hash": ""
   },
   "test/static/integrity.test.js": {
-    "mtime": 1780633642.6482913,
-    "ast_hash": "e7ba89b61634706d7324416454a8d93c",
-    "semantic_hash": "e7ba89b61634706d7324416454a8d93c"
+    "mtime": 1781112439.971958,
+    "ast_hash": "e32506b327c46008e99d9fa1057bc550",
+    "semantic_hash": ""
   },
   "test/unit/accounting.test.js": {
     "mtime": 1780633642.6482913,

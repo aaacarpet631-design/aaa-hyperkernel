@@ -1,16 +1,16 @@
 # Graph Report - aaa-hyperkernel  (2026-06-10)
 
 ## Corpus Check
-- 680 files · ~574,862 words
+- 680 files · ~575,211 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 7376 nodes · 13017 edges · 582 communities (521 shown, 61 thin omitted)
+- 7377 nodes · 13019 edges · 582 communities (521 shown, 61 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 34 edges (avg confidence: 0.81)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `d8ceb21e`
+- Built from commit: `638ffcf3`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -605,8 +605,8 @@ Cohesion: 0.02
 Nodes (96): load(), makeClock(), makeConfig(), makeData(), makeEvents(), makeIds(), makeRunner(), path (+88 more)
 
 ### Community 1 - "Intelligence Vector Memory"
-Cohesion: 0.14
-Nodes (22): allowed(), cfg(), clock(), data(), embed(), feature(), hash32(), index() (+14 more)
+Cohesion: 0.08
+Nodes (43): Memory Lifecycle (capture, normalize, index, recall, score, decay), cfg(), clock(), data(), ingest(), insights(), listQuotes(), mean() (+35 more)
 
 ### Community 2 - "Intelligence Executive Council"
 Cohesion: 0.08
@@ -617,8 +617,8 @@ Cohesion: 0.05
 Nodes (46): asyncapi, channels, comm.inbound, comm.notification, job.closed, quote.created, quote.sent, recommendation.created (+38 more)
 
 ### Community 4 - "Transport Transport Core"
-Cohesion: 0.07
-Nodes (65): Memory Lifecycle (capture, normalize, index, recall, score, decay), cfg(), clock(), data(), ingest(), insights(), listQuotes(), mean() (+57 more)
+Cohesion: 0.13
+Nodes (44): adapters(), analytics(), applyStatusEvent(), _attachOutbound(), biz(), cfg(), clock(), closeThread() (+36 more)
 
 ### Community 5 - "Core Privacy"
 Cohesion: 0.13
@@ -714,7 +714,7 @@ Nodes (29): arr(), buildBase(), calibration(), cfg(), clamp(), clock(), data(), 
 
 ### Community 28 - "Job List"
 Cohesion: 0.13
-Nodes (27): _allJobs(), _askAITeam(), boot(), _chip(), esc(), formatDate(), _getJob(), _governanceReview() (+19 more)
+Nodes (28): _allJobs(), _askAITeam(), boot(), _chip(), esc(), formatDate(), _getJob(), _governanceReview() (+20 more)
 
 ### Community 29 - "Genesis Tool Forge"
 Cohesion: 0.16
@@ -2581,4 +2581,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `Unit Audit Ledger` be split into smaller, more focused modules?**
   _Cohesion score 0.02182942142374191 - nodes in this community are weakly interconnected._
 - **Should `Intelligence Vector Memory` be split into smaller, more focused modules?**
-  _Cohesion score 0.14461538461538462 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.0784313725490196 - nodes in this community are weakly interconnected._

@@ -880,8 +880,8 @@
     "semantic_hash": "23819498c1e3b3a09630f35e879aa960"
   },
   "js/ui/job-list-ui.js": {
-    "mtime": 1781109703.7077951,
-    "ast_hash": "e9faade855efbca163ca85e37963f438",
+    "mtime": 1781113009.0199916,
+    "ast_hash": "4e20be7af6eb926185b566fd2f26c0c0",
     "semantic_hash": ""
   },
   "js/ui/knowledge-os-ui.js": {
@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1781112424.755957,
-    "ast_hash": "60caee5c4d0972d31453d0a15d2ee65b",
+    "mtime": 1781127918.7879999,
+    "ast_hash": "313a41d78128fbe8dce3cb398b5af0bf",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
