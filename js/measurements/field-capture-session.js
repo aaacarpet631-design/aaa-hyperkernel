@@ -113,7 +113,48 @@
       return { ok: true, session: upd, estimateEntries: estimateEntries };
     },
 
+    // ---- keyboard-free active-room capture (driven by the Bluetooth bridge) ----
+    /** Begin (or reset) the room currently being measured. */
+    async beginRoom(sessionId, opts) {
+      const o = opts || {};
+      const sess = await this.get(sessionId);
+      if (!sess) return { ok: false, error: 'SESSION_NOT_FOUND' };
+      const draft = { roomName: o.roomName || ('Room ' + (sess.roomIds.length + 1)), length: null, width: null, stairsCount: o.stairsCount || 0 };
+      await data().put(COLLECTION, sessionId, Object.assign({}, sess, { activeDraft: draft, updatedAt: nowISO() }));
+      return { ok: true, draft: draft };
+    },
+
+    /**
+     * Set a dimension on the active room from a (feet) reading. 'generic' fills
+     * the next empty slot (length then width). When both length and width are
+     * present the room is committed via addRoom and the draft clears.
+     */
+    async setDimension(sessionId, valueFt, dimension) {
+      const sess = await this.get(sessionId);
+      if (!sess) return { ok: false, error: 'SESSION_NOT_FOUND' };
+      const v = Number(valueFt);
+      if (!isFinite(v) || v <= 0) return { ok: false, error: 'INVALID_MEASUREMENT' };
+      let draft = sess.activeDraft || { roomName: 'Room ' + (sess.roomIds.length + 1), length: null, width: null, stairsCount: 0 };
+      draft = Object.assign({}, draft);
+      let slot = dimension;
+      if (dimension === 'generic' || !dimension) slot = (draft.length == null ? 'length' : (draft.width == null ? 'width' : 'length'));
+      if (slot === 'length' || slot === 'width') draft[slot] = Math.round(v * 100) / 100;
+      else if (slot === 'height') draft.height = Math.round(v * 100) / 100; // captured, not used for carpet area
+      else return { ok: false, error: 'UNKNOWN_DIMENSION' };
+
+      if (draft.length != null && draft.length > 0 && draft.width != null && draft.width > 0) {
+        await data().put(COLLECTION, sessionId, Object.assign({}, sess, { activeDraft: null, updatedAt: nowISO() }));
+        const added = await this.addRoom(sessionId, { roomName: draft.roomName, length: draft.length, width: draft.width, stairsCount: draft.stairsCount, source: 'bluetooth' });
+        return { ok: true, committed: true, room: added.room, dimension: slot, value: draft[slot] };
+      }
+      await data().put(COLLECTION, sessionId, Object.assign({}, sess, { activeDraft: draft, updatedAt: nowISO() }));
+      return { ok: true, committed: false, draft: draft, dimension: slot, value: draft[slot] };
+    },
+
     async get(id) { const r = await data().get(COLLECTION, id); return mine(r) ? r : null; },
+
+    async activeDraft(sessionId) { const s = await this.get(sessionId); return s ? (s.activeDraft || null) : null; },
+
     async list() { return (await data().list(COLLECTION)).filter(mine).sort(function (a, b) { return String(b.createdAt || '').localeCompare(String(a.createdAt || '')); }); }
   };
 

@@ -4280,9 +4280,9 @@
     "semantic_hash": "70eeae1f2364a3990c78c333fec021e7"
   },
   "/home/user/aaa-hyperkernel/js/measurements/field-capture-session.js": {
-    "mtime": 1781096217.0069056,
-    "ast_hash": "dc323d516e45570123f84a877c33b581",
-    "semantic_hash": "dc323d516e45570123f84a877c33b581"
+    "mtime": 1781098387.246363,
+    "ast_hash": "43debc246147d654d7777e2a0cf10273",
+    "semantic_hash": "43debc246147d654d7777e2a0cf10273"
   },
   "/home/user/aaa-hyperkernel/js/measurements/measurement-ai-assistant.js": {
     "mtime": 1781065386.5298831,
@@ -4930,9 +4930,9 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "/home/user/aaa-hyperkernel/test/run.js": {
-    "mtime": 1781097413.16257,
-    "ast_hash": "0ff6692d963af1f922af44dfdd89676b",
-    "semantic_hash": "0ff6692d963af1f922af44dfdd89676b"
+    "mtime": 1781098364.2214699,
+    "ast_hash": "b0c9c0bd4cee65af8a71da6a5d11c8ee",
+    "semantic_hash": "b0c9c0bd4cee65af8a71da6a5d11c8ee"
   },
   "/home/user/aaa-hyperkernel/test/smoke/boot.test.js": {
     "mtime": 1781065386.5464003,
@@ -5745,9 +5745,9 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "/home/user/aaa-hyperkernel/index.html": {
-    "mtime": 1781097471.5945735,
-    "ast_hash": "d670a407b1bfbb8dd940b26f17006c9b",
-    "semantic_hash": "d670a407b1bfbb8dd940b26f17006c9b"
+    "mtime": 1781098424.4343653,
+    "ast_hash": "38add2a71c9faedf8e85f759b99430bc",
+    "semantic_hash": "38add2a71c9faedf8e85f759b99430bc"
   },
   "/home/user/aaa-hyperkernel/netlify/functions/RESEARCH.md": {
     "mtime": 1780633642.6350634,
@@ -5838,5 +5838,30 @@
     "mtime": 1781097525.4825766,
     "ast_hash": "564ff5e855858261b3eb6747e41c8788",
     "semantic_hash": "564ff5e855858261b3eb6747e41c8788"
+  },
+  "/home/user/aaa-hyperkernel/js/bluetooth/services/bosch-glm-adapter.js": {
+    "mtime": 1781098300.4823577,
+    "ast_hash": "c32eb8b4d0fd08f2fa4f43634312c1c4",
+    "semantic_hash": "c32eb8b4d0fd08f2fa4f43634312c1c4"
+  },
+  "/home/user/aaa-hyperkernel/js/bluetooth/services/leica-disto-adapter.js": {
+    "mtime": 1781098289.086357,
+    "ast_hash": "04808aac485d1e485dfd09eec8dccec8",
+    "semantic_hash": "04808aac485d1e485dfd09eec8dccec8"
+  },
+  "/home/user/aaa-hyperkernel/js/field/bluetooth-bridge.js": {
+    "mtime": 1781098405.2263641,
+    "ast_hash": "89e82f3c138b98d81e9b848968522b02",
+    "semantic_hash": "89e82f3c138b98d81e9b848968522b02"
+  },
+  "/home/user/aaa-hyperkernel/test/unit/bluetooth-bridge.test.js": {
+    "mtime": 1781098354.198361,
+    "ast_hash": "e75489dfe35369aa2a59abd1cf923dda",
+    "semantic_hash": "e75489dfe35369aa2a59abd1cf923dda"
+  },
+  "/home/user/aaa-hyperkernel/references/FIELD_BLUETOOTH_LASER_BRIDGE.md": {
+    "mtime": 1781098490.138369,
+    "ast_hash": "ce5d3022c8fe1e6ec58f46a677cbcfa0",
+    "semantic_hash": "ce5d3022c8fe1e6ec58f46a677cbcfa0"
   }
 }
