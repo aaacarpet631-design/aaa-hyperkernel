@@ -163,8 +163,11 @@ body {
   transition: transform 0.12s ease;
 }
 .voice-fab:active { transform: scale(0.92); }
-/* Chat/Focus tabs own the bottom-right corner with their own Send button. */
-body.hk-hide-voice-fab .voice-fab { display: none; }
+/* Chat/Focus tabs own the bottom-right corner with their own Send button.
+ * Targets #voice-fab by ID so this out-specifies voice-hud.css's
+ * `#voice-hud .voice-fab { display: flex }` (1,1,0) — a plain `.voice-fab`
+ * hide (0,2,1) loses to it and never takes effect. */
+body.hk-hide-voice-fab #voice-fab { display: none; }
 
 /* Build stamp on the More tab — settles "which version am I running?" */
 .aaa-build-stamp { margin-top: 18px; text-align: center; font-size: 11px; color: var(--hk-text-dim); letter-spacing: 0.05em; }
