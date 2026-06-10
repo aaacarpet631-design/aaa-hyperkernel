@@ -1,0 +1,1 @@
+{"nodes": [{"id": "governance_prompt_registry_aaa_prompt_registry", "label": "AAA_PROMPT_REGISTRY (governed versioned prompt registry)", "file_type": "code", "source_file": "js/governance/prompt-registry.js", "source_location": null, "source_url": null, "captured_at": null, "author": null, "contributor": null}], "edges": [], "hyperedges": []}

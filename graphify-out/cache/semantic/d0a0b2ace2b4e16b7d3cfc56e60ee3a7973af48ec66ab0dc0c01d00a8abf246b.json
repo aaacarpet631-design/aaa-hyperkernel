@@ -1,0 +1,1 @@
+{"nodes": [{"id": "governance_prompt_change_pipeline_aaa_prompt_pipeline", "label": "AAA_PROMPT_PIPELINE (human-approved prompt change pipeline)", "file_type": "code", "source_file": "js/governance/prompt-change-pipeline.js", "source_location": null, "source_url": null, "captured_at": null, "author": null, "contributor": null}], "edges": [], "hyperedges": []}
