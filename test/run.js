@@ -166,6 +166,7 @@ const SUITES = [
   'unit/review-governance.test.js',
   'unit/research-brain.test.js',
   'static/integrity.test.js',
+  'static/css-contracts.test.js',
   'smoke/boot.test.js'
 ];
 

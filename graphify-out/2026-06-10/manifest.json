@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1781132551.4985707,
-    "ast_hash": "21ff30f6bc298f0e368cbcafec6b6c5c",
+    "mtime": 1781133581.0475118,
+    "ast_hash": "dfbf04808bb64a2f6ad2621cebf7e062",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
@@ -1180,8 +1180,8 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "test/run.js": {
-    "mtime": 1781132546.7580888,
-    "ast_hash": "ab16b660dd6a70c655ad1ab7be543b26",
+    "mtime": 1781133576.1660655,
+    "ast_hash": "3bda3cdb62407994718f613dd69339ed",
     "semantic_hash": ""
   },
   "test/smoke/boot.test.js": {
@@ -1895,8 +1895,8 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "index.html": {
-    "mtime": 1781132545.582089,
-    "ast_hash": "c76af60f20eba3d65b5cf01d3e55ef7c",
+    "mtime": 1781133575.1220653,
+    "ast_hash": "31b6c2ff4a119e60cc9379e120d7376a",
     "semantic_hash": ""
   },
   "netlify/functions/RESEARCH.md": {

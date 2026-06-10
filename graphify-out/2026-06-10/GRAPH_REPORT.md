@@ -1,7 +1,7 @@
 # Graph Report - aaa-hyperkernel  (2026-06-10)
 
 ## Corpus Check
-- 688 files · ~589,241 words
+- 688 files · ~589,249 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
