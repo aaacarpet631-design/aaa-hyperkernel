@@ -3880,9 +3880,9 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "/home/user/aaa-hyperkernel/test/run.js": {
-    "mtime": 1781092905.9067087,
-    "ast_hash": "cf95f4dd8affae7bf5b74de5e3992804",
-    "semantic_hash": "cf95f4dd8affae7bf5b74de5e3992804"
+    "mtime": 1781094341.382794,
+    "ast_hash": "33f5469a86c5a355c71e088abc3dd75b",
+    "semantic_hash": "33f5469a86c5a355c71e088abc3dd75b"
   },
   "/home/user/aaa-hyperkernel/test/smoke/boot.test.js": {
     "mtime": 1781065386.5464003,
@@ -4605,9 +4605,9 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "/home/user/aaa-hyperkernel/index.html": {
-    "mtime": 1781092915.6147091,
-    "ast_hash": "a68e845c9b5ab45ec0f99e7821b7c04d",
-    "semantic_hash": "a68e845c9b5ab45ec0f99e7821b7c04d"
+    "mtime": 1781094365.3827953,
+    "ast_hash": "e9a28219703936cd031f264ed26e69cd",
+    "semantic_hash": "e9a28219703936cd031f264ed26e69cd"
   },
   "/home/user/aaa-hyperkernel/netlify/functions/RESEARCH.md": {
     "mtime": 1780633642.6350634,
@@ -4998,5 +4998,125 @@
     "mtime": 1781092959.270712,
     "ast_hash": "7fc3f302e27ecd6b5dc19667721abd7d",
     "semantic_hash": "7fc3f302e27ecd6b5dc19667721abd7d"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/copilot-dashboard-readmodel.js": {
+    "mtime": 1781093945.5427704,
+    "ast_hash": "78e145ac3ab60ba06556b23e2f4e57e8",
+    "semantic_hash": "78e145ac3ab60ba06556b23e2f4e57e8"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/copilot-goal-interface.js": {
+    "mtime": 1781093911.3347685,
+    "ast_hash": "6806175f0b827c84c1fac1297faede05",
+    "semantic_hash": "6806175f0b827c84c1fac1297faede05"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/copilot-governance-gate.js": {
+    "mtime": 1781093810.9347625,
+    "ast_hash": "6b42223941fc67ffc1a0e89bf9965251",
+    "semantic_hash": "6b42223941fc67ffc1a0e89bf9965251"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/copilot-intent-router.js": {
+    "mtime": 1781094146.4587824,
+    "ast_hash": "489054d135528db2a1b6f78636e4c278",
+    "semantic_hash": "489054d135528db2a1b6f78636e4c278"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/copilot-memory-retriever.js": {
+    "mtime": 1781093823.3547633,
+    "ast_hash": "fa7780826629a6a46868bf37c6ccaadf",
+    "semantic_hash": "fa7780826629a6a46868bf37c6ccaadf"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/copilot-simulation-interface.js": {
+    "mtime": 1781093886.250767,
+    "ast_hash": "dab32c43e7f610bd23afd59b88b82ad6",
+    "semantic_hash": "dab32c43e7f610bd23afd59b88b82ad6"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/copilot-ui.js": {
+    "mtime": 1781094027.7747753,
+    "ast_hash": "8f2633ee48080414ce743d998931ea9d",
+    "semantic_hash": "8f2633ee48080414ce743d998931ea9d"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/council-query-engine.js": {
+    "mtime": 1781093792.6747613,
+    "ast_hash": "4b321ceafb7827f8dfad57feeb60c250",
+    "semantic_hash": "4b321ceafb7827f8dfad57feeb60c250"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/executive-copilot.js": {
+    "mtime": 1781094122.498781,
+    "ast_hash": "1d09568fcb726afdc2c84fce8c771a66",
+    "semantic_hash": "1d09568fcb726afdc2c84fce8c771a66"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/executive-synthesizer.js": {
+    "mtime": 1781093866.3947659,
+    "ast_hash": "c8e6d1122337c55ace7f29190ad49bbb",
+    "semantic_hash": "c8e6d1122337c55ace7f29190ad49bbb"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/morning-briefing-engine.js": {
+    "mtime": 1781093929.9067695,
+    "ast_hash": "12e6168783cf378e2cebc8c018c86cb9",
+    "semantic_hash": "12e6168783cf378e2cebc8c018c86cb9"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/sms-command-router.js": {
+    "mtime": 1781094257.638789,
+    "ast_hash": "ab446ccfc46464ec632f9b07f85c8ba8",
+    "semantic_hash": "ab446ccfc46464ec632f9b07f85c8ba8"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/sms-copilot-adapter.js": {
+    "mtime": 1781094363.2747953,
+    "ast_hash": "bf5b65ab63027b5fd6e2ab9bcdc14478",
+    "semantic_hash": "bf5b65ab63027b5fd6e2ab9bcdc14478"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/sms-response-formatter.js": {
+    "mtime": 1781094275.53079,
+    "ast_hash": "18700f944def8434bf28a134352c9404",
+    "semantic_hash": "18700f944def8434bf28a134352c9404"
+  },
+  "/home/user/aaa-hyperkernel/js/copilot/voice-input-adapter.js": {
+    "mtime": 1781093963.5707715,
+    "ast_hash": "39154df04a34d2735ec1f08fd9079e7b",
+    "semantic_hash": "39154df04a34d2735ec1f08fd9079e7b"
+  },
+  "/home/user/aaa-hyperkernel/js/epistemology/belief-registry.js": {
+    "mtime": 1781093378.2227368,
+    "ast_hash": "95dfca67f03a07e5a9d43529a0f89b2f",
+    "semantic_hash": "95dfca67f03a07e5a9d43529a0f89b2f"
+  },
+  "/home/user/aaa-hyperkernel/js/epistemology/knowledge-compounding-engine.js": {
+    "mtime": 1781093303.5147324,
+    "ast_hash": "ff6a748161374866b01b18942ea973e7",
+    "semantic_hash": "ff6a748161374866b01b18942ea973e7"
+  },
+  "/home/user/aaa-hyperkernel/js/epistemology/scientific-discovery-council.js": {
+    "mtime": 1781093278.4667308,
+    "ast_hash": "5c5095af0fc533cec205d56eaa61b949",
+    "semantic_hash": "5c5095af0fc533cec205d56eaa61b949"
+  },
+  "/home/user/aaa-hyperkernel/js/genesis/goal-capability-bridge.js": {
+    "mtime": 1781093655.5987532,
+    "ast_hash": "69153c02bc126e5d11a12d460b46a2ba",
+    "semantic_hash": "69153c02bc126e5d11a12d460b46a2ba"
+  },
+  "/home/user/aaa-hyperkernel/test/unit/copilot.test.js": {
+    "mtime": 1781094069.7427778,
+    "ast_hash": "459a3830c3122b09b0373c6430070d97",
+    "semantic_hash": "459a3830c3122b09b0373c6430070d97"
+  },
+  "/home/user/aaa-hyperkernel/test/unit/epistemology.test.js": {
+    "mtime": 1781093354.2507353,
+    "ast_hash": "4203b6b4f7ae72768c6bb8f09b3b9179",
+    "semantic_hash": "4203b6b4f7ae72768c6bb8f09b3b9179"
+  },
+  "/home/user/aaa-hyperkernel/test/unit/goal-capability-bridge.test.js": {
+    "mtime": 1781093628.3787515,
+    "ast_hash": "89e82dfc8a1c249c9b1138f831050300",
+    "semantic_hash": "89e82dfc8a1c249c9b1138f831050300"
+  },
+  "/home/user/aaa-hyperkernel/test/unit/sms-copilot.test.js": {
+    "mtime": 1781094335.2267935,
+    "ast_hash": "00d57c2819017c8bfd28708e32132f8d",
+    "semantic_hash": "00d57c2819017c8bfd28708e32132f8d"
+  },
+  "/home/user/aaa-hyperkernel/references/HYPERKERNEL_EXECUTIVE_COPILOT.md": {
+    "mtime": 1781094171.7587838,
+    "ast_hash": "3a677110dbdc4c18d7205f9a74069dd5",
+    "semantic_hash": "3a677110dbdc4c18d7205f9a74069dd5"
   }
 }

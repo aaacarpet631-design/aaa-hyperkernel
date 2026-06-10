@@ -61,6 +61,7 @@ const SUITES = [
   'unit/epistemology.test.js',
   'unit/goal-capability-bridge.test.js',
   'unit/copilot.test.js',
+  'unit/sms-copilot.test.js',
   'unit/event-stream-ui.test.js',
   'unit/privacy.test.js',
   'unit/privacy-dashboard-ui.test.js',
