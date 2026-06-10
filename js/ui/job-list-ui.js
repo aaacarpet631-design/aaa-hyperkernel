@@ -27,11 +27,12 @@
     async boot() {
       this.storage = global.AAA_LOCAL_FIRST_STORAGE;
       await this._seedIfEmpty();
-      // Open work-first: every cold launch lands in Field Mode on START
-      // MEASUREMENT (laser → capture → quote), never the executive Command
-      // deck — which has no Measure tab. Executive is one tap away via
-      // More → Switch to Executive Mode when you want to check the business.
-      if (global.AAA_APP_MODE && global.AAA_APP_MODE.set) global.AAA_APP_MODE.set('field');
+      // Open work-first: when the "Always open to Measure" preference is on
+      // (default), every cold launch lands in Field Mode on START MEASUREMENT
+      // rather than restoring the executive Command deck. Turn it off (More →
+      // toggle) to have the app remember whichever mode you were last in.
+      const workFirst = (global.AAA_CONFIG && global.AAA_CONFIG.flag) ? global.AAA_CONFIG.flag('openWorkFirst', true) : true;
+      if (workFirst && global.AAA_APP_MODE && global.AAA_APP_MODE.set) global.AAA_APP_MODE.set('field');
       this._landed = false;
       this._mountVoiceHud();
       if (!this._focusBound) {
@@ -227,6 +228,10 @@
         root.appendChild(main);
         const ui = UI();
         if (global.AAA_APP_MODE) main.appendChild(ui.button({ label: 'Switch to ' + (global.AAA_APP_MODE.get() === 'field' ? 'Executive' : 'Field') + ' Mode', icon: '🔀', variant: 'primary', full: true, onClick: () => { global.AAA_APP_MODE.toggle(); this._landed = false; this.render(); } }));
+        // Launch preference: on (default) → open straight to Measure every time;
+        // off → remember whichever mode you were last in.
+        const cfgFlag = global.AAA_CONFIG && global.AAA_CONFIG.flag ? global.AAA_CONFIG.flag('openWorkFirst', true) : true;
+        main.appendChild(ui.button({ label: 'Always open to Measure: ' + (cfgFlag ? 'On' : 'Off'), icon: cfgFlag ? '✅' : '⬜️', variant: 'secondary', full: true, onClick: () => { if (global.AAA_CONFIG && global.AAA_CONFIG.set) global.AAA_CONFIG.set({ openWorkFirst: !cfgFlag }); this.render(); } }));
         main.appendChild(ui.button({ label: 'AI Team', icon: '🧠', variant: 'secondary', full: true, onClick: () => this._switchTab('agents') }));
         main.appendChild(ui.button({ label: 'Business', icon: '📊', variant: 'secondary', full: true, onClick: () => this._switchTab('business') }));
         // Build stamp — reads the live SW cache version so "is the deploy on
