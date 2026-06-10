@@ -32,6 +32,20 @@ jobs:
       - name: Run test suite
         run: npm test
 
+  python-backup:
+    name: Python backup backend (unittest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      # Tests are stdlib-only (the GCS/Flask layers are not imported under test),
+      # so no pip install is needed — mirrors the zero-dependency Node suite.
+      - name: Run backup backend tests
+        working-directory: backend-python
+        run: python -m unittest test_main -v
+
   netlify-build:
     name: Netlify build (offline)
     runs-on: ubuntu-latest
