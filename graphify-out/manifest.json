@@ -300,13 +300,13 @@
     "semantic_hash": "1d84696412abbda689d8c82d9c9ff1be"
   },
   "js/bluetooth/hooks/use-bluetooth-connection.js": {
-    "mtime": 1780633642.6123943,
-    "ast_hash": "1f50758b3992b78594a233050335212d",
-    "semantic_hash": "1f50758b3992b78594a233050335212d"
+    "mtime": 1781136256.1045387,
+    "ast_hash": "fdd3707152d951ac19182e03cb16ff55",
+    "semantic_hash": ""
   },
   "js/bluetooth/screens/measurement-hud-ui.js": {
-    "mtime": 1781106729.3828852,
-    "ast_hash": "2c6ef0c8dc337108bc5142148e37cf03",
+    "mtime": 1781136281.032538,
+    "ast_hash": "aef99993426b7647c078e141f367c64f",
     "semantic_hash": ""
   },
   "js/bluetooth/services/device-adapter-registry.js": {
@@ -315,9 +315,9 @@
     "semantic_hash": "3c25a410d7c47c7a67607ce4fa0bacc7"
   },
   "js/bluetooth/services/generic-ble-adapter.js": {
-    "mtime": 1780633642.6145597,
-    "ast_hash": "d3d8cbc2abf2f31d9c49899e8c50cdf4",
-    "semantic_hash": "d3d8cbc2abf2f31d9c49899e8c50cdf4"
+    "mtime": 1781136223.3845394,
+    "ast_hash": "6f563ba746f693dd579c8f364d647e13",
+    "semantic_hash": ""
   },
   "js/bluetooth/services/huepar-s60-adapter.js": {
     "mtime": 1780633642.6145597,
@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1781135901.328831,
-    "ast_hash": "2e5242d0294dc9ab6dacee0f60bd5d97",
+    "mtime": 1781136660.8137906,
+    "ast_hash": "b1125ca3449b1b0be96ee33a2d825931",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
@@ -1275,9 +1275,9 @@
     "semantic_hash": "06a05875c34702b4cee28105cb813f59"
   },
   "test/unit/bluetooth-connect.test.js": {
-    "mtime": 1780633642.6515408,
-    "ast_hash": "3230909961959629ee34656d4a2478a0",
-    "semantic_hash": "3230909961959629ee34656d4a2478a0"
+    "mtime": 1781136526.6205323,
+    "ast_hash": "d66051af1e90f62daa39fbcebb93d6d9",
+    "semantic_hash": ""
   },
   "test/unit/business-digital-twin-ui.test.js": {
     "mtime": 1781099272.2125432,

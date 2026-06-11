@@ -43,6 +43,22 @@
     const origClose = sheet.close;
     sheet.close = function () { stopSeq(); if (state.unsub) { state.unsub(); state.unsub = null; } origClose(); if (events()) events().emit('hud:closed', { hud: 'measurement-hud' }); };
     go('setup');
+
+    // Auto-reconnect: if the tech already paired their laser once, silently
+    // re-acquire it (no Scan, no picker) and watch for it powering on while
+    // this screen is open. Fire-and-forget — the subscribe above re-renders
+    // status as it transitions. Manual Scan stays fully available either way.
+    if (ble() && ble().isSupported && ble().isSupported()) {
+      try { if (ble().autoReconnect) Promise.resolve(ble().autoReconnect()).catch(() => {}); } catch (_) {}
+      try { if (ble().watchForDevice) Promise.resolve(ble().watchForDevice()).catch(() => {}); } catch (_) {}
+      // With a remembered device, land on the scanner so the tech sees a live
+      // "Looking for your Huepar…" status immediately instead of the setup menu.
+      if (ble().lastKnownDeviceId) {
+        Promise.resolve(ble().lastKnownDeviceId()).then((id) => {
+          if (id && state.sheet === sheet && state.view === 'setup') go('scanner');
+        }).catch(() => {});
+      }
+    }
   }
 
   function go(view) { if (state.view === 'capture' && view !== 'capture') stopSeq(); state.view = view; render(); }
@@ -109,6 +125,17 @@
       return;
     }
 
+    // Honest live auto-reconnect status. While the controller hunts for the
+    // remembered laser the tech sees it happening; manual Scan stays right below.
+    const s = ble().getState();
+    if (s.status === 'connecting') {
+      body.appendChild(ui.el('div', { className: 'aaa-list-row', style: { borderColor: '#F59E0B' }, html:
+        '<strong>🔄 Looking for your ' + esc(s.deviceName || 'Huepar') + '…</strong>' +
+        '<div class="aaa-list-sub">Make sure the laser is powered on. If it doesn’t connect, tap Scan below to pick it manually.</div>' }));
+    } else if (s.status === 'connected') {
+      body.appendChild(ui.button({ label: 'Connected — view device', icon: '✅', variant: 'primary', full: true, onClick: () => go('details') }));
+    }
+
     body.appendChild(ui.el('p', { className: 'aaa-voice-hint', text: 'Tap “Scan” to open your phone’s Bluetooth picker, choose your laser, then connect.' }));
     body.appendChild(ui.button({ label: 'Scan (open picker)', icon: '🔍', variant: 'primary', full: true, onClick: async () => {
       const res = await ble().scanAndPick();
@@ -126,7 +153,7 @@
           '<div class="aaa-list-sub">' + esc(d.manufacturer || d.deviceType) + (d.lastConnectedAt ? ' · last ' + esc(fmt(d.lastConnectedAt)) : '') + '</div>' });
         body.appendChild(row);
       });
-      body.appendChild(ui.el('p', { className: 'aaa-voice-hint', text: 'Browsers can’t silently reconnect — tap Scan and re-pick the same device.' }));
+      body.appendChild(ui.el('p', { className: 'aaa-voice-hint', text: 'Your last laser reconnects automatically while this screen is open (Chrome on Android). If it doesn’t, tap Scan and re-pick it.' }));
     }
     body.appendChild(navRow([{ label: 'Back', onClick: () => go('setup') }]));
   }

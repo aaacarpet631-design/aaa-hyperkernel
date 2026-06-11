@@ -84,6 +84,34 @@
       }
     },
 
+    /**
+     * Previously-permitted devices (Chrome's navigator.bluetooth.getDevices()).
+     * Lets autoReconnect re-acquire a remembered laser WITHOUT the picker.
+     * Honest fallback: returns [] when the API is missing (Safari/iOS, older
+     * Chrome, permission not persisted) — never throws.
+     */
+    async getPermittedDevices() {
+      try {
+        if (global.navigator && global.navigator.bluetooth &&
+            typeof global.navigator.bluetooth.getDevices === 'function') {
+          const devices = await global.navigator.bluetooth.getDevices();
+          return Array.isArray(devices) ? devices : [];
+        }
+      } catch (_) { /* permission API hiccup → behave as "none permitted" */ }
+      return [];
+    },
+
+    /**
+     * Adopt a pre-acquired BluetoothDevice handle (e.g. from getDevices()) so a
+     * following connect() uses it instead of requiring the picker. Mirrors how
+     * requestDevice() stores the handle in this._device.
+     */
+    adoptDevice(bluetoothDevice) {
+      if (!bluetoothDevice) return false;
+      this._device = bluetoothDevice;
+      return true;
+    },
+
     /** Connect GATT, subscribe to notifyable characteristics, wire reconnect. */
     async connect(opts) {
       if (!this._device) return { ok: false, error: 'NO_DEVICE', message: 'Pick a device first.' };

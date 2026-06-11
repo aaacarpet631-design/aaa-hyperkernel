@@ -33,6 +33,7 @@
     },
     _subs: [],
     _foregroundBound: null,
+    _watchingDeviceId: null,   // device id we're watching advertisements for
 
     // ---- subscription ---------------------------------------------------
     subscribe(cb) {
@@ -162,6 +163,128 @@
       return { ok: false, error: 'MUST_REPICK', message: 'Tap “Scan for device” to reconnect.' };
     },
 
+    // ---- auto-reconnect (no picker) --------------------------------------
+    /**
+     * The id of the most-recently-connected SAVED device (by lastConnectedAt),
+     * or null. This is the device autoReconnect looks for after a cold reload.
+     */
+    async lastKnownDeviceId() {
+      try {
+        const s = store();
+        if (!s) return null;
+        if (typeof s.lastConnectedDevice === 'function') {
+          const d = await s.lastConnectedDevice();
+          return d && d.id ? d.id : null;
+        }
+        if (typeof s.listDevices === 'function') {
+          const list = (await s.listDevices()) || [];
+          const known = list.filter((d) => d && d.lastConnectedAt)
+            .sort((a, b) => String(b.lastConnectedAt).localeCompare(String(a.lastConnectedAt)));
+          return known.length ? known[0].id : null;
+        }
+      } catch (_) {}
+      return null;
+    },
+
+    _mustRepick() {
+      return { ok: false, error: 'MUST_REPICK', message: 'Tap “Scan for device” to connect your laser.' };
+    },
+
+    /**
+     * Reconnect to the remembered laser WITHOUT the picker, when the platform
+     * allows it. Order:
+     *   1. already connected → no-op success.
+     *   2. live in-page adapter + device record → plain reconnect().
+     *   3. cold path (after reload): look the saved device up in Chrome's
+     *      navigator.bluetooth.getDevices() (via the generic adapter), adopt
+     *      the handle onto the right brand adapter, and connect — no picker.
+     *   4. anything missing → honest MUST_REPICK (manual Scan still works).
+     * Never throws; always resolves a result object. State transitions
+     * (connecting → connected/error) flow to subscribers via _set/_wireAdapter.
+     */
+    async autoReconnect() {
+      try {
+        if (this.isConnected()) return { ok: true, already: true };
+        if (this._adapter && this._deviceRec) return this.reconnect();
+        if (!this.isSupported()) return this._mustRepick();
+
+        const id = await this.lastKnownDeviceId();
+        if (!id) return this._mustRepick();
+
+        const reg = registry();
+        const generic = reg && reg.generic();
+        if (!generic || typeof generic.getPermittedDevices !== 'function') return this._mustRepick();
+        const handles = await generic.getPermittedDevices();
+        const handle = (handles || []).find((h) => h && h.id === id);
+        // Permission didn't persist (or getDevices() unsupported): be honest.
+        if (!handle) return this._mustRepick();
+
+        const saved = store() ? await store().getDevice(id) : null;
+        const resolved = reg.resolve({ name: handle.name || (saved && saved.name) });
+        const adapter = resolved ? resolved.adapter : generic;
+        if (typeof adapter.adoptDevice === 'function') adapter.adoptDevice(handle);
+        else adapter._device = handle;
+        this._adapter = adapter;
+        this._wireAdapter(resolved ? resolved.id : 'generic-ble');
+        this._deviceRec = saved || {
+          id: id, name: handle.name || 'Saved device',
+          adapterId: resolved ? resolved.id : 'generic-ble'
+        };
+        this._set({
+          status: 'connecting',
+          deviceId: id,
+          deviceName: (saved && (saved.nickname || saved.name)) || handle.name || null,
+          error: null, errorDetail: null
+        });
+        return await this.connect();
+      } catch (err) {
+        const msg = (err && err.message) || String(err);
+        this._set({ status: 'error', error: msg });
+        return { ok: false, error: 'AUTO_RECONNECT_FAILED', message: msg };
+      }
+    },
+
+    /**
+     * Watch for the remembered laser to start advertising (i.e. the tech powers
+     * it on while this screen is already open) and auto-connect the moment it
+     * does. Uses the experimental watchAdvertisements() API — feature-detected,
+     * honest no-op everywhere it's missing. Never throws.
+     */
+    async watchForDevice() {
+      try {
+        if (!this.isSupported()) return { ok: false, reason: 'UNSUPPORTED' };
+        if (this.isConnected()) return { ok: false, reason: 'ALREADY_CONNECTED' };
+        const id = await this.lastKnownDeviceId();
+        if (!id) return { ok: false, reason: 'NO_SAVED_DEVICE' };
+        const generic = registry() && registry().generic();
+        if (!generic || typeof generic.getPermittedDevices !== 'function') return { ok: false, reason: 'NO_GETDEVICES' };
+        const handles = await generic.getPermittedDevices();
+        const handle = (handles || []).find((h) => h && h.id === id);
+        if (!handle) return { ok: false, reason: 'NO_PERMITTED_DEVICE' };
+        if (typeof handle.watchAdvertisements !== 'function') return { ok: false, reason: 'WATCH_UNSUPPORTED' };
+        if (this._watchingDeviceId === id) return { ok: true, watching: true, already: true };
+
+        const self = this;
+        const ctl = typeof global.AbortController === 'function' ? new global.AbortController() : null;
+        const onAdv = function () {
+          // One-shot: stop listening/watching, then grab the device.
+          try { handle.removeEventListener('advertisementreceived', onAdv); } catch (_) {}
+          self._watchingDeviceId = null;
+          try {
+            if (ctl) ctl.abort();
+            else if (typeof handle.unwatchAdvertisements === 'function') handle.unwatchAdvertisements();
+          } catch (_) {}
+          self.autoReconnect();
+        };
+        handle.addEventListener('advertisementreceived', onAdv);
+        await handle.watchAdvertisements(ctl ? { signal: ctl.signal } : undefined);
+        this._watchingDeviceId = id;
+        return { ok: true, watching: true };
+      } catch (err) {
+        return { ok: false, reason: 'WATCH_FAILED', message: (err && err.message) || String(err) };
+      }
+    },
+
     async refreshBattery() {
       if (!this._adapter || !this._adapter.readBattery) return null;
       const b = await this._adapter.readBattery();
@@ -198,9 +321,11 @@
     installLifecycleHandlers() {
       if (this._foregroundBound || typeof global.document === 'undefined') return;
       this._foregroundBound = () => {
-        if (global.document.visibilityState === 'visible' && this._adapter && !this.isConnected() && this._deviceRec) {
-          // Best-effort silent reconnect when the tech returns to the app.
-          this.reconnect();
+        if (global.document.visibilityState === 'visible' && !this.isConnected()) {
+          // Best-effort silent re-acquire when the tech returns to the app.
+          // autoReconnect covers the live-adapter path AND the cold path after
+          // a reload (via getDevices), and resolves MUST_REPICK harmlessly.
+          this.autoReconnect();
         }
       };
       global.document.addEventListener('visibilitychange', this._foregroundBound);
