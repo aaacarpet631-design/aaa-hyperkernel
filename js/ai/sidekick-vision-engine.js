@@ -124,6 +124,27 @@
       if (typeof navigator !== 'undefined' && navigator.onLine) {
         // Online: perform analysis immediately
         const analysis = await analyzeCarpetDamage(base64, imageFile.type);
+        // Record this capture as structured visual evidence (moat layer). Maps
+        // ONLY real analysis fields — never invents — and is fully guarded so a
+        // missing/erroring memory store can't break capture. Local-first; no
+        // image egress happens here.
+        if (global.AAA_VISUAL_MEMORY && global.AAA_VISUAL_MEMORY.record) {
+          try {
+            const qr = analysis && analysis.estimatedQuoteRange;
+            const lo = Array.isArray(qr) ? qr[0] : (qr && qr.low != null ? qr.low : null);
+            const hi = Array.isArray(qr) ? qr[1] : (qr && qr.high != null ? qr.high : null);
+            await global.AAA_VISUAL_MEMORY.record({
+              jobId: jobId, imageRef: mediaId, source: 'vision',
+              analysis: {
+                category: analysis && analysis.type != null ? analysis.type : null,
+                recommendation: analysis && (analysis.recommendedNextStep || analysis.summary) || null,
+                confidenceScore: analysis && analysis.confidence != null ? analysis.confidence : null,
+                estimateLowUSD: lo, estimateHighUSD: hi
+              },
+              tags: analysis && Array.isArray(analysis.materials) ? analysis.materials : []
+            });
+          } catch (_) { /* visual memory is best-effort; capture must not fail on it */ }
+        }
         return { ok: true, analysis: analysis, mediaId: mediaId };
       } else {
         // Offline: queue mutation for later analysis
