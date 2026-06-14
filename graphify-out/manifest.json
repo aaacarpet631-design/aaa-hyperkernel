@@ -880,8 +880,8 @@
     "semantic_hash": "23819498c1e3b3a09630f35e879aa960"
   },
   "js/ui/job-list-ui.js": {
-    "mtime": 1781135895.7685468,
-    "ast_hash": "709fbcf32209dd89992532179c806498",
+    "mtime": 1781408638.4733744,
+    "ast_hash": "7877a562ce017f3596fd70e6c43cc59d",
     "semantic_hash": ""
   },
   "js/ui/knowledge-os-ui.js": {
@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1781402031.4604897,
-    "ast_hash": "2a7f60265d30276679d11182780fa3d0",
+    "mtime": 1781408760.7028043,
+    "ast_hash": "704938119cfa8bd6e9565b8928d9bba6",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
@@ -1180,8 +1180,8 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "test/run.js": {
-    "mtime": 1781402029.528054,
-    "ast_hash": "3745d36c7b5c849a2ff2f166f4016fcf",
+    "mtime": 1781408746.6933787,
+    "ast_hash": "c9c0b6425e0059a2d354cf19a07d11ff",
     "semantic_hash": ""
   },
   "test/smoke/boot.test.js": {
@@ -1895,8 +1895,8 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "index.html": {
-    "mtime": 1781402028.120054,
-    "ast_hash": "1c975f73f6a45c9ca1f3cc1c68e89c63",
+    "mtime": 1781408745.8213787,
+    "ast_hash": "94fb8e6fb9d14f27cee2d9b498217707",
     "semantic_hash": ""
   },
   "netlify/functions/RESEARCH.md": {
@@ -3482,6 +3482,16 @@
   "test/unit/visual-memory.test.js": {
     "mtime": 1781402001.7280524,
     "ast_hash": "9c069417753fbb13acdde8ae608f8b9b",
+    "semantic_hash": ""
+  },
+  "js/ui/visual-evidence-ui.js": {
+    "mtime": 1781408670.9373758,
+    "ast_hash": "269df01497f4f942396f5768b1ca27db",
+    "semantic_hash": ""
+  },
+  "test/unit/visual-evidence-ui.test.js": {
+    "mtime": 1781408719.3573775,
+    "ast_hash": "0d5a45607191e1274e35dc2a03de1948",
     "semantic_hash": ""
   }
 }

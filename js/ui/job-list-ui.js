@@ -413,6 +413,9 @@
       actions.appendChild(ui.button({ label: 'Measure Room', icon: '📐', variant: 'secondary', onClick: () => {
         if (global.AAA_MEASUREMENT_HUD_UI && global.AAA_MEASUREMENT_HUD_UI.boot) { global.AAA_MEASUREMENT_HUD_UI.boot({ jobId: job.id, customerId: job.customerId }); this._reRenderWhenHudCloses('measurement-hud'); }
       } }));
+      actions.appendChild(ui.button({ label: 'Visual Evidence', icon: '📸', variant: 'secondary', onClick: () => {
+        if (global.AAA_VISUAL_EVIDENCE_UI && global.AAA_VISUAL_EVIDENCE_UI.open) global.AAA_VISUAL_EVIDENCE_UI.open({ jobId: job.id });
+      } }));
       if (job.currentState !== 'CLOSED') {
         actions.appendChild(ui.button({ label: 'Close Job', icon: '✓', variant: 'secondary', onClick: () => {
           if (global.AAA_CLOSURE_HUD_UI && global.AAA_CLOSURE_HUD_UI.boot) { global.AAA_CLOSURE_HUD_UI.boot({ jobId: job.id }); this._reRenderWhenHudCloses('closure-hud'); }

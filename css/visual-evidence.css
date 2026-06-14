@@ -1,0 +1,37 @@
+/* Visual Evidence sheet — the moat made visible. --hk-* tokens only. */
+.ve-root { display: flex; flex-direction: column; gap: 8px; }
+.ve-sec { margin: 10px 0 2px; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; color: var(--hk-text-dim, #93a0ba); }
+
+/* captured evidence cards */
+.ve-ev {
+  position: relative; padding: 11px 13px 11px 16px; border-radius: 13px;
+  background: var(--hk-panel, rgba(20, 26, 38, 0.66));
+  border: 1px solid var(--hk-stroke, rgba(120, 160, 220, 0.16));
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+}
+.ve-ev::before { content: ""; position: absolute; left: 0; top: 9px; bottom: 9px; width: 3px; border-radius: 3px; background: linear-gradient(180deg, var(--hk-cyan, #2ee6d6), var(--hk-cyan-2, #38bdf8)); }
+.ve-ev__top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.ve-ev__cat { font-size: 0.98rem; font-weight: 700; color: var(--hk-text, #eaf0fb); }
+.ve-ev__conf { font-size: 0.72rem; font-weight: 700; color: var(--hk-cyan-2, #38bdf8); font-variant-numeric: tabular-nums; }
+.ve-ev__conf--dim { color: var(--hk-text-dim, #93a0ba); }
+.ve-ev__rec { margin-top: 3px; font-size: 0.82rem; color: var(--hk-text-dim, #93a0ba); }
+.ve-ev__est { margin-top: 3px; font-size: 0.82rem; font-weight: 600; color: var(--hk-green, #2fe08a); font-variant-numeric: tabular-nums; }
+
+/* similar-jobs evidence panel */
+.ve-panel {
+  padding: 13px 14px; border-radius: 14px;
+  background: linear-gradient(135deg, rgba(46, 230, 214, 0.06), transparent 60%), var(--hk-panel-2, rgba(30, 38, 54, 0.55));
+  border: 1px solid var(--hk-stroke, rgba(120, 160, 220, 0.16));
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+}
+.ve-panel__head { font-size: 0.9rem; font-weight: 700; color: var(--hk-text, #eaf0fb); }
+.ve-panel__on { font-weight: 600; color: var(--hk-text-dim, #93a0ba); font-size: 0.78rem; }
+.ve-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+.ve-stat { display: flex; flex-direction: column; gap: 2px; align-items: flex-start; }
+.ve-stat__v { font-size: 1.25rem; font-weight: 800; color: var(--hk-green, #2fe08a); font-variant-numeric: tabular-nums; line-height: 1; }
+.ve-stat__l { font-size: 0.64rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--hk-text-dim, #93a0ba); }
+.ve-note { margin-top: 9px; font-size: 0.72rem; color: var(--hk-text-dim, #93a0ba); }
+
+.ve-acc { margin-top: 4px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--hk-stroke, rgba(120, 160, 220, 0.16)); font-size: 0.8rem; color: var(--hk-text, #eaf0fb); font-variant-numeric: tabular-nums; }
+
+.ve-empty { padding: 16px; border-radius: 13px; border: 1px dashed var(--hk-stroke-2, rgba(120, 160, 220, 0.28)); color: var(--hk-text-dim, #93a0ba); text-align: center; font-size: 0.82rem; }
