@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1781503758.8108025,
-    "ast_hash": "3e499759a257f735b3ff9f2b6e329f2a",
+    "mtime": 1781504209.5336733,
+    "ast_hash": "e54cd028113e3070a888d36138db6169",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
@@ -1180,8 +1180,8 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "test/run.js": {
-    "mtime": 1781503758.8134203,
-    "ast_hash": "0505749a81b6a057e67547a5d9fa625d",
+    "mtime": 1781504209.536148,
+    "ast_hash": "b458324256be2f0d58dc53298898e0a7",
     "semantic_hash": ""
   },
   "test/smoke/boot.test.js": {
@@ -1895,8 +1895,8 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "index.html": {
-    "mtime": 1781503758.8051164,
-    "ast_hash": "acb8116b7370c0625355f751df874eb9",
+    "mtime": 1781504209.527892,
+    "ast_hash": "3ef8e060019791e4c015887ffd9e8472",
     "semantic_hash": ""
   },
   "netlify/functions/RESEARCH.md": {
@@ -3502,6 +3502,16 @@
   "test/unit/ad-attribution.test.js": {
     "mtime": 1781503699.9395452,
     "ast_hash": "26daba18b9d201260e8560ccf51f2d07",
+    "semantic_hash": ""
+  },
+  "js/intelligence/telemetry-seal.js": {
+    "mtime": 1781504159.6795282,
+    "ast_hash": "cdadc28f33ff5172c23750a9441ffdbd",
+    "semantic_hash": ""
+  },
+  "test/unit/telemetry-seal.test.js": {
+    "mtime": 1781504191.531527,
+    "ast_hash": "5dd7bf7bee89a07c5990c90b5e331aa3",
     "semantic_hash": ""
   }
 }
