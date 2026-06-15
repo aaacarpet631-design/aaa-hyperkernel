@@ -34,6 +34,7 @@ const SUITES = [
   'unit/quote-lifecycle-ui.test.js',
   'unit/outcome-learning.test.js',
   'unit/visual-memory.test.js',
+  'unit/ad-attribution.test.js',
   'unit/visual-evidence-ui.test.js',
   'unit/pricing-optimizer.test.js',
   'unit/pricing-optimizer-ui.test.js',

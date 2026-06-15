@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1781408760.7028043,
-    "ast_hash": "704938119cfa8bd6e9565b8928d9bba6",
+    "mtime": 1781503758.8108025,
+    "ast_hash": "3e499759a257f735b3ff9f2b6e329f2a",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
@@ -1180,8 +1180,8 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "test/run.js": {
-    "mtime": 1781408746.6933787,
-    "ast_hash": "c9c0b6425e0059a2d354cf19a07d11ff",
+    "mtime": 1781503758.8134203,
+    "ast_hash": "0505749a81b6a057e67547a5d9fa625d",
     "semantic_hash": ""
   },
   "test/smoke/boot.test.js": {
@@ -1895,8 +1895,8 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "index.html": {
-    "mtime": 1781408745.8213787,
-    "ast_hash": "94fb8e6fb9d14f27cee2d9b498217707",
+    "mtime": 1781503758.8051164,
+    "ast_hash": "acb8116b7370c0625355f751df874eb9",
     "semantic_hash": ""
   },
   "netlify/functions/RESEARCH.md": {
@@ -3492,6 +3492,16 @@
   "test/unit/visual-evidence-ui.test.js": {
     "mtime": 1781408719.3573775,
     "ast_hash": "0d5a45607191e1274e35dc2a03de1948",
+    "semantic_hash": ""
+  },
+  "js/intelligence/ad-attribution.js": {
+    "mtime": 1781503737.6195438,
+    "ast_hash": "0a7d871f18d84aee45889d2ef34b7fbb",
+    "semantic_hash": ""
+  },
+  "test/unit/ad-attribution.test.js": {
+    "mtime": 1781503699.9395452,
+    "ast_hash": "26daba18b9d201260e8560ccf51f2d07",
     "semantic_hash": ""
   }
 }
