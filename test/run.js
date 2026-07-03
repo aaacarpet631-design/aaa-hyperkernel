@@ -17,6 +17,8 @@ const SUITES = [
   'unit/country-packs.test.js',
   'unit/decision-envelope.test.js',
   'unit/global-desk.test.js',
+  'unit/planning-desk.test.js',
+  'unit/review-protocol.test.js',
   'unit/hermes-gateway.test.js',
   'unit/eval-golden.test.js',
   'unit/outcome-spine.test.js',
