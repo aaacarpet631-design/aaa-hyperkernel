@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1783052296.6346536,
-    "ast_hash": "655f7cfa08ebd9b1fe2feb45f5d0f47c",
+    "mtime": 1783053321.0920873,
+    "ast_hash": "6ff4397ba2ca98d92f59a8c8bf1a7217",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
@@ -1180,8 +1180,8 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "test/run.js": {
-    "mtime": 1783052296.6352596,
-    "ast_hash": "3d15a0184574e84f36993593600a69ab",
+    "mtime": 1783053321.0926924,
+    "ast_hash": "03d4a4b8982fdc7f776bad95d3a02abc",
     "semantic_hash": ""
   },
   "test/smoke/boot.test.js": {
@@ -1895,8 +1895,8 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "index.html": {
-    "mtime": 1783052296.634965,
-    "ast_hash": "81aabe240056f1bc03edf7b391d60550",
+    "mtime": 1783053321.0925136,
+    "ast_hash": "2c2f30d6f1dd85c8f0124b1cbe99f003",
     "semantic_hash": ""
   },
   "netlify/functions/RESEARCH.md": {
@@ -3542,6 +3542,51 @@
   "test/unit/global-desk.test.js": {
     "mtime": 1783052265.9644215,
     "ast_hash": "7407cf98e786ba59fc74c111483dd75c",
+    "semantic_hash": ""
+  },
+  "js/agents/mission-manager.js": {
+    "mtime": 1783053233.677013,
+    "ast_hash": "9e6ddb4ce64c3bb792d77530cee780bd",
+    "semantic_hash": ""
+  },
+  "js/agents/planning-desk.js": {
+    "mtime": 1783052822.3570223,
+    "ast_hash": "9a1247dd52003f356714391876ed53cc",
+    "semantic_hash": ""
+  },
+  "js/agents/review-protocol.js": {
+    "mtime": 1783052927.5090199,
+    "ast_hash": "2869077e6c6358561649c9dc306e699b",
+    "semantic_hash": ""
+  },
+  "js/core/tenant-guard.js": {
+    "mtime": 1783053152.8370147,
+    "ast_hash": "e134d35aeaea03d8610e5a69f7183da6",
+    "semantic_hash": ""
+  },
+  "test/unit/mission-manager.test.js": {
+    "mtime": 1783053302.5410113,
+    "ast_hash": "c017070c7b1c09c95daf0cde7c393bfc",
+    "semantic_hash": ""
+  },
+  "test/unit/planning-desk.test.js": {
+    "mtime": 1783052876.8890212,
+    "ast_hash": "b5f2bcf548ccecd9bcc9ee96998f11bf",
+    "semantic_hash": ""
+  },
+  "test/unit/review-protocol.test.js": {
+    "mtime": 1783052990.5290184,
+    "ast_hash": "144df2f40707fa6e764ebc855a4dfd8e",
+    "semantic_hash": ""
+  },
+  "test/unit/tenant-guard.test.js": {
+    "mtime": 1783053169.4730144,
+    "ast_hash": "17cd5f21438e111af45696162c06170f",
+    "semantic_hash": ""
+  },
+  "docs/AGENT-ARCHITECTURE-AUDIT.md": {
+    "mtime": 1783053131.8010154,
+    "ast_hash": "6f1ddc1d7ed53b7508de29f3323fba6f",
     "semantic_hash": ""
   }
 }

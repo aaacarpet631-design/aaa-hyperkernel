@@ -19,6 +19,8 @@ const SUITES = [
   'unit/global-desk.test.js',
   'unit/planning-desk.test.js',
   'unit/review-protocol.test.js',
+  'unit/tenant-guard.test.js',
+  'unit/mission-manager.test.js',
   'unit/hermes-gateway.test.js',
   'unit/eval-golden.test.js',
   'unit/outcome-spine.test.js',
