@@ -73,6 +73,14 @@
       const market = o.country != null ? cp.contextFor(o.country) : cp.contextFor(null);
       if (!market) return { ok: false, error: 'UNKNOWN_COUNTRY', country: o.country };
 
+      // 1b. restricted-market check (fail-closed): a tenant policy that
+      // restricts this market stops the dispatch before any agent runs.
+      const tenantPolicy = global.AAA_TENANT_MODEL_POLICY;
+      if (tenantPolicy && tenantPolicy.marketAllowed) {
+        const mk = await tenantPolicy.marketAllowed(market.country);
+        if (!mk.ok) return { ok: false, error: 'MARKET_RESTRICTED', denial: mk.denial, market: market.country };
+      }
+
       // 2. resolve the agent.
       const agentId = o.agent || this.routeFor(o.department);
       if (!agentId) return { ok: false, error: 'UNKNOWN_DEPARTMENT', department: o.department || null };

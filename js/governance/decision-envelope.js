@@ -209,11 +209,24 @@
       return { ok: true, envelope: env };
     },
 
-    /** Human approves. A gate-DENIED envelope can never be approved. */
+    /**
+     * Human approves. A gate-DENIED envelope can never be approved, a
+     * NON-HUMAN identity (agent:/mission:/reviewer:/system:… or the authoring
+     * agent itself) can never approve, and when RBAC is installed the
+     * approver's session needs OVERRIDE_AI_DECISION (owner-only by matrix).
+     * Rejection stays ungated on purpose — a brake anyone can pull is safe;
+     * approval is the privilege.
+     */
     approve: async function (envelopeId, opts) {
       const o = opts || {};
       const env = await data().get(COLLECTION, envelopeId);
       if (!env) return { ok: false, error: 'NOT_FOUND' };
+      const approver = String(o.approver || 'owner');
+      if (/^(agent|reviewer|mission|system|planner|desk|bot):/i.test(approver) || approver === env.agent) {
+        return { ok: false, error: 'NON_HUMAN_APPROVER', reason: 'envelopes are approved by humans; agents, reviewers, and missions cannot approve work' };
+      }
+      const rb = global.AAA_RBAC;
+      if (rb && rb.can && !rb.can('OVERRIDE_AI_DECISION')) return { ok: false, error: 'FORBIDDEN', required: 'OVERRIDE_AI_DECISION' };
       if (env.gate && env.gate.decision === 'deny') return { ok: false, error: 'GATE_DENIED', reason: 'a denied action cannot be human-approved; change the plan' };
       if (env.approval.status === 'approved') return { ok: false, error: 'ALREADY_APPROVED' };
       env.approval.status = 'approved';
