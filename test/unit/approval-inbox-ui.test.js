@@ -3,11 +3,28 @@
  * Guards the honest contract: the read model lists awaiting envelopes (with
  * paused reasons, localized impact, review verdicts, tenant) and paused
  * mission gates; approve is role-gated in the UI AND again in the engine;
- * reject stays available to any role (the brake); approveGate passes a real
- * mission gate end-to-end; markup escapes all dynamic values; missing DOM
- * and empty states degrade honestly. */
+ * reject stays available to any role (the brake); the SAME act() path backs
+ * both tests and the delegated DOM handler; approve buttons never render
+ * for roles that cannot approve; markup escapes all dynamic values; missing
+ * DOM/engines degrade honestly. */
 'use strict';
 const { makeRunner, setupEnv, load } = require('../helpers/harness');
+
+// Minimal host element stub for mount(el) — captures innerHTML + listener.
+function makeHost() {
+  const attrs = {};
+  return {
+    innerHTML: '', _listeners: {},
+    getAttribute: (k) => (k in attrs ? attrs[k] : null),
+    setAttribute: (k, v) => { attrs[k] = String(v); },
+    removeAttribute: (k) => { delete attrs[k]; },
+    addEventListener(type, fn) { this._listeners[type] = fn; }
+  };
+}
+// Fake click target whose closest() yields a button-like stub.
+function makeBtnTarget(data) {
+  return { closest: () => ({ getAttribute: (k) => (data[k.replace('data-', '')] != null ? data[k.replace('data-', '')] : null) }) };
+}
 
 module.exports = async function run() {
   const t = makeRunner('approval-inbox-ui');
@@ -56,9 +73,14 @@ module.exports = async function run() {
   const gate = model.gates[0];
   t.ok('gate row names mission, phase, risk', gate.missionId === m1.mission.id && gate.phaseId === 'gate' && gate.risk === 'high');
 
-  // ===== markup escapes dynamic values =====
-  const html = UI.envelopeRowHtml(row);
+  // ===== markup: escaping + permission-gated buttons =====
+  const html = UI.envelopeRowHtml(row, { canApprove: true });
   t.ok('recommendation is escaped in markup', html.indexOf('<script>') === -1 && html.indexOf('&lt;script&gt;') !== -1);
+  t.ok('owner markup has approve AND reject buttons', html.indexOf('data-act="approve"') !== -1 && html.indexOf('data-act="reject"') !== -1);
+  const crewHtml = UI.envelopeRowHtml(row, { canApprove: false });
+  t.ok('non-approver markup has NO approve button, keeps the brake', crewHtml.indexOf('data-act="approve"') === -1 && crewHtml.indexOf('data-act="reject"') !== -1);
+  const gateHtml = UI.gateRowHtml(gate, { canApprove: true });
+  t.ok('gate markup carries mission+phase+envelope refs', gateHtml.indexOf('data-act="gate"') !== -1 && gateHtml.indexOf(gate.envelopeId) !== -1);
 
   // ===== role gating: crew cannot approve, CAN reject =====
   cfg.set({ role: 'crew' });
@@ -66,18 +88,43 @@ module.exports = async function run() {
   t.eq('crew sees read-only', crewModel.canApprove, false);
   t.eq('crew approve refused in the UI', (await UI.approve(w1.envelope.id)).error, 'FORBIDDEN');
   t.eq('crew approveGate refused', (await UI.approveGate(m1.mission.id, 'gate', 'any')).error, 'FORBIDDEN');
-  const crewReject = await UI.reject(w1.envelope.id, { reason: 'wrong market flow' });
-  t.ok('crew CAN pull the brake (reject)', crewReject.ok === true && crewReject.envelope.approval.status === 'rejected');
+  t.eq('crew act(approve) refused via the same path', (await UI.act('approve', { envelopeId: w1.envelope.id })).error, 'FORBIDDEN');
+  const crewReject = await UI.act('reject', { envelopeId: w1.envelope.id });
+  t.ok('crew CAN pull the brake (reject) via act()', crewReject.ok === true && crewReject.envelope.approval.status === 'rejected');
+  t.ok('inbox reject records a reason', crewReject.envelope.approval.reason.indexOf('approval inbox') !== -1);
   cfg.set({ role: 'owner' });
 
-  // ===== owner approves the gate end-to-end =====
+  // ===== mount(el): interactive rows + one delegated listener =====
+  G.document = { getElementById: () => null }; // minimal DOM presence
+  const host = makeHost();
+  const mounted = await UI.mount(host);
+  t.ok('mount(el) renders into the provided element', mounted.ok === true && host.innerHTML.indexOf('approval-inbox') !== -1);
+  t.ok('one delegated click listener is wired', typeof host._listeners.click === 'function' && host._approvalWired === true);
+  await UI.mount(host);
+  t.ok('re-mount does not double-wire', host._approvalWired === true);
+  t.ok('gate row rendered with its approve-gate button', host.innerHTML.indexOf('data-act="gate"') !== -1);
+
+  // ===== the delegated click path passes the mission gate end-to-end =====
   const pend = (await MM.get(m1.mission.id)).pendingApprovals[0];
-  const gatePass = await UI.approveGate(m1.mission.id, 'gate', pend.envelopeId, { approver: 'aaron' });
-  t.ok('owner approveGate passes the mission gate', gatePass.ok === true && gatePass.mission.status === 'completed');
-  t.eq('the gate envelope is approved', (await ENV.get(pend.envelopeId)).approval.status, 'approved');
+  await ENV.approve(pend.envelopeId, { approver: 'aaron' }); // human grants first
+  const clickRes = await UI._onClick(makeBtnTarget({ act: 'gate', mission: m1.mission.id, phase: 'gate', envelope: pend.envelopeId }), host);
+  t.ok('clicking Approve gate passes the mission gate', clickRes.ok === true && clickRes.mission.status === 'completed');
+  t.ok('the host re-rendered live state after the action', host.innerHTML.indexOf('Approvals (0)') !== -1);
+  t.eq('a non-button click is a no-op', await UI._onClick({ closest: () => null }, host), null);
+
+  // ===== a refused action surfaces an honest note =====
+  cfg.set({ role: 'crew' });
+  const w2 = ENV.wrap({ agent: 'sales', decision: { recommendation: 'x', rationale: 'r', confidence: 40, risks: [], next_actions: [] } });
+  await ENV.seal(w2.envelope);
+  await UI._onClick(makeBtnTarget({ act: 'approve', envelope: w2.envelope.id }), host);
+  t.ok('a forbidden click renders the refusal note', host.innerHTML.indexOf('cannot approve') !== -1);
+  cfg.set({ role: 'owner' });
+  t.eq('unknown action refused', (await UI.act('yolo', {})).error, 'UNKNOWN_ACTION');
+  delete G.document;
 
   // ===== honest degradation =====
   t.eq('mount without DOM refuses', (await UI.mount()).error, 'NO_DOM');
+  t.eq('open without the UI kit refuses', UI.open().error, 'NO_DOM');
   const savedEnv = G.AAA_DECISION_ENVELOPE; delete G.AAA_DECISION_ENVELOPE;
   t.eq('approve without the engine refuses', (await UI.approve('x')).error, 'ENVELOPE_MODULE_MISSING');
   const degraded = await UI.renderModel();

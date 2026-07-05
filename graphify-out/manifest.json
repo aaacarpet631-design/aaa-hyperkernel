@@ -150,7 +150,7 @@
     "semantic_hash": "ea490a746879fed114757f478e7b699e"
   },
   "js/agents/agent-os.js": {
-    "mtime": 1783206887.552762,
+    "mtime": 1783210103.8585978,
     "ast_hash": "618505aff1cd8ad54ff763fb0c363c60",
     "semantic_hash": ""
   },
@@ -810,9 +810,9 @@
     "semantic_hash": "2831df82f2729f9ea6d2e0bcb2782640"
   },
   "js/ui/command-center-ui.js": {
-    "mtime": 1781099272.2066503,
-    "ast_hash": "486d3c961fbe59475a22c3740cb1e6f0",
-    "semantic_hash": "486d3c961fbe59475a22c3740cb1e6f0"
+    "mtime": 1783211238.8625207,
+    "ast_hash": "310ea493b32aa30204faadff62d2a164",
+    "semantic_hash": ""
   },
   "js/ui/contracts-ui.js": {
     "mtime": 1780633642.6308837,
@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1783207147.6758544,
-    "ast_hash": "81c61b792ecf70696d809b851ee62a40",
+    "mtime": 1783211262.871759,
+    "ast_hash": "7b82f5d51322357f99f49e0fc98e13d0",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
@@ -1180,7 +1180,7 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "test/run.js": {
-    "mtime": 1783207147.6764593,
+    "mtime": 1783210103.8625977,
     "ast_hash": "b7fff97c5bb05ff28133e991dce62b0d",
     "semantic_hash": ""
   },
@@ -1190,8 +1190,8 @@
     "semantic_hash": ""
   },
   "test/static/integrity.test.js": {
-    "mtime": 1781112439.971958,
-    "ast_hash": "e32506b327c46008e99d9fa1057bc550",
+    "mtime": 1783210103.8625977,
+    "ast_hash": "3d7851630aeecbfa63258c34535f9cfa",
     "semantic_hash": ""
   },
   "test/unit/accounting.test.js": {
@@ -1820,9 +1820,9 @@
     "semantic_hash": "735abbe6080079f45584555abdf560bb"
   },
   ".github/workflows/ci.yml": {
-    "mtime": 1781099272.115643,
-    "ast_hash": "bcb23f3351da368880f4a17525a0e5d4",
-    "semantic_hash": "bcb23f3351da368880f4a17525a0e5d4"
+    "mtime": 1783210973.5811038,
+    "ast_hash": "eacdf822b2e7f3728a22a10bc018ce03",
+    "semantic_hash": ""
   },
   "CLAUDE.md": {
     "mtime": 1781099272.115643,
@@ -1895,8 +1895,8 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "index.html": {
-    "mtime": 1783207147.6761332,
-    "ast_hash": "f1b47838fe0d172d3ee70684f645fb7c",
+    "mtime": 1783211262.8721316,
+    "ast_hash": "11f1ef568355160751a004074bc88614",
     "semantic_hash": ""
   },
   "netlify/functions/RESEARCH.md": {
@@ -3515,102 +3515,102 @@
     "semantic_hash": ""
   },
   "js/agents/global-desk.js": {
-    "mtime": 1783206866.4207609,
+    "mtime": 1783210103.8585978,
     "ast_hash": "44cda15d45c626ec007988b742f8c949",
     "semantic_hash": ""
   },
   "js/core/country-packs.js": {
-    "mtime": 1783051971.5604281,
+    "mtime": 1783210103.8625977,
     "ast_hash": "7a5f19ecce472730b4b3b46d4ccecd15",
     "semantic_hash": ""
   },
   "js/governance/decision-envelope.js": {
-    "mtime": 1783206871.6407611,
+    "mtime": 1783210103.8625977,
     "ast_hash": "b53c0bf4601c480af62d370fbb7eb215",
     "semantic_hash": ""
   },
   "test/unit/country-packs.test.js": {
-    "mtime": 1783052001.1844275,
+    "mtime": 1783210103.8625977,
     "ast_hash": "f5491863548c90159ef419ca49306a8b",
     "semantic_hash": ""
   },
   "test/unit/decision-envelope.test.js": {
-    "mtime": 1783052312.9724205,
+    "mtime": 1783210103.8665977,
     "ast_hash": "ffc7e78079f84794c54b9421ccc63e69",
     "semantic_hash": ""
   },
   "test/unit/global-desk.test.js": {
-    "mtime": 1783052265.9644215,
+    "mtime": 1783210103.8665977,
     "ast_hash": "7407cf98e786ba59fc74c111483dd75c",
     "semantic_hash": ""
   },
   "js/agents/mission-manager.js": {
-    "mtime": 1783053233.677013,
+    "mtime": 1783210103.8585978,
     "ast_hash": "9e6ddb4ce64c3bb792d77530cee780bd",
     "semantic_hash": ""
   },
   "js/agents/planning-desk.js": {
-    "mtime": 1783052822.3570223,
+    "mtime": 1783210103.8625977,
     "ast_hash": "9a1247dd52003f356714391876ed53cc",
     "semantic_hash": ""
   },
   "js/agents/review-protocol.js": {
-    "mtime": 1783052927.5090199,
+    "mtime": 1783210103.8625977,
     "ast_hash": "2869077e6c6358561649c9dc306e699b",
     "semantic_hash": ""
   },
   "js/core/tenant-guard.js": {
-    "mtime": 1783053152.8370147,
+    "mtime": 1783210103.8625977,
     "ast_hash": "e134d35aeaea03d8610e5a69f7183da6",
     "semantic_hash": ""
   },
   "test/unit/mission-manager.test.js": {
-    "mtime": 1783053302.5410113,
+    "mtime": 1783210103.8665977,
     "ast_hash": "c017070c7b1c09c95daf0cde7c393bfc",
     "semantic_hash": ""
   },
   "test/unit/planning-desk.test.js": {
-    "mtime": 1783052876.8890212,
+    "mtime": 1783210103.8665977,
     "ast_hash": "b5f2bcf548ccecd9bcc9ee96998f11bf",
     "semantic_hash": ""
   },
   "test/unit/review-protocol.test.js": {
-    "mtime": 1783052990.5290184,
+    "mtime": 1783210103.8665977,
     "ast_hash": "144df2f40707fa6e764ebc855a4dfd8e",
     "semantic_hash": ""
   },
   "test/unit/tenant-guard.test.js": {
-    "mtime": 1783053169.4730144,
+    "mtime": 1783210103.8665977,
     "ast_hash": "17cd5f21438e111af45696162c06170f",
     "semantic_hash": ""
   },
   "docs/AGENT-ARCHITECTURE-AUDIT.md": {
-    "mtime": 1783053131.8010154,
+    "mtime": 1783210103.8425977,
     "ast_hash": "6f1ddc1d7ed53b7508de29f3323fba6f",
     "semantic_hash": ""
   },
   "js/ai/tenant-model-policy.js": {
-    "mtime": 1783206835.120759,
+    "mtime": 1783210103.8625977,
     "ast_hash": "67b14b27a881078e9f61a72211d40dff",
     "semantic_hash": ""
   },
   "js/ui/approval-inbox-ui.js": {
-    "mtime": 1783206922.3807642,
-    "ast_hash": "ba73772ea11bbd740119eea2cc5db44d",
+    "mtime": 1783211192.434518,
+    "ast_hash": "6f979d0160e1ac758a32ab03c9e24d98",
     "semantic_hash": ""
   },
   "test/unit/approval-inbox-ui.test.js": {
-    "mtime": 1783207045.5367715,
-    "ast_hash": "ba2af057acccf86b11659cbddaa760f1",
+    "mtime": 1783211302.2745245,
+    "ast_hash": "e09c494b22115201e8173bd2bb92e01c",
     "semantic_hash": ""
   },
   "test/unit/governance-guarantees.test.js": {
-    "mtime": 1783207115.9607756,
+    "mtime": 1783210103.8665977,
     "ast_hash": "a15c51ce77f1aed68a3c6eff15b5a8cc",
     "semantic_hash": ""
   },
   "test/unit/tenant-model-policy.test.js": {
-    "mtime": 1783207012.9263163,
+    "mtime": 1783210103.8665977,
     "ast_hash": "b8b1fd6fa7f9cba51336c4a231e80e09",
     "semantic_hash": ""
   }
