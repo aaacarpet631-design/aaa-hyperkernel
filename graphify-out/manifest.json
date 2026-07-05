@@ -810,8 +810,8 @@
     "semantic_hash": "2831df82f2729f9ea6d2e0bcb2782640"
   },
   "js/ui/command-center-ui.js": {
-    "mtime": 1783211238.8625207,
-    "ast_hash": "310ea493b32aa30204faadff62d2a164",
+    "mtime": 1783211715.786549,
+    "ast_hash": "ab38be022304d67e9cc843c3b233063f",
     "semantic_hash": ""
   },
   "js/ui/contracts-ui.js": {
@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1783211262.871759,
-    "ast_hash": "7b82f5d51322357f99f49e0fc98e13d0",
+    "mtime": 1783211738.988214,
+    "ast_hash": "0487bd1e72396f7b327b64d1167d0919",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
@@ -1180,8 +1180,8 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "test/run.js": {
-    "mtime": 1783210103.8625977,
-    "ast_hash": "b7fff97c5bb05ff28133e991dce62b0d",
+    "mtime": 1783211738.9887068,
+    "ast_hash": "c97aa7362be02370e3d46d5414c383c7",
     "semantic_hash": ""
   },
   "test/smoke/boot.test.js": {
@@ -1895,8 +1895,8 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "index.html": {
-    "mtime": 1783211262.8721316,
-    "ast_hash": "11f1ef568355160751a004074bc88614",
+    "mtime": 1783211738.988584,
+    "ast_hash": "08f26a4b034d51500b3b0c7b17cc858b",
     "semantic_hash": ""
   },
   "netlify/functions/RESEARCH.md": {
@@ -3612,6 +3612,51 @@
   "test/unit/tenant-model-policy.test.js": {
     "mtime": 1783210103.8665977,
     "ast_hash": "b8b1fd6fa7f9cba51336c4a231e80e09",
+    "semantic_hash": ""
+  },
+  "js/agents/workforce-queue.js": {
+    "mtime": 1783211584.9985414,
+    "ast_hash": "41027df8f0b9ac18455439f71b4c9437",
+    "semantic_hash": ""
+  },
+  "js/agents/workforce-registry.js": {
+    "mtime": 1783211994.2590215,
+    "ast_hash": "2258bb3551cfd772de3b24bcf6671f79",
+    "semantic_hash": ""
+  },
+  "js/agents/workforce-scheduler.js": {
+    "mtime": 1783211886.0505593,
+    "ast_hash": "b2456cd6aaa0366e2e48d25b79761f1d",
+    "semantic_hash": ""
+  },
+  "js/ui/workforce-ui.js": {
+    "mtime": 1783211673.8265467,
+    "ast_hash": "ff64050ec626c7db02f13d8b68fe0212",
+    "semantic_hash": ""
+  },
+  "test/unit/workforce-queue.test.js": {
+    "mtime": 1783211788.3065534,
+    "ast_hash": "8954fac55fcf8e55304f8bb65df13aee",
+    "semantic_hash": ""
+  },
+  "test/unit/workforce-registry.test.js": {
+    "mtime": 1783211765.094552,
+    "ast_hash": "27115665e8dd0e96c5302343a67585ea",
+    "semantic_hash": ""
+  },
+  "test/unit/workforce-scheduler.test.js": {
+    "mtime": 1783211892.0585597,
+    "ast_hash": "d99e9ea81200c569a4868a3a7dedc93f",
+    "semantic_hash": ""
+  },
+  "test/unit/workforce-ui.test.js": {
+    "mtime": 1783211994.2592006,
+    "ast_hash": "95c0c9a9d92fbf2ee10af71e0b121467",
+    "semantic_hash": ""
+  },
+  "docs/CONTINUOUS_AGENT_WORKFORCE.md": {
+    "mtime": 1783211706.4465485,
+    "ast_hash": "655f3a8b94532d2179e068a585cc39aa",
     "semantic_hash": ""
   }
 }
