@@ -1,0 +1,50 @@
+/* Agent Workforce Command Center — hairline rows, numbers loudest,
+   matches the approval-inbox / decision-inbox surface conventions. */
+
+.wf-panel { display: flex; flex-direction: column; gap: 10px; }
+
+.wf-title { font-size: 1.05rem; margin: 0 0 2px; }
+
+.wf-switch,
+.wf-readonly,
+.wf-empty,
+.wf-meta {
+  font-size: 0.82rem;
+  color: var(--text-dim, #8a8f98);
+  margin: 0;
+}
+
+.wf-note,
+.wf-attn { font-size: 0.85rem; color: var(--warning, #d9a13b); margin: 0; }
+
+.wf-row {
+  border-top: 1px solid var(--hairline, rgba(128, 128, 128, 0.25));
+  padding: 10px 2px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wf-head { font-size: 0.92rem; }
+
+.wf-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+
+.wf-btn {
+  font: inherit;
+  font-size: 0.82rem;
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--hairline, rgba(128, 128, 128, 0.35));
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.wf-btn--attn {
+  border-color: var(--warning, #d9a13b);
+  color: var(--warning, #d9a13b);
+}
+
+.wf-log { margin-top: 6px; display: flex; flex-direction: column; gap: 2px; }
+
+.wf-log-row { font-size: 0.78rem; color: var(--text-dim, #8a8f98); }

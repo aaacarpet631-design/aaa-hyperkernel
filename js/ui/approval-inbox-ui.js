@@ -15,9 +15,12 @@
  *   gate    → passing a mission gate calls AAA_MISSION_MANAGER.approvePhase,
  *             which re-verifies the envelope approval in the planning desk.
  *
- * renderModel() is pure/DOM-free (all reads through engine modules, honest
- * empty states, never a throw); mount() is DOM-guarded; everything rendered
- * through esc().
+ * Surfaces: open() presents the standard bottom sheet (command-center
+ * pattern); mount(el) renders into a given element (tab pattern) or the
+ * legacy #approval-inbox anchor. Rows carry real buttons wired through ONE
+ * delegated listener → act(), so the testable dispatch path and the DOM
+ * path are the same code. renderModel() stays pure/DOM-free; everything
+ * rendered goes through esc(); every missing engine degrades honestly.
  */
 ;(function (global) {
   'use strict';
@@ -29,6 +32,7 @@
   function missions() { return global.AAA_MISSION_MANAGER; }
   function reviews() { return global.AAA_REVIEW_PROTOCOL; }
   function rbac() { return global.AAA_RBAC; }
+  function uikit() { return global.AAA_UI; }
 
   function canApprove() {
     const r = rbac();
@@ -110,11 +114,27 @@
       return mm.approvePhase(missionId, phaseId, envelopeId);
     },
 
-    /** Static row markup (all dynamic values escaped). */
-    envelopeRowHtml: function (row) {
+    /**
+     * One dispatch path for every surface (DOM clicks and tests alike).
+     * act('approve'|'reject', {envelopeId}) / act('gate', {missionId, phaseId, envelopeId})
+     */
+    act: async function (action, refs) {
+      const r = refs || {};
+      if (action === 'approve') return this.approve(r.envelopeId);
+      if (action === 'reject') return this.reject(r.envelopeId, { reason: r.reason || 'rejected from approval inbox' });
+      if (action === 'gate') return this.approveGate(r.missionId, r.phaseId, r.envelopeId);
+      return { ok: false, error: 'UNKNOWN_ACTION', action: action };
+    },
+
+    /** Static row markup (all dynamic values escaped). Buttons only when permitted. */
+    envelopeRowHtml: function (row, opts) {
+      const o = opts || {};
       const reviewsNote = (row.reviews || []).length
         ? (row.reviews || []).map(function (v) { return esc(v.decision) + (v.defects ? ' (' + v.defects + ' defects)' : ''); }).join(', ')
         : 'not yet reviewed';
+      const btns =
+        (o.canApprove ? '<button type="button" class="approval-btn approval-btn--approve" data-act="approve" data-envelope="' + esc(row.envelopeId) + '">Approve</button>' : '') +
+        '<button type="button" class="approval-btn approval-btn--reject" data-act="reject" data-envelope="' + esc(row.envelopeId) + '">Reject</button>';
       return '<div class="approval-row" data-envelope="' + esc(row.envelopeId) + '">' +
         '<div class="approval-head"><strong>' + esc(row.agent) + '</strong>' +
         (row.country ? ' · ' + esc(row.country) : '') +
@@ -123,26 +143,78 @@
         '<div class="approval-rec">' + esc(row.recommendation) + '</div>' +
         '<div class="approval-why">Paused: ' + esc((row.pausedReasons || []).join('; ') || 'awaiting review') + '</div>' +
         '<div class="approval-reviews">Reviews: ' + reviewsNote + '</div>' +
+        '<div class="approval-actions">' + btns + '</div>' +
         '</div>';
     },
 
-    /** Mount into #approval-inbox if the DOM (and the anchor) exist. */
-    mount: async function () {
+    gateRowHtml: function (g, opts) {
+      const o = opts || {};
+      const btn = o.canApprove
+        ? '<button type="button" class="approval-btn approval-btn--approve" data-act="gate" data-mission="' + esc(g.missionId) + '" data-phase="' + esc(g.phaseId) + '" data-envelope="' + esc(g.envelopeId) + '">Approve gate</button>'
+        : '';
+      return '<div class="gate-row" data-mission="' + esc(g.missionId) + '" data-phase="' + esc(g.phaseId) + '">' +
+        '<div class="approval-head"><strong>' + esc(g.mission) + '</strong> · phase ' + esc(g.phaseId) +
+        (g.risk ? ' · risk ' + esc(g.risk) : '') + (g.country ? ' · ' + esc(g.country) : '') + '</div>' +
+        '<div class="approval-actions">' + btn + '</div>' +
+        '</div>';
+    },
+
+    /** Delegated click handler — thin DOM adapter over act(). */
+    _onClick: async function (evTarget, host) {
+      const btn = evTarget && evTarget.closest ? evTarget.closest('.approval-btn') : null;
+      if (!btn || !btn.getAttribute) return null;
+      const res = await this.act(btn.getAttribute('data-act'), {
+        envelopeId: btn.getAttribute('data-envelope'),
+        missionId: btn.getAttribute('data-mission'),
+        phaseId: btn.getAttribute('data-phase')
+      });
+      if (host) {
+        if (res && res.ok === false) {
+          const note = (res.error === 'FORBIDDEN') ? 'Your role cannot approve (needs OVERRIDE_AI_DECISION).' : 'Action refused: ' + res.error;
+          host.setAttribute && host.setAttribute('data-approval-note', note);
+        }
+        await this.mount(host); // re-render live state after any action
+      }
+      return res;
+    },
+
+    /**
+     * Render into `el` (tab pattern), or the legacy #approval-inbox anchor.
+     * Attaches ONE delegated listener per host (survives re-renders).
+     */
+    mount: async function (el) {
       if (typeof document === 'undefined' || !document.getElementById) return { ok: false, error: 'NO_DOM' };
-      const host = document.getElementById('approval-inbox');
+      const host = el || document.getElementById('approval-inbox');
       if (!host) return { ok: false, error: 'NO_ANCHOR' };
       const model = await this.renderModel();
-      const rows = model.envelopes.map(this.envelopeRowHtml).join('');
-      const gates = model.gates.map(function (g) {
-        return '<div class="gate-row" data-mission="' + esc(g.missionId) + '" data-phase="' + esc(g.phaseId) + '">' +
-          '<strong>' + esc(g.mission) + '</strong> · phase ' + esc(g.phaseId) +
-          (g.risk ? ' · risk ' + esc(g.risk) : '') + '</div>';
-      }).join('');
+      const opts = { canApprove: model.canApprove };
+      const self = this;
+      const rows = model.envelopes.map(function (r) { return self.envelopeRowHtml(r, opts); }).join('');
+      const gates = model.gates.map(function (g) { return self.gateRowHtml(g, opts); }).join('');
+      const note = host.getAttribute && host.getAttribute('data-approval-note');
       host.innerHTML =
-        '<h2>Approvals (' + (model.counts.envelopes + model.counts.gates) + ')</h2>' +
-        (model.canApprove ? '' : '<p class="approval-readonly">Read-only: your role cannot approve (needs OVERRIDE_AI_DECISION).</p>') +
-        (rows || gates ? rows + gates : '<p class="approval-empty">Nothing is waiting on you.</p>');
+        '<div class="approval-inbox">' +
+        '<h2 class="approval-title">Approvals (' + (model.counts.envelopes + model.counts.gates) + ')</h2>' +
+        (model.canApprove ? '' : '<p class="approval-readonly">Read-only: your role cannot approve (needs OVERRIDE_AI_DECISION). You can still reject.</p>') +
+        (note ? '<p class="approval-note">' + esc(note) + '</p>' : '') +
+        (rows || gates ? rows + gates : '<p class="approval-empty">Nothing is waiting on you.</p>') +
+        '</div>';
+      if (host.removeAttribute) host.removeAttribute('data-approval-note');
+      if (host.addEventListener && !host._approvalWired) {
+        host._approvalWired = true;
+        host.addEventListener('click', function (ev) { self._onClick(ev && ev.target, host); });
+      }
       return { ok: true, counts: model.counts };
+    },
+
+    /** Command-center surface: the standard bottom sheet. */
+    open: function () {
+      const ui = uikit();
+      if (typeof document === 'undefined' || !ui || !ui.sheet) return { ok: false, error: 'NO_DOM' };
+      const s = ui.sheet({ title: 'Approvals', subtitle: 'Decisions paused for a human' });
+      document.body.appendChild(s.overlay);
+      this.mount(s.body);
+      return { ok: true, close: s.close };
     }
   };
 
