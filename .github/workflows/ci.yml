@@ -30,7 +30,18 @@ jobs:
           node-version: 20
       # The core suite is zero-dependency: no install needed.
       - name: Run test suite
-        run: npm test
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee test-output.log
+      # Publish the totals to the run summary so the evidence is publicly
+      # visible on the run page (job logs require sign-in even on public repos).
+      - name: Publish test totals to the run summary
+        if: always()
+        run: |
+          {
+            echo '## Test totals'
+            grep -E '^TOTAL:|^ALL GREEN$|^ALL PASSED$' test-output.log || echo 'totals not found — check the job log'
+          } >> "$GITHUB_STEP_SUMMARY"
 
   netlify-build:
     name: Netlify build (offline)
