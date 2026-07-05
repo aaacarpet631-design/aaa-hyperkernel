@@ -23,8 +23,9 @@
     queued: ['running', 'cancelled'],
     running: ['awaiting_approval', 'completed', 'failed', 'blocked'],
     awaiting_approval: ['completed', 'failed', 'cancelled'],
-    blocked: ['queued', 'cancelled'],
-    failed: ['queued'],
+    blocked: ['queued', 'cancelled', 'dead_letter'],
+    failed: ['queued', 'dead_letter'],
+    dead_letter: ['queued', 'cancelled'],   // revival is explicit and human
     completed: [],
     cancelled: []
   };
@@ -44,14 +45,24 @@
     STATES: Object.keys(TRANSITIONS),
     TRANSITIONS: TRANSITIONS,
 
-    /** Create a job in 'queued'. */
+    /**
+     * Create a job in 'queued'. When a tickToken is supplied, enqueue is
+     * IDEMPOTENT: a second enqueue for the same agent+token returns the
+     * existing job (DUPLICATE_TICK) instead of creating double work — the
+     * at-least-once world's retry becomes exactly-one job.
+     */
     enqueue: async function (input) {
       const i = input || {};
       if (!i.agentId) return { ok: false, error: 'NO_AGENT' };
       if (!data()) return { ok: false, error: 'NO_DATA_LAYER' };
+      if (i.tickToken) {
+        const dup = (await this.list({ agentId: i.agentId })).filter(function (j) { return j.tickToken === i.tickToken; })[0];
+        if (dup) return { ok: false, error: 'DUPLICATE_TICK', job: dup, tickToken: i.tickToken };
+      }
       const rec = {
         id: newId('wjob'), workspaceId: ws(),
         agentId: i.agentId, missionId: i.missionId || null,
+        tickToken: i.tickToken || null,
         trigger: i.trigger || 'schedule',
         inputSummary: i.inputSummary != null ? String(i.inputSummary).slice(0, 400) : null,
         governance: { risk: i.risk || null, killSwitch: null, notes: [] },
@@ -84,7 +95,7 @@
       if (p.risk !== undefined) rec.governance.risk = p.risk;
       rec.status = to;
       if (to === 'running' && !rec.startedAt) rec.startedAt = nowISO();
-      if (TERMINAL[to] || to === 'failed' || to === 'blocked') rec.endedAt = nowISO();
+      if (TERMINAL[to] || to === 'failed' || to === 'blocked' || to === 'dead_letter') rec.endedAt = nowISO();
       if (to === 'queued') { rec.endedAt = null; rec.error = null; } // retry/unblock resets
       await data().put(COLLECTION, rec.id, rec);
       try {

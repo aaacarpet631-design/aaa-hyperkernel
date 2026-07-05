@@ -6,7 +6,7 @@
  * app fully usable offline. Old caches are purged on activate, and the worker
  * takes control immediately to avoid serving a stale shell after an update.
  */
-const CACHE_NAME = 'hyperkernel-v102';
+const CACHE_NAME = 'hyperkernel-v103';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -96,6 +96,8 @@ const PRECACHE = [
   '/js/agents/workforce-registry.js',
   '/js/agents/workforce-queue.js',
   '/js/agents/workforce-scheduler.js',
+  '/js/agents/workforce-lease.js',
+  '/js/agents/workforce-runner.js',
   '/js/agents/prompt-architect.js',
   '/js/agents/self-improvement.js',
   '/js/agents/agent-marketplace.js',
