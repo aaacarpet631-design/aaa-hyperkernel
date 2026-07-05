@@ -6,3 +6,6 @@ package-lock.json
 # graphify: machine-local interpreter pointers (re-resolved by the skill)
 graphify-out/.graphify_python
 graphify-out/.graphify_root
+
+# graphify dated snapshot dirs (canonical graph lives at graphify-out root)
+graphify-out/20*/

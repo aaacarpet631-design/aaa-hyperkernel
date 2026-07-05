@@ -84,6 +84,16 @@
       // with no taskKind this returns the agent's declared model unchanged.
       const routed = router() ? router().forAgent(agent.model, opts && opts.taskKind) : { model: agent.model, reason: 'no router' };
 
+      // Tenant model policy (fail-closed): the routed model must be permitted
+      // for this workspace BEFORE any provider call is dispatched. No policy
+      // installed → seam inactive, behavior unchanged.
+      const tenantPolicy = global.AAA_TENANT_MODEL_POLICY;
+      if (tenantPolicy && tenantPolicy.pick) {
+        const picked = await tenantPolicy.pick(routed.model);
+        if (!picked.ok) return { ok: false, error: 'NO_ALLOWED_MODEL_FOR_TENANT', denial: picked.denial, roleId: roleId };
+        if (picked.substituted) { routed.model = picked.model; routed.reason = 'tenant policy: ' + picked.reason; }
+      }
+
       const res = await data().callAgent({
         agent: roleId,
         model: routed.model,

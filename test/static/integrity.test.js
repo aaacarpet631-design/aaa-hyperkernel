@@ -56,7 +56,7 @@ module.exports = function run() {
   t.ok('sw CACHE_NAME present', /CACHE_NAME\s*=\s*'hyperkernel-v\d+'/.test(sw));
 
   // 6. PRECACHE parity with index.html (both directions for js/css)
-  const preBlock = (sw.match(/const PRECACHE = \[([\s\S]*?)\];/) || [, ''])[1];
+  const preBlock = (sw.match(/const PRECACHE = \[([\s\S]*?)\];/) || ['', ''])[1];
   const precached = new Set((preBlock.match(/'[^']+'/g) || []).map((s) => s.slice(1, -1)));
   const referenced = []
     .concat((index.match(/<script src="([^"]+)"/g) || []).map((s) => s.slice(13, -1)))
