@@ -18,6 +18,10 @@ const css = fs.readFileSync(cssPath, 'utf8');
 assert.ok(css.includes('--aaa-red'), 'UI polish should define AAA red brand token');
 assert.ok(css.includes('.aaa-tabbar'), 'UI polish should style bottom navigation');
 assert.ok(css.includes('.fm-primary'), 'UI polish should style Field Mode primary measurement CTA');
+assert.ok(css.includes('--aaa-pixel-content'), 'UI polish should define Pixel-class content width token');
+assert.ok(css.includes('--aaa-pixel-tap'), 'UI polish should define Pixel-class tap target token');
+assert.ok(css.includes('min-width: 390px') && css.includes('max-width: 460px'), 'UI polish should include Pixel 10 Pro portrait viewport tuning');
+assert.ok(css.includes('orientation: landscape'), 'UI polish should include rotated phone tuning');
 
 const appMode = fs.readFileSync(appModePath, 'utf8');
 assert.ok(appMode.includes('aaa-ui-polish-css'), 'app-mode should install the polish stylesheet once');
