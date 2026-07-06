@@ -142,6 +142,8 @@
       if (!res.ok) { toast(body, res.message || res.error, '#EF4444'); return; }
       go('details');
     } }));
+    body.appendChild(ui.button({ label: 'Measure manually', icon: '📏', variant: 'secondary', full: true, onClick: startManualCapture }));
+    body.appendChild(ui.el('p', { className: 'aaa-voice-hint', text: 'No laser? Keep moving. Manual rooms save to the same review screen and quote flow.' }));
 
     // Previously paired devices.
     const devices = store() ? await store().listDevices() : [];
@@ -410,149 +412,70 @@
 
     body.appendChild(ui.button({ label: 'Add another room', icon: '➕', variant: 'secondary', full: true, onClick: () => go('capture') }));
     if (ai()) body.appendChild(ui.button({ label: 'AI review measurements', icon: '🧠', variant: 'secondary', full: true, onClick: () => runAIReview(body, sessions) }));
-    if (sessions.length) body.appendChild(ui.button({ label: 'Send to quote', icon: '🧾', variant: 'primary', full: true, onClick: () => go('quote') }));
+    if (quote()) body.appendChild(ui.button({ label: 'Send to quote', icon: '🧾', variant: 'primary', full: true, onClick: () => go('quote') }));
+    body.appendChild(navRow([{ label: 'History', onClick: () => go('history') }, { label: 'Close', onClick: () => state.sheet.close() }]));
+  }
+
+  // ---- 6. Send measurements to Quote OS --------------------------------
+  async function renderSendToQuote(body) {
+    const ui = U();
+    body.appendChild(title('Send to Quote'));
+    const sessions = await store().listSessions({ jobId: state.jobId });
+    const result = quote() ? await quote().preview({ jobId: state.jobId, customerId: state.customerId, sessions }) : { ok: false, error: 'Quote integration unavailable.' };
+    if (!result.ok) { body.appendChild(ui.el('p', { className: 'aaa-empty', text: result.error || 'Cannot create quote preview.' })); body.appendChild(navRow([{ label: 'Back', onClick: () => go('review') }])); return; }
+    body.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+      '<strong>' + result.roomCount + ' room(s) · ' + result.totalSqFt + ' ft²</strong>' +
+      '<div class="aaa-list-sub">Draft quote total: $' + result.customerTotal + ' · margin ' + result.marginPercent + '%</div>' }));
+    body.appendChild(ui.button({ label: 'Create draft quote', icon: '✅', variant: 'primary', full: true, onClick: async () => {
+      const saved = await quote().createDraft({ jobId: state.jobId, customerId: state.customerId, sessions });
+      if (!saved.ok) toast(body, saved.error || 'Could not create quote.', '#EF4444');
+      else toast(body, 'Draft quote created.', '#10B981');
+    } }));
+    body.appendChild(navRow([{ label: 'Back', onClick: () => go('review') }, { label: 'Close', onClick: () => state.sheet.close() }]));
+  }
+
+  // ---- 7. History -------------------------------------------------------
+  async function renderHistory(body) {
+    const ui = U();
+    body.appendChild(title('Measurement History'));
+    const sessions = await store().listSessions({ jobId: state.jobId });
+    if (!sessions.length) body.appendChild(ui.el('p', { className: 'aaa-empty', text: 'No saved measurements for this job yet.' }));
+    sessions.forEach((s) => body.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+      '<strong>' + esc(s.roomName) + '</strong><div class="aaa-list-sub">' + (s.squareFeet != null ? s.squareFeet + ' ft² · ' : '') + esc(fmt(s.createdAt)) + '</div>' })));
+    body.appendChild(navRow([{ label: 'Setup', onClick: () => go('setup') }, { label: 'Review', onClick: () => go('review') }]));
+  }
+
+  // ---- 8. Troubleshooting / Manual -------------------------------------
+  function renderTroubleshooting(body) {
+    const ui = U();
+    body.appendChild(title('Troubleshooting / Manual Mode'));
+    body.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+      '<strong>Manual entry always works</strong><div class="aaa-list-sub">Use it if Bluetooth permission is blocked, the device is asleep, or you are offline.</div>' }));
+    body.appendChild(ui.button({ label: 'Enter measurements manually', icon: '✍️', variant: 'primary', full: true, onClick: startManualCapture }));
+    body.appendChild(ui.el('p', { className: 'aaa-voice-hint', text: 'For Chrome on Android: ensure Bluetooth is enabled, Location is on if your device requires it, and the laser is awake before scanning.' }));
     body.appendChild(navRow([{ label: 'Setup', onClick: () => go('setup') }, { label: 'Close', onClick: () => state.sheet.close() }]));
   }
 
   async function runAIReview(body, sessions) {
     const ui = U();
-    const card = ui.el('div', {}); card.appendChild(ui.spinner('Reviewing measurements…'));
-    body.appendChild(card);
-    const res = await ai().review(sessions, { jobId: state.jobId });
-    card.innerHTML = '';
-    const r = res.review || {};
-    card.appendChild(title('AI Review (' + (res.mode || 'local') + ')'));
-    if (res.note) card.appendChild(ui.el('p', { className: 'aaa-voice-hint', text: res.note }));
-    const flag = (label, val) => { if (val && (typeof val !== 'object' || val.length)) card.appendChild(ui.el('div', { className: 'aaa-list-row', html: '<strong>' + label + '</strong><div class="aaa-list-sub">' + esc(Array.isArray(val) ? val.join(' · ') : val) + '</div>' })); };
-    card.appendChild(ui.el('div', { className: 'aaa-list-row', html: '<strong>Quote confidence: ' + (r.quoteConfidence != null ? r.quoteConfidence + '%' : '—') + '</strong>' }));
-    flag('Missing rooms', r.missingRooms);
-    flag('Unrealistic readings', r.unrealistic);
-    flag('Stair pricing risk', r.stairRisk);
-    flag('Install waste', r.wasteWarning);
-    flag('Repair vs replacement', r.repairVsReplace);
-    flag('Field notes', r.fieldNotesSummary);
-    card.appendChild(ui.el('p', { className: 'aaa-voice-hint', text: 'AI is advisory only — you confirm the final price.' }));
+    if (!sessions.length) { toast(body, 'No rooms to review.', '#F59E0B'); return; }
+    const res = await ai().review({ sessions });
+    body.appendChild(ui.el('div', { className: 'aaa-list-row', html:
+      '<strong>AI measurement review</strong><div class="aaa-list-sub">Confidence ' + Math.round((res.confidence || 0) * 100) + '%</div>' +
+      (res.notes ? '<div class="aaa-list-sub">' + esc(res.notes.join(' · ')) + '</div>' : '') }));
   }
 
-  // ---- 6. Send to Quote -------------------------------------------------
-  async function renderSendToQuote(body) {
-    const ui = U();
-    body.appendChild(title('Send to Quote'));
-    const sessions = await store().listSessions({ jobId: state.jobId });
-    if (!sessions.length) { body.appendChild(ui.el('p', { className: 'aaa-empty', text: 'No rooms to quote.' })); body.appendChild(navRow([{ label: 'Back', onClick: () => go('review') }])); return; }
-
-    body.appendChild(ui.el('p', { className: 'aaa-voice-hint', text: 'Pick the services to price from these measurements.' }));
-    const chosen = {};
-    quote().serviceOptions().forEach((opt) => {
-      const cb = ui.el('input', { attrs: { type: 'checkbox' } });
-      cb.addEventListener('change', () => { chosen[opt.id] = cb.checked; });
-      const row = ui.el('label', { className: 'aaa-list-row', style: { display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer' } }, [cb, ui.el('span', { html: '<strong>' + esc(opt.label) + '</strong>' })]);
-      body.appendChild(row);
-    });
-
-    const out = ui.el('div', {});
-    body.appendChild(ui.button({ label: 'Build draft quote', icon: '🧮', variant: 'primary', full: true, onClick: () => {
-      const selections = Object.keys(chosen).filter((k) => chosen[k]).map((id) => ({ serviceId: id, sessions: sessions }));
-      if (!selections.length) { toast(body, 'Pick at least one service.', '#F59E0B'); return; }
-      const q = quote().buildQuote(selections);
-      state._lastQuote = q; state._lastSessions = sessions;
-      // RBAC: only roles that may see margins get the labor/material breakdown.
-      const rbac = global.AAA_RBAC;
-      const showMargins = !rbac || rbac.can('VIEW_MARGINS');
-      out.innerHTML = '';
-      out.appendChild(title(showMargins ? 'Draft (internal) — needs your review' : 'Draft quote — needs owner review'));
-      q.lines.forEach((l) => out.appendChild(ui.el('div', { className: 'aaa-list-row', html:
-        '<strong>' + esc(l.label) + ' · ' + l.range + '</strong>' +
-        '<div class="aaa-list-sub">' + esc(l.basis) + (showMargins ? ' · labor $' + l._labor + ' · material $' + l._material : '') + '</div>' })));
-      out.appendChild(ui.el('div', { className: 'aaa-list-row', html: '<strong>Total ' + q.totalRange + '</strong>' + (showMargins ? '<div class="aaa-list-sub">internal labor $' + q._laborTotal + ' · material $' + q._materialTotal + '</div>' : '') }));
-      out.appendChild(ui.button({ label: 'Preview customer receipt', icon: '🧾', variant: 'secondary', full: true, onClick: () => showReceipt(q) }));
-      out.appendChild(ui.button({ label: 'Apply to job (for review)', icon: '✅', variant: 'primary', full: true, onClick: () => applyToJob(body, q, sessions) }));
-    } }));
-    body.appendChild(out);
-    body.appendChild(navRow([{ label: 'Back', onClick: () => go('review') }]));
-  }
-
-  function showReceipt(q) {
-    const ui = U();
-    const r = quote().toReceipt(q, {});
-    const s = ui.sheet({ title: r.businessName, subtitle: 'Estimate', size: 'sm' });
-    document.body.appendChild(s.overlay);
-    r.items.forEach((it) => s.body.appendChild(ui.el('div', { className: 'aaa-list-row', html: '<strong>' + esc(it.description) + '</strong><div class="aaa-list-sub">$' + it.amount + '</div>' })));
-    s.body.appendChild(ui.el('div', { className: 'aaa-list-row', html: '<strong>Estimated total: ' + esc(r.estimateRange) + '</strong>' }));
-    s.body.appendChild(ui.el('p', { className: 'aaa-voice-hint', text: r.note }));
-  }
-
-  async function applyToJob(body, q, sessions) {
-    if (!state.jobId) { toast(body, 'Open this from a job to apply estimates.', '#F59E0B'); return; }
-    const entries = quote().toEstimateEntries(q, { sessionIds: sessions.map((s) => s.id) });
-
-    // Route through the Runtime Gateway: human-origin ADD_ESTIMATE, RBAC-checked
-    // and audited. (These estimates stay needsReview — finalizing the customer
-    // price is a separate FINALIZE_PRICE action a person approves.)
-    const gw = global.AAA_RUNTIME_GATEWAY;
-    const doMutate = async () => {
-      const storage = global.AAA_LOCAL_FIRST_STORAGE;
-      const job = await storage.get('jobs', state.jobId);
-      if (!job) throw new Error('Job not found.');
-      const updated = Object.assign({}, job, { estimates: (Array.isArray(job.estimates) ? job.estimates : []).concat(entries) });
-      await storage.put('jobs', state.jobId, updated);
-      try { if (global.AAA_DATA && global.AAA_DATA.put) await global.AAA_DATA.put('jobs', state.jobId, updated); } catch (_) {}
-      if (events()) events().emit('estimate.added', { jobId: state.jobId, count: entries.length, source: 'measurement' });
-      return updated;
-    };
-
-    if (gw) {
-      const res = await gw.run({ action: 'ADD_ESTIMATE', origin: 'human', target: { type: 'job', id: state.jobId }, detail: { count: entries.length, source: 'measurement' }, mutate: doMutate });
-      if (!res.ok) { toast(body, res.message || res.error, '#EF4444'); return; }
-    } else {
-      await doMutate();
-    }
-    toast(body, entries.length + ' estimate(s) added to the job for your review.', '#10B981');
-  }
-
-  // ---- 7. Measurement History ------------------------------------------
-  async function renderHistory(body) {
-    const ui = U();
-    body.appendChild(title('Measurement History'));
-    const sessions = await store().listSessions(state.jobId ? { jobId: state.jobId } : {});
-    if (!sessions.length) { body.appendChild(ui.el('p', { className: 'aaa-empty', text: 'No measurements yet.' })); }
-    sessions.slice(0, 50).forEach((s) => body.appendChild(ui.el('div', { className: 'aaa-list-row', html:
-      '<strong>' + esc(s.roomName) + ' · ' + (s.squareFeet != null ? s.squareFeet + ' ft²' : '—') + '</strong>' +
-      '<div class="aaa-list-sub">' + esc(s.source) + ' · ' + esc(fmt(s.updatedAt)) + (s.syncedToCloud ? ' · ☁ synced' : ' · 💾 local') + '</div>' })));
-    if (store() && store().cloudReady()) body.appendChild(ui.button({ label: 'Sync now', icon: '☁', variant: 'secondary', full: true, onClick: async () => { const r = await store().syncPending(); toast(body, r.ok ? 'Synced.' : ('Synced ' + (r.pushed || 0) + ', ' + (r.failed || 0) + ' pending'), r.ok ? '#10B981' : '#F59E0B'); } }));
-    body.appendChild(navRow([{ label: 'Back', onClick: () => go('setup') }]));
-  }
-
-  // ---- 8. Troubleshooting / Manual Mode --------------------------------
-  function renderTroubleshooting(body) {
-    const ui = U();
-    body.appendChild(title('Troubleshooting / Manual Mode'));
-    const supported = ble() && ble().isSupported();
-    const checks = [
-      ['Web Bluetooth', supported ? 'available' : 'not available', supported],
-      ['Secure (https)', global.isSecureContext ? 'yes' : 'no', !!global.isSecureContext],
-      ['Storage', store() ? 'ready' : 'missing', !!store()],
-      ['Cloud sync', store() && store().cloudReady() ? 'connected' : 'local-only', store() && store().cloudReady()]
-    ];
-    checks.forEach(([k, v, ok]) => body.appendChild(ui.el('div', { className: 'vision-row' }, [
-      ui.el('span', { className: 'vision-row__k', text: k }),
-      ui.el('span', { className: 'vision-row__v', text: v, style: { color: ok ? '#10B981' : '#F59E0B' } })
-    ])));
-    body.appendChild(ui.el('p', { className: 'aaa-voice-hint', text: supported
-      ? 'If a device won’t connect: make sure it’s on and in range, turn its Bluetooth on, then Scan and re-pick it. Move closer if it times out.'
-      : (ble() ? ble().unsupportedReason() : '') }));
-    body.appendChild(ui.el('p', { className: 'aaa-voice-hint', text: 'Manual entry always works and never blocks a quote — use it any time Bluetooth gives you trouble.' }));
-    body.appendChild(ui.button({ label: 'Enter measurements manually', icon: '✍️', variant: 'primary', full: true, onClick: startManualCapture }));
-    body.appendChild(navRow([{ label: 'Back', onClick: () => go('setup') }]));
-  }
-
-  // ---- helpers ----------------------------------------------------------
   function toast(body, msg, color) {
-    const t = U().el('div', { className: 'aaa-list-row', style: { borderColor: color || '#2A2A33' }, html: '<strong style="color:' + (color || '#F8FAFC') + '">' + esc(msg) + '</strong>' });
-    body.insertBefore(t, body.firstChild);
-    setTimeout(() => { if (t.parentNode) t.parentNode.removeChild(t); }, 4000);
+    const ui = U();
+    const node = ui.el('p', { className: 'aaa-empty', style: { color: color || '#A1A1AA' }, text: msg || '' });
+    body.appendChild(node);
+    setTimeout(() => { try { node.remove(); } catch (_) {} }, 3000);
   }
-  function fmt(iso) { const d = new Date(iso); return isNaN(d.getTime()) ? String(iso) : d.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }); }
 
-  global.AAA_MEASUREMENT_HUD_UI = { boot: boot };
+  function fmt(v) {
+    const d = new Date(v);
+    return isNaN(d.getTime()) ? String(v || '') : d.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  }
+
+  global.AAA_MEASUREMENT_HUD_UI = { boot };
 })(typeof window !== 'undefined' ? window : this);
