@@ -3,9 +3,10 @@
  * that should render the answer.
  *
  * Delegates to the existing Executive Copilot intent router (requirement: chat
- * uses the same router), and adds two chat-native intents the canvas needs:
- * `software_factory` ("build a review dashboard") and `governance_approval`
- * ("approve this change"). Pure; deterministic.
+ * uses the same router), and adds chat-native intents the canvas needs:
+ * `greeting` ("hi"), `help` ("what can you do?"), `software_factory`
+ * ("build a review dashboard"), and `governance_approval` ("approve this change").
+ * Pure; deterministic.
  */
 ;(function (global) {
   'use strict';
@@ -14,6 +15,8 @@
 
   // copilot intent → chat card type
   const CARD_FOR = {
+    greeting: 'business_copilot_home',
+    help: 'business_copilot_home',
     business_status: 'executive_briefing',
     morning_briefing: 'executive_briefing',
     revenue_analysis: 'executive_briefing',
@@ -28,10 +31,24 @@
     unknown: 'text'
   };
 
+  function normalized(text) { return String(text == null ? '' : text).trim().toLowerCase(); }
+
   const Router = {
     classify(text) {
-      const t = String(text == null ? '' : text).toLowerCase();
-      // Chat-native intents first.
+      const t = normalized(text);
+      // Friendly chat-native intents first. A business copilot should not treat
+      // "hi" as confusion — it should open the owner command surface.
+      if (/^(hi|hello|hey|yo|sup|good morning|good afternoon|good evening|gm|👋)[!.\s]*$/.test(t)) {
+        return { intent: 'greeting', cardType: 'business_copilot_home', confidence: 0.95, base: null };
+      }
+      if (/^(help|what can you do|what can you help with|show commands|commands|suggestions|menu)[?!.\s]*$/.test(t)) {
+        return { intent: 'help', cardType: 'business_copilot_home', confidence: 0.9, base: null };
+      }
+      // Common owner shorthand should route to a useful business status answer.
+      if (/^(what's going on|whats going on|anything important|what needs attention|what should i do|what now|status|update)[?!.\s]*$/.test(t)) {
+        return { intent: 'business_status', cardType: 'executive_briefing', confidence: 0.85, base: null };
+      }
+      // Chat-native build / approval intents.
       if (/\b(build|create|make|ship)\b/.test(t) && /\b(dashboard|report|tool|feature|page|view|agent|widget|screen)\b/.test(t)) {
         return { intent: 'software_factory', cardType: 'software_factory', confidence: 0.8, base: null };
       }
