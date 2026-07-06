@@ -4,6 +4,10 @@
  * Pure presentation pass. No business logic, no data writes, no routing changes.
  * Loaded after the field-mode skin to make the owner/field shell feel more
  * modern, red-branded, and easier to scan on a phone.
+ *
+ * Pixel 10 Pro target: 6.3" 20:9 high-density Android display. Prioritize
+ * portrait rhythm, glove-friendly tap targets, safe bottom spacing, and quick
+ * one-handed scanning without assuming one exact browser CSS viewport.
  */
 
 :root {
@@ -16,6 +20,9 @@
   --aaa-card-strong: rgba(24, 28, 40, 0.88);
   --aaa-line: rgba(248, 113, 113, 0.18);
   --aaa-line-soft: rgba(148, 163, 184, 0.14);
+  --aaa-pixel-content: 430px;
+  --aaa-pixel-tap: 56px;
+  --aaa-pixel-nav: 72px;
 }
 
 /* App shell: keep the futuristic base, but make AAA red the brand signal. */
@@ -183,7 +190,171 @@ a.aaa-btn--secondary {
   background-clip: text;
 }
 
-/* Mobile readability: compress less, tap more. */
+/* Pixel 10 Pro / similar 6.3" Android phones: portrait-first PWA tuning. */
+@media (min-width: 390px) and (max-width: 460px) and (orientation: portrait) {
+  :root {
+    --hk-nav-h: var(--aaa-pixel-nav);
+  }
+
+  #app-root {
+    padding-bottom: calc(var(--aaa-pixel-nav) + env(safe-area-inset-bottom, 0px) + 28px);
+  }
+
+  .aaa-main,
+  .fm-home,
+  .cc-root {
+    max-width: var(--aaa-pixel-content);
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .aaa-header {
+    padding-top: max(10px, env(safe-area-inset-top, 0px));
+  }
+
+  .aaa-title-mark {
+    min-width: 46px;
+    padding: 4px 9px;
+  }
+
+  .fm-greeting {
+    font-size: clamp(28px, 7.1vw, 32px);
+    line-height: 1.05;
+    margin-bottom: 18px;
+  }
+
+  .fm-primary {
+    min-height: 88px;
+    border-radius: 26px;
+    font-size: 21px;
+    letter-spacing: 0.075em;
+  }
+
+  .fm-quick {
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .fm-q {
+    min-height: 98px;
+    padding: 16px;
+  }
+
+  .fm-q span {
+    font-size: 15px;
+    line-height: 1.25;
+  }
+
+  .aaa-btn,
+  button.aaa-btn,
+  a.aaa-btn,
+  .aaa-list-row,
+  .jl-job,
+  .fm-job {
+    min-height: var(--aaa-pixel-tap);
+  }
+
+  .aaa-btn,
+  button.aaa-btn,
+  a.aaa-btn {
+    border-radius: 18px;
+    font-size: 16px;
+  }
+
+  .aaa-summary,
+  .jl-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .aaa-chip,
+  .jl-tile {
+    min-height: 82px;
+    border-radius: 18px;
+    padding: 12px 10px;
+  }
+
+  .aaa-chip__value,
+  .jl-tile__value {
+    font-size: clamp(25px, 7.8vw, 36px);
+    line-height: 1;
+  }
+
+  .aaa-chip__label,
+  .jl-tile__label {
+    font-size: 11px;
+    line-height: 1.15;
+  }
+
+  .jl-job {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .jl-job__name {
+    font-size: 16px;
+    line-height: 1.25;
+  }
+
+  .aaa-tabbar {
+    height: calc(var(--aaa-pixel-nav) + env(safe-area-inset-bottom, 0px));
+    padding-left: max(4px, env(safe-area-inset-left, 0px));
+    padding-right: max(4px, env(safe-area-inset-right, 0px));
+  }
+
+  .aaa-tab {
+    min-height: 64px;
+    padding-top: 10px;
+    font-size: 12px;
+  }
+
+  .aaa-tab__icon {
+    font-size: 22px;
+  }
+
+  .voice-fab {
+    right: 20px;
+    bottom: calc(var(--aaa-pixel-nav) + env(safe-area-inset-bottom, 0px) + 22px);
+    width: 64px;
+    height: 64px;
+  }
+
+  .cc-bar {
+    bottom: calc(var(--aaa-pixel-nav) + env(safe-area-inset-bottom, 0px));
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .cc-input {
+    min-height: 52px;
+    font-size: 16px;
+  }
+
+  .cc-send {
+    min-width: 72px;
+  }
+}
+
+/* Pixel 10 Pro landscape / rotated truck-desk use: keep content readable. */
+@media (min-width: 700px) and (max-width: 980px) and (orientation: landscape) {
+  .aaa-main,
+  .fm-home,
+  .cc-root {
+    max-width: 720px;
+  }
+
+  .fm-quick,
+  .aaa-summary,
+  .jl-summary {
+    gap: 14px;
+  }
+
+  .fm-primary {
+    min-height: 72px;
+  }
+}
+
+/* Mobile readability fallback: compress less, tap more. */
 @media (max-width: 420px) {
   .aaa-main { padding-left: 14px; padding-right: 14px; }
   .aaa-summary, .jl-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
