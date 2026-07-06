@@ -18,6 +18,7 @@
     html(card) {
       if (!card) return '';
       switch (card.type) {
+        case 'business_copilot_home': return this._home(card);
         case 'executive_briefing': return this._briefing(card);
         case 'simulation': return this._sim(card);
         case 'goal': return this._goal(card);
@@ -29,6 +30,14 @@
 
     _missing(card) { return (card.missingData && card.missingData.length) ? '<div class="cp-missing">Missing: ' + esc(card.missingData.join(', ')) + '</div>' : ''; },
     _conf(card) { return card.confidence == null ? '' : '<div class="cp-meta">confidence ' + pct(card.confidence) + '</div>'; },
+
+    _home(c) {
+      const actions = (c.actions || []).map(function (a) { return '<button class="cp-suggest" type="button" data-prompt="' + esc(a) + '">' + esc(a) + '</button>'; }).join('');
+      return '<div class="cp-card cp-home"><h3>' + esc(c.title || 'AAA Business Copilot') + '</h3>' +
+        '<p class="cp-summary">' + esc(c.summary || '') + '</p>' +
+        (actions ? '<div class="cp-suggestions">' + actions + '</div>' : '') +
+        this._conf(c) + this._missing(c) + '</div>';
+    },
 
     _briefing(c) {
       return '<div class="cp-card cp-briefing"><h3>' + esc(c.title) + '</h3>' +
