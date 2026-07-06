@@ -1,7 +1,7 @@
-# Graph Report - aaa-hyperkernel  (2026-07-05)
+# Graph Report - aaa-hyperkernel  (2026-07-06)
 
 ## Corpus Check
-- 731 files · ~632,098 words
+- 731 files · ~632,274 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `d9a4abc3`
+- Built from commit: `688c6af4`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
