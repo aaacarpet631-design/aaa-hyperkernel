@@ -17,7 +17,45 @@
   function copilot() { return global.AAA_EXECUTIVE_COPILOT; }
   function card(name) { return global['AAA_' + name]; }
 
+  const OWNER_ACTIONS = [
+    'Show what needs attention',
+    'Build an estimate',
+    'Who should I call today?',
+    'Review open quotes',
+    'Check today\'s jobs',
+    'What are my biggest risks?'
+  ];
+
+  function friendlyHomeCard(kind) {
+    const hello = kind === 'help'
+      ? 'Here are the fastest things I can help with.'
+      : 'Hey — I\'m here. Ask me anything about jobs, quotes, leads, money, scheduling, reviews, or estimates.';
+    return {
+      type: 'business_copilot_home',
+      title: 'AAA Business Copilot',
+      summary: hello,
+      actions: OWNER_ACTIONS.slice(),
+      confidence: 0.95,
+      missingData: []
+    };
+  }
+
+  function smarterFallbackCard(text, route) {
+    const t = String(text == null ? '' : text).trim();
+    return {
+      type: 'business_copilot_home',
+      title: 'AAA Business Copilot',
+      summary: t
+        ? 'I can help with that. Tell me whether this is about a job, estimate, customer, schedule, money, reviews, or leads — or tap one of these actions.'
+        : 'Ask me about jobs, quotes, leads, scheduling, reviews, money, or what needs attention today.',
+      actions: OWNER_ACTIONS.slice(),
+      confidence: route && route.confidence != null ? route.confidence : 0.45,
+      missingData: []
+    };
+  }
+
   async function buildCard(intent, cardType, text, answer, opts) {
+    if (cardType === 'business_copilot_home') return friendlyHomeCard(intent);
     if (cardType === 'software_factory') return card('SOFTWARE_FACTORY_CARD') ? await card('SOFTWARE_FACTORY_CARD').build(text, opts) : { type: 'text', summary: 'Software factory unavailable.' };
     if (intent === 'governance_approval') return card('GOVERNANCE_APPROVAL_CARD') ? await card('GOVERNANCE_APPROVAL_CARD').build(null) : { type: 'text', summary: 'Nothing to approve.' };
     if (cardType === 'simulation') return card('SIMULATION_RESULT_CARD') ? card('SIMULATION_RESULT_CARD').build(answer) : { type: 'text', summary: (answer.answer && answer.answer.summary) || '' };
@@ -33,15 +71,22 @@
     /** Send a message → stored user msg + assistant msg with a rich card. */
     async send(text, opts) {
       const o = opts || {};
+      const cleanText = String(text == null ? '' : text).trim();
       const online = queue() ? queue().isOnline() : true;
-      const userMsg = store() ? await store().add({ role: 'user', text: text, status: online ? 'sent' : 'queued', threadId: o.threadId }) : null;
+      const userMsg = store() ? await store().add({ role: 'user', text: cleanText, status: online ? 'sent' : 'queued', threadId: o.threadId }) : null;
 
       if (!online && !o._replay) {
-        if (queue()) await queue().enqueue({ text: text, opts: o });
+        if (queue()) await queue().enqueue({ text: cleanText, opts: o });
         return { queued: true, userMessage: userMsg };
       }
 
-      const route = router() ? router().classify(text) : { intent: 'unknown', cardType: 'text', confidence: 0 };
+      const route = router() ? router().classify(cleanText) : { intent: 'unknown', cardType: 'text', confidence: 0 };
+
+      if (route.cardType === 'business_copilot_home') {
+        const homeCard = await buildCard(route.intent, route.cardType, cleanText, {}, o);
+        const homeMsg = store() ? await store().add({ role: 'assistant', text: homeCard.summary, card: homeCard, threadId: o.threadId, status: 'sent' }) : null;
+        return { queued: false, intent: route.intent, cardType: route.cardType, confidence: route.confidence, userMessage: userMsg, assistantMessage: homeMsg, card: homeCard, answer: null };
+      }
 
       // Company Brain — evidence-cited answers for business questions the
       // copilot router doesn't claim (win rates, profitability, revenue
@@ -50,7 +95,7 @@
       // cites source, metric, value, and sample size).
       if (route.intent === 'unknown' && global.AAA_COMPANY_BRAIN && global.AAA_COMPANY_BRAIN.ask) {
         try {
-          const brain = await global.AAA_COMPANY_BRAIN.ask(text);
+          const brain = await global.AAA_COMPANY_BRAIN.ask(cleanText);
           // Only pre-empt the copilot when the brain actually brings evidence —
           // a recognized intent with zero findings means it couldn't answer
           // from data, so let the copilot path handle it.
@@ -68,9 +113,12 @@
 
       let answer = null;
       const needsCopilot = route.intent !== 'software_factory' && route.intent !== 'governance_approval';
-      if (needsCopilot && copilot()) answer = await copilot().ask(text, o);
+      if (needsCopilot && copilot()) answer = await copilot().ask(cleanText, o);
 
-      const cardModel = await buildCard(route.intent, route.cardType, text, answer || {}, o);
+      let cardModel = await buildCard(route.intent, route.cardType, cleanText, answer || {}, o);
+      const weakUnknown = route.intent === 'unknown' && (!cardModel || !String(cardModel.summary || '').trim());
+      if (weakUnknown) cardModel = smarterFallbackCard(cleanText, route);
+
       const summary = (answer && answer.answer && answer.answer.summary) || cardModel.summary || cardModel.title || 'Done.';
       const assistantMsg = store() ? await store().add({ role: 'assistant', text: summary, card: cardModel, threadId: o.threadId, status: 'sent' }) : null;
 
