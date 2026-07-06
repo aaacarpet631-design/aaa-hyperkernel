@@ -1,0 +1,363 @@
+/*
+ * AAA HyperKernel — UI Polish Layer
+ *
+ * Pure presentation pass. No business logic, no data writes, no routing changes.
+ * Loaded after the field-mode skin to make the owner/field shell feel more
+ * modern, red-branded, and easier to scan on a phone.
+ *
+ * Pixel 10 Pro target: 6.3" 20:9 high-density Android display. Prioritize
+ * portrait rhythm, glove-friendly tap targets, safe bottom spacing, and quick
+ * one-handed scanning without assuming one exact browser CSS viewport.
+ */
+
+:root {
+  --aaa-red: #dc2626;
+  --aaa-red-hot: #ff3b4e;
+  --aaa-red-dark: #7f1d1d;
+  --aaa-ink: #f8fafc;
+  --aaa-muted: #9ca3af;
+  --aaa-card: rgba(15, 18, 28, 0.78);
+  --aaa-card-strong: rgba(24, 28, 40, 0.88);
+  --aaa-line: rgba(248, 113, 113, 0.18);
+  --aaa-line-soft: rgba(148, 163, 184, 0.14);
+  --aaa-pixel-content: 430px;
+  --aaa-pixel-tap: 56px;
+  --aaa-pixel-nav: 72px;
+}
+
+/* App shell: keep the futuristic base, but make AAA red the brand signal. */
+body {
+  background:
+    radial-gradient(900px 520px at 8% -10%, rgba(220, 38, 38, 0.20), transparent 58%),
+    radial-gradient(900px 620px at 94% 4%, rgba(56, 189, 248, 0.10), transparent 58%),
+    linear-gradient(180deg, #09090b 0%, #05060a 100%);
+}
+
+.aaa-main {
+  padding-top: 16px;
+}
+
+/* Headers read like a command system instead of a plain mobile page. */
+.aaa-header {
+  border-bottom: 1px solid var(--aaa-line-soft);
+  background:
+    linear-gradient(180deg, rgba(9, 9, 11, 0.94), rgba(9, 9, 11, 0.72));
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+}
+
+.aaa-title-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  margin-right: 6px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--aaa-red), var(--aaa-red-hot));
+  box-shadow: 0 0 24px rgba(220, 38, 38, 0.34);
+}
+
+/* Cards/lists: stronger hierarchy, less flat gray. */
+.aaa-list-row,
+.aaa-card,
+.aaa-detail-summary,
+.cp-card {
+  border: 1px solid var(--aaa-line-soft);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.018)),
+    var(--aaa-card);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.24);
+}
+
+.aaa-list-row strong,
+.aaa-card-name {
+  color: var(--aaa-ink);
+}
+
+.aaa-list-sub,
+.aaa-empty,
+.aaa-empty-sub,
+.aaa-detail-line,
+.aaa-detail-notes {
+  color: var(--aaa-muted);
+}
+
+/* Summary tiles: make the dashboard scannable at arm's length. */
+.aaa-summary,
+.jl-summary {
+  gap: 10px;
+}
+
+.aaa-chip,
+.jl-tile {
+  border: 1px solid var(--aaa-line-soft);
+  background:
+    radial-gradient(circle at 18% 0%, rgba(248, 113, 113, 0.11), transparent 42%),
+    var(--aaa-card-strong);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 10px 26px rgba(0,0,0,0.18);
+}
+
+.jl-tile--attn,
+.jl-tile--hot {
+  border-color: rgba(248, 113, 113, 0.34);
+  box-shadow: 0 0 0 1px rgba(220,38,38,0.10), 0 12px 30px rgba(220,38,38,0.12);
+}
+
+/* Buttons: primary action is clearly AAA red; secondary is calmer glass. */
+.aaa-btn--primary,
+button.aaa-btn--primary,
+a.aaa-btn--primary {
+  background: linear-gradient(135deg, var(--aaa-red), var(--aaa-red-hot));
+  color: #fff;
+  box-shadow: 0 10px 28px rgba(220, 38, 38, 0.28);
+}
+
+.aaa-btn--secondary,
+button.aaa-btn--secondary,
+a.aaa-btn--secondary {
+  border-color: var(--aaa-line-soft);
+  background: rgba(24, 28, 40, 0.72);
+}
+
+.aaa-btn:active,
+.fm-primary:active,
+.fm-q:active,
+.jl-job:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+/* Jobs: the important cards should look important. */
+.jl-job {
+  border: 1px solid var(--aaa-line-soft);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.016)),
+    var(--aaa-card);
+}
+
+.jl-job--attn {
+  border-color: rgba(248, 113, 113, 0.36);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(220, 38, 38, 0.18), transparent 42%),
+    var(--aaa-card-strong);
+}
+
+.jl-job__why {
+  color: #fecaca;
+}
+
+/* Bottom nav: clearer current tab and bigger thumb target feel. */
+.aaa-tabbar {
+  background: rgba(5, 6, 10, 0.90);
+  border-top-color: rgba(248, 113, 113, 0.18);
+  box-shadow: 0 -14px 34px rgba(0, 0, 0, 0.34);
+}
+
+.aaa-tab {
+  min-height: 56px;
+}
+
+.aaa-tab.is-active {
+  color: #fff;
+}
+
+.aaa-tab.is-active::before {
+  background: linear-gradient(90deg, var(--aaa-red), var(--aaa-red-hot));
+  box-shadow: 0 0 16px rgba(220, 38, 38, 0.62);
+}
+
+.aaa-tab.is-active .aaa-tab__icon {
+  filter: none drop-shadow(0 0 10px rgba(220, 38, 38, 0.55));
+}
+
+/* Field Mode: keep the measurement CTA impossible to miss, but brand it red. */
+.fm-primary {
+  color: #fff;
+  background: linear-gradient(135deg, var(--aaa-red), var(--aaa-red-hot));
+  box-shadow: 0 12px 36px rgba(220, 38, 38, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.30);
+}
+
+.fm-q,
+.fm-job,
+.fm-empty {
+  border-color: var(--aaa-line-soft);
+}
+
+.fm-greeting {
+  background: linear-gradient(92deg, #fff 24%, #fecaca 58%, var(--aaa-red-hot));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Pixel 10 Pro / similar 6.3" Android phones: portrait-first PWA tuning. */
+@media (min-width: 390px) and (max-width: 460px) and (orientation: portrait) {
+  :root {
+    --hk-nav-h: var(--aaa-pixel-nav);
+  }
+
+  #app-root {
+    padding-bottom: calc(var(--aaa-pixel-nav) + env(safe-area-inset-bottom, 0px) + 28px);
+  }
+
+  .aaa-main,
+  .fm-home,
+  .cc-root {
+    max-width: var(--aaa-pixel-content);
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .aaa-header {
+    padding-top: max(10px, env(safe-area-inset-top, 0px));
+  }
+
+  .aaa-title-mark {
+    min-width: 46px;
+    padding: 4px 9px;
+  }
+
+  .fm-greeting {
+    font-size: clamp(28px, 7.1vw, 32px);
+    line-height: 1.05;
+    margin-bottom: 18px;
+  }
+
+  .fm-primary {
+    min-height: 88px;
+    border-radius: 26px;
+    font-size: 21px;
+    letter-spacing: 0.075em;
+  }
+
+  .fm-quick {
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .fm-q {
+    min-height: 98px;
+    padding: 16px;
+  }
+
+  .fm-q span {
+    font-size: 15px;
+    line-height: 1.25;
+  }
+
+  .aaa-btn,
+  button.aaa-btn,
+  a.aaa-btn,
+  .aaa-list-row,
+  .jl-job,
+  .fm-job {
+    min-height: var(--aaa-pixel-tap);
+  }
+
+  .aaa-btn,
+  button.aaa-btn,
+  a.aaa-btn {
+    border-radius: 18px;
+    font-size: 16px;
+  }
+
+  .aaa-summary,
+  .jl-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .aaa-chip,
+  .jl-tile {
+    min-height: 82px;
+    border-radius: 18px;
+    padding: 12px 10px;
+  }
+
+  .aaa-chip__value,
+  .jl-tile__value {
+    font-size: clamp(25px, 7.8vw, 36px);
+    line-height: 1;
+  }
+
+  .aaa-chip__label,
+  .jl-tile__label {
+    font-size: 11px;
+    line-height: 1.15;
+  }
+
+  .jl-job {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .jl-job__name {
+    font-size: 16px;
+    line-height: 1.25;
+  }
+
+  .aaa-tabbar {
+    height: calc(var(--aaa-pixel-nav) + env(safe-area-inset-bottom, 0px));
+    padding-left: max(4px, env(safe-area-inset-left, 0px));
+    padding-right: max(4px, env(safe-area-inset-right, 0px));
+  }
+
+  .aaa-tab {
+    min-height: 64px;
+    padding-top: 10px;
+    font-size: 12px;
+  }
+
+  .aaa-tab__icon {
+    font-size: 22px;
+  }
+
+  .voice-fab {
+    right: 20px;
+    bottom: calc(var(--aaa-pixel-nav) + env(safe-area-inset-bottom, 0px) + 22px);
+    width: 64px;
+    height: 64px;
+  }
+
+  .cc-bar {
+    bottom: calc(var(--aaa-pixel-nav) + env(safe-area-inset-bottom, 0px));
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .cc-input {
+    min-height: 52px;
+    font-size: 16px;
+  }
+
+  .cc-send {
+    min-width: 72px;
+  }
+}
+
+/* Pixel 10 Pro landscape / rotated truck-desk use: keep content readable. */
+@media (min-width: 700px) and (max-width: 980px) and (orientation: landscape) {
+  .aaa-main,
+  .fm-home,
+  .cc-root {
+    max-width: 720px;
+  }
+
+  .fm-quick,
+  .aaa-summary,
+  .jl-summary {
+    gap: 14px;
+  }
+
+  .fm-primary {
+    min-height: 72px;
+  }
+}
+
+/* Mobile readability fallback: compress less, tap more. */
+@media (max-width: 420px) {
+  .aaa-main { padding-left: 14px; padding-right: 14px; }
+  .aaa-summary, .jl-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .aaa-chip__value, .jl-tile__value { font-size: clamp(22px, 8vw, 34px); }
+  .aaa-section-title, .fm-sec { margin-top: 20px; }
+}
