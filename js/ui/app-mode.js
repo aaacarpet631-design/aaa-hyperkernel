@@ -10,6 +10,17 @@
 ;(function (global) {
   'use strict';
 
+  function installPolishStylesheet() {
+    if (!global.document) return;
+    if (global.document.getElementById('aaa-ui-polish-css')) return;
+    const link = global.document.createElement('link');
+    link.id = 'aaa-ui-polish-css';
+    link.rel = 'stylesheet';
+    link.href = '/css/ui-polish.css';
+    global.document.head.appendChild(link);
+  }
+  installPolishStylesheet();
+
   function cfg() { return global.AAA_CONFIG || {}; }
   function rbac() { return global.AAA_RBAC; }
   function events() { return global.AAA_EVENTS; }
