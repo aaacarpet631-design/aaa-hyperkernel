@@ -47,8 +47,34 @@
     COLLECTION: COLLECTION,
 
     /**
+     * Pure helper: extract click ids + UTM parameters from a landing-page URL
+     * (or query string). Returns an attach()-ready partial; unknown params are
+     * ignored, nothing is stored. Never throws — a bad URL yields {}.
+     */
+    fromUrl(url) {
+      const out = {};
+      if (!url) return out;
+      let qs = null;
+      try {
+        const s = String(url);
+        const q = s.indexOf('?') !== -1 ? s.slice(s.indexOf('?') + 1) : (s.indexOf('=') !== -1 ? s : '');
+        qs = new global.URLSearchParams(q);
+        const path = s.indexOf('://') !== -1 ? s.replace(/^[a-z]+:\/\/[^/]+/i, '').split('?')[0] : (s.indexOf('?') > 0 ? s.split('?')[0] : null);
+        if (path) out.landingPage = path;
+      } catch (_) { return out; }
+      const map = { gclid: 'gclid', gbraid: 'gbraid', wbraid: 'wbraid', utm_source: 'utmSource', utm_medium: 'utmMedium', utm_campaign: 'utmCampaign', utm_term: 'utmTerm', utm_content: 'utmContent' };
+      Object.keys(map).forEach(function (k) { const v = qs.get(k); if (v) out[map[k]] = v; });
+      return out;
+    },
+
+    /**
      * Attach ad attribution to a lead at intake (Phase 2). Upsert by leadId.
      * gclid (or gbraid/wbraid for iOS/app) is the join key back to Google.
+     *
+     * The record is built by WHITELIST — a caller can pass a whole intake blob
+     * and no name/phone/email/address ever lands in this collection.
+     * consent is 'granted'|'denied'|'unknown'; only 'granted' records are
+     * eligible for any first-party-data upload downstream.
      */
     async attach(leadId, attribution) {
       if (!leadId) return { ok: false, error: 'NO_LEAD' };
@@ -57,6 +83,7 @@
       let prior = null;
       try { prior = await data().get(COLLECTION, leadId); } catch (_) { prior = null; }
       const p = mine(prior) ? prior : {};
+      const consent = ['granted', 'denied', 'unknown'].indexOf(a.consent) !== -1 ? a.consent : null;
       // Upsert semantics: a provided field updates; an omitted field PRESERVES
       // the prior value (so a second attach can't null out the campaign/gclid).
       const rec = {
@@ -71,6 +98,19 @@
         searchTerm: str(a.searchTerm, 200) || p.searchTerm || null,
         source: str(a.source, 48) || p.source || 'google_ads',
         landingPage: str(a.landingPage, 300) || p.landingPage || null,
+        // UTM set (Slice 1: measurement foundation)
+        utmSource: str(a.utmSource, 120) || p.utmSource || null,
+        utmMedium: str(a.utmMedium, 120) || p.utmMedium || null,
+        utmCampaign: str(a.utmCampaign, 160) || p.utmCampaign || null,
+        utmTerm: str(a.utmTerm, 160) || p.utmTerm || null,
+        utmContent: str(a.utmContent, 160) || p.utmContent || null,
+        // how the lead arrived (form|call|chat|lsa|portal) — not WHO it is
+        channel: str(a.channel, 32) || p.channel || null,
+        // coarse geo only (service-area analysis); never a street address
+        city: str(a.city, 80) || p.city || null,
+        zip: str(a.zip, 16) || p.zip || null,
+        // first-party-data consent state; 'unknown' until explicitly captured
+        consent: consent || p.consent || 'unknown',
         capturedAt: p.capturedAt || a.capturedAt || nowISO(),
         conversion: p.conversion || null
       };

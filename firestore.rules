@@ -82,7 +82,14 @@ service cloud.firestore {
           || c == 'model_versions'
           // NVIDIA Model Adapter Layer: enablement settings + model-call usage/
           // provenance stream — owner-only (governs external intelligence engines).
-          || c == 'model_settings' || c == 'model_calls';
+          || c == 'model_settings' || c == 'model_calls'
+          // Google Ads governance: the conversion ladder + released export
+          // batches carry realized revenue values, and recommendations carry
+          // spend/impact payloads — owner-only, same as the rest of the books.
+          // (ad_attribution itself stays member-writable: lead intake attaches
+          // click context and it holds no money and no PII.)
+          || c == 'ads_conversion_events' || c == 'ads_conversion_exports'
+          || c == 'ads_recommendations';
     }
     // Collections only a trusted backend (Admin SDK) may touch. Notably
     // 'integrations' holds QuickBooks OAuth tokens — clients must never read it.
