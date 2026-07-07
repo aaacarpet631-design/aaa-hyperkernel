@@ -53,6 +53,8 @@ const SUITES = [
   'unit/ads-conversion-ledger.test.js',
   'unit/ads-reporting.test.js',
   'unit/ads-governance.test.js',
+  'unit/ads-margin-join.test.js',
+  'unit/ads-outcomes-link.test.js',
   'unit/telemetry-seal.test.js',
   'unit/visual-evidence-ui.test.js',
   'unit/pricing-optimizer.test.js',

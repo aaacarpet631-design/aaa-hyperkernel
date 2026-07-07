@@ -49,6 +49,7 @@
   function clock() { return global.AAA_RUNTIME_CLOCK; }
   function envelopes() { return global.AAA_DECISION_ENVELOPE; }
   function gateway() { return global.AAA_RUNTIME_GATEWAY; }
+  function outcomes() { return global.AAA_AGENT_OUTCOMES; }
   function ws() { return cfg().workspaceId || 'default'; }
   function nowISO() { return clock() && clock().nowISO ? clock().nowISO() : new Date().toISOString(); }
   function mine(r) { return r && (r.workspaceId == null || r.workspaceId === ws()); }
@@ -114,8 +115,26 @@
         payload: i.payload || null,
         envelopeId: sealed.envelope.id,
         status: sealed.envelope.approval.status === 'auto_approved' ? 'auto_approved' : 'awaiting_approval',
+        outcomeDecisionId: null,
         createdAt: nowISO(), decidedAt: null, clearedAt: null
       };
+      // Measurability: register the decision in the Agent Outcome Registry so
+      // scorecards can grade this agent later. Advisory only — a missing or
+      // failing registry never blocks governance; the record then honestly
+      // carries outcomeDecisionId: null.
+      const reg = outcomes();
+      if (reg && reg.recordDecision) {
+        try {
+          const d = await reg.recordDecision({
+            agentId: rec.agent, agentType: 'ads',
+            confidence: i.confidence,
+            recommendation: str(i.recommendation, 300),
+            subjectType: 'ads_recommendation', subjectId: rec.id,
+            sourceModule: 'ads-governance'
+          });
+          if (d && d.ok && d.decision) rec.outcomeDecisionId = d.decision.decisionId;
+        } catch (_) { /* advisory — never blocks */ }
+      }
       await data().put(COLLECTION, rec.id, rec);
       return { ok: true, recommendation: rec, envelope: sealed.envelope };
     },
@@ -155,6 +174,17 @@
       if (!r.ok) return r;
       rec.status = 'rejected'; rec.decidedAt = nowISO();
       await data().put(COLLECTION, rec.id, rec);
+      // A human rejection overrides the agent's call — feed that back to the
+      // outcome registry as training signal (advisory; never blocks the reject).
+      if (rec.outcomeDecisionId) {
+        const reg = outcomes();
+        if (reg && reg.markOverridden) {
+          try {
+            const o = opts || {};
+            await reg.markOverridden(rec.outcomeDecisionId, { reason: o.reason || null, actorId: o.approver || null });
+          } catch (_) { /* advisory — never blocks */ }
+        }
+      }
       return { ok: true, recommendation: rec };
     },
 

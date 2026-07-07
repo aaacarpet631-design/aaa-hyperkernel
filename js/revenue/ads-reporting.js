@@ -1,7 +1,10 @@
 /*
  * AAA Ads Reporting — the read-only join between ad spend context and business
  * truth: attribution (which click) × conversion ladder (what happened) × Lead
- * OS (pipeline stage, won/lost revenue).
+ * OS (pipeline stage, won/lost revenue) × Quote Store (gross margin on WON
+ * quotes, joined via quote.leadId → attribution campaign — the click → margin
+ * loop). Margin coverage is explicit: `marginKnownWon` counts the won jobs
+ * whose margin is actually knowable through that join.
  *
  * READ-ONLY BY CONSTRUCTION: this module holds no collection of its own and
  * never calls put() — it can be pointed at production data with zero risk.
@@ -23,8 +26,23 @@
   function attribution() { return global.AAA_AD_ATTRIBUTION; }
   function conversions() { return global.AAA_ADS_CONVERSIONS; }
   function leadsOS() { return global.AAA_LEADS; }
+  function quotes() { return global.AAA_QUOTES; }
   function num(v) { const n = Number(v); return isFinite(n) ? n : 0; }
   function round2(n) { return Math.round(n * 100) / 100; }
+  function fin(v) { if (v == null) return null; const n = Number(v); return isFinite(n) ? n : null; }
+
+  /**
+   * Gross margin of a WON quote — honest or null. Prefer recomputing from
+   * finalPrice minus internal cost (actual jobCost when recorded, else the
+   * drafted internalCost.total); fall back to the stored grossMargin. Never
+   * invented: when neither side is knowable the answer is null.
+   */
+  function wonMargin(q) {
+    const finalPrice = fin(q.finalPrice);
+    const cost = q.jobCost != null ? fin(q.jobCost) : fin(q.internalCost && q.internalCost.total);
+    if (finalPrice != null && cost != null) return round2(finalPrice - cost);
+    return fin(q.grossMargin) != null ? round2(fin(q.grossMargin)) : null;
+  }
 
   const LADDER_COLUMNS = {
     LEAD_CREATED: 'leads', QUALIFIED_LEAD: 'qualified', ESTIMATE_SCHEDULED: 'estimatesScheduled',
@@ -35,14 +53,18 @@
   function emptyRow(key) {
     return { campaign: key, leads: 0, qualified: 0, estimatesScheduled: 0, estimatesSent: 0,
       won: 0, completed: 0, highMargin: 0, badLeads: 0, refunds: 0, complaints: 0,
-      revenueUSD: 0, spendUSD: null, costPerWonJob: null, revenuePerAdDollar: null, closeRatePct: null };
+      revenueUSD: 0, grossMarginUSD: 0, marginKnownWon: 0, spendUSD: null,
+      costPerWonJob: null, revenuePerAdDollar: null, marginPerAdDollar: null,
+      costPerMarginDollar: null, closeRatePct: null };
   }
 
   const Reporting = {
     /**
      * Campaign scorecard: one row per campaign (unattributed leads roll into
-     * '(unattributed)'), ladder counts + revenue truth. opts.spendByCampaign
-     * { [campaign]: USD } unlocks costPerWonJob / revenuePerAdDollar.
+     * '(unattributed)'), ladder counts + revenue truth + gross margin joined
+     * from WON quotes via quote.leadId (grossMarginUSD / marginKnownWon).
+     * opts.spendByCampaign { [campaign]: USD } unlocks costPerWonJob /
+     * revenuePerAdDollar / marginPerAdDollar / costPerMarginDollar.
      */
     async campaignScorecard(opts) {
       const o = opts || {};
@@ -83,14 +105,35 @@
         });
       }
 
+      // Margin join: WON quotes carrying a leadId reveal TRUE gross margin per
+      // campaign. Margin is recomputed from finalPrice minus internal cost
+      // (jobCost when recorded, else the drafted internalCost.total); the stored
+      // grossMargin is the fallback. Quotes without a leadId contribute nothing —
+      // `marginKnownWon` makes that coverage gap visible instead of hiding it.
+      if (quotes() && quotes().list) {
+        (await quotes().list()).forEach(function (q) {
+          if (!q || q.status !== 'won' || !q.leadId) return;
+          const m = wonMargin(q);
+          if (m == null) return;
+          const r = row(leadCampaign[q.leadId] || '(unattributed)');
+          r.grossMarginUSD += m;
+          r.marginKnownWon++;
+        });
+      }
+
       const spend = o.spendByCampaign || null;
       const out = Object.keys(rows).map(function (k) {
         const r = rows[k];
         r.revenueUSD = round2(r.revenueUSD);
+        r.grossMarginUSD = round2(r.grossMarginUSD);
         const s = spend && spend[k] != null ? num(spend[k]) : null;
         r.spendUSD = s;
         r.costPerWonJob = (s != null && r.won > 0) ? round2(s / r.won) : null;
         r.revenuePerAdDollar = (s != null && s > 0) ? round2(r.revenueUSD / s) : null;
+        // Margin-adjusted north stars — only when BOTH sides are known (spend
+        // supplied AND at least one won job's margin is visible via the join).
+        r.marginPerAdDollar = (s != null && s > 0 && r.marginKnownWon > 0) ? round2(r.grossMarginUSD / s) : null;
+        r.costPerMarginDollar = (s != null && r.grossMarginUSD > 0) ? round2(s / r.grossMarginUSD) : null;
         r.closeRatePct = r.estimatesSent > 0 ? Math.round((r.won / r.estimatesSent) * 100) : null;
         return r;
       });

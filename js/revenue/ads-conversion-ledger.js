@@ -18,6 +18,12 @@
  *    JOB_COMPLETED / HIGH_MARGIN_JOB are primary business signals.
  *  - PII-FREE BY WHITELIST: records are constructed from a fixed field set;
  *    a caller can pass a whole intake blob and no name/phone/email survives.
+ *  - HIGH_MARGIN_JOB RULE: recordJobFinancials(leadId, {revenueUSD, costUSD})
+ *    always records JOB_COMPLETED (valueUSD = revenue) and ALSO records
+ *    HIGH_MARGIN_JOB (valueUSD = rounded margin, revenue - cost) when the
+ *    margin percentage — (revenue - cost) / revenue * 100 — is at or above
+ *    the 'adsHighMarginPctFloor' config flag (default 55). The raw cost
+ *    breakdown is NEVER stored on any event; only the margin value survives.
  *  - UPLOAD IS GATED: uploadQueue() emits Google-ready payloads ONLY for
  *    events whose lead has a click id AND consent === 'granted'. Nothing here
  *    ever calls the Google Ads API — payload generation and transmission are
@@ -99,6 +105,41 @@
       };
       try { await data().put(COLLECTION, id, ev); } catch (_) { return { ok: false, error: 'WRITE_FAILED' }; }
       return { ok: true, event: ev, deduped: false };
+    },
+
+    /**
+     * Record the financial outcome of a completed job in one step.
+     * fin: { revenueUSD, costUSD, sourceRef? } — both numbers required and
+     * finite, revenue > 0. Always records JOB_COMPLETED (valueUSD = revenue);
+     * when marginPct = (revenue - cost) / revenue * 100 is at or above the
+     * 'adsHighMarginPctFloor' flag (default 55) it ALSO records
+     * HIGH_MARGIN_JOB with valueUSD = round(revenue - cost). The raw cost is
+     * never stored — margin value only. Both events dedupe via record().
+     * Returns { ok, events: [...], marginPct, highMargin }.
+     */
+    async recordJobFinancials(leadId, fin) {
+      if (!leadId) return { ok: false, error: 'NO_LEAD' };
+      const f = fin || {};
+      const revenue = Number(f.revenueUSD), cost = Number(f.costUSD);
+      if (f.revenueUSD == null || !isFinite(revenue)) return { ok: false, error: 'REVENUE_REQUIRED' };
+      if (f.costUSD == null || !isFinite(cost)) return { ok: false, error: 'COST_REQUIRED' };
+      if (revenue <= 0) return { ok: false, error: 'REVENUE_MUST_BE_POSITIVE' };
+
+      const completed = await this.record(leadId, 'JOB_COMPLETED', { valueUSD: revenue, sourceRef: f.sourceRef });
+      if (!completed.ok) return completed;
+      const events = [completed.event];
+
+      const marginPct = (revenue - cost) / revenue * 100;
+      const floor = Number(cfg().flag ? cfg().flag('adsHighMarginPctFloor', 55) : 55);
+      let highMargin = false;
+      if (marginPct >= floor) {
+        highMargin = true;
+        // Margin value only — the raw cost breakdown is never persisted.
+        const hm = await this.record(leadId, 'HIGH_MARGIN_JOB', { valueUSD: Math.round(revenue - cost), sourceRef: f.sourceRef });
+        if (!hm.ok) return hm;
+        events.push(hm.event);
+      }
+      return { ok: true, events: events, marginPct: marginPct, highMargin: highMargin };
     },
 
     async listForLead(leadId) {

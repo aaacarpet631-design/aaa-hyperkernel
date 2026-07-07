@@ -725,9 +725,9 @@
     "semantic_hash": "52fea6cfba1320c0e5eca4e0745cb079"
   },
   "js/quotes/quote-store.js": {
-    "mtime": 1783050778.1135724,
-    "ast_hash": "9ede89f807944e05556a1a2be603df2d",
-    "semantic_hash": "9ede89f807944e05556a1a2be603df2d"
+    "mtime": 1783398967.3125882,
+    "ast_hash": "91c6ffaac61188977827397212144278",
+    "semantic_hash": ""
   },
   "js/scheduling/schedule-store.js": {
     "mtime": 1783050778.1181278,
@@ -1675,9 +1675,9 @@
     "semantic_hash": "c5691ce0f5774c5b3f4cb8cb62bfa9aa"
   },
   "test/unit/quote-store.test.js": {
-    "mtime": 1783050778.1781278,
-    "ast_hash": "45ac66444b8fde56cb2bb0363d961df8",
-    "semantic_hash": "45ac66444b8fde56cb2bb0363d961df8"
+    "mtime": 1783399080.8605855,
+    "ast_hash": "65c7381c0831cb7ba4c8d25d0ad46c57",
+    "semantic_hash": ""
   },
   "test/unit/quote-win-probability-ui.test.js": {
     "mtime": 1783050778.1781278,
@@ -3660,18 +3660,18 @@
     "semantic_hash": ""
   },
   "js/revenue/ads-conversion-ledger.js": {
-    "mtime": 1783323165.1946554,
-    "ast_hash": "bab751011e3d82a84d93991a9cbdcb6e",
+    "mtime": 1783399039.5125866,
+    "ast_hash": "7d5bbc0deaf6683f49b30e55d542f3f1",
     "semantic_hash": ""
   },
   "js/revenue/ads-governance.js": {
-    "mtime": 1783322921.1426468,
-    "ast_hash": "b9860cffcecfce4140aaa81fded9a2fa",
+    "mtime": 1783399023.024587,
+    "ast_hash": "8c1f923fe0c0957f5eeadbd8c50dc6e0",
     "semantic_hash": ""
   },
   "js/revenue/ads-reporting.js": {
-    "mtime": 1783323166.6186554,
-    "ast_hash": "0b7c8e55b3df096d3613e6f6e0011c55",
+    "mtime": 1783399014.124587,
+    "ast_hash": "ceaf3c7ed97cec2619509b09a0793f79",
     "semantic_hash": ""
   },
   "schemas/google-ads-attribution.json": {
@@ -3712,6 +3712,16 @@
   "docs/UI_POLISH_PR_NOTES.md": {
     "mtime": 1783322274.8386235,
     "ast_hash": "695d3e8797c662b188c68c1c8f4db674",
+    "semantic_hash": ""
+  },
+  "test/unit/ads-outcomes-link.test.js": {
+    "mtime": 1783399072.3005857,
+    "ast_hash": "e752dfa0584213af4845d1c3c24886bf",
+    "semantic_hash": ""
+  },
+  "test/unit/ads-margin-join.test.js": {
+    "mtime": 1783399111.104585,
+    "ast_hash": "aabbba615a772b700fda1cea81bb72f4",
     "semantic_hash": ""
   }
 }
