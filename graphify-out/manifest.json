@@ -170,9 +170,9 @@
     "semantic_hash": "03624a49fc5c1419ea95fe962c106095"
   },
   "js/agents/estimator-agent.js": {
-    "mtime": 1783050778.0501845,
-    "ast_hash": "666190cf3b7365dd28d91561773e9525",
-    "semantic_hash": "666190cf3b7365dd28d91561773e9525"
+    "mtime": 1783399295.3045807,
+    "ast_hash": "76dc517266e96018d81306328318642e",
+    "semantic_hash": ""
   },
   "js/agents/hermes-gateway.js": {
     "mtime": 1783050778.0501845,
@@ -1180,8 +1180,8 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "test/run.js": {
-    "mtime": 1783323036.3666508,
-    "ast_hash": "02e990f6c62998cbcee7b26c9d0fcfb2",
+    "mtime": 1783399233.680582,
+    "ast_hash": "6fe9ffb1cd339c54ba0f54ef814e866f",
     "semantic_hash": ""
   },
   "test/smoke/boot.test.js": {
@@ -3665,8 +3665,8 @@
     "semantic_hash": ""
   },
   "js/revenue/ads-governance.js": {
-    "mtime": 1783399023.024587,
-    "ast_hash": "8c1f923fe0c0957f5eeadbd8c50dc6e0",
+    "mtime": 1783399563.6605744,
+    "ast_hash": "653eae0298bffef7def3a5cf01b8cbe5",
     "semantic_hash": ""
   },
   "js/revenue/ads-reporting.js": {
@@ -3722,6 +3722,36 @@
   "test/unit/ads-margin-join.test.js": {
     "mtime": 1783399111.104585,
     "ast_hash": "aabbba615a772b700fda1cea81bb72f4",
+    "semantic_hash": ""
+  },
+  "js/ads/google-ads-datamanager-client.js": {
+    "mtime": 1783399348.4405794,
+    "ast_hash": "d924be7b4f68a3e6579cc765ff507cd2",
+    "semantic_hash": ""
+  },
+  "js/ads/google-ads-diagnostics.js": {
+    "mtime": 1783399363.7565792,
+    "ast_hash": "44caaa3db8485683087e6fecd5056b7d",
+    "semantic_hash": ""
+  },
+  "js/ads/google-ads-mock-client.js": {
+    "mtime": 1783399374.700579,
+    "ast_hash": "6a6487e62d4461f8bcb6dd7c7fd42552",
+    "semantic_hash": ""
+  },
+  "test/unit/ads-datamanager-client.test.js": {
+    "mtime": 1783399435.1125774,
+    "ast_hash": "48a83b13997e8acb1d7c21d6dba40c60",
+    "semantic_hash": ""
+  },
+  "test/unit/ads-diagnostics.test.js": {
+    "mtime": 1783399478.5085764,
+    "ast_hash": "702bfbb08248f87a63f78ec071326cc8",
+    "semantic_hash": ""
+  },
+  "test/unit/ads-provenance-link.test.js": {
+    "mtime": 1783399591.7805738,
+    "ast_hash": "9da8aa80f6cc7324b5fd92b06da68edd",
     "semantic_hash": ""
   }
 }

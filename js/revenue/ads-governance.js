@@ -20,6 +20,12 @@
  * Analysis-tier outputs (ANALYSIS, NEGATIVE_KEYWORD_PATCH, TRACKING_ALERT…)
  * still get an envelope + audit record; they may auto-approve when the gate
  * and escalation policy allow, matching the plan's "guarded apply" tier.
+ *
+ * Every recommendation is also traced into the AAA_PROVENANCE ledger (why does
+ * this recommendation exist? — evidence ids, envelope id, agent, confidence),
+ * linked via provenanceId on the record. Advisory only: a missing or failing
+ * provenance store never blocks governance (provenanceId is then null). Ids
+ * and aggregates only — never customer PII, never raw payload dumps.
  */
 ;(function (global) {
   'use strict';
@@ -50,6 +56,7 @@
   function envelopes() { return global.AAA_DECISION_ENVELOPE; }
   function gateway() { return global.AAA_RUNTIME_GATEWAY; }
   function outcomes() { return global.AAA_AGENT_OUTCOMES; }
+  function provenance() { return global.AAA_PROVENANCE; }
   function ws() { return cfg().workspaceId || 'default'; }
   function nowISO() { return clock() && clock().nowISO ? clock().nowISO() : new Date().toISOString(); }
   function mine(r) { return r && (r.workspaceId == null || r.workspaceId === ws()); }
@@ -116,6 +123,7 @@
         envelopeId: sealed.envelope.id,
         status: sealed.envelope.approval.status === 'auto_approved' ? 'auto_approved' : 'awaiting_approval',
         outcomeDecisionId: null,
+        provenanceId: null,
         createdAt: nowISO(), decidedAt: null, clearedAt: null
       };
       // Measurability: register the decision in the Agent Outcome Registry so
@@ -134,6 +142,37 @@
           });
           if (d && d.ok && d.decision) rec.outcomeDecisionId = d.decision.decisionId;
         } catch (_) { /* advisory — never blocks */ }
+      }
+      // Explainability: append an immutable "why does this exist" trace to the
+      // provenance ledger — evidence ids, envelope id, agent, type, confidence.
+      // Advisory only — a missing or failing provenance store never blocks
+      // governance; the record then honestly carries provenanceId: null.
+      // Ids and aggregates only: no customer PII, no raw payload dumps.
+      const prov = provenance();
+      if (prov && prov.record) {
+        try {
+          const cited = (Array.isArray(i.evidence) ? i.evidence : []).slice(0, 50).map(function (e, idx) {
+            if (e && typeof e === 'object') {
+              return {
+                kind: str(e.kind, 40) || 'evidence',
+                label: str(e.label != null ? e.label : (e.ref != null ? e.ref : e.id), 160) || ('evidence[' + idx + ']'),
+                detail: str(e.detail, 300)
+              };
+            }
+            return { kind: 'evidence', label: str(e, 160) || ('evidence[' + idx + ']'), detail: null };
+          });
+          cited.push({ kind: 'envelope', label: 'decision_envelope', detail: sealed.envelope.id });
+          const tr = await prov.record({
+            subjectType: 'ads_recommendation', subjectId: rec.id, subjectLabel: rec.summary,
+            agent: rec.agent,
+            summary: { decision: i.type, confidence: i.confidence != null ? i.confidence : null, recommendation: rec.summary },
+            envelopeId: sealed.envelope.id,
+            evidence: cited,
+            modelVersion: null, promptVersion: null, calibrationVersion: null,
+            sourceQuotes: [], predictionIds: [], closureIds: []
+          });
+          if (tr && tr.id) rec.provenanceId = tr.id;
+        } catch (_) { rec.provenanceId = null; /* advisory — never blocks */ }
       }
       await data().put(COLLECTION, rec.id, rec);
       return { ok: true, recommendation: rec, envelope: sealed.envelope };

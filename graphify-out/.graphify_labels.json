@@ -560,6 +560,8 @@
   "558": "Community 558",
   "559": "transport-native.test.js",
   "560": "Community 560",
+  "561": "governance-learning.test.js",
+  "562": "review-governance.test.js",
   "563": "Community 563",
   "564": "Community 564",
   "565": "Community 565",
@@ -650,5 +652,10 @@
   "650": "Fail-Closed Review-Safety Verdict Mapping",
   "651": "NVIDIA Nemotron Provider (hosted, OpenAI-compatible)",
   "652": "Receipt Intelligence Pipeline (capture, OCR, classify, human review, post)",
-  "653": "Supabase Backend Setup (shared memory + AI proxy)"
+  "653": "Supabase Backend Setup (shared memory + AI proxy)",
+  "654": "capture-sequencer.js",
+  "655": "assisted-draft-queue.test.js",
+  "656": "governance-notifier.test.js",
+  "657": "mission-manager.test.js",
+  "658": "planning-desk.test.js"
 }
