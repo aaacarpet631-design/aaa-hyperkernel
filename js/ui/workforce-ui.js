@@ -53,7 +53,7 @@
           purpose: a.purpose, enabled: a.enabled, status: a.status, health: a.health,
           cadence: a.cadence, riskCeiling: a.riskCeiling,
           lastRunAt: a.lastRunAt, nextRunAt: a.nextRunAt,
-          failures: a.failures || 0, runs: a.runs || 0, costUsd: a.costUsd || 0,
+          failures: a.failures || 0, runs: a.runs || 0, costUsd: a.costUsd || 0, budgetUsd: a.budgetUsd != null ? a.budgetUsd : null,
           lastJob: last ? { id: last.id, status: last.status, missionId: last.missionId, error: last.error, trigger: last.trigger } : null,
           awaiting: awaiting,
           log: LOG_AGENT === a.id ? jobs.slice(0, 8).map(function (j) { return { id: j.id, status: j.status, trigger: j.trigger, error: j.error, at: j.createdAt }; }) : null
@@ -110,7 +110,7 @@
       }).join('');
       return '<div class="wf-row" data-agent="' + esc(a.id) + '">' +
         '<div class="wf-head"><strong>' + esc(a.name) + '</strong> · ' + esc(a.department) + ' · ' + (a.enabled ? 'enabled' : 'paused') + ' · ' + esc(a.status) + ' · health ' + esc(a.health) + '</div>' +
-        '<div class="wf-meta">cadence ' + esc(a.cadence) + ' · risk ≤ ' + esc(a.riskCeiling) + ' · runs ' + esc(a.runs) + ' · failures ' + esc(a.failures) + ' · cost $' + esc(a.costUsd) + '</div>' +
+        '<div class="wf-meta">cadence ' + esc(a.cadence) + ' · risk ≤ ' + esc(a.riskCeiling) + ' · runs ' + esc(a.runs) + ' · failures ' + esc(a.failures) + ' · cost $' + esc(a.costUsd) + (a.budgetUsd != null ? ' of $' + esc(a.budgetUsd) + ' cap' : '') + '</div>' +
         '<div class="wf-meta">last ' + esc(fmtTime(a.lastRunAt)) + ' · next ' + esc(fmtTime(a.nextRunAt)) + ' · last job: ' + lastJob + '</div>' +
         '<div class="wf-actions">' + controls + logBtn + approvalsBtn + '</div>' +
         (a.log ? '<div class="wf-log">' + (log || '<div class="wf-log-row">no jobs</div>') + '</div>' : '') +

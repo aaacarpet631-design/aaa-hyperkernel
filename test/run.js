@@ -28,6 +28,8 @@ const SUITES = [
   'unit/workforce-queue.test.js',
   'unit/workforce-scheduler.test.js',
   'unit/workforce-ui.test.js',
+  'unit/workforce-lease.test.js',
+  'unit/workforce-runner.test.js',
   'unit/hermes-gateway.test.js',
   'unit/eval-golden.test.js',
   'unit/outcome-spine.test.js',

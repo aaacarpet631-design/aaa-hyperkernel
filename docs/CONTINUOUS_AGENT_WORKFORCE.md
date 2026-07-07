@@ -106,3 +106,38 @@ hash-chained audit ledger; job records carry the audit entry ids
 (`auditRefs`). Missions add their own trail (start, phases, gates, reroutes,
 envelopes, reviews). "What did the workforce do overnight" is a ledger
 query, not a reconstruction.
+
+## Slice 2 — the continuous runtime (leases, budgets, dead-letter, server runner)
+
+**Runner topology.** `netlify/functions/workforce-tick.mjs` is a Netlify
+scheduled function (every 15 minutes) that loads the exact same module stack
+the app and tests run and calls `AAA_WORKFORCE_RUNNER.runTick()` against a
+dedicated Netlify Blobs store (`hyperkernel-workforce`, one JSON blob per
+workspace+collection). GET observes state without executing. Env gates:
+`CONTINUOUS_AGENTS_ENABLED` must be exactly `'true'` (in addition to the
+in-store kill switch — schedule ≠ permission), `WORKFORCE_WORKSPACE_ID`,
+`MODEL_PROXY_URL` (absent → missions fail honestly with `AI_NOT_CONFIGURED`).
+No secrets in the repo; the proxy URL and keys live in function env config.
+
+**Exactly-one execution in an at-least-once world**, three persisted layers:
+1. **Tick lease** (`workforce.tick`) — overlapping runners (cron retry,
+   redeploy overlap, a human tick during a cron) resolve to ONE executing
+   tick; the loser is told `TICK_LEASE_HELD` and who holds it. Expired
+   leases are taken over and every takeover is audited — a dead runner is
+   visible, not silent.
+2. **Agent lease** (`agent:<id>`) — one execution per agent at a time.
+3. **Tick token** (`sched@<nextRunAt>`, `event:<type>@<id>`) — the queue is
+   idempotent per due-mark: a redelivered tick finds `DUPLICATE_TICK` and
+   creates no second job, no second spend, no second audit trail.
+
+**Resource governance.** Per-agent `budgetUsd` ceilings block jobs
+(`BUDGET_EXCEEDED`) BEFORE any model call — blocked, not failed, because
+raising a budget is a human decision that can requeue the work.
+`workforceMaxConcurrent` (default 2) caps agents per tick; the overflow
+stays due and is named in the tick result (`deferred`), never dropped.
+
+**Dead-letter policy.** After `workforceQuarantineAfter` (default 3)
+consecutive failures, the agent is QUARANTINED — disabled, status
+`quarantined`, audited with the reason — and its latest job parks in the
+`dead_letter` state. Revival is explicit and human: re-enable the agent,
+requeue the job. Nothing revives itself.

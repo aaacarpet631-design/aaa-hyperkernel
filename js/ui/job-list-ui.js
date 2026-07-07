@@ -264,7 +264,14 @@
         root.appendChild(this._header('<span class="aaa-title-mark">AAA</span> Business', null));
         const main = UI().el('main', { className: 'aaa-main' });
         root.appendChild(main);
-        if (global.AAA_BUSINESS && global.AAA_BUSINESS.render) await global.AAA_BUSINESS.render(main);
+        // Executive Mode's way BACK to the field. Without this, executive nav
+        // (focus/jobs/chat/business) has no 'more' tab and therefore no mode
+        // switch — a one-way door that locks measurement away from the owner.
+        // The Business renderer clears its container, so it gets its own host.
+        if (global.AAA_APP_MODE) main.appendChild(UI().button({ label: 'Switch to Field Mode (Measure)', icon: '📐', variant: 'secondary', full: true, onClick: () => { global.AAA_APP_MODE.set('field'); this._landed = false; this.tab = 'measure'; this.render(); } }));
+        const bizHost = UI().el('div', { className: 'aaa-business-host' });
+        main.appendChild(bizHost);
+        if (global.AAA_BUSINESS && global.AAA_BUSINESS.render) await global.AAA_BUSINESS.render(bizHost);
         return;
       }
       // jobs tab

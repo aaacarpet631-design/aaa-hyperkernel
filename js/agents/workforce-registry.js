@@ -87,9 +87,10 @@
         riskCeiling: def.riskCeiling,
         approvalPolicy: def.approvalPolicy === 'always' ? 'always' : 'risk_gated',
         taskKind: def.taskKind || null,
+        budgetUsd: isFinite(+def.budgetUsd) && +def.budgetUsd > 0 ? +def.budgetUsd : null,
         lastRunAt: null, nextRunAt: nowISO(),
         status: def.enabled === true ? 'idle' : 'paused',
-        health: 'ok', costUsd: 0, failures: 0, runs: 0,
+        health: 'ok', costUsd: 0, failures: 0, consecutiveFailures: 0, runs: 0,
         createdAt: nowISO()
       };
       await data().put(COLLECTION, rec.id, rec);
@@ -122,11 +123,28 @@
       rec.costUsd = Math.round(((rec.costUsd || 0) + (+r.costUsd || 0)) * 10000) / 10000;
       if (r.ok === false) {
         rec.failures = (rec.failures || 0) + 1;
+        rec.consecutiveFailures = (rec.consecutiveFailures || 0) + 1;
         rec.health = rec.failures >= 3 ? 'failing' : 'degraded';
-      } else if (rec.health !== 'ok' && r.ok === true) {
-        rec.health = 'ok'; // a clean run restores health (failures counter stays for history)
+      } else if (r.ok === true) {
+        rec.consecutiveFailures = 0;
+        if (rec.health !== 'ok') rec.health = 'ok'; // a clean run restores health (failures counter stays for history)
       }
       await data().put(COLLECTION, rec.id, rec);
+      return { ok: true, agent: rec };
+    },
+
+    /**
+     * Quarantine: pull a repeatedly-failing agent OFF DUTY. Disabled +
+     * status 'quarantined' + audited with the reason. Revival is a human
+     * decision (setEnabled true), never automatic.
+     */
+    quarantine: async function (agentId, reason) {
+      const rec = await this.get(agentId);
+      if (!rec) return { ok: false, error: 'NOT_FOUND' };
+      rec.enabled = false;
+      rec.status = 'quarantined';
+      await data().put(COLLECTION, rec.id, rec);
+      await audit('workforce.agent.quarantined', { agentId: rec.id, reason: reason || null, consecutiveFailures: rec.consecutiveFailures || 0 });
       return { ok: true, agent: rec };
     },
 

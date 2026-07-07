@@ -6,7 +6,7 @@
  * app fully usable offline. Old caches are purged on activate, and the worker
  * takes control immediately to avoid serving a stale shell after an update.
  */
-const CACHE_NAME = 'hyperkernel-v102';
+const CACHE_NAME = 'hyperkernel-v104';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -96,6 +96,8 @@ const PRECACHE = [
   '/js/agents/workforce-registry.js',
   '/js/agents/workforce-queue.js',
   '/js/agents/workforce-scheduler.js',
+  '/js/agents/workforce-lease.js',
+  '/js/agents/workforce-runner.js',
   '/js/agents/prompt-architect.js',
   '/js/agents/self-improvement.js',
   '/js/agents/agent-marketplace.js',
@@ -362,8 +364,13 @@ const PRECACHE = [
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
+  // Cache each URL individually: addAll() is all-or-nothing, so one bad path
+  // during a deploy skew would silently leave the WHOLE cache empty and break
+  // the app offline — exactly where a field tech needs it.
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE)).catch(() => {})
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.allSettled(PRECACHE.map((url) => cache.add(url)))
+    ).catch(() => {})
   );
 });
 
@@ -389,7 +396,14 @@ self.addEventListener('fetch', (event) => {
         return response;
       })
       .catch(() =>
-        caches.match(req).then((cached) => cached || caches.match('/index.html'))
+        caches.match(req).then((cached) => {
+          if (cached) return cached;
+          // The index.html fallback is for NAVIGATIONS only. Serving HTML to a
+          // script/style request executes HTML as JS offline — it kills the
+          // module (measurement, field mode, …) instead of failing loudly.
+          if (req.mode === 'navigate' || req.destination === 'document') return caches.match('/index.html');
+          return Response.error();
+        })
       )
   );
 });

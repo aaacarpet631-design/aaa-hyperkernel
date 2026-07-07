@@ -810,7 +810,7 @@
     "semantic_hash": "2831df82f2729f9ea6d2e0bcb2782640"
   },
   "js/ui/command-center-ui.js": {
-    "mtime": 1783211715.786549,
+    "mtime": 1783273547.2359984,
     "ast_hash": "ab38be022304d67e9cc843c3b233063f",
     "semantic_hash": ""
   },
@@ -880,8 +880,8 @@
     "semantic_hash": "23819498c1e3b3a09630f35e879aa960"
   },
   "js/ui/job-list-ui.js": {
-    "mtime": 1781408638.4733744,
-    "ast_hash": "7877a562ce017f3596fd70e6c43cc59d",
+    "mtime": 1783298620.3020773,
+    "ast_hash": "2ef0dcf17909d283be773fc5581aa58c",
     "semantic_hash": ""
   },
   "js/ui/knowledge-os-ui.js": {
@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1783211738.988214,
-    "ast_hash": "0487bd1e72396f7b327b64d1167d0919",
+    "mtime": 1783298543.366073,
+    "ast_hash": "51d3e13ef15b30723e412a24f229fe37",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
@@ -1180,8 +1180,8 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "test/run.js": {
-    "mtime": 1783211738.9887068,
-    "ast_hash": "c97aa7362be02370e3d46d5414c383c7",
+    "mtime": 1783273983.6012602,
+    "ast_hash": "6d243f6afeaaaba6825e755d2d3d1ceb",
     "semantic_hash": ""
   },
   "test/smoke/boot.test.js": {
@@ -1820,8 +1820,8 @@
     "semantic_hash": "735abbe6080079f45584555abdf560bb"
   },
   ".github/workflows/ci.yml": {
-    "mtime": 1783210973.5811038,
-    "ast_hash": "eacdf822b2e7f3728a22a10bc018ce03",
+    "mtime": 1783273547.2159984,
+    "ast_hash": "df92629cab4f3705161c7db4ad8334dc",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -1895,8 +1895,8 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "index.html": {
-    "mtime": 1783211738.988584,
-    "ast_hash": "08f26a4b034d51500b3b0c7b17cc858b",
+    "mtime": 1783273983.6010985,
+    "ast_hash": "9249f6a9514c13998c9243fb7ade442e",
     "semantic_hash": ""
   },
   "netlify/functions/RESEARCH.md": {
@@ -3595,12 +3595,12 @@
     "semantic_hash": ""
   },
   "js/ui/approval-inbox-ui.js": {
-    "mtime": 1783211192.434518,
+    "mtime": 1783273547.2359984,
     "ast_hash": "6f979d0160e1ac758a32ab03c9e24d98",
     "semantic_hash": ""
   },
   "test/unit/approval-inbox-ui.test.js": {
-    "mtime": 1783211302.2745245,
+    "mtime": 1783273547.2399986,
     "ast_hash": "e09c494b22115201e8173bd2bb92e01c",
     "semantic_hash": ""
   },
@@ -3615,48 +3615,73 @@
     "semantic_hash": ""
   },
   "js/agents/workforce-queue.js": {
-    "mtime": 1783211584.9985414,
-    "ast_hash": "41027df8f0b9ac18455439f71b4c9437",
+    "mtime": 1783273682.1400065,
+    "ast_hash": "2f5836a998dd0b5ff563f53de8733c42",
     "semantic_hash": ""
   },
   "js/agents/workforce-registry.js": {
-    "mtime": 1783211994.2590215,
-    "ast_hash": "2258bb3551cfd772de3b24bcf6671f79",
+    "mtime": 1783273698.0160074,
+    "ast_hash": "3d555b7af6ed6e0890cae9e80f0cdad5",
     "semantic_hash": ""
   },
   "js/agents/workforce-scheduler.js": {
-    "mtime": 1783211886.0505593,
-    "ast_hash": "b2456cd6aaa0366e2e48d25b79761f1d",
+    "mtime": 1783273755.379369,
+    "ast_hash": "11488ffa6e873e5f1922e60c53509cdd",
     "semantic_hash": ""
   },
   "js/ui/workforce-ui.js": {
-    "mtime": 1783211673.8265467,
-    "ast_hash": "ff64050ec626c7db02f13d8b68fe0212",
+    "mtime": 1783273853.0114317,
+    "ast_hash": "84a7ec813d63ea42a391e28e72300671",
     "semantic_hash": ""
   },
   "test/unit/workforce-queue.test.js": {
-    "mtime": 1783211788.3065534,
+    "mtime": 1783273547.2399986,
     "ast_hash": "8954fac55fcf8e55304f8bb65df13aee",
     "semantic_hash": ""
   },
   "test/unit/workforce-registry.test.js": {
-    "mtime": 1783211765.094552,
+    "mtime": 1783273547.2399986,
     "ast_hash": "27115665e8dd0e96c5302343a67585ea",
     "semantic_hash": ""
   },
   "test/unit/workforce-scheduler.test.js": {
-    "mtime": 1783211892.0585597,
+    "mtime": 1783273547.2399986,
     "ast_hash": "d99e9ea81200c569a4868a3a7dedc93f",
     "semantic_hash": ""
   },
   "test/unit/workforce-ui.test.js": {
-    "mtime": 1783211994.2592006,
+    "mtime": 1783273547.2399986,
     "ast_hash": "95c0c9a9d92fbf2ee10af71e0b121467",
     "semantic_hash": ""
   },
   "docs/CONTINUOUS_AGENT_WORKFORCE.md": {
-    "mtime": 1783211706.4465485,
-    "ast_hash": "655f3a8b94532d2179e068a585cc39aa",
+    "mtime": 1783273853.0108788,
+    "ast_hash": "2c36f1d1a12755f54e89ae5b3e31139d",
+    "semantic_hash": ""
+  },
+  "js/agents/workforce-lease.js": {
+    "mtime": 1783273658.072005,
+    "ast_hash": "ecb43333d6bfa8bf95c72a3b12953dfd",
+    "semantic_hash": ""
+  },
+  "js/agents/workforce-runner.js": {
+    "mtime": 1783273794.9240131,
+    "ast_hash": "9b9f061522a28aef6d3ec6792b5beb0c",
+    "semantic_hash": ""
+  },
+  "netlify/functions/workforce-tick.mjs": {
+    "mtime": 1783273828.9400153,
+    "ast_hash": "074b7f94779cbea57531f4189fdbd3b8",
+    "semantic_hash": ""
+  },
+  "test/unit/workforce-lease.test.js": {
+    "mtime": 1783273872.8800178,
+    "ast_hash": "5e0e48f95e94c895d109eaef5c274181",
+    "semantic_hash": ""
+  },
+  "test/unit/workforce-runner.test.js": {
+    "mtime": 1783274035.8124568,
+    "ast_hash": "bb9a3e75149d21ffe590ba0333a782bb",
     "semantic_hash": ""
   }
 }
