@@ -12,6 +12,7 @@ Use this checklist before marking Phase 1D complete.
 - [x] Approval policy helper added for risky/customer-visible actions.
 - [x] Outcome registry, action-outcome links, and scorecard builder added.
 - [x] Unit tests added for auth, denied scopes, approval rules, supervisor queue, and scorecards.
+- [x] Core enums use portable `str, Enum` pattern instead of Python 3.11-only `StrEnum`.
 - [ ] Durable DB-backed storage wired.
 - [ ] FastAPI route dependencies wired.
 - [ ] Dashboard cards wired.
