@@ -4,13 +4,17 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from enum import StrEnum
+from enum import Enum
 from uuid import uuid4
 
 from .agent_auth import AgentIdentity
 
 
-class ApprovalStatus(StrEnum):
+class _StringEnum(str, Enum):
+    """Portable string enum for Python 3.10+ compatibility."""
+
+
+class ApprovalStatus(_StringEnum):
     NOT_REQUIRED = "not_required"
     PENDING_APPROVAL = "pending_approval"
     APPROVED = "approved"
@@ -18,7 +22,7 @@ class ApprovalStatus(StrEnum):
     BLOCKED = "blocked"
 
 
-class QueuePriority(StrEnum):
+class QueuePriority(_StringEnum):
     LOW = "low"
     NORMAL = "normal"
     HIGH = "high"
