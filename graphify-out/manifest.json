@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1783399807.9098313,
-    "ast_hash": "a4662755984049e6d072a6af9586aece",
+    "mtime": 1783564081.2932537,
+    "ast_hash": "c7c173b04fdc3a57f9a67eb09eda54e9",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
@@ -1180,8 +1180,8 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "test/run.js": {
-    "mtime": 1783399798.5885692,
-    "ast_hash": "f9aa199137a6deb47bc1d7f4beb60183",
+    "mtime": 1783564069.9591005,
+    "ast_hash": "a26e96eae0906d91c5162ca7fa11ed4b",
     "semantic_hash": ""
   },
   "test/smoke/boot.test.js": {
@@ -1895,8 +1895,8 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "index.html": {
-    "mtime": 1783399796.464569,
-    "ast_hash": "8984faa419f35d7c7a274141a529a168",
+    "mtime": 1783564068.6591005,
+    "ast_hash": "60988c45af71e5375228f457267e319e",
     "semantic_hash": ""
   },
   "netlify/functions/RESEARCH.md": {
@@ -3200,14 +3200,14 @@
     "semantic_hash": ""
   },
   "js/ui/field-mode-home.js": {
-    "mtime": 1783050778.1301277,
-    "ast_hash": "120ffb2302fa21bf99fba2a5624e48dd",
+    "mtime": 1783564018.8350985,
+    "ast_hash": "40a531cf1f4f6f4fb154176e160fdc4a",
     "semantic_hash": ""
   },
   "test/unit/field-mode.test.js": {
-    "mtime": 1783050778.1661277,
-    "ast_hash": "fe232a166545ae3991d0010800afbed5",
-    "semantic_hash": "fe232a166545ae3991d0010800afbed5"
+    "mtime": 1783564031.227099,
+    "ast_hash": "3ba2fa8a4d59c187ccade054089d8902",
+    "semantic_hash": ""
   },
   "references/HYPERKERNEL_FIELD_MODE.md": {
     "mtime": 1783050778.1483135,
@@ -3762,6 +3762,16 @@
   "docs/ADS_EVENT_TAXONOMY.md": {
     "mtime": 1783399671.272572,
     "ast_hash": "979e543208e6ee681cf72a7a260facb4",
+    "semantic_hash": ""
+  },
+  "js/ui/manual-measure-ui.js": {
+    "mtime": 1783564096.4151015,
+    "ast_hash": "27d1ed1ae8b3ef57fa6495e71e482256",
+    "semantic_hash": ""
+  },
+  "test/unit/manual-measure-ui.test.js": {
+    "mtime": 1783564055.0711,
+    "ast_hash": "fef02f1cf47eb30142eb7a3e40f6cacf",
     "semantic_hash": ""
   }
 }

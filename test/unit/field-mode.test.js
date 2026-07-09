@@ -33,7 +33,7 @@ module.exports = async function run() {
   const m = await HOME.renderModel({ now: NOON });
   t.ok('greeting is time-aware and personal', /Good afternoon, Aaron/.test(m.greeting));
   t.eq('the primary action is START MEASUREMENT', m.primaryAction.label, 'START MEASUREMENT');
-  t.ok('four quick actions are offered', m.quickActions.length === 4 && m.quickActions.map((q) => q.id).indexOf('scan_room') !== -1 && m.quickActions.map((q) => q.id).indexOf('voice_note') !== -1);
+  t.ok('five quick actions are offered', m.quickActions.length === 5 && m.quickActions.map((q) => q.id).indexOf('scan_room') !== -1 && m.quickActions.map((q) => q.id).indexOf('manual_measure') !== -1 && m.quickActions.map((q) => q.id).indexOf('voice_note') !== -1);
   t.ok('quick actions are honestly unavailable when no engine is loaded', m.quickActions.every((q) => q.available === false));
   t.ok("today's jobs show active work only (closed excluded)", m.todaysJobs.length === 2 && m.todaysJobs.every((j) => j.id !== 'j3'));
   t.ok('ask-HyperKernel prompt is present', /focus/i.test(m.ask.placeholder));
@@ -43,6 +43,13 @@ module.exports = async function run() {
   const m2 = await HOME.renderModel({ now: NOON });
   t.ok('voice note becomes available once the voice HUD is loaded', m2.quickActions.find((q) => q.id === 'voice_note').available === true);
   delete G.AAA_VOICE_HUD_UI;
+
+  // manual entry lights up the quick action AND the primary START MEASUREMENT
+  G.AAA_MANUAL_MEASURE_UI = { open: function () {} };
+  const m3 = await HOME.renderModel({ now: NOON });
+  t.ok('manual entry becomes available once its UI is loaded', m3.quickActions.find((q) => q.id === 'manual_measure').available === true);
+  t.ok('START MEASUREMENT is available via manual entry alone (no laser needed)', m3.primaryAction.available === true);
+  delete G.AAA_MANUAL_MEASURE_UI;
 
   // ===== start routing (honest: no DOM / no engine → not routed, no throw) =====
   const started = await HOME.start({});
