@@ -9,7 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from hashlib import sha256
 from hmac import compare_digest
-from typing import Iterable, Mapping
+from typing import Iterable, Mapping, Optional
 
 
 class AgentAuthError(Exception):
@@ -73,7 +73,7 @@ class AgentCredentialStore:
     or replace the class with a DB-backed implementation using the same methods.
     """
 
-    def __init__(self, credentials: Iterable[AgentCredential] | None = None) -> None:
+    def __init__(self, credentials: Optional[Iterable[AgentCredential]] = None) -> None:
         self._by_hash: dict[str, AgentIdentity] = {}
         for credential in credentials or []:
             self._by_hash[credential.key_hash] = credential.identity
