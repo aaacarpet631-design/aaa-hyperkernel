@@ -672,5 +672,9 @@
   "670": "workforce-ui.test.js",
   "671": "utmMedium",
   "672": "assisted-draft-queue.test.js",
-  "673": "company-brain.test.js"
+  "673": "company-brain.test.js",
+  "674": "review-safety.test.js",
+  "675": "workforce-ui.test.js",
+  "676": "opportunity-scorer.test.js",
+  "677": "sensing.test.js"
 }

@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1783566928.3045573,
-    "ast_hash": "ceb3ddc1bc3b164c52083402ccf1fa07",
+    "mtime": 1783610813.3325539,
+    "ast_hash": "39ef4841d3d7782e40235932d3e6c069",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
@@ -1180,8 +1180,8 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "test/run.js": {
-    "mtime": 1783566908.979303,
-    "ast_hash": "6d527c6407eada7d26ebcf2a060a700b",
+    "mtime": 1783610796.791726,
+    "ast_hash": "c938f2657a5f490acf985a97eb7822fb",
     "semantic_hash": ""
   },
   "test/smoke/boot.test.js": {
@@ -1895,8 +1895,8 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "index.html": {
-    "mtime": 1783566907.7033029,
-    "ast_hash": "76ca98aa9ab0491d823c762ac13ded51",
+    "mtime": 1783610795.3357263,
+    "ast_hash": "7c356f86dc6261acf7cb0def4e5df823",
     "semantic_hash": ""
   },
   "netlify/functions/RESEARCH.md": {
@@ -3855,8 +3855,18 @@
     "semantic_hash": ""
   },
   "docs/HYPERKERNEL_CHAT_MISSION.md": {
-    "mtime": 1783566917.2353032,
-    "ast_hash": "cbb63679f5eadc2b63748b770f237539",
+    "mtime": 1783610799.7917264,
+    "ast_hash": "d645665ae82964d07406cb7caacb03ab",
+    "semantic_hash": ""
+  },
+  "js/copilot/context-packet.js": {
+    "mtime": 1783610732.9197242,
+    "ast_hash": "4d7306c01db8c3091a419ca53f80b5d8",
+    "semantic_hash": ""
+  },
+  "test/unit/copilot-context-packet.test.js": {
+    "mtime": 1783610772.4077253,
+    "ast_hash": "c6ea8bf2e9eda88298c4b6ba022be6a0",
     "semantic_hash": ""
   }
 }

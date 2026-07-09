@@ -90,6 +90,7 @@ const SUITES = [
   'unit/epistemology.test.js',
   'unit/goal-capability-bridge.test.js',
   'unit/copilot-contract.test.js',
+  'unit/copilot-context-packet.test.js',
   'unit/copilot.test.js',
   'unit/sms-copilot.test.js',
   'unit/chat-canvas.test.js',
