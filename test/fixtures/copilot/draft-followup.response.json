@@ -52,5 +52,10 @@
         "draftRef": "assisted_drafts:pending"
       }
     }
+  },
+  "conversationId": "thread_fx_1",
+  "usage": {
+    "latencyMs": 180,
+    "model": "copilot-deterministic-v1"
   }
 }

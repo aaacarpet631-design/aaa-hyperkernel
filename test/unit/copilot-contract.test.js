@@ -25,8 +25,12 @@ module.exports = async function run() {
 
   // ===== the 10 golden fixtures validate + ground =====
   const dir = srcPath('test/fixtures/copilot');
-  const files = fs.readdirSync(dir).filter((f) => f.endsWith('.json')).sort();
-  t.eq('exactly 10 fixtures exist (request+response per job)', files.length, 10);
+  const files = fs.readdirSync(dir).filter((f) => /\.(request|response)\.json$/.test(f)).sort();
+  t.eq('exactly 10 golden fixtures exist (request+response per job)', files.length, 10);
+  const manifest = JSON.parse(fs.readFileSync(path.join(dir, 'MANIFEST.json'), 'utf8'));
+  const sha = (f) => require('crypto').createHash('sha256').update(fs.readFileSync(path.join(dir, f))).digest('hex');
+  t.ok('every golden fixture matches its MANIFEST sha256 (cross-repo parity anchor)',
+    files.every((f) => manifest[f] === sha(f)));
   let allValid = true, allGrounded = true;
   const byName = {};
   files.forEach((f) => {
@@ -81,6 +85,37 @@ module.exports = async function run() {
   t.ok('template placeholders do not count as business numbers', C.groundednessIssues(placeholders).length === 0);
   const cocky = Object.assign({}, bare, { answer: 'All good.', confidence: 95 });
   t.ok('high confidence with no cards and no evidence is flagged', C.groundednessIssues(cocky).some((i) => /CONFIDENCE_WITHOUT_EVIDENCE/.test(i)));
+
+  // ===== v1 additive machinery: thread, usage, error envelope, formats =====
+  const dReq = byName['draft-followup.request.json'];
+  const dRes = byName['draft-followup.response.json'];
+  t.ok('the draft fixture pair exercises conversation threading',
+    dReq.thread.conversationId === 'thread_fx_1' && dRes.conversationId === 'thread_fx_1');
+  t.ok('optional usage accounting validates', dRes.usage.latencyMs === 180 && C.validateResponse(dRes).ok);
+  const errOk = C.validateError({ contractVersion: '1.0', requestId: 'r1', error: { code: 'workspace_mismatch', message: 'packet workspace differs' } });
+  t.ok('the error envelope validates the agreed unhappy path', errOk.ok === true);
+  t.ok('an off-enum error code is rejected', C.validateError({ contractVersion: '1.0', error: { code: 'oops', message: 'x' } }).ok === false);
+  m = C.validateRequest(mutate(goodReq, (r) => { r.contextPacket.assembledAt = 'yesterday at noon'; }));
+  t.ok('non-ISO timestamps are rejected by pattern', !m.ok && m.issues.some((i) => /format/.test(i)));
+  m = C.validateRequest(mutate(goodReq, (r) => { r.message = 'x'.repeat(4001); }));
+  t.ok('oversized messages are rejected (maxLength 4000)', !m.ok && m.issues.some((i) => /maxLength/.test(i)));
+  m = C.validateRequest(mutate(goodReq, (r) => { r.contextPacket.sections[0].items = Array.from({ length: 51 }, (_, k) => r.contextPacket.sections[0].items[0] || { sourceRef: { collection: 'x', id: 'i' + k }, data: {} }); }));
+  t.ok('oversized sections are rejected (maxItems 50)', !m.ok && m.issues.some((i) => /maxItems/.test(i)));
+  const schemaDoc = C.schema();
+  t.ok('published card union is standard oneOf (usable by any 2020-12 validator)',
+    Array.isArray(schemaDoc.$defs.responseEnvelope.properties.cards.items.oneOf) &&
+    schemaDoc.$defs.responseEnvelope.properties.cards.items.oneOf.length === 6);
+
+  // ===== evidence referential integrity =====
+  t.ok('golden pairs pass evidence integrity', C.evidenceIntegrityIssues(goodReq, goodRes).length === 0);
+  const fabricated = mutate(goodRes, (r) => { r.evidence.push({ claim: 'made up', sourceRefs: [{ collection: 'quotes', id: 'quote_999' }] }); });
+  t.ok('a schema-valid response citing a record the packet never carried is flagged',
+    C.validateResponse(fabricated).ok === true &&
+    C.evidenceIntegrityIssues(goodReq, fabricated).some((i) => /EVIDENCE_NOT_IN_PACKET.*quotes:quote_999/.test(i)));
+  const skewed = mutate(goodRes, (r) => { r.evidence[0].sourceRefs[0].asOf = '2020-01-01T00:00:00.000Z'; });
+  t.ok('an asOf that disagrees with the packet is flagged',
+    C.evidenceIntegrityIssues(goodReq, skewed).some((i) => /ASOF_MISMATCH/.test(i)));
+  t.ok('evidence integrity never throws on garbage', Array.isArray(C.evidenceIntegrityIssues(null, null)));
 
   // ===== null tolerance =====
   t.ok('null request is handled honestly', C.validateRequest(null).ok === false);

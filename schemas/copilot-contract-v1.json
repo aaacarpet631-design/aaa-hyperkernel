@@ -21,7 +21,8 @@
           "type": "string"
         },
         "asOf": {
-          "type": "string"
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?Z$"
         }
       },
       "additionalProperties": false
@@ -57,6 +58,22 @@
         "maxCostUSDPerConversation": {
           "type": "number",
           "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "thread": {
+      "type": "object",
+      "required": [
+        "conversationId"
+      ],
+      "properties": {
+        "conversationId": {
+          "type": "string"
+        },
+        "turn": {
+          "type": "number",
+          "minimum": 1
         }
       },
       "additionalProperties": false
@@ -101,7 +118,15 @@
           "type": "array",
           "items": {
             "$ref": "#/$defs/contextItem"
-          }
+          },
+          "maxItems": 50
+        },
+        "truncated": {
+          "type": "boolean"
+        },
+        "omittedCount": {
+          "type": "number",
+          "minimum": 0
         }
       },
       "additionalProperties": false
@@ -126,7 +151,8 @@
           "type": "string"
         },
         "assembledAt": {
-          "type": "string"
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?Z$"
         },
         "role": {
           "type": "string",
@@ -140,7 +166,8 @@
           "type": "array",
           "items": {
             "$ref": "#/$defs/contextSection"
-          }
+          },
+          "maxItems": 8
         },
         "redactions": {
           "type": "array",
@@ -189,13 +216,17 @@
           ]
         },
         "message": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 4000
         },
         "contextPacket": {
           "$ref": "#/$defs/contextPacket"
         },
         "budgets": {
           "$ref": "#/$defs/budgets"
+        },
+        "thread": {
+          "$ref": "#/$defs/thread"
         }
       },
       "additionalProperties": false
@@ -273,6 +304,64 @@
             "local",
             "none"
           ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "usage": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "costUSD": {
+          "type": "number",
+          "minimum": 0
+        },
+        "latencyMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "model": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "errorEnvelope": {
+      "type": "object",
+      "required": [
+        "contractVersion",
+        "error"
+      ],
+      "properties": {
+        "contractVersion": {
+          "type": "string"
+        },
+        "requestId": {
+          "type": "string"
+        },
+        "error": {
+          "type": "object",
+          "required": [
+            "code",
+            "message"
+          ],
+          "properties": {
+            "code": {
+              "type": "string",
+              "enum": [
+                "permission_denied",
+                "invalid_request",
+                "version_unsupported",
+                "workspace_mismatch",
+                "rate_limited",
+                "internal"
+              ]
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
@@ -566,12 +655,35 @@
         "requestId": {
           "type": "string"
         },
+        "conversationId": {
+          "type": "string"
+        },
         "answer": {
           "type": "string"
         },
         "cards": {
           "type": "array",
           "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/card_attention_list"
+              },
+              {
+                "$ref": "#/$defs/card_followup_list"
+              },
+              {
+                "$ref": "#/$defs/card_estimate_risk"
+              },
+              {
+                "$ref": "#/$defs/card_agent_activity"
+              },
+              {
+                "$ref": "#/$defs/card_draft_message"
+              },
+              {
+                "$ref": "#/$defs/card_text"
+              }
+            ],
             "discriminator": "cardType"
           }
         },
@@ -597,6 +709,9 @@
         },
         "degraded": {
           "$ref": "#/$defs/degraded"
+        },
+        "usage": {
+          "$ref": "#/$defs/usage"
         }
       },
       "additionalProperties": false

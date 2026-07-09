@@ -34,6 +34,9 @@
   // ---- schema (JSON-Schema-flavored; validated by the subset validator below)
   const STR = { type: 'string' };
   const BOOL = { type: 'boolean' };
+  // ISO-8601 UTC instants only — a locale-formatted or zoneless timestamp is
+  // drift, not data. Enforced by the subset validator's pattern support.
+  const DATETIME = { type: 'string', pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?Z$' };
   function arr(items, minItems) { const a = { type: 'array', items: items }; if (minItems != null) a.minItems = minItems; return a; }
   function obj(required, properties, open) {
     const o = { type: 'object', required: required, properties: properties };
@@ -44,10 +47,14 @@
 
   const DEFS = {
     sourceRef: obj(['collection', 'id'], {
-      collection: STR, id: STR, field: STR, asOf: STR
+      collection: STR, id: STR, field: STR, asOf: DATETIME
     }),
     identity: obj(['role'], { role: { type: 'string', enum: ROLES }, name: STR }),
     budgets: obj([], { p95LatencyMs: { type: 'number', minimum: 1 }, maxCostUSDPerConversation: { type: 'number', minimum: 0 } }),
+    // Conversation threading: correlates multi-turn asks ("who should I follow
+    // up with?" → "draft a follow-up") and makes the per-CONVERSATION cost
+    // budget accountable — without it requests are unlinkable.
+    thread: obj(['conversationId'], { conversationId: STR, turn: { type: 'number', minimum: 1 } }),
     contextItem: obj(['sourceRef', 'data'], {
       sourceRef: REF('sourceRef'),
       data: { type: 'object' },
@@ -55,14 +62,16 @@
     }),
     contextSection: obj(['kind', 'items'], {
       kind: { type: 'string', enum: SECTION_KINDS },
-      items: arr(REF('contextItem'))
+      items: { type: 'array', items: REF('contextItem'), maxItems: 50 },
+      truncated: BOOL, // the assembler capped this section — the gap is declared, not hidden
+      omittedCount: { type: 'number', minimum: 0 }
     }),
     contextPacket: obj(['packetVersion', 'workspaceId', 'assembledAt', 'role', 'sections'], {
       packetVersion: { type: 'number', enum: [1] },
       workspaceId: STR,
-      assembledAt: STR,
+      assembledAt: DATETIME,
       role: { type: 'string', enum: ROLES },
-      sections: arr(REF('contextSection')),
+      sections: { type: 'array', items: REF('contextSection'), maxItems: 8 },
       redactions: arr(STR)
     }),
     requestEnvelope: obj(['contractVersion', 'requestId', 'workspaceId', 'identity', 'job', 'message', 'contextPacket'], {
@@ -71,9 +80,10 @@
       workspaceId: STR,
       identity: REF('identity'),
       job: { type: 'string', enum: JOBS },
-      message: STR,
+      message: { type: 'string', maxLength: 4000 },
       contextPacket: REF('contextPacket'),
-      budgets: REF('budgets')
+      budgets: REF('budgets'),
+      thread: REF('thread')
     }),
     evidence: obj(['claim', 'sourceRefs'], { claim: STR, sourceRefs: arr(REF('sourceRef'), 1) }),
     approval: obj(['required'], {
@@ -82,6 +92,20 @@
       approvalPackage: obj(['actionType'], { actionType: STR, payload: { type: 'object' } }, true)
     }),
     degraded: obj(['reason'], { reason: { type: 'string', enum: DEGRADED_REASONS }, fallback: { type: 'string', enum: ['local', 'none'] } }),
+    // Optional cost/latency accounting — makes the budget release gates
+    // measurable per response without breaking any existing fixture.
+    usage: obj([], { costUSD: { type: 'number', minimum: 0 }, latencyMs: { type: 'number', minimum: 0 }, model: STR }),
+    // The agreed unhappy path: server-side refusals (403 perm denial, 422
+    // validation, workspace mismatch, future version skew) return THIS shape,
+    // so consumers can tell "your contract is stale" from "service down".
+    errorEnvelope: obj(['contractVersion', 'error'], {
+      contractVersion: STR,
+      requestId: STR,
+      error: obj(['code', 'message'], {
+        code: { type: 'string', enum: ['permission_denied', 'invalid_request', 'version_unsupported', 'workspace_mismatch', 'rate_limited', 'internal'] },
+        message: STR
+      })
+    }),
 
     // ---- cards: discriminated union on cardType; every fact cites a record.
     card_attention_list: obj(['cardType', 'items'], {
@@ -125,13 +149,21 @@
     responseEnvelope: obj(['contractVersion', 'requestId', 'answer', 'cards', 'evidence', 'confidence', 'unknowns', 'approval'], {
       contractVersion: { type: 'string', enum: [VERSION] },
       requestId: STR,
+      conversationId: STR, // echo of request.thread.conversationId when threaded
       answer: STR,
-      cards: arr({ discriminator: 'cardType' }),
+      // Standard-schema card union: oneOf makes the published JSON usable by
+      // any draft-2020-12 validator; the discriminator hint keeps our subset
+      // validator (and OpenAPI-style consumers) on the exact-card fast path.
+      cards: arr({
+        oneOf: CARD_TYPES.map(function (ct) { return REF('card_' + ct); }),
+        discriminator: 'cardType'
+      }),
       evidence: arr(REF('evidence')),
       confidence: { type: 'number', minimum: 0, maximum: 100 },
       unknowns: arr(STR),
       approval: REF('approval'),
-      degraded: REF('degraded')
+      degraded: REF('degraded'),
+      usage: REF('usage')
     })
   };
 
@@ -168,12 +200,17 @@
     }
     if (s.type && typeOf(value) !== s.type) { issues.push(path + ' must be ' + s.type); return; }
     if (s.enum && s.enum.indexOf(value) === -1) { issues.push(path + ' must be one of ' + s.enum.join('/')); return; }
+    if (s.type === 'string') {
+      if (s.maxLength != null && value.length > s.maxLength) issues.push(path + ' exceeds maxLength ' + s.maxLength);
+      if (s.pattern && !(new RegExp(s.pattern)).test(value)) issues.push(path + ' does not match required format');
+    }
     if (s.type === 'number') {
       if (s.minimum != null && value < s.minimum) issues.push(path + ' must be >= ' + s.minimum);
       if (s.maximum != null && value > s.maximum) issues.push(path + ' must be <= ' + s.maximum);
     }
     if (s.type === 'array') {
       if (s.minItems != null && value.length < s.minItems) issues.push(path + ' needs at least ' + s.minItems + ' item(s)');
+      if (s.maxItems != null && value.length > s.maxItems) issues.push(path + ' exceeds maxItems ' + s.maxItems);
       if (s.items) value.forEach(function (v, i) { check(v, s.items, path + '[' + i + ']', issues); });
     }
     if (s.type === 'object') {
@@ -206,6 +243,7 @@
     validateRequest(o) { return run(o, 'requestEnvelope'); },
     validateResponse(o) { return run(o, 'responseEnvelope'); },
     validateContextPacket(o) { return run(o, 'contextPacket'); },
+    validateError(o) { return run(o, 'errorEnvelope'); },
     validateCard(o) {
       const issues = [];
       check(o, { discriminator: 'cardType' }, '$', issues);
@@ -229,6 +267,47 @@
       if ((r.confidence || 0) >= 70 && evidence.length === 0 && Array.isArray(r.cards) && r.cards.length === 0) {
         issues.push('CONFIDENCE_WITHOUT_EVIDENCE: high confidence with no cards and no evidence');
       }
+      return issues;
+    },
+
+    /**
+     * Referential integrity: every sourceRef a response cites — in evidence
+     * AND inside every card — must name a record the REQUEST's packet
+     * actually carried (EVIDENCE_NOT_IN_PACKET otherwise), and when the
+     * response echoes an asOf it must match the packet's asOf for that record
+     * (ASOF_MISMATCH). A schema-valid reply citing a fabricated record dies
+     * here. This is THE guard that must hold before any LLM sits behind the
+     * contract. Never throws; garbage in → issues out.
+     */
+    evidenceIntegrityIssues(request, response) {
+      const issues = [];
+      const req = request || {};
+      const res = response || {};
+      const packet = req.contextPacket || {};
+      const known = {}; // 'collection:id' -> asOf
+      (Array.isArray(packet.sections) ? packet.sections : []).forEach(function (sec) {
+        (Array.isArray(sec && sec.items) ? sec.items : []).forEach(function (it) {
+          const r = it && it.sourceRef;
+          if (r && r.collection && r.id) known[r.collection + ':' + r.id] = r.asOf || null;
+        });
+      });
+      function checkRef(ref, where) {
+        if (!ref || !ref.collection || !ref.id) return;
+        const key = ref.collection + ':' + ref.id;
+        if (!(key in known)) { issues.push('EVIDENCE_NOT_IN_PACKET: ' + where + ' cites ' + key + ' which the packet never carried'); return; }
+        if (ref.asOf && known[key] && ref.asOf !== known[key]) issues.push('ASOF_MISMATCH: ' + where + ' cites ' + key + ' at a different asOf than the packet');
+      }
+      (Array.isArray(res.evidence) ? res.evidence : []).forEach(function (e, i) {
+        (Array.isArray(e && e.sourceRefs) ? e.sourceRefs : []).forEach(function (r) { checkRef(r, 'evidence[' + i + ']'); });
+      });
+      (Array.isArray(res.cards) ? res.cards : []).forEach(function (c, i) {
+        if (!c) return;
+        const where = 'cards[' + i + ']';
+        (Array.isArray(c.items) ? c.items : []).forEach(function (it) { checkRef(it && it.sourceRef, where); });
+        checkRef(c.quoteRef, where);
+        checkRef(c.customerRef, where);
+        (Array.isArray(c.factors) ? c.factors : []).forEach(function (f) { checkRef(f && f.sourceRef, where); });
+      });
       return issues;
     }
   };

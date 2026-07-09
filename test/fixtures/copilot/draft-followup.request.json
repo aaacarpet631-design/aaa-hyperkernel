@@ -52,5 +52,9 @@
   "budgets": {
     "p95LatencyMs": 6000,
     "maxCostUSDPerConversation": 0.15
+  },
+  "thread": {
+    "conversationId": "thread_fx_1",
+    "turn": 2
   }
 }
