@@ -4,6 +4,24 @@
 
 Turn the Phase 1 Lead OS MVP into the governed customer-intelligence backbone for AAA HyperKernel. Phase 1D connects agents to Lead OS through scoped APIs, supervisor monitoring, outcome learning, and dashboard-ready telemetry without allowing any agent to own or directly mutate core business data.
 
+## Build status
+
+First build slice started in this PR:
+
+- Added framework-light `lead_os` Python package.
+- Added hashed agent API key resolution and fail-closed scope enforcement.
+- Added least-privilege default scopes for Sales, Estimator, Follow-Up, Review, Accounting, and Supervisor agents.
+- Added supervisor action ledger, approval policy helper, and queue projection.
+- Added outcome registry, weighted action-outcome attribution, and agent scorecard builder.
+- Added unit tests covering auth, denied scopes, approval rules, supervisor queueing, and scorecards.
+
+Remaining implementation work:
+
+- Mount package into the live Lead OS FastAPI service.
+- Persist credentials, supervisor actions, queue items, outcomes, and links in the production database.
+- Wire route dependencies and dashboard cards.
+- Run CI/local tests in the target environment.
+
 ## Current baseline from Hermes
 
 Phase 1A–1C delivered:
