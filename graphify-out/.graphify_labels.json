@@ -556,8 +556,11 @@
   "554": "Community 554",
   "555": "Community 555",
   "556": "governance-notifier.test.js",
+  "557": "owner-copilot-ui.test.js",
   "558": "Community 558",
+  "559": "quote-lifecycle-ui.test.js",
   "560": "Community 560",
+  "561": "command-deck.test.js",
   "562": "review-governance.test.js",
   "563": "Community 563",
   "564": "Community 564",
@@ -651,5 +654,7 @@
   "652": "Receipt Intelligence Pipeline (capture, OCR, classify, human review, post)",
   "653": "Supabase Backend Setup (shared memory + AI proxy)",
   "654": "capture-sequencer.js",
+  "655": "review-safety.test.js",
+  "656": "ai-model-router.test.js",
   "657": "mission-manager.test.js"
 }

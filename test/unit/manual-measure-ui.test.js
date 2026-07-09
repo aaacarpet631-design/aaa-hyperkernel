@@ -12,6 +12,7 @@ module.exports = async function run() {
   const t = makeRunner('manual-measure-ui');
   const { G } = setupEnv();
   ['js/measurements/models/measurement-models.js', 'js/measurements/storage/measurement-store.js',
+   'js/measurements/precision-engine.js',
    'js/quotes/integrations/measurement-to-quote.js', 'js/measurements/field-brain.js',
    'js/measurements/field-capture-session.js', 'js/ui/manual-measure-ui.js'].forEach(load);
   const MM = G.AAA_MANUAL_MEASURE_UI, FCS = G.AAA_FIELD_CAPTURE_SESSION;
@@ -46,6 +47,20 @@ module.exports = async function run() {
   const before = (await FCS.list()).length;
   const rejected = await MM.saveRoom(null, { length: 5 });
   t.ok('invalid input is refused BEFORE any session is created', rejected.ok === false && (await FCS.list()).length === before);
+
+  // ===== precision path: tape notation + field-safety warnings =====
+  const tape = MM.buildRoom({ roomName: 'Master', length: '12\'6"', width: '10\'4"' });
+  t.ok('tape notation parses exactly (12\'6" × 10\'4")', tape.ok && tape.room.length === 12.5 && Math.abs(tape.room.width - 10.333) < 0.001);
+  t.eq('metric input converts (3.8m → 12.467 ft)', MM.buildRoom({ length: '3.8m', width: '10' }).room.length, 12.467);
+  t.eq('unreadable notation is a named error', MM.buildRoom({ length: 'about twelve', width: 10 }).error, 'INVALID_DIMENSION');
+
+  const suspicious = await MM.saveRoom(first.sessionId, { roomName: 'Warehouse', length: 250, width: 10 });
+  t.ok('suspicious dims are held for confirmation, not saved', suspicious.ok === false && suspicious.error === 'CONFIRM_WARNINGS' && suspicious.warnings.some((w) => /200 ft/.test(w)));
+  t.eq('nothing was persisted while held', (await FCS.rooms(first.sessionId)).length, 2);
+  const forced = await MM.saveRoom(first.sessionId, { roomName: 'Warehouse', length: 250, width: 10 }, { force: true });
+  t.ok('an explicit Save-anyway persists it', forced.ok === true && (await FCS.rooms(first.sessionId)).length === 3);
+  const dupTry = await MM.saveRoom(first.sessionId, { roomName: 'Living', length: 12, width: 10 });
+  t.ok('a near-identical room in the same session warns as a duplicate', dupTry.error === 'CONFIRM_WARNINGS' && dupTry.warnings.some((w) => /duplicate/i.test(w)));
 
   // ===== honest degradation =====
   const savedFCS = G.AAA_FIELD_CAPTURE_SESSION; delete G.AAA_FIELD_CAPTURE_SESSION;

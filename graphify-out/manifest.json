@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1783564081.2932537,
-    "ast_hash": "c7c173b04fdc3a57f9a67eb09eda54e9",
+    "mtime": 1783564642.035655,
+    "ast_hash": "7c2ef7a5ee85fa6b3427061404690707",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
@@ -1180,8 +1180,8 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "test/run.js": {
-    "mtime": 1783564069.9591005,
-    "ast_hash": "a26e96eae0906d91c5162ca7fa11ed4b",
+    "mtime": 1783564629.2831235,
+    "ast_hash": "57953ca62602fdb1ba490f1d617d1b6b",
     "semantic_hash": ""
   },
   "test/smoke/boot.test.js": {
@@ -1895,8 +1895,8 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "index.html": {
-    "mtime": 1783564068.6591005,
-    "ast_hash": "60988c45af71e5375228f457267e319e",
+    "mtime": 1783564627.9071236,
+    "ast_hash": "7fc2060703e5a0264f5d299bfa4f7442",
     "semantic_hash": ""
   },
   "netlify/functions/RESEARCH.md": {
@@ -3765,13 +3765,23 @@
     "semantic_hash": ""
   },
   "js/ui/manual-measure-ui.js": {
-    "mtime": 1783564096.4151015,
-    "ast_hash": "27d1ed1ae8b3ef57fa6495e71e482256",
+    "mtime": 1783564603.5991225,
+    "ast_hash": "dded2f0d0eaddb5df137acb614c0ea48",
     "semantic_hash": ""
   },
   "test/unit/manual-measure-ui.test.js": {
-    "mtime": 1783564055.0711,
-    "ast_hash": "fef02f1cf47eb30142eb7a3e40f6cacf",
+    "mtime": 1783564567.551121,
+    "ast_hash": "8289b74da6316bdb096cf578a1ae6485",
+    "semantic_hash": ""
+  },
+  "js/measurements/precision-engine.js": {
+    "mtime": 1783564607.3311226,
+    "ast_hash": "bd3c23fc3303f1a8b4d48e253356c699",
+    "semantic_hash": ""
+  },
+  "test/unit/measurement-precision.test.js": {
+    "mtime": 1783564544.37912,
+    "ast_hash": "93c1efd5c6b4d6115565081ccf647d9e",
     "semantic_hash": ""
   }
 }
