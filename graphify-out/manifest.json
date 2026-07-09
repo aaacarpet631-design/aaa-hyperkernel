@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1783323106.3849816,
-    "ast_hash": "f64a9af9fec4c511afcbe8e676ececb7",
+    "mtime": 1783399807.9098313,
+    "ast_hash": "a4662755984049e6d072a6af9586aece",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
@@ -1180,8 +1180,8 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "test/run.js": {
-    "mtime": 1783399233.680582,
-    "ast_hash": "6fe9ffb1cd339c54ba0f54ef814e866f",
+    "mtime": 1783399798.5885692,
+    "ast_hash": "f9aa199137a6deb47bc1d7f4beb60183",
     "semantic_hash": ""
   },
   "test/smoke/boot.test.js": {
@@ -1335,9 +1335,9 @@
     "semantic_hash": "a6af50e2923e72a2860477cd7a5e348b"
   },
   "test/unit/estimator-agent.test.js": {
-    "mtime": 1783050778.1661277,
-    "ast_hash": "1f120ed48d3150f4fffbe0d73ee26629",
-    "semantic_hash": "1f120ed48d3150f4fffbe0d73ee26629"
+    "mtime": 1783563472.7390761,
+    "ast_hash": "4839207ba5b8ef13149a0004177a6ea5",
+    "semantic_hash": ""
   },
   "test/unit/estimator-ui.test.js": {
     "mtime": 1783050778.1661277,
@@ -1895,8 +1895,8 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "index.html": {
-    "mtime": 1783322724.6946397,
-    "ast_hash": "23dd358bbca468c8b6ae8f3dd5da08b8",
+    "mtime": 1783399796.464569,
+    "ast_hash": "8984faa419f35d7c7a274141a529a168",
     "semantic_hash": ""
   },
   "netlify/functions/RESEARCH.md": {
@@ -3705,8 +3705,8 @@
     "semantic_hash": ""
   },
   "docs/GOOGLE_ADS_HYPERKERNEL_AUDIT.md": {
-    "mtime": 1783323385.3626633,
-    "ast_hash": "e22ee758addc942b9449fac76cebdadc",
+    "mtime": 1783563552.2630794,
+    "ast_hash": "de63674c465b1fba0898984162f6e1ac",
     "semantic_hash": ""
   },
   "docs/UI_POLISH_PR_NOTES.md": {
@@ -3752,6 +3752,16 @@
   "test/unit/ads-provenance-link.test.js": {
     "mtime": 1783399591.7805738,
     "ast_hash": "9da8aa80f6cc7324b5fd92b06da68edd",
+    "semantic_hash": ""
+  },
+  "docs/ADS_ATTRIBUTION_SCHEMA.md": {
+    "mtime": 1783399719.540571,
+    "ast_hash": "078a22a2b13a5fba23861ee57ecd8ac8",
+    "semantic_hash": ""
+  },
+  "docs/ADS_EVENT_TAXONOMY.md": {
+    "mtime": 1783399671.272572,
+    "ast_hash": "979e543208e6ee681cf72a7a260facb4",
     "semantic_hash": ""
   }
 }

@@ -182,6 +182,50 @@ is: keep every new division shipping through the envelope/gateway spine, and
 grow the ads slices (2→7) into the Marketing Division of the org chart rather
 than building a parallel system.
 
+## 12. Slice 2–3 addendum (2026-07-09)
+
+Built by a coordinated agent team after the Slice 1 audit above; see
+`docs/ADS_EVENT_TAXONOMY.md` and `docs/ADS_ATTRIBUTION_SCHEMA.md` for the
+canonical contracts.
+
+- **Click → margin loop closed (Slice 2)**: quotes now carry `leadId`
+  (`AAA_QUOTES.createDraft` and the estimator's `draftQuote` forward it; the
+  outcomes training record includes it; `customerView()` still hides it). The
+  campaign scorecard joins WON-quote margin via that key: `grossMarginUSD`,
+  `marginKnownWon` (coverage visibility), and with real spend
+  `marginPerAdDollar` + `costPerMarginDollar` — the margin-adjusted north-star
+  cells. Unknown stays null, never invented.
+- **Ads agents are now measurable**: `AAA_ADS_GOVERNANCE.recommend()` registers
+  every recommendation in `AAA_AGENT_OUTCOMES` (`outcomeDecisionId`; reject →
+  `overridden` + training queue) and appends an `AAA_PROVENANCE` trace
+  (`provenanceId`: evidence + envelope citation). Both advisory — a missing
+  registry never blocks governance, the record then honestly carries null.
+- **HIGH_MARGIN_JOB rule defined**: `recordJobFinancials(leadId, {revenueUSD,
+  costUSD})` always records JOB_COMPLETED and adds HIGH_MARGIN_JOB when margin
+  % ≥ `adsHighMarginPctFloor` (default 55). Raw cost is never stored — only the
+  margin value survives.
+- **Data Manager–first adapter layer** (`js/ads/`): `AAA_ADS_DATAMANAGER`
+  consumes only human-released export batches, validates the
+  exactly-one-click-id rule (GBRAID/WBRAID case preserved verbatim), maps to
+  Data-Manager-shaped requests, and `dryRun()` writes honestly-labeled
+  `mode:'fixture'` records to `ads_transmission_fixtures` (owner-only in
+  firestore.rules). There is deliberately NO transport: `send()` returns
+  `NO_CREDENTIALS` or `TRANSPORT_NOT_IMPLEMENTED` — success is never faked and
+  `batch.transmitted` never flips. `AAA_ADS_MOCK_CLIENT` is a deterministic
+  test-only fake, not loaded by index.html.
+- **Diagnostics**: `AAA_ADS_DIAGNOSTICS.healthReport()` — 8 read-only checks
+  (click-id/consent coverage, upload blockers, dedupe integrity, orphan
+  events, missing attribution, value sanity, unreleased backlog).
+- Tests: 3,786 assertions across 190 suites, all green (9 ads-specific suites).
+
+**Review status**: the increment passed the coordinator's inline review
+(fixes applied: `ads_transmission_fixtures` added to the financial rules
+class; estimator `leadId` pass-through + regression test). A 4-lens
+adversarial multi-agent review workflow was launched but its finder agents
+were killed by a session usage limit — it reported an empty result that is a
+false negative, NOT a clean bill. The workflow is scheduled to re-run after
+the limit resets; findings, if any, land in a follow-up commit.
+
 ## Recommended next slice
 
 **Slice 2 — Reporting Brain**: add `leadId` to quote drafts, join quote
