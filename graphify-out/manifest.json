@@ -225,9 +225,9 @@
     "semantic_hash": "eae853020c704ebf8e3f38b19c4f9c6f"
   },
   "js/ai/assisted-draft-queue.js": {
-    "mtime": 1783050778.0541277,
-    "ast_hash": "b04504a69d62dfe800d42368bd5b3a10",
-    "semantic_hash": "b04504a69d62dfe800d42368bd5b3a10"
+    "mtime": 1783623622.6796813,
+    "ast_hash": "861d19bf35df9f7fbd483a3f8d5546dd",
+    "semantic_hash": ""
   },
   "js/ai/content-safety.js": {
     "mtime": 1783050778.0560992,
@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1783616802.0614142,
-    "ast_hash": "a377df57b74c83675a156c51b589342c",
+    "mtime": 1783624429.6781704,
+    "ast_hash": "77a96e807f165dabd6398295d1b1df35",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
@@ -1180,8 +1180,8 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "test/run.js": {
-    "mtime": 1783616786.1062026,
-    "ast_hash": "cee4541d8d2934164101ed6473123a84",
+    "mtime": 1783624419.507663,
+    "ast_hash": "6c14201d865c513680d4f28cb28531f5",
     "semantic_hash": ""
   },
   "test/smoke/boot.test.js": {
@@ -1255,9 +1255,9 @@
     "semantic_hash": "7b815692442da72a2d1d75726ae85074"
   },
   "test/unit/assisted-draft-queue.test.js": {
-    "mtime": 1783050778.1581278,
-    "ast_hash": "cde9701e998c412eb66594baa5d11010",
-    "semantic_hash": "cde9701e998c412eb66594baa5d11010"
+    "mtime": 1783623811.611677,
+    "ast_hash": "0d717dd38acebad035ac1d8b373889c0",
+    "semantic_hash": ""
   },
   "test/unit/assisted-drafts-ui.test.js": {
     "mtime": 1783050778.1581278,
@@ -1895,8 +1895,8 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "index.html": {
-    "mtime": 1783616784.2742023,
-    "ast_hash": "57966cf477c8098fb793415eaa1ed46b",
+    "mtime": 1783624417.8996632,
+    "ast_hash": "7babdfc0d04ea3ac002dbf2395b670f9",
     "semantic_hash": ""
   },
   "netlify/functions/RESEARCH.md": {
@@ -3170,9 +3170,9 @@
     "semantic_hash": "877f71265388969fb086955a5b028605"
   },
   "js/copilot/rich-card-renderer.js": {
-    "mtime": 1783050778.0661278,
-    "ast_hash": "b6999559811073c20a93151482c5a3a4",
-    "semantic_hash": "b6999559811073c20a93151482c5a3a4"
+    "mtime": 1783623612.0356815,
+    "ast_hash": "2880571948918ec69e8da5b255ad6e8d",
+    "semantic_hash": ""
   },
   "js/copilot/simulation-result-card.js": {
     "mtime": 1783050778.0661278,
@@ -3785,13 +3785,13 @@
     "semantic_hash": ""
   },
   "js/copilot/copilot-contract.js": {
-    "mtime": 1783566975.7393055,
-    "ast_hash": "17a4897e08e27f8d860230f0e05a5f1c",
+    "mtime": 1783622542.375706,
+    "ast_hash": "f09bb5984f004410512f0e07ca41f6a3",
     "semantic_hash": ""
   },
   "schemas/copilot-contract-v1.json": {
-    "mtime": 1783566548.139288,
-    "ast_hash": "4b4502fba64449a501b786bce33c5c20",
+    "mtime": 1783622567.3317056,
+    "ast_hash": "16999472750a770099c22f8dd027b723",
     "semantic_hash": ""
   },
   "test/fixtures/copilot/agent-activity.request.json": {
@@ -3815,13 +3815,13 @@
     "semantic_hash": ""
   },
   "test/fixtures/copilot/draft-followup.request.json": {
-    "mtime": 1783566609.0632906,
-    "ast_hash": "fe2a914bc0c04109b123ea4ac6cd2060",
+    "mtime": 1783622567.3357055,
+    "ast_hash": "ffcfc262ea719156440fd5edeffa0331",
     "semantic_hash": ""
   },
   "test/fixtures/copilot/draft-followup.response.json": {
-    "mtime": 1783566609.0632906,
-    "ast_hash": "2dd18dc79b9c12a7286d758ab93868d0",
+    "mtime": 1783622567.3357055,
+    "ast_hash": "1d33e7efaf988b0d53d4a8bbd8cc0381",
     "semantic_hash": ""
   },
   "test/fixtures/copilot/estimate-risk.request.json": {
@@ -3845,8 +3845,8 @@
     "semantic_hash": ""
   },
   "test/unit/copilot-contract.test.js": {
-    "mtime": 1783566641.331292,
-    "ast_hash": "e765d3e33dd4df026088fa8e8b021cbe",
+    "mtime": 1783622593.955705,
+    "ast_hash": "9df5ccee3e989b671b56dd1980956d89",
     "semantic_hash": ""
   },
   "docs/COPILOT_SLICE_A_RECON.md": {
@@ -3855,43 +3855,118 @@
     "semantic_hash": ""
   },
   "docs/HYPERKERNEL_CHAT_MISSION.md": {
-    "mtime": 1783616790.1662028,
-    "ast_hash": "ead1288e406ffe19f639e2d73198aa80",
+    "mtime": 1783624482.2116616,
+    "ast_hash": "aa1df0148dc18c46b8b3e42ded51bd22",
     "semantic_hash": ""
   },
   "js/copilot/context-packet.js": {
-    "mtime": 1783610732.9197242,
-    "ast_hash": "4d7306c01db8c3091a419ca53f80b5d8",
+    "mtime": 1783623244.2299986,
+    "ast_hash": "91d896f38ab137d2637eca71a0bd1e2d",
     "semantic_hash": ""
   },
   "test/unit/copilot-context-packet.test.js": {
-    "mtime": 1783610772.4077253,
-    "ast_hash": "c6ea8bf2e9eda88298c4b6ba022be6a0",
+    "mtime": 1783623216.391684,
+    "ast_hash": "50af53884c3f199da80b01bef938c5d3",
     "semantic_hash": ""
   },
   "js/copilot/contract-card-renderer.js": {
-    "mtime": 1783616628.5781932,
-    "ast_hash": "3e9fbf8e9099c36eeb3c76777da3be33",
+    "mtime": 1783623646.9756808,
+    "ast_hash": "297baab5dadbf5f8c600610ba19ba8ee",
     "semantic_hash": ""
   },
   "js/copilot/copilot-chat-bridge.js": {
-    "mtime": 1783616650.9341946,
-    "ast_hash": "a1785b6dc1125dbb56d22cd68a99b4f4",
+    "mtime": 1783623680.3996801,
+    "ast_hash": "9140ac3a42d1fd2be8e74c7df6f59139",
     "semantic_hash": ""
   },
   "js/copilot/copilot-remote-adapter.js": {
-    "mtime": 1783616600.5781915,
-    "ast_hash": "d196fe5e9126eaa3e040addf24e33a66",
+    "mtime": 1783623216.391684,
+    "ast_hash": "79b63addbe241955d2e580c6f3cb3d15",
     "semantic_hash": ""
   },
   "test/unit/copilot-chat-bridge.test.js": {
-    "mtime": 1783616752.7222006,
-    "ast_hash": "254ae9c683a636ffa399fd67a9210d56",
+    "mtime": 1783623784.1396778,
+    "ast_hash": "4e50d756f2fbf03e655f722148c77331",
     "semantic_hash": ""
   },
   "test/unit/copilot-remote-adapter.test.js": {
-    "mtime": 1783616719.5981987,
-    "ast_hash": "cd92e8bd57f373704721172f96a13227",
+    "mtime": 1783623216.391684,
+    "ast_hash": "b7974ce39ecb65b07560e14de5ba544e",
+    "semantic_hash": ""
+  },
+  "js/copilot/copilot-telemetry.js": {
+    "mtime": 1783623053.3396943,
+    "ast_hash": "7e864128482070d2e8135895a25bf98b",
+    "semantic_hash": ""
+  },
+  "test/fixtures/copilot/MANIFEST.json": {
+    "mtime": 1783622567.3397055,
+    "ast_hash": "8a2cfdaa6212a8ece397bb5a442289d1",
+    "semantic_hash": ""
+  },
+  "test/unit/copilot-telemetry.test.js": {
+    "mtime": 1783623170.6116917,
+    "ast_hash": "3f4e4adb8eded4fac280c31415715f14",
+    "semantic_hash": ""
+  },
+  "test/fixtures/copilot/invalid/confidence-overflow.json": {
+    "mtime": 1783624145.7756693,
+    "ast_hash": "dd9d004439d00dcde3ee780f2f1227d0",
+    "semantic_hash": ""
+  },
+  "test/fixtures/copilot/invalid/degraded-context-unavailable.response.json": {
+    "mtime": 1783624145.7756693,
+    "ast_hash": "e4e167b41d9ac069b1bd8aed089754f6",
+    "semantic_hash": ""
+  },
+  "test/fixtures/copilot/invalid/empty-evidence-refs.json": {
+    "mtime": 1783624145.7756693,
+    "ast_hash": "70f7b4280131ea78a5041d16bdb40fae",
+    "semantic_hash": ""
+  },
+  "test/fixtures/copilot/invalid/fabricated-evidence.json": {
+    "mtime": 1783624145.7756693,
+    "ast_hash": "dfdf8e55bbd51c01d1a81f67edd3cfc1",
+    "semantic_hash": ""
+  },
+  "test/fixtures/copilot/invalid/foreign-field.json": {
+    "mtime": 1783624145.7756693,
+    "ast_hash": "6a58d3e3dfc8f1dfb9c21641d3dc69fd",
+    "semantic_hash": ""
+  },
+  "test/fixtures/copilot/invalid/missing-sourceref.json": {
+    "mtime": 1783624145.7756693,
+    "ast_hash": "70d52f016b958fbe69fe88287506b3a4",
+    "semantic_hash": ""
+  },
+  "test/fixtures/copilot/invalid/sendable-draft.json": {
+    "mtime": 1783624145.7756693,
+    "ast_hash": "6419821fa9699de27c2537cb1fc978ec",
+    "semantic_hash": ""
+  },
+  "test/fixtures/copilot/invalid/unknown-cardtype.json": {
+    "mtime": 1783624145.7756693,
+    "ast_hash": "f6a220e89b40165f4c7f257ff7d27aa3",
+    "semantic_hash": ""
+  },
+  "test/fixtures/copilot/invalid/wrong-version.json": {
+    "mtime": 1783624145.7756693,
+    "ast_hash": "8438ae4634fc16caa8917c933d3f56c9",
+    "semantic_hash": ""
+  },
+  "test/helpers/copilot-mutants.js": {
+    "mtime": 1783624120.27567,
+    "ast_hash": "51dd11439370c967397d3b8d8883e077",
+    "semantic_hash": ""
+  },
+  "test/unit/copilot-eval-gate.test.js": {
+    "mtime": 1783624194.9236681,
+    "ast_hash": "fbcd72d184c04dde79dfd0e13c870594",
+    "semantic_hash": ""
+  },
+  "test/fixtures/copilot/invalid/README.md": {
+    "mtime": 1783624160.479669,
+    "ast_hash": "61ab96f8cae31b152d90c0292ea2747b",
     "semantic_hash": ""
   }
 }

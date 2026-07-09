@@ -8,7 +8,10 @@
  * signal: a recognized job AND a configured remote adapter. ask() runs the
  * remote round-trip and packages the validated response as a chat card
  * ({ type:'copilot_contract', response, html }) rendered escape-safe by the
- * contract card renderer.
+ * contract card renderer. A draft_message card in the reply is additionally
+ * FILED into the assisted-drafts queue (pending human approval, source
+ * 'copilot', never sent) and the card carries draftQueuedId — advisory only,
+ * a filing failure never breaks the chat reply.
  *
  * FAIL OPEN TO LOCAL: any remote failure returns { ok:false, fallback:
  * 'local' } and the chat canvas continues down its existing Executive
@@ -20,22 +23,57 @@
 
   function remote() { return global.AAA_COPILOT_REMOTE; }
   function renderer() { return global.AAA_CONTRACT_CARD_RENDERER; }
+  function drafts() { return global.AAA_ASSISTED_DRAFTS; }
 
-  // Deterministic keyword routing for the five phase-one jobs. Draft beats
-  // followups (a draft request usually contains "follow-up"); risk requires a
-  // quote reference to be actionable.
+  // Deterministic keyword routing for the five phase-one jobs, as an ORDERED
+  // per-job pattern table. Row order is precedence: draft beats followups (a
+  // draft request usually contains "follow-up"). Quote handling per row:
+  //   'require'      — pattern matched but no quote reference → NOT claimed
+  //                    (a draft without a quote isn't actionable);
+  //   'skip_without' — pattern matched but no quote reference → keep looking
+  //                    (risk talk without a quote may still be a follow-up
+  //                    or attention question).
+  // Rows without a quote rule never attach a quoteId. Anything the table
+  // doesn't match returns null — ordinary chat is never claimed.
   const QUOTE_ID = /(quote_[a-z0-9_]+)/i;
+  const ROUTES = [
+    { job: 'draft_followup', quote: 'require', patterns: [/\bdraft\b/] },
+    { job: 'estimate_risk', quote: 'skip_without', patterns: [/underpriced/, /at risk/, /risky/, /price.*right/, /estimate risk/] },
+    { job: 'followups', patterns: [/follow.?up/] },
+    { job: 'agent_activity', patterns: [/(agents?|overnight).*(do|did|activity)/, /what did the agents/, /what happened overnight/, /overnight (summary|recap|report)/] },
+    { job: 'attention_today', patterns: [/attention/, /needs? me/, /top of the list/, /what.?s urgent/, /today.?s priorities/] }
+  ];
   function classify(text) {
     const s = String(text == null ? '' : text).toLowerCase();
     if (!s.trim()) return null;
     const quote = String(text).match(QUOTE_ID);
     const quoteId = quote ? quote[1] : null;
-    if (/\bdraft\b/.test(s)) return quoteId ? { job: 'draft_followup', quoteId: quoteId } : null;
-    if (/(underpriced|at risk|risky|price.*right|estimate risk)/.test(s) && quoteId) return { job: 'estimate_risk', quoteId: quoteId };
-    if (/follow.?up/.test(s)) return { job: 'followups' };
-    if (/(agents?|overnight).*(do|did|activity)|what did the agents/.test(s)) return { job: 'agent_activity' };
-    if (/(attention|needs? me|top of the list|what.?s urgent|today.?s priorities)/.test(s)) return { job: 'attention_today' };
+    for (let i = 0; i < ROUTES.length; i++) {
+      const row = ROUTES[i];
+      if (!row.patterns.some(function (p) { return p.test(s); })) continue;
+      if (row.quote === 'require') return quoteId ? { job: row.job, quoteId: quoteId } : null;
+      if (row.quote === 'skip_without' && !quoteId) continue;
+      return row.quote ? { job: row.job, quoteId: quoteId } : { job: row.job };
+    }
     return null;
+  }
+
+  // Advisory side-effect: a remote draft_message card is FILED into the
+  // assisted-drafts queue (pending human approval, source 'copilot', never
+  // sent). Returns the queued draft id or null — any failure here is
+  // swallowed by the caller; filing can never break the chat reply.
+  async function fileDraftCard(dm) {
+    const q = drafts();
+    if (!q || typeof q.file !== 'function' || !dm) return null;
+    const filed = await q.file({
+      channel: dm.channel,
+      body: dm.body,
+      customerId: dm.customerRef ? dm.customerRef.id : null,
+      intent: 'follow_up',
+      source: 'copilot',
+      origin: 'ai'
+    });
+    return filed && filed.ok && filed.draft ? filed.draft.id : null;
   }
 
   const Bridge = {
@@ -65,6 +103,16 @@
         response: res.response,
         html: rd && rd.render ? rd.render(res.response) : null
       };
+      // A drafted follow-up also lands in the assisted-drafts queue so the
+      // owner can approve/edit it later from the Approval Inbox. Advisory:
+      // a filing failure never breaks the chat reply.
+      const dm = (Array.isArray(res.response.cards) ? res.response.cards : []).filter(function (c) { return c && c.cardType === 'draft_message'; })[0];
+      if (dm) {
+        try {
+          const queuedId = await fileDraftCard(dm);
+          if (queuedId) card.draftQueuedId = queuedId;
+        } catch (_) { /* advisory — the chat reply stands on its own */ }
+      }
       return { ok: true, job: route.job, card: card, summary: res.response.answer, response: res.response };
     }
   };

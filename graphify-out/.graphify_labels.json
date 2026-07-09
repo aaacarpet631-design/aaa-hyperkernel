@@ -684,7 +684,5 @@
   "682": "assisted-draft-queue.test.js",
   "683": "audit-ledger-crypto.test.js",
   "684": "governance-learning.test.js",
-  "685": "planning-desk.test.js",
-  "686": "private-gpu-adapter.test.js",
-  "687": "quickbooks-online.test.js"
+  "685": "planning-desk.test.js"
 }

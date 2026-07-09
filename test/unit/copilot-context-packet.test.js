@@ -24,7 +24,7 @@ module.exports = async function run() {
   const staleLead = Object.assign({}, lead, { createdAt: Date.parse('2026-07-08T15:00:00Z'), updatedAt: Date.parse('2026-07-08T15:00:00Z') });
   await data.put('leads', lead.leadId, staleLead);
 
-  await data.put('customers', 'cust_1', { id: 'cust_1', name: 'Maria Gonzalez', phone: '7135559876', email: 'mg@x.com', address: '12 Oak St', notes: 'asked about pet-safe adhesive', preferredChannel: 'sms', workspaceId: 'ws_test' });
+  await data.put('customers', 'cust_1', { id: 'cust_1', name: 'Maria Gonzalez', phone: '7135559876', email: 'mg@x.com', address: '12 Oak St', notes: 'asked about pet-safe adhesive — call 713-555-9876 or mg@x.com', preferredChannel: 'sms', workspaceId: 'ws_test' });
   const draft = await Q.createDraft({ estimate: { quote: { _laborTotal: 500, _materialTotal: 200, total: 1500 }, receipt: { total: 1500 } }, customerId: 'cust_1', customerName: 'Maria Gonzalez', leadId: lead.leadId, leadSource: 'google_ads' });
   await Q.markReviewed(draft.id, { actor: 'owner' });
   await Q.send(draft.id, { actor: 'owner' });
@@ -34,6 +34,13 @@ module.exports = async function run() {
   await data.put('outcomes', 'out_1', { id: 'out_1', result: 'won', serviceType: null, finalAmount: 2100, workspaceId: 'ws_test' });
   // a foreign-workspace quote that must be invisible
   await data.put('quotes', 'q_foreign', { quoteId: 'q_foreign', id: 'q_foreign', status: 'follow_up_due', workspaceId: 'ws_other', customerName: 'Other Tenant' });
+  // today's jobs: one scheduled (with PII that must never ship), one closed, one foreign
+  await data.put('jobs', 'job_today', { id: 'job_today', currentState: 'SCHEDULED', scheduledFor: '2026-07-09T14:00:00.000Z', customerName: 'Maria Gonzalez', address: '12 Oak St', workspaceId: 'ws_test' });
+  await data.put('jobs', 'job_closed', { id: 'job_closed', currentState: 'CLOSED', workspaceId: 'ws_test' });
+  await data.put('jobs', 'job_foreign', { id: 'job_foreign', currentState: 'SCHEDULED', workspaceId: 'ws_other' });
+  // an awaiting-approval envelope whose recommendation embeds a phone + email
+  const pend = G.AAA_DECISION_ENVELOPE.wrap({ agent: 'agent:pricing', decision: { recommendation: 'Call the customer at 7135551234 or a@b.com to confirm', rationale: 'low confidence', confidence: 20 } });
+  await G.AAA_DECISION_ENVELOPE.seal(pend.envelope);
 
   // ---- attention_today ----
   const att = await CTX.assemble('attention_today');
@@ -41,7 +48,21 @@ module.exports = async function run() {
   const attItems = att.packet.sections[0].items;
   t.ok('stale NEW lead is included with age, ids only', attItems.some((i) => i.sourceRef.id === lead.leadId && i.data.ageHours >= 24));
   t.ok('overdue quote is included', attItems.some((i) => i.sourceRef.collection === 'quotes' && i.sourceRef.id === draft.id));
-  t.ok('foreign-workspace records are invisible', !JSON.stringify(att.packet).includes('q_foreign'));
+  const jobItem = attItems.find((i) => i.sourceRef.collection === 'jobs');
+  t.ok('today\'s scheduled job is included with state + scheduledFor, ids only',
+    jobItem && jobItem.sourceRef.id === 'job_today' && jobItem.data.state === 'SCHEDULED' && jobItem.data.scheduledFor === '2026-07-09T14:00:00.000Z');
+  t.ok('closed jobs stay out of attention', !attItems.some((i) => i.sourceRef.id === 'job_closed'));
+  t.ok('foreign-workspace records are invisible', !JSON.stringify(att.packet).includes('q_foreign') && !JSON.stringify(att.packet).includes('job_foreign'));
+  const envAtt = attItems.find((i) => i.sourceRef.collection === 'decision_envelopes');
+  t.ok('envelope recommendation free text is scrubbed of phone/email',
+    envAtt && envAtt.data.recommendation.includes('[redacted]') && !envAtt.data.recommendation.includes('7135551234') && !envAtt.data.recommendation.includes('a@b.com'));
+
+  // ---- record-level asOf: the ref carries the record's age, not assembly time
+  const quoteAtt = attItems.find((i) => i.sourceRef.collection === 'quotes');
+  t.eq('sourceRef.asOf reflects the backdated record, not assembly time', quoteAtt.sourceRef.asOf, '2026-07-01T00:00:00.000Z');
+  const leadAtt = attItems.find((i) => i.sourceRef.collection === 'leads');
+  t.eq('lead asOf normalizes the numeric timestamp to ISO', leadAtt.sourceRef.asOf, '2026-07-08T15:00:00.000Z');
+  t.eq('assembledAt stays on the fixed clock', att.packet.assembledAt, '2026-07-09T15:00:00.000Z');
 
   // ---- PII redaction: plant PII, prove absence ----
   const attStr = JSON.stringify(att.packet);
@@ -53,6 +74,18 @@ module.exports = async function run() {
   const again = await CTX.assemble('attention_today');
   t.ok('same store + same clock → byte-identical packet', JSON.stringify(again.packet) === attStr);
 
+  // ---- honest truncation at the section cap ----
+  cfg.set({ copilotSectionMaxItems: 2 });
+  const capped = await CTX.assemble('attention_today');
+  const cappedSec = capped.packet.sections[0];
+  t.ok('capped section keeps exactly the cap and stays contract-valid', capped.ok && cappedSec.items.length === 2 && C.validateContextPacket(capped.packet).ok);
+  t.ok('capped section declares truncated:true', cappedSec.truncated === true);
+  t.eq('omittedCount counts every dropped item', cappedSec.omittedCount, attItems.length - 2);
+  t.ok('deterministic priority order: kept items are the byRefId head', JSON.stringify(cappedSec.items) === JSON.stringify(attItems.slice(0, 2)));
+  cfg.set({ copilotSectionMaxItems: null });
+  const uncapped = await CTX.assemble('attention_today');
+  t.ok('below the cap no truncation flags ship', !('truncated' in uncapped.packet.sections[0]) && !('omittedCount' in uncapped.packet.sections[0]));
+
   // ---- followups: financial fields are RBAC-scoped ----
   const asOwner = await CTX.assemble('followups');
   const ownerQuoteItem = asOwner.packet.sections[0].items.find((i) => i.sourceRef.collection === 'quotes');
@@ -62,7 +95,12 @@ module.exports = async function run() {
   const crewQuoteItem = asCrew.packet.sections[0].items.find((i) => i.sourceRef.collection === 'quotes');
   t.ok('crew packet carries NO financial fields', asCrew.ok && crewQuoteItem && !('total' in crewQuoteItem.data));
   t.eq('crew packet declares its role', asCrew.packet.role, 'crew');
+  // attention gates the quote total on the SAME RBAC check
+  const attCrew = await CTX.assemble('attention_today');
+  const attCrewQuote = attCrew.packet.sections[0].items.find((i) => i.sourceRef.collection === 'quotes');
+  t.ok('crew sees NO quote total in attention either', attCrew.ok && attCrewQuote && !('total' in attCrewQuote.data));
   cfg.set({ role: 'owner' });
+  t.ok('owner still sees the quote total in attention', quoteAtt.data.total === 1500);
 
   // ---- estimate_risk: margin only for VIEW_FINANCIALS ----
   const risk = await CTX.assemble('estimate_risk', { quoteId: draft.id });
@@ -81,6 +119,9 @@ module.exports = async function run() {
   t.ok('draft context assembles', dctx.ok);
   const custItem = dctx.packet.sections[0].items.find((i) => i.sourceRef.collection === 'customers');
   t.ok('customer note ships untrusted:true', custItem && custItem.untrusted === true && /pet-safe/.test(custItem.data.note));
+  t.ok('phone/email planted inside the note free text are masked',
+    custItem.data.note.includes('[redacted]') && !/\d{7,}/.test(custItem.data.note.replace(/[\s().-]/g, '')) && !custItem.data.note.includes('mg@x.com'));
+  t.ok('the packet declares the free-text scrub', dctx.packet.redactions.indexOf('freeText.phone') !== -1 && dctx.packet.redactions.indexOf('freeText.email') !== -1);
   t.ok('customer PII never ships even in draft context',
     !JSON.stringify(dctx.packet).includes('7135559876') && !JSON.stringify(dctx.packet).includes('Maria'));
 

@@ -8,6 +8,14 @@
  * through esc() — a hostile string in a packet can never become markup.
  * Renders only what the model contains: no invented rows, unknowns shown
  * honestly, and a draft card always carries its "draft only" banner.
+ *
+ * Attention lists render worst-first (urgent > warn > info, unknown severity
+ * last, stable within a rank) under a derived "N item(s) - M urgent" summary
+ * line. When approval.approvalPackage.actionType is present the approval
+ * banner names the action and emits
+ * <button class="cc-open-approvals" data-action-type="...">. The renderer
+ * stays PURE — it attaches no handlers; the canvas/UI layer binds clicks by
+ * the cc-open-approvals class.
  */
 ;(function (global) {
   'use strict';
@@ -16,12 +24,24 @@
   function refChip(ref) { return ref ? '<span class="cc-ref">' + esc(ref.collection) + ':' + esc(ref.id) + '</span>' : ''; }
 
   const SEVERITY_ICON = { urgent: '🔴', warn: '🟡', info: 'ℹ️' };
+  const SEVERITY_RANK = { urgent: 0, warn: 1, info: 2 }; // unknown severities sort last
   const RISK_LABEL = { underpriced: '⚠ Underpriced', at_risk: '⚠ At risk', healthy: '✅ Healthy', unknown: '❔ Unknown' };
 
   function attentionList(card) {
-    return '<ul class="cc-list">' + (card.items || []).map(function (it) {
-      return '<li>' + (SEVERITY_ICON[it.severity] || '') + ' <strong>' + esc(it.label) + '</strong> — ' + esc(it.why) + ' ' + refChip(it.sourceRef) + '</li>';
-    }).join('') + '</ul>';
+    const items = Array.isArray(card.items) ? card.items : [];
+    // Worst first: urgent > warn > info > unknown; index tie-break keeps the
+    // sort stable within a rank regardless of engine.
+    const sorted = items.map(function (it, i) { return { it: it, i: i }; }).sort(function (a, b) {
+      const ra = a.it && SEVERITY_RANK[a.it.severity] != null ? SEVERITY_RANK[a.it.severity] : 3;
+      const rb = b.it && SEVERITY_RANK[b.it.severity] != null ? SEVERITY_RANK[b.it.severity] : 3;
+      return ra !== rb ? ra - rb : a.i - b.i;
+    }).map(function (x) { return x.it; });
+    const urgent = items.filter(function (it) { return it && it.severity === 'urgent'; }).length;
+    return '<p class="cc-attn-summary">' + items.length + ' item(s) - ' + urgent + ' urgent</p>' +
+      '<ul class="cc-list">' + sorted.map(function (it) {
+        const x = it || {};
+        return '<li>' + (SEVERITY_ICON[x.severity] || '') + ' <strong>' + esc(x.label) + '</strong> — ' + esc(x.why) + ' ' + refChip(x.sourceRef) + '</li>';
+      }).join('') + '</ul>';
   }
   function followupList(card) {
     return '<ul class="cc-list">' + (card.items || []).map(function (it) {
@@ -80,7 +100,13 @@
         }).join(' ') + '</div>');
       }
       if (r.approval && r.approval.required) {
-        parts.push('<div class="cc-approval">🔒 ' + esc((r.approval.reasons || []).join(' ') || 'This needs your approval.') + '</div>');
+        const pkg = r.approval.approvalPackage;
+        const actionType = pkg && pkg.actionType ? String(pkg.actionType) : null;
+        parts.push('<div class="cc-approval">🔒 ' + esc((r.approval.reasons || []).join(' ') || 'This needs your approval.') +
+          (actionType
+            ? ' <span class="cc-approval-action">' + esc(actionType) + '</span> <button class="cc-open-approvals" data-action-type="' + esc(actionType) + '">Review in Approval Inbox</button>'
+            : '') +
+          '</div>');
       }
       if (r.degraded) {
         parts.push('<div class="cc-degraded">⚠ Degraded: ' + esc(r.degraded.reason) + (r.degraded.fallback ? ' (fallback: ' + esc(r.degraded.fallback) + ')' : '') + '</div>');
