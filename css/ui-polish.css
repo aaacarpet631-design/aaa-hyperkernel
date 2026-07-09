@@ -190,6 +190,25 @@ a.aaa-btn--secondary {
   background-clip: text;
 }
 
+/* Smarter chat cards: turn fallback/help into a useful command surface. */
+.cp-home h3 { margin: 0 0 8px; font-size: 16px; }
+.cp-home .cp-summary { margin: 0 0 12px; white-space: pre-wrap; line-height: 1.45; }
+.cp-suggestions { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 12px; }
+.cp-suggest,
+.cc-suggestion {
+  min-height: 42px;
+  border-radius: 14px;
+  border: 1px solid rgba(248, 113, 113, 0.22);
+  background: rgba(24, 28, 40, 0.78);
+  color: var(--aaa-ink);
+  font-weight: 700;
+  text-align: left;
+  padding: 10px 12px;
+}
+.cp-suggest:active,
+.cc-suggestion:active { transform: scale(0.99); }
+.cc-typing { color: var(--aaa-muted); }
+
 /* Pixel 10 Pro / similar 6.3" Android phones: portrait-first PWA tuning. */
 @media (min-width: 390px) and (max-width: 460px) and (orientation: portrait) {
   :root {
