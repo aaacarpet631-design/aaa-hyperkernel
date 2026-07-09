@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1783564642.035655,
-    "ast_hash": "7c2ef7a5ee85fa6b3427061404690707",
+    "mtime": 1783566928.3045573,
+    "ast_hash": "ceb3ddc1bc3b164c52083402ccf1fa07",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
@@ -1180,8 +1180,8 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "test/run.js": {
-    "mtime": 1783564629.2831235,
-    "ast_hash": "57953ca62602fdb1ba490f1d617d1b6b",
+    "mtime": 1783566908.979303,
+    "ast_hash": "6d527c6407eada7d26ebcf2a060a700b",
     "semantic_hash": ""
   },
   "test/smoke/boot.test.js": {
@@ -1895,8 +1895,8 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "index.html": {
-    "mtime": 1783564627.9071236,
-    "ast_hash": "7fc2060703e5a0264f5d299bfa4f7442",
+    "mtime": 1783566907.7033029,
+    "ast_hash": "76ca98aa9ab0491d823c762ac13ded51",
     "semantic_hash": ""
   },
   "netlify/functions/RESEARCH.md": {
@@ -3782,6 +3782,81 @@
   "test/unit/measurement-precision.test.js": {
     "mtime": 1783564544.37912,
     "ast_hash": "93c1efd5c6b4d6115565081ccf647d9e",
+    "semantic_hash": ""
+  },
+  "js/copilot/copilot-contract.js": {
+    "mtime": 1783566975.7393055,
+    "ast_hash": "17a4897e08e27f8d860230f0e05a5f1c",
+    "semantic_hash": ""
+  },
+  "schemas/copilot-contract-v1.json": {
+    "mtime": 1783566548.139288,
+    "ast_hash": "4b4502fba64449a501b786bce33c5c20",
+    "semantic_hash": ""
+  },
+  "test/fixtures/copilot/agent-activity.request.json": {
+    "mtime": 1783566609.0632906,
+    "ast_hash": "1119353ccb9329610aca8ac7b0c2f278",
+    "semantic_hash": ""
+  },
+  "test/fixtures/copilot/agent-activity.response.json": {
+    "mtime": 1783566609.0632906,
+    "ast_hash": "3958abe5a757180cb038cce30c60c0e6",
+    "semantic_hash": ""
+  },
+  "test/fixtures/copilot/attention-today.request.json": {
+    "mtime": 1783566609.0632906,
+    "ast_hash": "c2a57554999464deedfd812ddba62317",
+    "semantic_hash": ""
+  },
+  "test/fixtures/copilot/attention-today.response.json": {
+    "mtime": 1783566609.0632906,
+    "ast_hash": "9a31632f6d5e152114c644b39ae52800",
+    "semantic_hash": ""
+  },
+  "test/fixtures/copilot/draft-followup.request.json": {
+    "mtime": 1783566609.0632906,
+    "ast_hash": "fe2a914bc0c04109b123ea4ac6cd2060",
+    "semantic_hash": ""
+  },
+  "test/fixtures/copilot/draft-followup.response.json": {
+    "mtime": 1783566609.0632906,
+    "ast_hash": "2dd18dc79b9c12a7286d758ab93868d0",
+    "semantic_hash": ""
+  },
+  "test/fixtures/copilot/estimate-risk.request.json": {
+    "mtime": 1783566609.0632906,
+    "ast_hash": "746be251485eb9745cc5fa1755f1458a",
+    "semantic_hash": ""
+  },
+  "test/fixtures/copilot/estimate-risk.response.json": {
+    "mtime": 1783566609.0632906,
+    "ast_hash": "dbc526916f70e7a066eb727acd6e2df9",
+    "semantic_hash": ""
+  },
+  "test/fixtures/copilot/followups.request.json": {
+    "mtime": 1783566609.0632906,
+    "ast_hash": "cd80360b7c0b12d8c95084ee74ffe998",
+    "semantic_hash": ""
+  },
+  "test/fixtures/copilot/followups.response.json": {
+    "mtime": 1783566609.0632906,
+    "ast_hash": "cda1d30f504512c77c3fd368c9108242",
+    "semantic_hash": ""
+  },
+  "test/unit/copilot-contract.test.js": {
+    "mtime": 1783566641.331292,
+    "ast_hash": "e765d3e33dd4df026088fa8e8b021cbe",
+    "semantic_hash": ""
+  },
+  "docs/COPILOT_SLICE_A_RECON.md": {
+    "mtime": 1783565740.8099895,
+    "ast_hash": "764ef8f5780c09b76337f289053efa2a",
+    "semantic_hash": ""
+  },
+  "docs/HYPERKERNEL_CHAT_MISSION.md": {
+    "mtime": 1783566917.2353032,
+    "ast_hash": "cbb63679f5eadc2b63748b770f237539",
     "semantic_hash": ""
   }
 }

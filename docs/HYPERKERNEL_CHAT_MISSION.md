@@ -112,7 +112,7 @@ Do not store secrets or unnecessary PII.
 | Slice | Scope | Status |
 |---|---|---|
 | A | Two-repo read-only recon — chat paths, data sources, schema seams, authorization boundaries, integration risks. No behavior changes. | **DONE** — see `docs/COPILOT_SLICE_A_RECON.md` |
-| B | Contracts and fixtures — versioned request/response schemas, card schemas, fixture packets, validation tests in both repos. | pending |
+| B | Contracts and fixtures — versioned request/response schemas, card schemas, fixture packets, validation tests in both repos. | **DONE** — `js/copilot/copilot-contract.js` → generated `schemas/copilot-contract-v1.json`; 10 golden fixtures in `test/fixtures/copilot/`; Pydantic mirror + same fixtures committed on Custonllm branch `claude/copilot-slice-b` (local, awaiting push authorization). Provisional decisions pending owner confirmation: budgets p95 ≤ 6000 ms / ≤ $0.15 per conversation (carried in fixtures), Netlify-proxy topology. |
 | C | Context packet — scoped context assembly with RBAC, tenant isolation, source refs, redaction, deterministic outputs. | pending |
 | D | Copilot endpoint — validated answers, cards, evidence, confidence, unknowns, approval requirements from fixture packets. | pending |
 | E | UI integration — structured cards, evidence, approval states in HyperKernel Chat; graceful failure when model/adapter unavailable. | pending |

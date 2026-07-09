@@ -1,0 +1,68 @@
+{
+  "contractVersion": "1.0",
+  "requestId": "fx-fu-1",
+  "workspaceId": "ws_fixture",
+  "identity": {
+    "role": "owner",
+    "name": "Owner"
+  },
+  "job": "followups",
+  "message": "Who should I follow up with?",
+  "contextPacket": {
+    "packetVersion": 1,
+    "workspaceId": "ws_fixture",
+    "assembledAt": "2026-07-09T13:00:00.000Z",
+    "role": "owner",
+    "sections": [
+      {
+        "kind": "followups",
+        "items": [
+          {
+            "sourceRef": {
+              "collection": "quotes",
+              "id": "quote_101",
+              "asOf": "2026-07-09T13:00:00.000Z"
+            },
+            "data": {
+              "status": "follow_up_due",
+              "total": 1840,
+              "sentAt": "2026-07-05"
+            }
+          },
+          {
+            "sourceRef": {
+              "collection": "quotes",
+              "id": "quote_98",
+              "asOf": "2026-07-09T13:00:00.000Z"
+            },
+            "data": {
+              "status": "sent",
+              "total": 620,
+              "sentAt": "2026-07-03"
+            }
+          },
+          {
+            "sourceRef": {
+              "collection": "leads",
+              "id": "lead_290",
+              "asOf": "2026-07-09T13:00:00.000Z"
+            },
+            "data": {
+              "stage": "CONTACTED",
+              "serviceType": "stretching",
+              "lastTouch": "2026-07-01"
+            }
+          }
+        ]
+      }
+    ],
+    "redactions": [
+      "customer.phone",
+      "customer.email"
+    ]
+  },
+  "budgets": {
+    "p95LatencyMs": 6000,
+    "maxCostUSDPerConversation": 0.15
+  }
+}

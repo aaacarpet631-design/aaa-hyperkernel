@@ -1,0 +1,605 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aaa-hyperkernel/schemas/copilot-contract-v1.json",
+  "title": "HyperKernel × Custonllm copilot contract v1.0",
+  "description": "Versioned wire contract for the owner-grade business copilot (docs/HYPERKERNEL_CHAT_MISSION.md, Slice B). Generated from js/copilot/copilot-contract.js — edit the module, not this file.",
+  "$defs": {
+    "sourceRef": {
+      "type": "object",
+      "required": [
+        "collection",
+        "id"
+      ],
+      "properties": {
+        "collection": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "field": {
+          "type": "string"
+        },
+        "asOf": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "identity": {
+      "type": "object",
+      "required": [
+        "role"
+      ],
+      "properties": {
+        "role": {
+          "type": "string",
+          "enum": [
+            "owner",
+            "manager",
+            "crew"
+          ]
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "budgets": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "p95LatencyMs": {
+          "type": "number",
+          "minimum": 1
+        },
+        "maxCostUSDPerConversation": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "contextItem": {
+      "type": "object",
+      "required": [
+        "sourceRef",
+        "data"
+      ],
+      "properties": {
+        "sourceRef": {
+          "$ref": "#/$defs/sourceRef"
+        },
+        "data": {
+          "type": "object"
+        },
+        "untrusted": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "contextSection": {
+      "type": "object",
+      "required": [
+        "kind",
+        "items"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "attention",
+            "followups",
+            "estimate_risk",
+            "agent_activity",
+            "draft_context"
+          ]
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/contextItem"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "contextPacket": {
+      "type": "object",
+      "required": [
+        "packetVersion",
+        "workspaceId",
+        "assembledAt",
+        "role",
+        "sections"
+      ],
+      "properties": {
+        "packetVersion": {
+          "type": "number",
+          "enum": [
+            1
+          ]
+        },
+        "workspaceId": {
+          "type": "string"
+        },
+        "assembledAt": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "owner",
+            "manager",
+            "crew"
+          ]
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/contextSection"
+          }
+        },
+        "redactions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "requestEnvelope": {
+      "type": "object",
+      "required": [
+        "contractVersion",
+        "requestId",
+        "workspaceId",
+        "identity",
+        "job",
+        "message",
+        "contextPacket"
+      ],
+      "properties": {
+        "contractVersion": {
+          "type": "string",
+          "enum": [
+            "1.0"
+          ]
+        },
+        "requestId": {
+          "type": "string"
+        },
+        "workspaceId": {
+          "type": "string"
+        },
+        "identity": {
+          "$ref": "#/$defs/identity"
+        },
+        "job": {
+          "type": "string",
+          "enum": [
+            "attention_today",
+            "followups",
+            "estimate_risk",
+            "agent_activity",
+            "draft_followup"
+          ]
+        },
+        "message": {
+          "type": "string"
+        },
+        "contextPacket": {
+          "$ref": "#/$defs/contextPacket"
+        },
+        "budgets": {
+          "$ref": "#/$defs/budgets"
+        }
+      },
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "object",
+      "required": [
+        "claim",
+        "sourceRefs"
+      ],
+      "properties": {
+        "claim": {
+          "type": "string"
+        },
+        "sourceRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sourceRef"
+          },
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "approval": {
+      "type": "object",
+      "required": [
+        "required"
+      ],
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "approvalPackage": {
+          "type": "object",
+          "required": [
+            "actionType"
+          ],
+          "properties": {
+            "actionType": {
+              "type": "string"
+            },
+            "payload": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "degraded": {
+      "type": "object",
+      "required": [
+        "reason"
+      ],
+      "properties": {
+        "reason": {
+          "type": "string",
+          "enum": [
+            "model_unavailable",
+            "adapter_unavailable",
+            "context_unavailable",
+            "budget_exceeded"
+          ]
+        },
+        "fallback": {
+          "type": "string",
+          "enum": [
+            "local",
+            "none"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "card_attention_list": {
+      "type": "object",
+      "required": [
+        "cardType",
+        "items"
+      ],
+      "properties": {
+        "cardType": {
+          "type": "string",
+          "enum": [
+            "attention_list"
+          ]
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "label",
+              "why",
+              "severity",
+              "sourceRef"
+            ],
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "why": {
+                "type": "string"
+              },
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "info",
+                  "warn",
+                  "urgent"
+                ]
+              },
+              "sourceRef": {
+                "$ref": "#/$defs/sourceRef"
+              }
+            },
+            "additionalProperties": false
+          },
+          "minItems": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "card_followup_list": {
+      "type": "object",
+      "required": [
+        "cardType",
+        "items"
+      ],
+      "properties": {
+        "cardType": {
+          "type": "string",
+          "enum": [
+            "followup_list"
+          ]
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "reason",
+              "sourceRef"
+            ],
+            "properties": {
+              "reason": {
+                "type": "string"
+              },
+              "sourceRef": {
+                "$ref": "#/$defs/sourceRef"
+              },
+              "lastTouchAt": {
+                "type": "string"
+              },
+              "suggestedChannel": {
+                "type": "string",
+                "enum": [
+                  "call",
+                  "sms",
+                  "email"
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "minItems": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "card_estimate_risk": {
+      "type": "object",
+      "required": [
+        "cardType",
+        "quoteRef",
+        "risk",
+        "factors"
+      ],
+      "properties": {
+        "cardType": {
+          "type": "string",
+          "enum": [
+            "estimate_risk"
+          ]
+        },
+        "quoteRef": {
+          "$ref": "#/$defs/sourceRef"
+        },
+        "risk": {
+          "type": "string",
+          "enum": [
+            "underpriced",
+            "at_risk",
+            "healthy",
+            "unknown"
+          ]
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "factors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "note",
+              "sourceRef"
+            ],
+            "properties": {
+              "note": {
+                "type": "string"
+              },
+              "sourceRef": {
+                "$ref": "#/$defs/sourceRef"
+              }
+            },
+            "additionalProperties": false
+          },
+          "minItems": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "card_agent_activity": {
+      "type": "object",
+      "required": [
+        "cardType",
+        "items"
+      ],
+      "properties": {
+        "cardType": {
+          "type": "string",
+          "enum": [
+            "agent_activity"
+          ]
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "agent",
+              "action",
+              "sourceRef"
+            ],
+            "properties": {
+              "agent": {
+                "type": "string"
+              },
+              "action": {
+                "type": "string"
+              },
+              "at": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "completed",
+                  "awaiting_approval",
+                  "rejected",
+                  "failed"
+                ]
+              },
+              "sourceRef": {
+                "$ref": "#/$defs/sourceRef"
+              }
+            },
+            "additionalProperties": false
+          },
+          "minItems": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "card_draft_message": {
+      "type": "object",
+      "required": [
+        "cardType",
+        "channel",
+        "customerRef",
+        "body",
+        "sendBlocked",
+        "approvalActionType"
+      ],
+      "properties": {
+        "cardType": {
+          "type": "string",
+          "enum": [
+            "draft_message"
+          ]
+        },
+        "channel": {
+          "type": "string",
+          "enum": [
+            "sms",
+            "email"
+          ]
+        },
+        "customerRef": {
+          "$ref": "#/$defs/sourceRef"
+        },
+        "body": {
+          "type": "string"
+        },
+        "sendBlocked": {
+          "type": "boolean",
+          "enum": [
+            true
+          ]
+        },
+        "approvalActionType": {
+          "type": "string",
+          "enum": [
+            "APPROVE_ASSISTED_MSG"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "card_text": {
+      "type": "object",
+      "required": [
+        "cardType",
+        "body"
+      ],
+      "properties": {
+        "cardType": {
+          "type": "string",
+          "enum": [
+            "text"
+          ]
+        },
+        "body": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "responseEnvelope": {
+      "type": "object",
+      "required": [
+        "contractVersion",
+        "requestId",
+        "answer",
+        "cards",
+        "evidence",
+        "confidence",
+        "unknowns",
+        "approval"
+      ],
+      "properties": {
+        "contractVersion": {
+          "type": "string",
+          "enum": [
+            "1.0"
+          ]
+        },
+        "requestId": {
+          "type": "string"
+        },
+        "answer": {
+          "type": "string"
+        },
+        "cards": {
+          "type": "array",
+          "items": {
+            "discriminator": "cardType"
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence"
+          }
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "unknowns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "approval": {
+          "$ref": "#/$defs/approval"
+        },
+        "degraded": {
+          "$ref": "#/$defs/degraded"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
