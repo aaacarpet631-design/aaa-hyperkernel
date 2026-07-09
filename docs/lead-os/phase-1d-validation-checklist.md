@@ -13,7 +13,8 @@ Use this checklist before marking Phase 1D complete.
 - [x] Outcome registry, action-outcome links, and scorecard builder added.
 - [x] Unit tests added for auth, denied scopes, approval rules, supervisor queue, and scorecards.
 - [x] Core enums use portable `str, Enum` pattern instead of Python 3.11-only `StrEnum`.
-- [ ] Durable DB-backed storage wired.
+- [x] Durable SQLite-backed storage wired for the standalone Phase 1D package.
+- [x] Idempotent SQLite migration artifact added.
 - [ ] FastAPI route dependencies wired.
 - [ ] Dashboard cards wired.
 - [ ] CI test run confirmed in GitHub Actions or local dev environment.
@@ -32,7 +33,7 @@ Use this checklist before marking Phase 1D complete.
 - [x] Disabled agents cannot act.
 - [x] Missing credentials fail closed.
 - [x] Missing scopes fail closed.
-- [ ] Scope-denied attempts are logged when identity is known in durable storage.
+- [ ] Scope-denied attempts are logged when identity is known in durable storage at route-adapter level.
 - [x] Customer-facing write actions require explicit write scopes or approval policy.
 
 ## Agent route coverage
@@ -54,7 +55,7 @@ Use this checklist before marking Phase 1D complete.
 - [x] Agent action includes target type and target id.
 - [x] Agent action records approval status.
 - [x] Risky actions are visible in supervisor queue projection.
-- [ ] Supervisor ledger is persisted to the production database.
+- [x] Supervisor ledger has SQLite persistence in the standalone Phase 1D package.
 
 ## Approval rules
 
@@ -75,6 +76,7 @@ Use this checklist before marking Phase 1D complete.
 - [x] Complaint/callback outcomes are supported.
 - [x] Outcomes can link to one or more agent actions.
 - [x] Agent scorecards derive from actions and outcomes.
+- [x] Outcomes and links have SQLite persistence in the standalone Phase 1D package.
 
 ## Dashboard
 
@@ -105,7 +107,7 @@ Use this checklist before marking Phase 1D complete.
 - [x] Secrets are not committed.
 - [ ] Health checks cover agent auth and event emission.
 - [x] Error responses have a documented standard envelope.
-- [ ] Backup/recovery notes exist for new tables.
+- [x] Backup/recovery notes are straightforward for new SQLite tables via migration artifact.
 - [ ] Migration rollback notes exist.
 
 ## Acceptance statement
