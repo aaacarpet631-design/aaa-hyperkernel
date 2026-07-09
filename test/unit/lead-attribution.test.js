@@ -25,6 +25,15 @@ module.exports = async function run() {
   t.eq('fromUrl keeps the landing path (no query string)', parsed.landingPage, '/repair');
   t.ok('fromUrl ignores unknown params and never throws', !('foo' in parsed) && typeof AD.fromUrl(null) === 'object');
 
+  // fragments never persist: '#' can carry identifiers, and a fragment after
+  // a click-id param must not fuse into the stored id.
+  const frag = AD.fromUrl('https://aaacarpet.com/book?gclid=Abc123#reviews');
+  t.eq('a fragment never fuses into the click id', frag.gclid, 'Abc123');
+  t.eq('landing path drops the fragment', frag.landingPage, '/book');
+  const piiFrag = AD.fromUrl('https://aaacarpet.com/book#email=jane.doe@example.com');
+  t.ok('identifiers in a fragment never persist anywhere',
+    JSON.stringify(piiFrag).indexOf('jane.doe') === -1 && piiFrag.landingPage === '/book');
+
   // ===== intake: attribution rides in the separate ledger =====
   const created = await LEADS.createLead({
     name: 'Maria Gonzalez', phone: '7135559876', source: 'google_ads', serviceType: 'pet damage repair',

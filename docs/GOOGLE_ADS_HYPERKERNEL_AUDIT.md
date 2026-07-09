@@ -218,13 +218,32 @@ canonical contracts.
   events, missing attribution, value sanity, unreleased backlog).
 - Tests: 3,786 assertions across 190 suites, all green (9 ads-specific suites).
 
-**Review status**: the increment passed the coordinator's inline review
-(fixes applied: `ads_transmission_fixtures` added to the financial rules
-class; estimator `leadId` pass-through + regression test). A 4-lens
-adversarial multi-agent review workflow was launched but its finder agents
-were killed by a session usage limit — it reported an empty result that is a
-false negative, NOT a clean bill. The workflow is scheduled to re-run after
-the limit resets; findings, if any, land in a follow-up commit.
+**Review status (final, 2026-07-09)**: the 4-lens adversarial review workflow
+completed — 15 raw findings across correctness / governance-security /
+PII-honesty / test-gaps lenses, deduped to 12, each judged by two independent
+skeptics. **5 confirmed, all fixed with regression tests in the same commit**:
+
+1. *(critical)* `campaignScorecard` summed HIGH_MARGIN_JOB's derived-margin
+   valueUSD into `revenueUSD` alongside JOB_COMPLETED revenue — a $10,000 job
+   at 60% margin reported as $16,000. Fixed: HIGH_MARGIN_JOB is margin, never
+   revenue (excluded from the revenue sum and the valued-leads dedupe map).
+2. *(major)* `recordJobFinancials` ignored `completed.deduped`: a repeat call
+   with different numbers could fabricate a HIGH_MARGIN_JOB the recorded job
+   never earned. Fixed: first write wins; on dedupe the repeat's numbers are
+   ignored and marginPct returns null (the original cost is never stored).
+3. *(major)* negative `costUSD` was accepted, fabricating margin beyond the
+   job's revenue (sign/data-entry errors). Fixed: `COST_MUST_BE_NON_NEGATIVE`.
+4. *(major test-gap)* the revenueUSD × grossMarginUSD interplay on a single
+   lead was unasserted. Fixed: interplay + margin-not-revenue regressions.
+5. *(minor)* `fromUrl()` kept URL fragments: `#email=…` persisted into the
+   landing page and a fragment after `?gclid=` fused into the stored click
+   id. Fixed: fragments are stripped before parsing (doc claim now true).
+
+7 findings were refuted by both skeptics (pre-existing behavior, intentional
+and documented, or immaterial); 1 test-coverage finding (diagnostics'
+workspace filters) went unverified when its two verifier agents hit a session
+limit — it alleges a coverage gap, not a defect, and is carried as a known
+minor gap rather than silently dropped.
 
 ## Recommended next slice
 

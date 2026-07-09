@@ -93,5 +93,34 @@ module.exports = async function run() {
   // ---- read-only by construction ----
   t.ok('store byte-identical after scorecard runs', JSON.stringify(G.AAA_DATA._store) === before);
 
+  // ---- revenueUSD × grossMarginUSD interplay on the SAME lead ----
+  // A lead whose JOB_WON event carries a value AND whose won quote joins a
+  // margin must show BOTH, separately — the value once in revenueUSD, the
+  // margin once in grossMarginUSD, never mixed or suppressed.
+  const l4 = (await LEADS.createLead({ name: 'D Four', phone: '7130000004', source: 'google_ads', serviceType: 'repair',
+    attribution: { gclid: 'GC-4', campaign: 'Both-Sides', consent: 'granted' } })).lead;
+  await CL.record(l4.leadId, 'JOB_WON', { valueUSD: 1500, sourceRef: 'q4' });
+  const wD = await winQuote({ estimate: estimateOf(500, 200, 1500), leadId: l4.leadId, leadSource: 'google_ads' },
+    { finalPrice: 1500, jobCost: 700 });
+  t.ok('interplay quote reached WON', wD.ok);
+  const sc2 = await REP.campaignScorecard();
+  const both = sc2.rows.find((r) => r.campaign === 'Both-Sides');
+  t.eq('event value lands in revenueUSD exactly once', both.revenueUSD, 1500);
+  t.eq('quote margin lands in grossMarginUSD, separately', both.grossMarginUSD, 800);
+  t.eq('the joinable win is counted in marginKnownWon', both.marginKnownWon, 1);
+
+  // ---- HIGH_MARGIN_JOB is margin, never revenue ----
+  // recordJobFinancials writes JOB_COMPLETED (revenue) + HIGH_MARGIN_JOB
+  // (derived margin on the SAME dollars): revenueUSD must show the revenue
+  // once, not revenue + margin.
+  const l5 = (await LEADS.createLead({ name: 'E Five', phone: '7130000005', source: 'google_ads', serviceType: 'install',
+    attribution: { gclid: 'GC-5', campaign: 'Premium-Jobs', consent: 'granted' } })).lead;
+  const fin = await CL.recordJobFinancials(l5.leadId, { revenueUSD: 10000, costUSD: 4000 });
+  t.ok('high-margin job recorded (60% >= 55 floor)', fin.ok && fin.highMargin === true);
+  const sc3 = await REP.campaignScorecard();
+  const prem = sc3.rows.find((r) => r.campaign === 'Premium-Jobs');
+  t.eq('revenueUSD is the job revenue, NOT revenue + margin', prem.revenueUSD, 10000);
+  t.eq('the high-margin event still counts in its own ladder column', prem.highMargin, 1);
+
   return t.report();
 };

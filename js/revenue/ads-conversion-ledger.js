@@ -114,8 +114,12 @@
      * when marginPct = (revenue - cost) / revenue * 100 is at or above the
      * 'adsHighMarginPctFloor' flag (default 55) it ALSO records
      * HIGH_MARGIN_JOB with valueUSD = round(revenue - cost). The raw cost is
-     * never stored — margin value only. Both events dedupe via record().
-     * Returns { ok, events: [...], marginPct, highMargin }.
+     * never stored — margin value only. Cost must be >= 0 (a negative cost
+     * would fabricate margin beyond the job's revenue). FIRST WRITE WINS:
+     * when JOB_COMPLETED dedupes, the repeat call's numbers are ignored —
+     * no HIGH_MARGIN_JOB is derived from them and marginPct returns null
+     * (the original cost was never stored, so it is honestly unknowable).
+     * Returns { ok, events: [...], marginPct, highMargin, deduped? }.
      */
     async recordJobFinancials(leadId, fin) {
       if (!leadId) return { ok: false, error: 'NO_LEAD' };
@@ -124,9 +128,22 @@
       if (f.revenueUSD == null || !isFinite(revenue)) return { ok: false, error: 'REVENUE_REQUIRED' };
       if (f.costUSD == null || !isFinite(cost)) return { ok: false, error: 'COST_REQUIRED' };
       if (revenue <= 0) return { ok: false, error: 'REVENUE_MUST_BE_POSITIVE' };
+      // A negative cost (sign/data-entry error) would fabricate a margin larger
+      // than the job's revenue — refused the same way zero revenue is.
+      if (cost < 0) return { ok: false, error: 'COST_MUST_BE_NON_NEGATIVE' };
 
       const completed = await this.record(leadId, 'JOB_COMPLETED', { valueUSD: revenue, sourceRef: f.sourceRef });
       if (!completed.ok) return completed;
+      if (completed.deduped) {
+        // First write wins — the ORIGINAL financials stand. Recomputing margin
+        // from a repeat call's numbers could fabricate a HIGH_MARGIN_JOB the
+        // recorded job never earned (the original cost is never stored, so the
+        // true margin is unknowable here: marginPct is honestly null).
+        let priorHM = null;
+        try { priorHM = await data().get(COLLECTION, String(leadId) + ':HIGH_MARGIN_JOB'); } catch (_) { priorHM = null; }
+        priorHM = mine(priorHM) ? priorHM : null;
+        return { ok: true, deduped: true, events: priorHM ? [completed.event, priorHM] : [completed.event], marginPct: null, highMargin: !!priorHM };
+      }
       const events = [completed.event];
 
       const marginPct = (revenue - cost) / revenue * 100;

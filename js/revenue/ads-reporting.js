@@ -82,12 +82,15 @@
       const rows = {};
       function row(key) { return rows[key] || (rows[key] = emptyRow(key)); }
 
-      // Ladder counts + event-carried value (primary signals only count as revenue).
+      // Ladder counts + event-carried value. Only REVENUE-carrying primary
+      // signals sum into revenueUSD: HIGH_MARGIN_JOB's valueUSD is a DERIVED
+      // margin on the same dollars as JOB_COMPLETED — counting it as revenue
+      // would inflate every high-margin job by its margin.
       (await conv.list()).forEach(function (e) {
         const r = row(leadCampaign[e.leadId] || '(unattributed)');
         const col = LADDER_COLUMNS[e.type];
         if (col) r[col]++;
-        if (e.primarySignal && e.valueUSD != null) r.revenueUSD += num(e.valueUSD);
+        if (e.primarySignal && e.valueUSD != null && e.type !== 'HIGH_MARGIN_JOB') r.revenueUSD += num(e.valueUSD);
       });
 
       // Lead OS outcomes: WON revenue recorded on the lead itself (when the
@@ -95,7 +98,9 @@
       // when no primary event carried value for that lead.
       const valuedLeads = {};
       (await conv.list({ primaryOnly: true })).forEach(function (e) {
-        if (e.valueUSD != null) valuedLeads[e.leadId] = true;
+        // HIGH_MARGIN_JOB carries margin, not revenue — it must not suppress
+        // the lead-outcome revenue join for a lead with no revenue event.
+        if (e.valueUSD != null && e.type !== 'HIGH_MARGIN_JOB') valuedLeads[e.leadId] = true;
       });
       if (leadsOS() && leadsOS().listLeads) {
         (await leadsOS().listLeads()).forEach(function (l) {

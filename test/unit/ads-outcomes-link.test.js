@@ -86,8 +86,16 @@ module.exports = async function run() {
     again.ok && again.events.length === 2 && again.events[0].valueUSD === 10000 && again.events[1].valueUSD === 5678);
   t.eq('no duplicate events stored for the lead', (await CL.listForLead('lead_hi')).length, 2);
 
+  // a repeat call with BETTER numbers must not fabricate a high-margin job:
+  // lead_lo recorded 50% margin (no HM). Retrying with cost 100 (90%) dedupes.
+  const retry = await CL.recordJobFinancials('lead_lo', { revenueUSD: 1000, costUSD: 100 });
+  t.ok('repeat call with different numbers cannot fabricate HIGH_MARGIN_JOB',
+    retry.ok && retry.deduped === true && retry.highMargin === false && retry.marginPct === null);
+  t.eq('lead_lo still has only its original JOB_COMPLETED', (await CL.listForLead('lead_lo')).length, 1);
+
   // ===== invalid inputs are refused, nothing stored =====
   t.eq('missing fin refused', (await CL.recordJobFinancials('lead_bad')).ok, false);
+  t.eq('negative cost refused (sign errors cannot fabricate margin)', (await CL.recordJobFinancials('lead_bad', { revenueUSD: 1000, costUSD: -500 })).error, 'COST_MUST_BE_NON_NEGATIVE');
   t.eq('non-finite revenue refused', (await CL.recordJobFinancials('lead_bad', { revenueUSD: 'lots', costUSD: 10 })).ok, false);
   t.eq('zero revenue refused', (await CL.recordJobFinancials('lead_bad', { revenueUSD: 0, costUSD: 0 })).ok, false);
   t.eq('missing cost refused', (await CL.recordJobFinancials('lead_bad', { revenueUSD: 100 })).ok, false);

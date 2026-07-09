@@ -56,7 +56,9 @@
       if (!url) return out;
       let qs = null;
       try {
-        const s = String(url);
+        // Fragments never persist: '#...' can carry identifiers (PII) and a
+        // fragment after a click-id param would fuse into the stored id.
+        const s = String(url).split('#')[0];
         const q = s.indexOf('?') !== -1 ? s.slice(s.indexOf('?') + 1) : (s.indexOf('=') !== -1 ? s : '');
         qs = new global.URLSearchParams(q);
         const path = s.indexOf('://') !== -1 ? s.replace(/^[a-z]+:\/\/[^/]+/i, '').split('?')[0] : (s.indexOf('?') > 0 ? s.split('?')[0] : null);

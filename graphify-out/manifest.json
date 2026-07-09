@@ -3495,8 +3495,8 @@
     "semantic_hash": ""
   },
   "js/intelligence/ad-attribution.js": {
-    "mtime": 1783322536.3546329,
-    "ast_hash": "130fd83910083698d788308395f96ee4",
+    "mtime": 1783610460.5397153,
+    "ast_hash": "e5c1aeb13b172e88d6f02b4b0b8aa99a",
     "semantic_hash": ""
   },
   "test/unit/ad-attribution.test.js": {
@@ -3660,8 +3660,8 @@
     "semantic_hash": ""
   },
   "js/revenue/ads-conversion-ledger.js": {
-    "mtime": 1783399039.5125866,
-    "ast_hash": "7d5bbc0deaf6683f49b30e55d542f3f1",
+    "mtime": 1783610478.3517158,
+    "ast_hash": "6800e9033ba3a185d202e1571c22346f",
     "semantic_hash": ""
   },
   "js/revenue/ads-governance.js": {
@@ -3670,8 +3670,8 @@
     "semantic_hash": ""
   },
   "js/revenue/ads-reporting.js": {
-    "mtime": 1783399014.124587,
-    "ast_hash": "ceaf3c7ed97cec2619509b09a0793f79",
+    "mtime": 1783610454.8677151,
+    "ast_hash": "02362a8a126665ced24830f691a715aa",
     "semantic_hash": ""
   },
   "schemas/google-ads-attribution.json": {
@@ -3700,13 +3700,13 @@
     "semantic_hash": ""
   },
   "test/unit/lead-attribution.test.js": {
-    "mtime": 1783323012.66665,
-    "ast_hash": "309d553e77bb3c5a469a87f83bc694b0",
+    "mtime": 1783610526.9477174,
+    "ast_hash": "9c0786cbb1a997eabe346c4203d7219a",
     "semantic_hash": ""
   },
   "docs/GOOGLE_ADS_HYPERKERNEL_AUDIT.md": {
-    "mtime": 1783563552.2630794,
-    "ast_hash": "de63674c465b1fba0898984162f6e1ac",
+    "mtime": 1783610564.0877187,
+    "ast_hash": "09e7ffde7180d559242ffbd913dd1568",
     "semantic_hash": ""
   },
   "docs/UI_POLISH_PR_NOTES.md": {
@@ -3715,23 +3715,23 @@
     "semantic_hash": ""
   },
   "test/unit/ads-outcomes-link.test.js": {
-    "mtime": 1783399072.3005857,
-    "ast_hash": "e752dfa0584213af4845d1c3c24886bf",
+    "mtime": 1783610483.419716,
+    "ast_hash": "d6e418f45a20df550d2e2022f5bcb0f7",
     "semantic_hash": ""
   },
   "test/unit/ads-margin-join.test.js": {
-    "mtime": 1783399111.104585,
-    "ast_hash": "aabbba615a772b700fda1cea81bb72f4",
+    "mtime": 1783610517.315717,
+    "ast_hash": "d40929d2762e1b291c1585cd890dc7c2",
     "semantic_hash": ""
   },
   "js/ads/google-ads-datamanager-client.js": {
-    "mtime": 1783399348.4405794,
+    "mtime": 1783592065.34048,
     "ast_hash": "d924be7b4f68a3e6579cc765ff507cd2",
     "semantic_hash": ""
   },
   "js/ads/google-ads-diagnostics.js": {
-    "mtime": 1783399363.7565792,
-    "ast_hash": "44caaa3db8485683087e6fecd5056b7d",
+    "mtime": 1783592127.048529,
+    "ast_hash": "3812035069258266bf0aba7be7bbf0f9",
     "semantic_hash": ""
   },
   "js/ads/google-ads-mock-client.js": {

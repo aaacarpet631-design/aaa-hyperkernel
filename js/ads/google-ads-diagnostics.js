@@ -133,7 +133,7 @@
   async function dedupeIntegrity() {
     const id = 'dedupe_integrity';
     if (!data() || !data().list) return unavailable(id);
-    const events = ((await data().list(EVENTS_COLLECTION)) || []).filter(mine);
+    const events = ((await data().list(EVENTS_COLLECTION)) || []);
     const seen = {};
     const bad = [];
     events.forEach(function (e) {
@@ -154,7 +154,7 @@
     const L = leads();
     if (!data() || !data().list) return unavailable(id);
     if (!L || !L.listLeads) return unavailable(id);
-    const events = ((await data().list(EVENTS_COLLECTION)) || []).filter(mine);
+    const events = ((await data().list(EVENTS_COLLECTION)) || []);
     const known = {};
     ((await L.listLeads()) || []).forEach(function (l) { if (l && l.leadId) known[l.leadId] = true; });
     const orphanIds = [];
@@ -203,7 +203,7 @@
     const q = await led.uploadQueue();
     const payloads = (q && q.payloads) || [];
     const released = {};
-    ((await data().list(EXPORTS_COLLECTION)) || []).filter(mine).forEach(function (b) {
+    ((await data().list(EXPORTS_COLLECTION)) || []).forEach(function (b) {
       if (!b || b.status !== 'released') return;
       (b.payloads || []).forEach(function (p) { if (p && p.eventId) released[p.eventId] = true; });
     });
