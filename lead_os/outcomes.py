@@ -5,13 +5,17 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from enum import StrEnum
+from enum import Enum
 from uuid import uuid4
 
 from .supervisor import AgentAction, ApprovalStatus
 
 
-class OutcomeType(StrEnum):
+class _StringEnum(str, Enum):
+    """Portable string enum for Python 3.10+ compatibility."""
+
+
+class OutcomeType(_StringEnum):
     LEAD_WON = "LEAD_WON"
     LEAD_LOST = "LEAD_LOST"
     JOB_COMPLETED = "JOB_COMPLETED"
