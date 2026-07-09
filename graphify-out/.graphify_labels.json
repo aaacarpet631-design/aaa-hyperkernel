@@ -676,5 +676,15 @@
   "674": "review-safety.test.js",
   "675": "workforce-ui.test.js",
   "676": "opportunity-scorer.test.js",
-  "677": "sensing.test.js"
+  "677": "sensing.test.js",
+  "678": "security-ui.test.js",
+  "679": "teleological.test.js",
+  "680": "copilot-remote-adapter.test.js",
+  "681": "governance-sync.test.js",
+  "682": "assisted-draft-queue.test.js",
+  "683": "audit-ledger-crypto.test.js",
+  "684": "governance-learning.test.js",
+  "685": "planning-desk.test.js",
+  "686": "private-gpu-adapter.test.js",
+  "687": "quickbooks-online.test.js"
 }

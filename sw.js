@@ -6,7 +6,7 @@
  * app fully usable offline. Old caches are purged on activate, and the worker
  * takes control immediately to avoid serving a stale shell after an update.
  */
-const CACHE_NAME = 'hyperkernel-v108';
+const CACHE_NAME = 'hyperkernel-v109';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -171,6 +171,9 @@ const PRECACHE = [
   '/js/copilot/software-factory-card.js',
   '/js/copilot/governance-approval-card.js',
   '/js/copilot/rich-card-renderer.js',
+  '/js/copilot/copilot-remote-adapter.js',
+  '/js/copilot/contract-card-renderer.js',
+  '/js/copilot/copilot-chat-bridge.js',
   '/js/copilot/chat-canvas.js',
   '/js/copilot/copilot-ui.js',
   '/js/copilot/sms-command-router.js',

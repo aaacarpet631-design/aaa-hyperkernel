@@ -1,16 +1,16 @@
 # Graph Report - aaa-hyperkernel  (2026-07-09)
 
 ## Corpus Check
-- 768 files · ~662,825 words
+- 773 files · ~666,089 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 8243 nodes · 14614 edges · 678 communities (544 shown, 134 thin omitted)
-- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 280 edges (avg confidence: 0.6)
+- 8279 nodes · 14685 edges · 688 communities (550 shown, 138 thin omitted)
+- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 281 edges (avg confidence: 0.6)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `d08eea60`
+- Built from commit: `0fc4910f`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -119,6 +119,7 @@
 - [[_COMMUNITY_Core Cloud|Core Cloud]]
 - [[_COMMUNITY_Epistemology Knowledge Compounding|Epistemology Knowledge Compounding]]
 - [[_COMMUNITY_Functions Sense Normalize|Functions Sense Normalize]]
+- [[_COMMUNITY_Genesis Capability Gap|Genesis Capability Gap]]
 - [[_COMMUNITY_Genesis Capability Reputation|Genesis Capability Reputation]]
 - [[_COMMUNITY_Genesis Goal Capability|Genesis Goal Capability]]
 - [[_COMMUNITY_Intelligence Provenance Store|Intelligence Provenance Store]]
@@ -660,11 +661,21 @@
 - [[_COMMUNITY_workforce-ui.test.js|workforce-ui.test.js]]
 - [[_COMMUNITY_opportunity-scorer.test.js|opportunity-scorer.test.js]]
 - [[_COMMUNITY_sensing.test.js|sensing.test.js]]
+- [[_COMMUNITY_security-ui.test.js|security-ui.test.js]]
+- [[_COMMUNITY_teleological.test.js|teleological.test.js]]
+- [[_COMMUNITY_copilot-remote-adapter.test.js|copilot-remote-adapter.test.js]]
+- [[_COMMUNITY_governance-sync.test.js|governance-sync.test.js]]
+- [[_COMMUNITY_assisted-draft-queue.test.js|assisted-draft-queue.test.js]]
+- [[_COMMUNITY_audit-ledger-crypto.test.js|audit-ledger-crypto.test.js]]
+- [[_COMMUNITY_governance-learning.test.js|governance-learning.test.js]]
+- [[_COMMUNITY_planning-desk.test.js|planning-desk.test.js]]
+- [[_COMMUNITY_private-gpu-adapter.test.js|private-gpu-adapter.test.js]]
+- [[_COMMUNITY_quickbooks-online.test.js|quickbooks-online.test.js]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `load()` - 227 edges
-2. `makeRunner()` - 191 edges
-3. `setupEnv()` - 186 edges
+1. `load()` - 229 edges
+2. `makeRunner()` - 193 edges
+3. `setupEnv()` - 188 edges
 4. `render()` - 30 edges
 5. `claude-obsidian: Self-Organizing AI Second Brain for Obsidian + Claude Code` - 27 edges
 6. `read()` - 24 edges
@@ -674,12 +685,12 @@
 10. `NotebookLM Automation` - 18 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `makeWindow()` --calls--> `require()`  [INFERRED]
+  test/smoke/boot.test.js → js/core/aaa-rbac.js
 - `load()` --calls--> `require()`  [INFERRED]
   test/helpers/harness.js → js/core/aaa-rbac.js
 - `setupEnv()` --calls--> `require()`  [INFERRED]
   test/helpers/harness.js → js/core/aaa-rbac.js
-- `makeWindow()` --calls--> `require()`  [INFERRED]
-  test/smoke/boot.test.js → js/core/aaa-rbac.js
 - `ingest()` --indirect_call--> `q()`  [INFERRED]
   js/intelligence/learning-fabric.js → test/unit/prediction-closure.test.js
 - `scoreAll()` --indirect_call--> `q()`  [INFERRED]
@@ -693,23 +704,23 @@
 - **HyperKernel Phase-1 founding architecture** — hyperkernel_event_taxonomy, hyperkernel_derived_graph, hyperkernel_five_primitives, hyperkernel_provenance, hyperkernel_closure_loops, hyperkernel_council_structure, hyperkernel_agent_lifecycle, hyperkernel_memory_lifecycle, hyperkernel_audit_architecture, hyperkernel_kernel_invariants, hyperkernel_hyperkernel [EXTRACTED 1.00]
 - **Bluetooth laser measurement pipeline (capture to quote)** — js_bluetooth_services_raw_reading_log_rawbluetoothreadinglog, js_bluetooth_services_measurement_parser_measurementparser, services_generic_ble_adapter_genericblemeasurementadapter, js_bluetooth_services_device_adapter_registry_deviceadapterregistry, js_bluetooth_services_huepar_s60_adapter_aaa_huepar_s60_adapter, js_bluetooth_hooks_use_bluetooth_connection_aaa_bluetooth, storage_measurement_store, measurements_measurement_ai_assistant, integrations_measurement_to_quote [EXTRACTED 1.00]
 
-## Communities (678 total, 134 thin omitted)
+## Communities (688 total, 138 thin omitted)
 
 ### Community 0 - "Unit Audit Ledger"
 Cohesion: 0.02
-Nodes (120): makeClock(), makeConfig(), makeData(), makeEvents(), makeIds(), makeRunner(), path, setupEnv() (+112 more)
+Nodes (109): makeClock(), makeConfig(), makeData(), makeEvents(), makeIds(), makeRunner(), path, setupEnv() (+101 more)
 
 ### Community 3 - "Asyncapi Events"
 Cohesion: 0.16
 Nodes (36): actor(), adapter(), applyVersion(), approveVersion(), audit(), canApprove(), cfg(), checksum() (+28 more)
 
 ### Community 4 - "Transport Transport Core"
-Cohesion: 0.13
-Nodes (44): adapters(), analytics(), applyStatusEvent(), _attachOutbound(), biz(), cfg(), clock(), closeThread() (+36 more)
+Cohesion: 0.08
+Nodes (66): cfg(), clock(), data(), ingest(), insights(), isWon(), listQuotes(), mean() (+58 more)
 
 ### Community 5 - "Core Privacy"
 Cohesion: 0.04
-Nodes (43): load(), loadAll(), { makeRunner, setupEnv, load }, loadCore(), { makeRunner, setupEnv, load }, BADOUT, GOOD, loadAll() (+35 more)
+Nodes (34): load(), { makeRunner, setupEnv, load }, { makeRunner, setupEnv, load }, { makeRunner, setupEnv, load }, loadAll(), { makeRunner, setupEnv, load }, { makeRunner, setupEnv, load }, loadCore() (+26 more)
 
 ### Community 6 - "Unit Bluetooth Connect"
 Cohesion: 0.08
@@ -737,7 +748,7 @@ Nodes (46): additionalProperties, minLength, type, maximum, minimum, type, minLe
 
 ### Community 12 - "Transport Transport Store"
 Cohesion: 0.04
-Nodes (27): ROOT, fs, { makeRunner, ROOT }, path, vm, cp, fs, { makeRunner, ROOT } (+19 more)
+Nodes (28): ROOT, fs, { makeRunner, ROOT }, makeWindow(), path, vm, cp, fs (+20 more)
 
 ### Community 13 - "Intelligence Prediction Closure"
 Cohesion: 0.04
@@ -924,8 +935,8 @@ Cohesion: 0.19
 Nodes (26): acceptRecommendation(), actor(), audit(), cards(), cfg(), clock(), createImprovementTask(), data() (+18 more)
 
 ### Community 60 - "Revenue Council Governance"
-Cohesion: 0.07
-Nodes (51): accuracy(), cfg(), classify(), clock(), correct(), data(), getOne(), ids() (+43 more)
+Cohesion: 0.24
+Nodes (20): accuracy(), cfg(), classify(), clock(), correct(), data(), getOne(), ids() (+12 more)
 
 ### Community 61 - "Simulation Simulation Governance"
 Cohesion: 0.07
@@ -1090,6 +1101,10 @@ Nodes (21): actor(), artifactRow(), btn(), chip(), contentStr(), diffDrawer(), d
 ### Community 103 - "Functions Sense Normalize"
 Cohesion: 0.15
 Nodes (12): MISSED, normalize(), answered, eq(), lead, miss, { normalize }, ok() (+4 more)
+
+### Community 104 - "Genesis Capability Gap"
+Cohesion: 0.17
+Nodes (3): See also, Sources, {{title}}
 
 ### Community 105 - "Genesis Capability Reputation"
 Cohesion: 0.10
@@ -2101,7 +2116,7 @@ Nodes (5): htmlOf(), installDom(), makeEl(), { makeRunner, setupEnv, load }, wal
 
 ### Community 370 - "Unit World Model"
 Cohesion: 0.20
-Nodes (22): cfg(), clock(), data(), ingest(), insights(), isWon(), listQuotes(), mean() (+14 more)
+Nodes (19): actorLabel(), _assembleModel(), clock(), countUp(), data(), esc(), fmtMoney(), fmtValue() (+11 more)
 
 ### Community 371 - "Agents Agent Registry"
 Cohesion: 0.33
@@ -2132,8 +2147,8 @@ Cohesion: 0.06
 Nodes (35): 10. Audit architecture, 1. The 25 highest-value business events, 2. Event taxonomy, 3. Graph schema, 4. Primitive schemas, 5. Governance model, 6. Learning loops, 7. Council structure (+27 more)
 
 ### Community 378 - "Innovation Experiment Scorecard"
-Cohesion: 0.22
-Nodes (5): uniq(), currentGeo(), runner(), simulate(), v()
+Cohesion: 0.12
+Nodes (7): uniq(), currentGeo(), runner(), simulate(), biz(), cfg(), v()
 
 ### Community 379 - "Simulation Policy Simulator"
 Cohesion: 0.33
@@ -2256,8 +2271,8 @@ Cohesion: 0.11
 Nodes (18): AAA Governance Engine — enterprise review/override/audit for AI decisions, Adding the next guardrail, Automatic measurement (Phase 2 — instrumentation & linkage), Business-event completion + prompt-change pipeline (Phase 4), Cloud persistence (Phase 7), Components, Cryptographic + multi-writer ledger (Phase 8), Delivery channels (`AAA_GOVERNANCE_NOTIFIER` + `/api/governance-alert`) (+10 more)
 
 ### Community 419 - "Community 419"
-Cohesion: 0.31
-Nodes (12): attribution(), campaignScorecard(), conversions(), data(), diagnostics(), fin(), leadsOS(), num() (+4 more)
+Cohesion: 0.18
+Nodes (19): attribution(), campaignScorecard(), conversions(), data(), diagnostics(), fin(), leadsOS(), num() (+11 more)
 
 ### Community 420 - "Community 420"
 Cohesion: 0.44
@@ -2612,8 +2627,8 @@ Cohesion: 0.13
 Nodes (15): type, additionalProperties, properties, required, type, properties, required, type (+7 more)
 
 ### Community 525 - "Community 525"
-Cohesion: 0.46
-Nodes (7): baselineCloseRate(), classify(), clock(), clusterKeywords(), marketing(), nowMs(), world()
+Cohesion: 0.23
+Nodes (11): can(), cfg(), events(), label(), require(), role(), setRole(), engine() (+3 more)
 
 ### Community 526 - "Community 526"
 Cohesion: 0.67
@@ -2663,6 +2678,10 @@ Nodes (3): utmTerm, maxLength, type
 Cohesion: 0.67
 Nodes (3): zip, maxLength, type
 
+### Community 556 - "governance-notifier.test.js"
+Cohesion: 0.31
+Nodes (12): ask(), cfg(), configured(), context(), contract(), fail(), flag(), ids() (+4 more)
+
 ### Community 557 - "owner-copilot-ui.test.js"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
@@ -2678,6 +2697,10 @@ Nodes (8): check(), resolve(), run(), typeOf(), validateCard(), validateContextP
 ### Community 562 - "review-governance.test.js"
 Cohesion: 0.67
 Nodes (3): maxLength, type, keyword
+
+### Community 656 - "ai-model-router.test.js"
+Cohesion: 0.45
+Nodes (10): agentActivity(), attentionList(), draftMessage(), esc(), estimateRisk(), followupList(), refChip(), render() (+2 more)
 
 ### Community 657 - "mission-manager.test.js"
 Cohesion: 0.40
@@ -2724,41 +2747,57 @@ Cohesion: 0.33
 Nodes (5): Adjacent MOCs, Core notes, Open questions / frontier, {{title}} — Map of Content, Why this MOC exists
 
 ### Community 668 - "agent-evaluation-ui.test.js"
-Cohesion: 0.40
-Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
+Cohesion: 0.17
+Nodes (8): fakeUI(), loadAll(), { makeRunner, setupEnv, load }, CURRENT, GOAL, loadAll(), { makeRunner, setupEnv, load }, MOCK
 
 ### Community 669 - "governance-bridge.test.js"
 Cohesion: 0.67
 Nodes (3): searchTerm, maxLength, type
 
+### Community 670 - "workforce-ui.test.js"
+Cohesion: 0.33
+Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
+
+### Community 671 - "utmMedium"
+Cohesion: 0.67
+Nodes (5): ask(), canHandle(), classify(), remote(), renderer()
+
 ### Community 672 - "assisted-draft-queue.test.js"
-Cohesion: 0.50
-Nodes (3): See also, Sources, {{title}}
+Cohesion: 0.40
+Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
 ### Community 673 - "company-brain.test.js"
 Cohesion: 0.67
 Nodes (3): installDom(), makeEl(), { makeRunner, setupEnv, load }
+
+### Community 678 - "security-ui.test.js"
+Cohesion: 0.40
+Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
+
+### Community 679 - "teleological.test.js"
+Cohesion: 0.33
+Nodes (4): CURRENT, GOAL, loadAll(), { makeRunner, setupEnv, load }
 
 ## Ambiguous Edges - Review These
 - `HyperKernel PWA App Icon (512x512)` → `White glyph on transparent background (exact shape indiscernible against white viewer background)`  [AMBIGUOUS]
   icons/icon-512.png · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **1876 isolated node(s):** `session-start.sh script`, `$schema`, `name`, `name`, `url` (+1871 more)
+- **1878 isolated node(s):** `session-start.sh script`, `$schema`, `name`, `name`, `url` (+1873 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **134 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **138 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **What is the exact relationship between `HyperKernel PWA App Icon (512x512)` and `White glyph on transparent background (exact shape indiscernible against white viewer background)`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
-- **Why does `q()` connect `Replay Sandbox` to `Community 419`, `Quotes Quote Store`, `Community 525`, `Simulation Counterfactual Runner`, `Business`, `Community 560`, `Unit World Model`, `Revenue Council Governance`?**
-  _High betweenness centrality (0.026) - this node is a cross-community bridge._
-- **Why does `v()` connect `Innovation Experiment Scorecard` to `Asyncapi Events`, `Agents Pricing Optimizer`, `Community 486`, `Unit Bluetooth Connect`, `Quotes Quote Store`, `Intelligence Agent Evaluation`, `governance-notifier.test.js`, `command-deck.test.js`, `Revenue Council Governance`, `Genesis Tool Forge`?**
-  _High betweenness centrality (0.017) - this node is a cross-community bridge._
-- **Why does `makeRunner()` connect `Unit Audit Ledger` to `Core Privacy`, `Community 523`, `Transport Transport Store`, `Quote Lifecycle`, `Community 526`, `review-safety.test.js`, `ai-model-router.test.js`, `ads-margin-join.test.js`, `Community 530`, `Community 527`, `Community 532`, `Community 528`, `mission-manager.test.js`, `rules.test.js`, `Community 408`, `Community 531`, `Community 410`, `Community 411`, `agent-evaluation-ui.test.js`, `Community 413`, `Community 414`, `workforce-ui.test.js`, `Community 415`, `company-brain.test.js`, `Community 416`, `Community 417`, `opportunity-scorer.test.js`, `Test Intelligence Smoke`, `Community 421`, `Community 423`, `review-safety.test.js`, `Community 425`, `Community 426`, `Community 427`, `sensing.test.js`, `Community 429`, `Community 430`, `quote-lifecycle-ui.test.js`, `Community 431`, `utmMedium`, `owner-copilot-ui.test.js`, `Community 433`, `Community 434`, `Copilot Governance Approval`, `workforce-ui.test.js`, `governance-business-events.test.js`, `Agents Marketing Intel`, `Claude Proxy Index`, `Replay Sandbox`, `Community 480`, `Community 482`, `Community 483`, `Community 484`, `Community 487`, `Unit Review Safety`, `Unit Transport Scheduler`?**
-  _High betweenness centrality (0.012) - this node is a cross-community bridge._
+- **Why does `q()` connect `Replay Sandbox` to `Community 419`, `Transport Transport Core`, `Quotes Quote Store`, `Simulation Counterfactual Runner`, `Business`, `Community 560`, `Unit World Model`?**
+  _High betweenness centrality (0.014) - this node is a cross-community bridge._
+- **Why does `makeRunner()` connect `Unit Audit Ledger` to `Core Privacy`, `Community 523`, `Transport Transport Store`, `Quote Lifecycle`, `Community 526`, `review-safety.test.js`, `Community 527`, `ads-margin-join.test.js`, `Community 530`, `Community 528`, `Community 532`, `mission-manager.test.js`, `Community 531`, `Community 408`, `Community 410`, `Community 411`, `agent-evaluation-ui.test.js`, `Community 413`, `Community 414`, `Community 415`, `Community 416`, `company-brain.test.js`, `Community 417`, `rules.test.js`, `opportunity-scorer.test.js`, `Test Intelligence Smoke`, `Community 421`, `Community 423`, `copilot-remote-adapter.test.js`, `Community 425`, `assisted-draft-queue.test.js`, `audit-ledger-crypto.test.js`, `governance-learning.test.js`, `governance-sync.test.js`, `Community 430`, `planning-desk.test.js`, `private-gpu-adapter.test.js`, `Community 426`, `Community 427`, `quickbooks-online.test.js`, `quote-lifecycle-ui.test.js`, `Community 429`, `assisted-draft-queue.test.js`, `Community 431`, `Community 433`, `Community 434`, `Copilot Governance Approval`, `review-safety.test.js`, `workforce-ui.test.js`, `sensing.test.js`, `security-ui.test.js`, `governance-business-events.test.js`, `workforce-ui.test.js`, `Agents Marketing Intel`, `Claude Proxy Index`, `Replay Sandbox`, `teleological.test.js`, `Community 480`, `Community 482`, `Community 483`, `Community 484`, `Community 487`, `Unit Review Safety`, `Unit Transport Scheduler`, `owner-copilot-ui.test.js`?**
+  _High betweenness centrality (0.008) - this node is a cross-community bridge._
+- **Why does `v()` connect `Innovation Experiment Scorecard` to `Asyncapi Events`, `Agents Pricing Optimizer`, `Community 486`, `Unit Bluetooth Connect`, `Quotes Quote Store`, `Intelligence Agent Evaluation`, `command-deck.test.js`, `Unit World Model`, `Genesis Tool Forge`?**
+  _High betweenness centrality (0.008) - this node is a cross-community bridge._
 - **Are the 16 inferred relationships involving `load()` (e.g. with `harness.js` and `require()`) actually correct?**
   _`load()` has 16 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 2 inferred relationships involving `makeRunner()` (e.g. with `harness.js` and `ok()`) actually correct?**

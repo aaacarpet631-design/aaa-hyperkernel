@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1783610813.3325539,
-    "ast_hash": "39ef4841d3d7782e40235932d3e6c069",
+    "mtime": 1783616802.0614142,
+    "ast_hash": "a377df57b74c83675a156c51b589342c",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
@@ -1180,8 +1180,8 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "test/run.js": {
-    "mtime": 1783610796.791726,
-    "ast_hash": "c938f2657a5f490acf985a97eb7822fb",
+    "mtime": 1783616786.1062026,
+    "ast_hash": "cee4541d8d2934164101ed6473123a84",
     "semantic_hash": ""
   },
   "test/smoke/boot.test.js": {
@@ -1895,8 +1895,8 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "index.html": {
-    "mtime": 1783610795.3357263,
-    "ast_hash": "7c356f86dc6261acf7cb0def4e5df823",
+    "mtime": 1783616784.2742023,
+    "ast_hash": "57966cf477c8098fb793415eaa1ed46b",
     "semantic_hash": ""
   },
   "netlify/functions/RESEARCH.md": {
@@ -3135,8 +3135,8 @@
     "semantic_hash": "3a677110dbdc4c18d7205f9a74069dd5"
   },
   "js/copilot/chat-canvas.js": {
-    "mtime": 1783050778.0623024,
-    "ast_hash": "f746adc6679f73723267fedf453cb113",
+    "mtime": 1783616692.098197,
+    "ast_hash": "41d9f501a33c8fd714cda0b9563e5365",
     "semantic_hash": ""
   },
   "js/copilot/chat-intent-router.js": {
@@ -3855,8 +3855,8 @@
     "semantic_hash": ""
   },
   "docs/HYPERKERNEL_CHAT_MISSION.md": {
-    "mtime": 1783610799.7917264,
-    "ast_hash": "d645665ae82964d07406cb7caacb03ab",
+    "mtime": 1783616790.1662028,
+    "ast_hash": "ead1288e406ffe19f639e2d73198aa80",
     "semantic_hash": ""
   },
   "js/copilot/context-packet.js": {
@@ -3867,6 +3867,31 @@
   "test/unit/copilot-context-packet.test.js": {
     "mtime": 1783610772.4077253,
     "ast_hash": "c6ea8bf2e9eda88298c4b6ba022be6a0",
+    "semantic_hash": ""
+  },
+  "js/copilot/contract-card-renderer.js": {
+    "mtime": 1783616628.5781932,
+    "ast_hash": "3e9fbf8e9099c36eeb3c76777da3be33",
+    "semantic_hash": ""
+  },
+  "js/copilot/copilot-chat-bridge.js": {
+    "mtime": 1783616650.9341946,
+    "ast_hash": "a1785b6dc1125dbb56d22cd68a99b4f4",
+    "semantic_hash": ""
+  },
+  "js/copilot/copilot-remote-adapter.js": {
+    "mtime": 1783616600.5781915,
+    "ast_hash": "d196fe5e9126eaa3e040addf24e33a66",
+    "semantic_hash": ""
+  },
+  "test/unit/copilot-chat-bridge.test.js": {
+    "mtime": 1783616752.7222006,
+    "ast_hash": "254ae9c683a636ffa399fd67a9210d56",
+    "semantic_hash": ""
+  },
+  "test/unit/copilot-remote-adapter.test.js": {
+    "mtime": 1783616719.5981987,
+    "ast_hash": "cd92e8bd57f373704721172f96a13227",
     "semantic_hash": ""
   }
 }
