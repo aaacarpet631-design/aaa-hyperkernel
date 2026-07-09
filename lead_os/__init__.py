@@ -11,6 +11,7 @@ from .agent_auth import (
     default_agent_identities,
 )
 from .outcomes import OutcomeRegistry, OutcomeType, build_scorecards
+from .storage import LeadOsSQLiteStore
 from .supervisor import AgentAction, ApprovalStatus, SupervisorLedger, requires_approval
 
 __all__ = [
@@ -18,6 +19,7 @@ __all__ = [
     "AgentCredentialStore",
     "AgentIdentity",
     "ApprovalStatus",
+    "LeadOsSQLiteStore",
     "OutcomeRegistry",
     "OutcomeType",
     "ScopeDeniedError",
