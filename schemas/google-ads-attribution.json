@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aaa-hyperkernel/schemas/google-ads-attribution.json",
+  "title": "Google Ads attribution & conversion schema (Slice 1)",
+  "description": "Contracts for the ad measurement foundation. ad_attribution is keyed by leadId and holds click context only (never PII). ads_conversion_events is the deduplicated conversion ladder, one event per (leadId, type). Implemented by js/intelligence/ad-attribution.js and js/revenue/ads-conversion-ledger.js.",
+  "$defs": {
+    "AdAttribution": {
+      "type": "object",
+      "required": ["leadId", "workspaceId", "source", "consent", "capturedAt"],
+      "additionalProperties": false,
+      "properties": {
+        "leadId": { "type": "string", "description": "Join key to the Lead OS record. The attribution collection carries NO name/phone/email/address." },
+        "workspaceId": { "type": "string" },
+        "gclid": { "type": ["string", "null"], "maxLength": 256, "description": "Google click ID — the offline-conversion join key." },
+        "gbraid": { "type": ["string", "null"], "maxLength": 256 },
+        "wbraid": { "type": ["string", "null"], "maxLength": 256 },
+        "campaign": { "type": ["string", "null"], "maxLength": 160 },
+        "adGroup": { "type": ["string", "null"], "maxLength": 160 },
+        "keyword": { "type": ["string", "null"], "maxLength": 160 },
+        "searchTerm": { "type": ["string", "null"], "maxLength": 200 },
+        "landingPage": { "type": ["string", "null"], "maxLength": 300, "description": "Path only, no query string with identifiers." },
+        "utmSource": { "type": ["string", "null"], "maxLength": 120 },
+        "utmMedium": { "type": ["string", "null"], "maxLength": 120 },
+        "utmCampaign": { "type": ["string", "null"], "maxLength": 160 },
+        "utmTerm": { "type": ["string", "null"], "maxLength": 160 },
+        "utmContent": { "type": ["string", "null"], "maxLength": 160 },
+        "channel": { "type": ["string", "null"], "enum": ["form", "call", "chat", "lsa", "portal", null], "description": "How the lead arrived — not who it is." },
+        "city": { "type": ["string", "null"], "maxLength": 80, "description": "Coarse geo for service-area analysis; never a street address." },
+        "zip": { "type": ["string", "null"], "maxLength": 16 },
+        "consent": { "type": "string", "enum": ["granted", "denied", "unknown"], "description": "First-party-data consent state. Only 'granted' records are eligible for conversion upload." },
+        "source": { "type": "string", "maxLength": 48, "default": "google_ads" },
+        "capturedAt": { "type": "string", "format": "date-time" },
+        "conversion": { "type": ["object", "null"], "description": "Legacy single-conversion record (ad-attribution.js recordConversion). The full ladder lives in ads_conversion_events." }
+      }
+    },
+    "AdsConversionEvent": {
+      "type": "object",
+      "required": ["id", "workspaceId", "leadId", "type", "tier", "direction", "primarySignal", "at"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "description": "'<leadId>:<type>' — the dedupe key. One event per lead per type, ever." },
+        "workspaceId": { "type": "string" },
+        "leadId": { "type": "string" },
+        "type": { "type": "string", "enum": ["LEAD_CREATED", "QUALIFIED_LEAD", "ESTIMATE_SCHEDULED", "ESTIMATE_SENT", "JOB_WON", "JOB_COMPLETED", "HIGH_MARGIN_JOB", "BAD_LEAD", "REFUND", "COMPLAINT"] },
+        "tier": { "type": "string", "enum": ["volume", "quality", "intent", "primary", "revenue", "premium", "negative"] },
+        "direction": { "type": "string", "enum": ["positive", "negative"] },
+        "primarySignal": { "type": "boolean", "description": "true only for JOB_WON / JOB_COMPLETED / HIGH_MARGIN_JOB. LEAD_CREATED is a volume signal and must never be treated as revenue truth." },
+        "valueUSD": { "type": ["number", "null"], "description": "Realized value where knowable. Never estimated." },
+        "sourceRef": { "type": ["string", "null"], "maxLength": 80, "description": "The quoteId/jobId/invoiceId that grounds this event." },
+        "note": { "type": ["string", "null"], "maxLength": 300 },
+        "at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "OfflineConversionPayload": {
+      "type": "object",
+      "description": "Google-ready upload payload emitted by uploadQueue(). Generated only for bidding-eligible events whose lead has a click id AND consent === 'granted'. Generation and transmission are separate governed steps — nothing in this codebase calls the Google Ads API.",
+      "required": ["eventId", "conversionAction", "currency", "conversionTime", "orderId"],
+      "properties": {
+        "eventId": { "type": "string" },
+        "conversionAction": { "type": "string" },
+        "gclid": { "type": ["string", "null"] },
+        "gbraid": { "type": ["string", "null"] },
+        "wbraid": { "type": ["string", "null"] },
+        "conversionValueUSD": { "type": ["number", "null"] },
+        "currency": { "type": "string", "const": "USD" },
+        "conversionTime": { "type": "string" },
+        "orderId": { "type": "string", "description": "Mirrors the event id so Google-side dedupe matches ours." }
+      }
+    }
+  }
+}

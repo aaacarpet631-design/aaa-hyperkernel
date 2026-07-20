@@ -1,0 +1,83 @@
+{
+  "contractVersion": "1.0",
+  "requestId": "fx-att-1",
+  "answer": "Three things need you today: an 18-hour-old NEW lead (speed to lead), a $1,840 quote 4 days without follow-up, and one agent recommendation awaiting your approval. Job job_55 is on schedule and needs nothing.",
+  "cards": [
+    {
+      "cardType": "attention_list",
+      "items": [
+        {
+          "label": "Uncontacted lead is 18h old",
+          "why": "Speed to lead drives close rate; still in NEW_LEAD.",
+          "severity": "urgent",
+          "sourceRef": {
+            "collection": "leads",
+            "id": "lead_301",
+            "asOf": "2026-07-09T13:00:00.000Z",
+            "field": "stage"
+          }
+        },
+        {
+          "label": "Quote $1,840 idle for 4 days",
+          "why": "follow_up_due since 2026-07-05.",
+          "severity": "warn",
+          "sourceRef": {
+            "collection": "quotes",
+            "id": "quote_101",
+            "asOf": "2026-07-09T13:00:00.000Z",
+            "field": "status"
+          }
+        },
+        {
+          "label": "Budget recommendation awaiting approval",
+          "why": "agent:budget-bidding sealed a BUDGET_CHANGE envelope.",
+          "severity": "info",
+          "sourceRef": {
+            "collection": "decision_envelopes",
+            "id": "env_9",
+            "asOf": "2026-07-09T13:00:00.000Z",
+            "field": "approval.status"
+          }
+        }
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "claim": "A new lead has waited 18 hours without contact",
+      "sourceRefs": [
+        {
+          "collection": "leads",
+          "id": "lead_301",
+          "asOf": "2026-07-09T13:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "claim": "Quote quote_101 ($1,840) has had no follow-up for 4 days",
+      "sourceRefs": [
+        {
+          "collection": "quotes",
+          "id": "quote_101",
+          "asOf": "2026-07-09T13:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "claim": "One governance envelope is awaiting approval",
+      "sourceRefs": [
+        {
+          "collection": "decision_envelopes",
+          "id": "env_9",
+          "asOf": "2026-07-09T13:00:00.000Z"
+        }
+      ]
+    }
+  ],
+  "confidence": 92,
+  "unknowns": [],
+  "approval": {
+    "required": false,
+    "reasons": []
+  }
+}

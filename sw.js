@@ -6,7 +6,7 @@
  * app fully usable offline. Old caches are purged on activate, and the worker
  * takes control immediately to avoid serving a stale shell after an update.
  */
-const CACHE_NAME = 'hyperkernel-v102';
+const CACHE_NAME = 'hyperkernel-v110';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -149,6 +149,8 @@ const PRECACHE = [
   '/js/epistemology/belief-registry.js',
   '/js/epistemology/scientific-discovery-council.js',
   '/js/epistemology/knowledge-compounding-engine.js',
+  '/js/copilot/copilot-contract.js',
+  '/js/copilot/context-packet.js',
   '/js/copilot/copilot-intent-router.js',
   '/js/copilot/council-query-engine.js',
   '/js/copilot/copilot-governance-gate.js',
@@ -169,6 +171,10 @@ const PRECACHE = [
   '/js/copilot/software-factory-card.js',
   '/js/copilot/governance-approval-card.js',
   '/js/copilot/rich-card-renderer.js',
+  '/js/copilot/copilot-telemetry.js',
+  '/js/copilot/copilot-remote-adapter.js',
+  '/js/copilot/contract-card-renderer.js',
+  '/js/copilot/copilot-chat-bridge.js',
   '/js/copilot/chat-canvas.js',
   '/js/copilot/copilot-ui.js',
   '/js/copilot/sms-command-router.js',
@@ -196,6 +202,11 @@ const PRECACHE = [
   '/js/revenue/referral-engine.js',
   '/js/revenue/revenue-intelligence-council.js',
   '/js/revenue/revenue-dashboard.js',
+  '/js/revenue/ads-conversion-ledger.js',
+  '/js/revenue/ads-reporting.js',
+  '/js/revenue/ads-governance.js',
+  '/js/ads/google-ads-datamanager-client.js',
+  '/js/ads/google-ads-diagnostics.js',
   '/js/innovation/adjacency-mapper.js',
   '/js/innovation/opportunity-registry.js',
   '/js/innovation/venture-discovery-engine.js',
@@ -268,6 +279,7 @@ const PRECACHE = [
   '/js/ai/sidekick-vision-engine.js',
   '/js/ai/sidekick-closure-engine.js',
   '/js/measurements/models/measurement-models.js',
+  '/js/measurements/precision-engine.js',
   '/js/measurements/storage/measurement-store.js',
   '/js/bluetooth/services/raw-reading-log.js',
   '/js/bluetooth/services/measurement-parser.js',
@@ -347,6 +359,7 @@ const PRECACHE = [
   '/js/bluetooth/services/bosch-glm-adapter.js',
   '/js/field/bluetooth-bridge.js',
   '/js/ui/app-mode.js',
+  '/js/ui/manual-measure-ui.js',
   '/js/ui/field-mode-home.js',
   '/js/ui/command-deck-ui.js',
   '/js/ui/decision-card-ui.js',

@@ -57,6 +57,14 @@ module.exports = async function run() {
   t.ok('decision is by estimator + has confidence', decisions[0].agent === 'estimator' && typeof decisions[0].confidence === 'number');
   t.ok('decision carries NO cost internals', !('_labor' in decisions[0]) && !('_laborTotal' in decisions[0]) && decisions[0].total != null);
 
+  // --- draftQuote(): forwards leadId onto the quote draft (the click → margin join key) ---
+  load('js/quotes/quote-store.js');
+  const dq = await E.draftQuote({ sessions: [room], services: ['carpet_install'], jobId: 'j2', leadId: 'lead_777' });
+  t.ok('draftQuote ok with a quoteId', dq.ok === true && !!dq.quoteId);
+  t.eq('leadId forwarded onto the quote draft', (await G.AAA_QUOTES.get(dq.quoteId)).leadId, 'lead_777');
+  const dqNone = await E.draftQuote({ sessions: [room], services: ['carpet_install'], jobId: 'j2' });
+  t.ok('leadId stays null when not provided', (await G.AAA_QUOTES.get(dqNone.quoteId)).leadId === null);
+
   // --- supervisor scores the estimator's decision against the outcome (learning loop) ---
   await data.put('jobs', 'j1', { id: 'j1', customerName: 'Jane', estimates: [], workspaceId: 'ws_test' });
   const acc = await E.accept({ jobId: 'j1', estimate: est, sessionIds: [room.id], origin: 'human', actor: 'owner' });

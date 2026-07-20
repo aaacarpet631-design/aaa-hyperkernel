@@ -1,0 +1,19 @@
+{
+  "contractVersion": "1.0",
+  "requestId": "fx-degraded-ctx",
+  "answer": "I could not read your workspace context just now, so I have nothing grounded to report. Please retry shortly, or check the dashboard directly.",
+  "cards": [],
+  "evidence": [],
+  "confidence": 0,
+  "unknowns": [
+    "Context assembly was unavailable for this turn; no workspace records were readable."
+  ],
+  "approval": {
+    "required": false,
+    "reasons": []
+  },
+  "degraded": {
+    "reason": "context_unavailable",
+    "fallback": "local"
+  }
+}

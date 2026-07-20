@@ -1,0 +1,59 @@
+{
+  "contractVersion": "1.0",
+  "requestId": "fx-er-1",
+  "workspaceId": "ws_fixture",
+  "identity": {
+    "role": "owner",
+    "name": "Owner"
+  },
+  "job": "estimate_risk",
+  "message": "Is quote_101 at risk or underpriced?",
+  "contextPacket": {
+    "packetVersion": 1,
+    "workspaceId": "ws_fixture",
+    "assembledAt": "2026-07-09T13:00:00.000Z",
+    "role": "owner",
+    "sections": [
+      {
+        "kind": "estimate_risk",
+        "items": [
+          {
+            "sourceRef": {
+              "collection": "quotes",
+              "id": "quote_101",
+              "asOf": "2026-07-09T13:00:00.000Z"
+            },
+            "data": {
+              "total": 1840,
+              "grossMargin": 320,
+              "marginPct": 17,
+              "serviceType": "carpet_install",
+              "sqft": 1150
+            }
+          },
+          {
+            "sourceRef": {
+              "collection": "outcomes",
+              "id": "out_77",
+              "asOf": "2026-07-09T13:00:00.000Z"
+            },
+            "data": {
+              "comparable": true,
+              "serviceType": "carpet_install",
+              "finalAmount": 2100,
+              "result": "won"
+            }
+          }
+        ]
+      }
+    ],
+    "redactions": [
+      "customer.phone",
+      "customer.email"
+    ]
+  },
+  "budgets": {
+    "p95LatencyMs": 6000,
+    "maxCostUSDPerConversation": 0.15
+  }
+}

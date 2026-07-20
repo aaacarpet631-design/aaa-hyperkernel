@@ -1,0 +1,68 @@
+{
+  "contractVersion": "1.0",
+  "requestId": "fx-aa-1",
+  "workspaceId": "ws_fixture",
+  "identity": {
+    "role": "owner",
+    "name": "Owner"
+  },
+  "job": "agent_activity",
+  "message": "What did the agents do overnight?",
+  "contextPacket": {
+    "packetVersion": 1,
+    "workspaceId": "ws_fixture",
+    "assembledAt": "2026-07-09T13:00:00.000Z",
+    "role": "owner",
+    "sections": [
+      {
+        "kind": "agent_activity",
+        "items": [
+          {
+            "sourceRef": {
+              "collection": "ads_recommendations",
+              "id": "adsrec_4",
+              "asOf": "2026-07-09T13:00:00.000Z"
+            },
+            "data": {
+              "type": "NEGATIVE_KEYWORD_PATCH",
+              "status": "auto_approved",
+              "agent": "agent:search-intent"
+            }
+          },
+          {
+            "sourceRef": {
+              "collection": "decision_envelopes",
+              "id": "env_9",
+              "asOf": "2026-07-09T13:00:00.000Z"
+            },
+            "data": {
+              "status": "awaiting_approval",
+              "agent": "agent:budget-bidding",
+              "recommendation": "Raise Repair-Houston daily budget to $55"
+            }
+          },
+          {
+            "sourceRef": {
+              "collection": "audit_log",
+              "id": "audit_301",
+              "asOf": "2026-07-09T13:00:00.000Z"
+            },
+            "data": {
+              "action": "EXPORT_CONVERSIONS",
+              "decision": "denied",
+              "reason": "AI_NOT_PERMITTED"
+            }
+          }
+        ]
+      }
+    ],
+    "redactions": [
+      "customer.phone",
+      "customer.email"
+    ]
+  },
+  "budgets": {
+    "p95LatencyMs": 6000,
+    "maxCostUSDPerConversation": 0.15
+  }
+}

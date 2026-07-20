@@ -1,0 +1,61 @@
+{
+  "contractVersion": "1.0",
+  "requestId": "fx-df-1",
+  "answer": "Here is an SMS draft for the quote_101 customer. It is a draft only — sending requires your approval in the assisted-drafts inbox.",
+  "cards": [
+    {
+      "cardType": "draft_message",
+      "channel": "sms",
+      "customerRef": {
+        "collection": "customers",
+        "id": "cust_12",
+        "asOf": "2026-07-09T13:00:00.000Z"
+      },
+      "body": "Hi {{customer_name}}, following up on your carpet install estimate ({{estimate_total}}) from Saturday. Happy to answer anything — including the pet-safe adhesive question. Reply here or call {{business_phone}}.",
+      "sendBlocked": false,
+      "approvalActionType": "APPROVE_ASSISTED_MSG"
+    }
+  ],
+  "evidence": [
+    {
+      "claim": "The estimate was sent 2026-07-05 for $1,840",
+      "sourceRefs": [
+        {
+          "collection": "quotes",
+          "id": "quote_101",
+          "asOf": "2026-07-09T13:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "claim": "The customer asked about pet-safe adhesive",
+      "sourceRefs": [
+        {
+          "collection": "customers",
+          "id": "cust_12",
+          "asOf": "2026-07-09T13:00:00.000Z",
+          "field": "note"
+        }
+      ]
+    }
+  ],
+  "confidence": 90,
+  "unknowns": [],
+  "approval": {
+    "required": true,
+    "reasons": [
+      "Customer-facing message: draft only, human sends."
+    ],
+    "approvalPackage": {
+      "actionType": "APPROVE_ASSISTED_MSG",
+      "payload": {
+        "draftRef": "assisted_drafts:pending"
+      }
+    }
+  },
+  "conversationId": "thread_fx_1",
+  "usage": {
+    "latencyMs": 180,
+    "model": "copilot-deterministic-v1"
+  }
+}

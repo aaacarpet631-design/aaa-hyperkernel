@@ -2,9 +2,15 @@
  * AAA Rich Card Renderer — turn a card model into safe, mobile-first HTML.
  *
  * Central, escape-safe rendering for every card type (executive_briefing,
- * simulation, goal, software_factory, governance_approval, text). Pure: model
- * in, HTML string out. It renders only what the model contains, and shows
- * insufficient_data / missing-data honestly.
+ * simulation, goal, software_factory, governance_approval, copilot_contract,
+ * text). Pure: model in, HTML string out. It renders only what the model
+ * contains, and shows insufficient_data / missing-data honestly.
+ *
+ * copilot_contract cards (remote copilot replies stored by the chat canvas)
+ * delegate to AAA_CONTRACT_CARD_RENDERER.render(card.response) — the single
+ * escape-safe renderer for contract envelopes — falling back to the card's
+ * pre-rendered html (produced by that same renderer at store time), then to
+ * the escaped summary text. Never a throw, never unescaped record data.
  */
 ;(function (global) {
   'use strict';
@@ -23,8 +29,22 @@
         case 'goal': return this._goal(card);
         case 'software_factory': return this._factory(card);
         case 'governance_approval': return this._gov(card);
+        case 'copilot_contract': return this._contract(card);
         default: return '<div class="cp-card cp-text">' + esc(card.summary || card.note || '') + '</div>';
       }
+    },
+
+    /* Remote copilot card → contract renderer, else escaped summary. The
+     * card's stored html string is NEVER emitted raw: it was escape-safe at
+     * creation, but a chat-store record tampered at rest would inject on
+     * re-render — only freshly-rendered or escaped output leaves here. A
+     * missing/broken contract renderer degrades, never throws. */
+    _contract(c) {
+      const rd = global.AAA_CONTRACT_CARD_RENDERER;
+      if (rd && typeof rd.render === 'function' && c.response) {
+        try { return rd.render(c.response); } catch (_) { /* fall through to escaped summary */ }
+      }
+      return '<div class="cp-card cp-text">' + esc(c.summary || c.note || '') + '</div>';
     },
 
     _missing(card) { return (card.missingData && card.missingData.length) ? '<div class="cp-missing">Missing: ' + esc(card.missingData.join(', ')) + '</div>' : ''; },

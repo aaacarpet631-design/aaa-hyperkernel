@@ -101,5 +101,21 @@ module.exports = async function run() {
   t.ok('stats close rate computed', stats.closeRatePct === 50 && stats.counts.won === 1 && stats.counts.lost === 1);
   t.ok('stats won revenue + margin', stats.wonRevenue === 2200 && stats.wonMargin === 800);
 
+  // --- leadId: ties a quote to Lead OS / ad attribution (internal-only) ---
+  t.ok('drafts without a leadId store null', q.leadId === null);
+  const estIn = { quote: { _laborTotal: 100, _materialTotal: 50, total: 400 }, receipt: { items: [{ description: 'Repair', amount: 400 }], total: 400 } };
+  const dLead = await Q.createDraft({ estimate: estIn, customerName: 'Cara', leadId: 'lead_777', leadSource: 'google_ads', actor: 'owner', origin: 'human' });
+  t.eq('draft stores leadId', dLead.leadId, 'lead_777');
+  const dLong = await Q.createDraft({ estimate: estIn, leadId: 'x'.repeat(80) });
+  t.ok('leadId sanitized to string, max 64 chars', typeof dLong.leadId === 'string' && dLong.leadId.length === 64);
+  const cvLead = Q.customerView(dLead);
+  t.ok('customer view never exposes leadId', !('leadId' in cvLead) && JSON.stringify(cvLead).indexOf('lead_777') === -1);
+  await Q.markReviewed(dLead.id, { actor: 'owner' });
+  await Q.send(dLead.id, { actor: 'owner' });
+  await Q.markWon(dLead.id, { actor: 'owner', reason: 'repeat customer', finalPrice: 400, jobCost: 150 });
+  const leadOut = (await data.list('outcomes')).find((o) => o.quoteId === dLead.id);
+  t.ok('won outcome carries leadId for the ads margin join', !!leadOut && leadOut.leadId === 'lead_777');
+  t.ok('outcomes without a lead carry leadId null', (await data.list('outcomes')).find((o) => o.quoteId === id).leadId === null);
+
   return t.report();
 };

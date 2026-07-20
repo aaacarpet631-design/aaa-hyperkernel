@@ -67,5 +67,15 @@ module.exports = async function run() {
   const du = await Q.draft({ customerId: 'c3', to: '+15554445555', intent: 'follow_up', actor: 'owner' });
   t.ok('with the model disabled, a blank draft is still created (owner writes it)', du.ok === true && du.modelUnavailable === true && du.draft.suggestedText === '');
 
+  // ===== file(): a PRE-WRITTEN draft (e.g. remote copilot) enters the same flow =====
+  const filed = await Q.file({ customerId: 'c9', channel: 'sms', body: 'Hi {{customer_name}} — checking in.', source: 'copilot', origin: 'ai' });
+  t.ok('a pre-written draft is filed pending owner approval', filed.ok === true && filed.draft.status === 'pending_owner' && filed.draft.source === 'copilot' && filed.draft.createdBy === 'ai');
+  t.ok('the filed body is kept verbatim with {{placeholders}}', filed.draft.suggestedText === 'Hi {{customer_name}} — checking in.' && filed.draft.finalText === null);
+  t.ok('the filed draft is on the normal pending list', (await Q.pending()).some((x) => x.id === filed.draft.id));
+  t.eq('an empty body cannot be filed', (await Q.file({ body: '   ' })).error, 'NO_BODY');
+  t.eq('AI cannot approve a filed draft (human-only)', (await Q.approve(filed.draft.id, { origin: 'ai' })).error, 'AI_NOT_PERMITTED');
+  const filedAppr = await Q.approve(filed.draft.id, { actor: 'owner' });
+  t.ok('owner approval of a filed draft marks it ready WITHOUT sending', filedAppr.ok === true && filedAppr.sent === false && filedAppr.finalText === 'Hi {{customer_name}} — checking in.');
+
   return t.report();
 };
