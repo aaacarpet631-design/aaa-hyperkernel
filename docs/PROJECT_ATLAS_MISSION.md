@@ -48,7 +48,7 @@ organization that can safely support thousands of businesses.**
 
 | Phase | Deliverable | Status |
 |---|---|---|
-| 1 | `SYSTEM_AUDIT.md` — deep audit: architecture map, risk register, dependency graph, bottlenecks, scalability limits, governance gaps | **in progress** |
+| 1 | `SYSTEM_AUDIT.md` — deep audit: architecture map, risk register, dependency graph, bottlenecks, scalability limits, governance gaps | **DONE** — `docs/SYSTEM_AUDIT.md`, six-lens parallel audit; 6 critical themes, 49 risk entries; central finding: security/tenancy/audit/durability guarantees are client-side or by-convention, not server-enforced |
 | 2 | `ATLAS_TARGET_ARCHITECTURE.md` — future-state blueprint | pending |
 | 3 | `ATLAS_ROADMAP.md` — 6–12 month execution plan | pending |
 | 4 | `ORGANIZATIONAL_MEMORY_SPEC.md` — organizational intelligence model | pending |
