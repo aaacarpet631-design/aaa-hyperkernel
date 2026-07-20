@@ -62,13 +62,31 @@
   // assisted-drafts queue (pending human approval, source 'copilot', never
   // sent). Returns the queued draft id or null — any failure here is
   // swallowed by the caller; filing can never break the chat reply.
+  //
+  // Filed-once discipline: the adapter's single-flight dedupe hands the SAME
+  // response to every concurrent identical ask, so filing must key on the
+  // response's requestId — otherwise a double-click files duplicate drafts.
+  // Bounded memory: the map only ever holds the last few requestIds.
+  const FILED = {};
+  const FILED_ORDER = [];
+  function alreadyFiled(requestId) {
+    if (!requestId) return false;
+    if (FILED[requestId]) return true;
+    FILED[requestId] = true;
+    FILED_ORDER.push(requestId);
+    while (FILED_ORDER.length > 50) delete FILED[FILED_ORDER.shift()];
+    return false;
+  }
   async function fileDraftCard(dm) {
     const q = drafts();
     if (!q || typeof q.file !== 'function' || !dm) return null;
+    // The engine falls back to the QUOTE ref when the packet carried no
+    // customer item — a quote id must never persist as a customerId.
+    const customerId = dm.customerRef && dm.customerRef.collection === 'customers' ? dm.customerRef.id : null;
     const filed = await q.file({
       channel: dm.channel,
       body: dm.body,
-      customerId: dm.customerRef ? dm.customerRef.id : null,
+      customerId: customerId,
       intent: 'follow_up',
       source: 'copilot',
       origin: 'ai'
@@ -107,7 +125,7 @@
       // owner can approve/edit it later from the Approval Inbox. Advisory:
       // a filing failure never breaks the chat reply.
       const dm = (Array.isArray(res.response.cards) ? res.response.cards : []).filter(function (c) { return c && c.cardType === 'draft_message'; })[0];
-      if (dm) {
+      if (dm && !alreadyFiled(res.response.requestId)) {
         try {
           const queuedId = await fileDraftCard(dm);
           if (queuedId) card.draftQueuedId = queuedId;

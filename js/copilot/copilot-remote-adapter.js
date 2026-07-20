@@ -142,10 +142,12 @@
     const rv = c.validateRequest(request);
     if (!rv.ok) return finish(fail('REQUEST_INVALID', { issues: rv.issues }));
 
-    // Client-side deadline: the fetch runs inside the request's OWN latency
-    // budget. AbortController when the platform has one (so the socket is
-    // actually torn down), Promise.race either way (so a stub or a platform
-    // that ignores the signal still can't hold us past the budget).
+    // Client-side deadline: ONE timer covers the whole remote exchange —
+    // headers AND body. A server that answers headers within budget and then
+    // stalls (or trickles) the body is still cut off at the deadline; without
+    // this, `await res.json()` would hang past the budget with the timer
+    // already cleared. AbortController when the platform has one (so the
+    // socket is actually torn down), Promise.race either way.
     const fetchStart = tnow();
     let httpRes = null;
     let timer = null;
@@ -166,14 +168,65 @@
           resolve(TIMEOUT_SENTINEL);
         }, budgetMs);
       });
-      const winner = await Promise.race([fetchP, deadlineP]);
+      // Race a promise against the shared deadline; stragglers never surface
+      // as unhandled rejections.
+      const underDeadline = async function (p) {
+        const w = await Promise.race([p, deadlineP]);
+        if (w === TIMEOUT_SENTINEL) Promise.resolve(p).catch(function () {});
+        return w;
+      };
+
+      const winner = await underDeadline(fetchP);
       if (winner === TIMEOUT_SENTINEL) {
-        // The straggler must not surface as an unhandled rejection later.
-        Promise.resolve(fetchP).catch(function () {});
         fetchMs = Math.max(0, tnow() - fetchStart);
         return finish(fail('REMOTE_TIMEOUT', { budgetMs: budgetMs }));
       }
       httpRes = winner;
+      fetchMs = Math.max(0, tnow() - fetchStart);
+
+      if (!httpRes || httpRes.ok === false) {
+        // The agreed unhappy path: a non-2xx that carries a contract
+        // errorEnvelope is a REFUSAL with a machine-readable code, not just an
+        // HTTP number. Anything else stays the bare status. The refusal body
+        // read runs under the same deadline.
+        let body = null;
+        if (httpRes && typeof httpRes.json === 'function') {
+          try {
+            const w2 = await underDeadline(httpRes.json());
+            body = w2 === TIMEOUT_SENTINEL ? null : w2;
+          } catch (_) { body = null; }
+        }
+        if (body && typeof c.validateError === 'function' && c.validateError(body).ok) {
+          return finish(fail('REMOTE_REFUSED', { code: body.error.code, status: httpRes.status }));
+        }
+        return finish(fail('REMOTE_HTTP_' + ((httpRes && httpRes.status) || 'ERROR')));
+      }
+
+      let response = null;
+      try {
+        const w3 = await underDeadline(httpRes.json());
+        if (w3 === TIMEOUT_SENTINEL) {
+          fetchMs = Math.max(0, tnow() - fetchStart);
+          return finish(fail('REMOTE_TIMEOUT', { budgetMs: budgetMs, phase: 'body' }));
+        }
+        response = w3;
+      } catch (_) { return finish(fail('REMOTE_NOT_JSON')); }
+      fetchMs = Math.max(0, tnow() - fetchStart);
+
+      // Fail closed: the reply must prove itself before anyone renders it.
+      const vv = c.validateResponse(response);
+      if (!vv.ok) return finish(fail('REMOTE_INVALID', { issues: vv.issues }));
+      if (response.requestId !== request.requestId) return finish(fail('REMOTE_INVALID', { issues: ['requestId mismatch'] }));
+      const g = c.groundednessIssues(response);
+      if (g.length) return finish(fail('REMOTE_INVALID', { issues: g }));
+      // Referential integrity: every cited sourceRef must name a record the
+      // request's packet actually carried. A fabricated citation dies here.
+      if (typeof c.evidenceIntegrityIssues === 'function') {
+        const ei = c.evidenceIntegrityIssues(request, response);
+        if (ei.length) return finish(fail('REMOTE_INVALID', { issues: ei }));
+      }
+
+      return finish({ ok: true, response: response, request: request });
     } catch (e) {
       fetchMs = Math.max(0, tnow() - fetchStart);
       if (timedOut) return finish(fail('REMOTE_TIMEOUT', { budgetMs: budgetMs }));
@@ -181,39 +234,6 @@
     } finally {
       if (timer != null) clearTimeout(timer);
     }
-    fetchMs = Math.max(0, tnow() - fetchStart);
-
-    if (!httpRes || httpRes.ok === false) {
-      // The agreed unhappy path: a non-2xx that carries a contract
-      // errorEnvelope is a REFUSAL with a machine-readable code, not just an
-      // HTTP number. Anything else stays the bare status.
-      let body = null;
-      if (httpRes && typeof httpRes.json === 'function') {
-        try { body = await httpRes.json(); } catch (_) { body = null; }
-      }
-      if (body && typeof c.validateError === 'function' && c.validateError(body).ok) {
-        return finish(fail('REMOTE_REFUSED', { code: body.error.code, status: httpRes.status }));
-      }
-      return finish(fail('REMOTE_HTTP_' + ((httpRes && httpRes.status) || 'ERROR')));
-    }
-
-    let response = null;
-    try { response = await httpRes.json(); } catch (_) { return finish(fail('REMOTE_NOT_JSON')); }
-
-    // Fail closed: the reply must prove itself before anyone renders it.
-    const vv = c.validateResponse(response);
-    if (!vv.ok) return finish(fail('REMOTE_INVALID', { issues: vv.issues }));
-    if (response.requestId !== request.requestId) return finish(fail('REMOTE_INVALID', { issues: ['requestId mismatch'] }));
-    const g = c.groundednessIssues(response);
-    if (g.length) return finish(fail('REMOTE_INVALID', { issues: g }));
-    // Referential integrity: every cited sourceRef must name a record the
-    // request's packet actually carried. A fabricated citation dies here.
-    if (typeof c.evidenceIntegrityIssues === 'function') {
-      const ei = c.evidenceIntegrityIssues(request, response);
-      if (ei.length) return finish(fail('REMOTE_INVALID', { issues: ei }));
-    }
-
-    return finish({ ok: true, response: response, request: request });
   }
 
   const Remote = {

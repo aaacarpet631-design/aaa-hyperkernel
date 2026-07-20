@@ -140,5 +140,14 @@ module.exports = async function run() {
   await CTX.assemble('attention_today'); await CTX.assemble('agent_activity');
   t.ok('assembly is read-only (store byte-identical)', JSON.stringify(G.AAA_DATA._store) === before);
 
+  // ===== scrub precision: contact PII masks, scheduling/reference data survives =====
+  await data.put('customers', 'cust_scrub', { id: 'cust_scrub', name: 'S', phone: '1', notes: 'reschedule to 2026-07-15 re quote_2026070901, call 713-555-0142 or 7135550142', preferredChannel: 'sms', workspaceId: 'ws_test' });
+  const scrubQuote = await Q.createDraft({ estimate: { quote: { _laborTotal: 10, _materialTotal: 5, total: 100 }, receipt: { total: 100 } }, customerId: 'cust_scrub' });
+  const scrubCtx = await CTX.assemble('draft_followup', { quoteId: scrubQuote.id });
+  const scrubNote = scrubCtx.packet.sections[0].items.find((i) => i.sourceRef.collection === 'customers').data.note;
+  t.ok('phone numbers still mask (dashed and bare)', scrubNote.indexOf('713-555-0142') === -1 && scrubNote.indexOf('7135550142') === -1);
+  t.ok('ISO dates survive the scrub', scrubNote.indexOf('2026-07-15') !== -1);
+  t.ok('record ids survive the scrub', scrubNote.indexOf('quote_2026070901') !== -1);
+
   return t.report();
 };

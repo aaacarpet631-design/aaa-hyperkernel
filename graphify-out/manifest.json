@@ -225,8 +225,8 @@
     "semantic_hash": "eae853020c704ebf8e3f38b19c4f9c6f"
   },
   "js/ai/assisted-draft-queue.js": {
-    "mtime": 1783623622.6796813,
-    "ast_hash": "861d19bf35df9f7fbd483a3f8d5546dd",
+    "mtime": 1784516993.6174235,
+    "ast_hash": "4b7d725b091e96c79a30026496eca57a",
     "semantic_hash": ""
   },
   "js/ai/content-safety.js": {
@@ -3860,13 +3860,13 @@
     "semantic_hash": ""
   },
   "js/copilot/context-packet.js": {
-    "mtime": 1783623244.2299986,
-    "ast_hash": "91d896f38ab137d2637eca71a0bd1e2d",
+    "mtime": 1784516927.0694196,
+    "ast_hash": "0adf43304f5b31fc995b6b56d98bbe66",
     "semantic_hash": ""
   },
   "test/unit/copilot-context-packet.test.js": {
-    "mtime": 1783623216.391684,
-    "ast_hash": "50af53884c3f199da80b01bef938c5d3",
+    "mtime": 1784517050.3294268,
+    "ast_hash": "918ffd2c28c728ba9e7567b4bd90a429",
     "semantic_hash": ""
   },
   "js/copilot/contract-card-renderer.js": {
@@ -3875,23 +3875,23 @@
     "semantic_hash": ""
   },
   "js/copilot/copilot-chat-bridge.js": {
-    "mtime": 1783623680.3996801,
-    "ast_hash": "9140ac3a42d1fd2be8e74c7df6f59139",
+    "mtime": 1784516952.129421,
+    "ast_hash": "0d43c80ac063ca0bb4aadb00868524e0",
     "semantic_hash": ""
   },
   "js/copilot/copilot-remote-adapter.js": {
-    "mtime": 1783623216.391684,
-    "ast_hash": "79b63addbe241955d2e580c6f3cb3d15",
+    "mtime": 1784517123.1934311,
+    "ast_hash": "c9a0674b3e2fc0f9eb7f03094013ca5a",
     "semantic_hash": ""
   },
   "test/unit/copilot-chat-bridge.test.js": {
-    "mtime": 1783623784.1396778,
-    "ast_hash": "4e50d756f2fbf03e655f722148c77331",
+    "mtime": 1784517077.9014285,
+    "ast_hash": "abb7993d572d30ccf8cbe8587ab11519",
     "semantic_hash": ""
   },
   "test/unit/copilot-remote-adapter.test.js": {
-    "mtime": 1783623216.391684,
-    "ast_hash": "b7974ce39ecb65b07560e14de5ba544e",
+    "mtime": 1784517041.8334262,
+    "ast_hash": "19d5d169541267d2eea670606195a82a",
     "semantic_hash": ""
   },
   "js/copilot/copilot-telemetry.js": {

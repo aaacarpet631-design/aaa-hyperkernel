@@ -169,5 +169,19 @@ module.exports = async function run() {
   delete G.fetch;
   t.eq('no fetch primitive → NO_FETCH', (await R.ask({ job: 'followups', message: 'x' })).error, 'NO_FETCH');
 
+  // ===== the deadline covers the BODY, not just the headers =====
+  // A server that answers headers instantly and then stalls the body must
+  // still be cut off at the budget — no eternal spinner, no pinned flight.
+  cfg.set({ copilotP95LatencyMs: 30 });
+  stubFetch(async function () {
+    return { ok: true, status: 200, json: function () { return sleep(150).then(function () { return validReply('late'); }); } };
+  });
+  const bodyStall = await R.ask({ job: 'followups', message: 'body stall' });
+  t.ok('a stalled body times out at the budget (REMOTE_TIMEOUT, budget_exceeded)',
+    bodyStall.error === 'REMOTE_TIMEOUT' && bodyStall.degraded.reason === 'budget_exceeded');
+  const afterStall = await R.ask({ job: 'followups', message: 'body stall' });
+  t.ok('the in-flight entry is released after a body-stall timeout', afterStall.error === 'REMOTE_TIMEOUT');
+  cfg.set({ copilotP95LatencyMs: null });
+
   return t.report();
 };

@@ -97,8 +97,19 @@
   // PII that the whitelist alone can't keep out.
   const EMAIL_LIKE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
   const PHONE_LIKE = /\+?(?:\d[\s().-]?){6,}\d/g;
+  const ISO_DATEISH = /^\d{4}-\d{2}-\d{2}/;
   function scrub(text) {
-    return String(text == null ? '' : text).replace(EMAIL_LIKE, '[redacted]').replace(PHONE_LIKE, '[redacted]');
+    return String(text == null ? '' : text)
+      .replace(EMAIL_LIKE, '[redacted]')
+      .replace(PHONE_LIKE, function (m, offset, whole) {
+        // Keep non-contact digit runs: ISO dates/timestamps and digit runs
+        // glued to a word or record id (quote_2026070901) carry scheduling /
+        // reference meaning, not PII. Bare separator-formatted runs still mask.
+        if (ISO_DATEISH.test(m)) return m;
+        const prev = offset > 0 ? whole.charAt(offset - 1) : '';
+        if (/[A-Za-z_]/.test(prev)) return m;
+        return '[redacted]';
+      });
   }
 
   // Bound a section to the configured cap (contract hard cap is 50). Items

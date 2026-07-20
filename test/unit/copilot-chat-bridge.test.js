@@ -165,5 +165,58 @@ module.exports = async function run() {
   t.eq('unknown card types render nothing (never throw)', RD.renderCard({ cardType: 'mind_control' }), '');
   t.ok('null response never throws', typeof RD.render(null) === 'string');
 
+  // ===== filed-once: concurrent identical draft asks file ONE queue entry =====
+  const pendingBefore = (await DRAFTS.pending()).length;
+  G.fetch = async function (url, init) {
+    const req = JSON.parse(init.body);
+    const refs = req.contextPacket.sections[0].items.map(function (it) { return it.sourceRef; });
+    const qref = refs.filter(function (r) { return r.collection === 'quotes'; })[0];
+    const cref = refs.filter(function (r) { return r.collection === 'customers'; })[0];
+    return { ok: true, status: 200, json: async function () {
+      return { contractVersion: '1.0', requestId: req.requestId,
+        answer: 'Draft ready for your review.',
+        cards: [{ cardType: 'draft_message', channel: 'sms',
+          customerRef: { collection: 'customers', id: cref.id, asOf: cref.asOf },
+          body: 'Hi {{customer_name}} — second draft.', sendBlocked: true, approvalActionType: 'APPROVE_ASSISTED_MSG' }],
+        evidence: [{ claim: 'the quote', sourceRefs: [{ collection: 'quotes', id: qref.id, asOf: qref.asOf }] }],
+        confidence: 75, unknowns: [],
+        approval: { required: true, reasons: ['A human sends every message.'], approvalPackage: { actionType: 'APPROVE_ASSISTED_MSG', payload: {} } } };
+    } };
+  };
+  const pair = await Promise.all([
+    B.ask('Draft a follow-up for quote_101 but do not send it'),
+    B.ask('Draft a follow-up for quote_101 but do not send it')
+  ]);
+  t.ok('both concurrent callers get the shared ok reply', pair[0].ok && pair[1].ok);
+  t.eq('one shared remote response files exactly ONE draft', (await DRAFTS.pending()).length, pendingBefore + 1);
+
+  // ===== a quote ref masquerading as customerRef never becomes a customerId =====
+  G.fetch = async function (url, init) {
+    const req = JSON.parse(init.body);
+    const qref = req.contextPacket.sections[0].items.map(function (it) { return it.sourceRef; })
+      .filter(function (r) { return r.collection === 'quotes'; })[0];
+    return { ok: true, status: 200, json: async function () {
+      return { contractVersion: '1.0', requestId: req.requestId,
+        answer: 'Draft ready for your review.',
+        cards: [{ cardType: 'draft_message', channel: 'sms',
+          customerRef: { collection: 'quotes', id: qref.id, asOf: qref.asOf }, // engine's no-customer fallback
+          body: 'Hi {{customer_name}} — quote-ref fallback.', sendBlocked: true, approvalActionType: 'APPROVE_ASSISTED_MSG' }],
+        evidence: [{ claim: 'the quote', sourceRefs: [{ collection: 'quotes', id: qref.id, asOf: qref.asOf }] }],
+        confidence: 75, unknowns: [],
+        approval: { required: true, reasons: ['A human sends every message.'], approvalPackage: { actionType: 'APPROVE_ASSISTED_MSG', payload: {} } } };
+    } };
+  };
+  const qfall = await B.ask('Draft a message draft for quote_101 please');
+  t.ok('quote-ref fallback still yields a reply with a filed draft', qfall.ok && typeof qfall.card.draftQueuedId === 'string');
+  const qfallDraft = await DRAFTS.get(qfall.card.draftQueuedId);
+  t.ok('a quote id NEVER persists as a customerId', qfallDraft.customerId === null);
+  delete G.fetch;
+
+  // ===== filing is role-gated like local drafting (no remote side door) =====
+  cfg.set({ role: 'crew' });
+  const crewFile = await DRAFTS.file({ channel: 'sms', body: 'Hi {{customer_name}}', source: 'copilot', origin: 'ai' });
+  t.ok('crew cannot file drafts (parity with the gated local path)', crewFile.ok === false && crewFile.error === 'FORBIDDEN');
+  cfg.set({ role: 'owner' });
+
   return t.report();
 };

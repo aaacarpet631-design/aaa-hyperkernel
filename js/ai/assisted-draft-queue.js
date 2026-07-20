@@ -66,6 +66,12 @@
       const i = input || {};
       const body = String(i.body == null ? '' : i.body);
       if (!body.trim()) return { ok: false, error: 'NO_BODY' };
+      // Role parity with draft(): local drafting runs through RUN_MODEL
+      // (office-level — crew denied by the gateway). Filing a remotely
+      // drafted message is the same capability, so the same roles hold it;
+      // the remote path must not be a side door around the local gate.
+      const rb = global.AAA_RBAC;
+      if (rb && rb.can && !rb.can('VIEW_ALL_JOBS')) return { ok: false, error: 'FORBIDDEN', permission: 'VIEW_ALL_JOBS' };
       const source = i.source || 'filed';
       const by = i.actor || (i.origin === 'ai' ? 'ai' : null);
       const id = newId('adraft');
@@ -79,6 +85,11 @@
         history: [{ type: 'filed', at: nowISO(), by: by, source: source }]
       };
       await put(rec);
+      // Audit parity with the drafting path — ids only, never the body.
+      try {
+        const led = global.AAA_AUDIT_LEDGER;
+        if (led && led.append) await led.append('assisted_draft.filed', { draftId: id, source: source, channel: rec.channel, by: by });
+      } catch (_) { /* advisory — the pending draft record itself is the fallback trail */ }
       return { ok: true, draft: rec };
     },
 
