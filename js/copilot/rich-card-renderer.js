@@ -34,14 +34,16 @@
       }
     },
 
-    /* Remote copilot card → contract renderer, then pre-rendered html, then
-     * escaped summary. A missing/broken contract renderer degrades, never throws. */
+    /* Remote copilot card → contract renderer, else escaped summary. The
+     * card's stored html string is NEVER emitted raw: it was escape-safe at
+     * creation, but a chat-store record tampered at rest would inject on
+     * re-render — only freshly-rendered or escaped output leaves here. A
+     * missing/broken contract renderer degrades, never throws. */
     _contract(c) {
       const rd = global.AAA_CONTRACT_CARD_RENDERER;
       if (rd && typeof rd.render === 'function' && c.response) {
-        try { return rd.render(c.response); } catch (_) { /* fall through to stored html */ }
+        try { return rd.render(c.response); } catch (_) { /* fall through to escaped summary */ }
       }
-      if (typeof c.html === 'string' && c.html) return c.html;
       return '<div class="cp-card cp-text">' + esc(c.summary || c.note || '') + '</div>';
     },
 

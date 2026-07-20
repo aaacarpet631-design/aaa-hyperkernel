@@ -67,6 +67,7 @@ function generateResponseMutants(response) {
   out.push(make(response, 'foreign-field:$', 'schema', function (r) { r.mutantForeignField = true; }));
   out.push(make(response, 'confidence:150', 'schema', function (r) { r.confidence = 150; }));
   out.push(make(response, 'confidence:-5', 'schema', function (r) { r.confidence = -5; }));
+  out.push(make(response, 'confidence:string-coercion', 'schema', function (r) { r.confidence = '85'; }));
   out.push(make(response, 'version:2.0', 'schema', function (r) { r.contractVersion = '2.0'; }));
 
   // Schema-valid by construction; the referential guard alone must catch it.

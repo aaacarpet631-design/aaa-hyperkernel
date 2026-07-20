@@ -1,7 +1,7 @@
 # Graph Report - aaa-hyperkernel  (2026-07-20)
 
 ## Corpus Check
-- 788 files · ~677,345 words
+- 788 files · ~677,438 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `4fc7e970`
+- Built from commit: `5e48a27a`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -798,8 +798,8 @@ Cohesion: 0.05
 Nodes (40): Changes, Changes, Changes, Changes, Changes, Changes, Changes, Commit message (+32 more)
 
 ### Community 24 - "Intelligence Financial Intelligence"
-Cohesion: 0.12
-Nodes (26): main(), STREAMING_METHODS, writePidFile(), parseArgs(), createBrokerEndpoint(), parseBrokerEndpoint(), sanitizePipeName(), clearBrokerSession() (+18 more)
+Cohesion: 0.11
+Nodes (30): main(), STREAMING_METHODS, writePidFile(), DEFAULT_CAPABILITIES, DEFAULT_CLIENT_INFO, PLUGIN_MANIFEST, PLUGIN_MANIFEST_URL, parseArgs() (+22 more)
 
 ### Community 25 - "Intelligence Governance Registry"
 Cohesion: 0.11
@@ -1066,8 +1066,8 @@ Cohesion: 0.12
 Nodes (16): env, browser, es2022, extends, ignorePatterns, overrides, parserOptions, ecmaVersion (+8 more)
 
 ### Community 94 - "Field Seam Layout"
-Cohesion: 0.11
-Nodes (9): AppServerClientBase, BrokerCodexAppServerClient, buildJsonRpcError(), createProtocolError(), DEFAULT_CAPABILITIES, DEFAULT_CLIENT_INFO, PLUGIN_MANIFEST, PLUGIN_MANIFEST_URL (+1 more)
+Cohesion: 0.12
+Nodes (5): AppServerClientBase, BrokerCodexAppServerClient, buildJsonRpcError(), createProtocolError(), SpawnedCodexAppServerClient
 
 ### Community 95 - "Intelligence Causal Hypothesis"
 Cohesion: 0.28
@@ -1742,8 +1742,8 @@ Cohesion: 0.27
 Nodes (6): buildQuote(), cfg(), estimateMinutes(), priceService(), rates(), toReceipt()
 
 ### Community 270 - "Field Layout"
-Cohesion: 0.10
-Nodes (21): additionalProperties, properties, required, type, additionalProperties, properties, required, type (+13 more)
+Cohesion: 0.09
+Nodes (25): additionalProperties, properties, required, type, additionalProperties, properties, required, type (+17 more)
 
 ### Community 271 - "Functions Index"
 Cohesion: 0.36
@@ -1998,8 +1998,8 @@ Cohesion: 0.39
 Nodes (5): byZip(), data(), list(), mean(), opportunityIndex()
 
 ### Community 337 - "Unit Financial Intelligence"
-Cohesion: 0.12
-Nodes (20): items, additionalProperties, items, properties, required, type, action, agent (+12 more)
+Cohesion: 0.14
+Nodes (17): items, additionalProperties, items, properties, required, type, action, agent (+9 more)
 
 ### Community 338 - "Unit Innovation Council"
 Cohesion: 0.39
@@ -2162,8 +2162,8 @@ Cohesion: 0.33
 Nodes (5): Claim, Cross-references, {{id}} — {{title}}, Reasoning, Sources
 
 ### Community 381 - "Unit Field Capture"
-Cohesion: 0.15
-Nodes (12): $defs, evidence, responseEnvelope, description, additionalProperties, required, $id, additionalProperties (+4 more)
+Cohesion: 0.40
+Nodes (4): description, $id, $schema, title
 
 ### Community 382 - "Unit Seam Layout"
 Cohesion: 0.33
@@ -2310,8 +2310,8 @@ Cohesion: 0.50
 Nodes (8): aggregate(), cfg(), flag(), laborHours(), materialPlan(), num(), r2(), serviceSelections()
 
 ### Community 428 - "Community 428"
-Cohesion: 0.09
-Nodes (24): type, $ref, items, type, enum, type, errorEnvelope, $ref (+16 more)
+Cohesion: 0.10
+Nodes (21): type, $ref, items, type, responseEnvelope, $ref, discriminator, oneOf (+13 more)
 
 ### Community 429 - "Community 429"
 Cohesion: 0.40
@@ -2522,8 +2522,8 @@ Cohesion: 0.83
 Nodes (3): say(), setup-retrieve.sh script, warn()
 
 ### Community 492 - "Community 492"
-Cohesion: 0.12
-Nodes (16): $ref, $ref, requestEnvelope, $ref, enum, type, budgets, contextPacket (+8 more)
+Cohesion: 0.08
+Nodes (26): $ref, $ref, enum, type, errorEnvelope, requestEnvelope, additionalProperties, properties (+18 more)
 
 ### Community 493 - "Community 493"
 Cohesion: 0.50

@@ -225,8 +225,8 @@
     "semantic_hash": "eae853020c704ebf8e3f38b19c4f9c6f"
   },
   "js/ai/assisted-draft-queue.js": {
-    "mtime": 1784516993.6174235,
-    "ast_hash": "4b7d725b091e96c79a30026496eca57a",
+    "mtime": 1784517988.5254827,
+    "ast_hash": "4334c5bf9b6067cfc4e05d197b382c37",
     "semantic_hash": ""
   },
   "js/ai/content-safety.js": {
@@ -3170,8 +3170,8 @@
     "semantic_hash": "877f71265388969fb086955a5b028605"
   },
   "js/copilot/rich-card-renderer.js": {
-    "mtime": 1783623612.0356815,
-    "ast_hash": "2880571948918ec69e8da5b255ad6e8d",
+    "mtime": 1784517974.4814818,
+    "ast_hash": "8bc17a9139a4518ed0ae264f0482d0bb",
     "semantic_hash": ""
   },
   "js/copilot/simulation-result-card.js": {
@@ -3785,8 +3785,8 @@
     "semantic_hash": ""
   },
   "js/copilot/copilot-contract.js": {
-    "mtime": 1783622542.375706,
-    "ast_hash": "f09bb5984f004410512f0e07ca41f6a3",
+    "mtime": 1784517998.2254832,
+    "ast_hash": "24309cde3b75ffe67c143c307982571e",
     "semantic_hash": ""
   },
   "schemas/copilot-contract-v1.json": {
@@ -3885,8 +3885,8 @@
     "semantic_hash": ""
   },
   "test/unit/copilot-chat-bridge.test.js": {
-    "mtime": 1784517077.9014285,
-    "ast_hash": "abb7993d572d30ccf8cbe8587ab11519",
+    "mtime": 1784517983.6094823,
+    "ast_hash": "16fb97cf10548cec62a76179d461afe8",
     "semantic_hash": ""
   },
   "test/unit/copilot-remote-adapter.test.js": {
@@ -3955,8 +3955,8 @@
     "semantic_hash": ""
   },
   "test/helpers/copilot-mutants.js": {
-    "mtime": 1783624120.27567,
-    "ast_hash": "51dd11439370c967397d3b8d8883e077",
+    "mtime": 1784517929.6087482,
+    "ast_hash": "277a89e9f45f288d6eca2e1bc93f463c",
     "semantic_hash": ""
   },
   "test/unit/copilot-eval-gate.test.js": {

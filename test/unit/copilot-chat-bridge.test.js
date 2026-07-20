@@ -70,7 +70,8 @@ module.exports = async function run() {
   const richHtml = RICH.html(asked.card);
   t.ok('rich renderer delegates copilot_contract to the contract renderer',
     richHtml.indexOf('cc-response') !== -1 && richHtml.indexOf('&lt;script&gt;') !== -1 && richHtml.indexOf('<script>') === -1);
-  t.eq('without a response it falls back to the pre-rendered html', RICH.html({ type: 'copilot_contract', html: '<div class="pre">x</div>' }), '<div class="pre">x</div>');
+  t.eq('stored html is NEVER emitted raw (tamper-at-rest defense) — escaped summary instead',
+    RICH.html({ type: 'copilot_contract', html: '<img onerror=x src=x>', summary: 'safe' }), '<div class="cp-card cp-text">safe</div>');
   t.eq('with neither, the summary renders escaped', RICH.html({ type: 'copilot_contract', summary: '<b>hi</b>' }), '<div class="cp-card cp-text">&lt;b&gt;hi&lt;/b&gt;</div>');
 
   // ===== a drafted follow-up is FILED into the assisted-drafts queue =====

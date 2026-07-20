@@ -70,8 +70,11 @@
       // (office-level — crew denied by the gateway). Filing a remotely
       // drafted message is the same capability, so the same roles hold it;
       // the remote path must not be a side door around the local gate.
+      // FAIL CLOSED: absence of the RBAC module is not permission (draft()
+      // likewise refuses without its router).
       const rb = global.AAA_RBAC;
-      if (rb && rb.can && !rb.can('VIEW_ALL_JOBS')) return { ok: false, error: 'FORBIDDEN', permission: 'VIEW_ALL_JOBS' };
+      if (!rb || !rb.can) return { ok: false, error: 'NO_RBAC' };
+      if (!rb.can('VIEW_ALL_JOBS')) return { ok: false, error: 'FORBIDDEN', permission: 'VIEW_ALL_JOBS' };
       const source = i.source || 'filed';
       const by = i.actor || (i.origin === 'ai' ? 'ai' : null);
       const id = newId('adraft');

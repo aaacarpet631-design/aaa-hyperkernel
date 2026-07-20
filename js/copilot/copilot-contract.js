@@ -95,9 +95,12 @@
     // Optional cost/latency accounting — makes the budget release gates
     // measurable per response without breaking any existing fixture.
     usage: obj([], { costUSD: { type: 'number', minimum: 0 }, latencyMs: { type: 'number', minimum: 0 }, model: STR }),
-    // The agreed unhappy path: server-side refusals (403 perm denial, 422
-    // validation, workspace mismatch, future version skew) return THIS shape,
-    // so consumers can tell "your contract is stale" from "service down".
+    // The agreed unhappy path for every refusal the server HANDLER controls:
+    // rate_limited (429), version_unsupported (422 — "your contract is
+    // stale"), invalid_request (422), workspace_mismatch (422), internal
+    // (500). Exception: permission_denied — the 403 is issued by the auth
+    // dependency before the handler runs and keeps the framework-default
+    // body, so the adapter treats a non-envelope 403 as REMOTE_HTTP_403.
     errorEnvelope: obj(['contractVersion', 'error'], {
       contractVersion: STR,
       requestId: STR,
