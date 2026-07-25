@@ -529,6 +529,7 @@
   "527": "Community 527",
   "528": "Community 528",
   "529": "ads-margin-join.test.js",
+  "530": "knowledge-os-ui.test.js",
   "531": "Community 531",
   "532": "Community 532",
   "533": "Community 533",
@@ -558,6 +559,7 @@
   "557": "owner-copilot-ui.test.js",
   "558": "Community 558",
   "559": "quote-lifecycle-ui.test.js",
+  "560": "outcome-intelligence-ui.test.js",
   "561": "command-deck.test.js",
   "562": "review-governance.test.js",
   "563": "Community 563",
@@ -673,6 +675,7 @@
   "673": "company-brain.test.js",
   "674": "review-safety.test.js",
   "675": "workforce-ui.test.js",
+  "676": "approval-inbox-ui.test.js",
   "677": "sensing.test.js",
   "678": "security-ui.test.js",
   "679": "teleological.test.js",
@@ -686,9 +689,11 @@
   "687": "company-brain.test.js",
   "688": "governance-notifier.test.js",
   "689": "quickbooks-online.test.js",
+  "690": "review-safety.test.js",
   "691": "Domain 7 — Scalability & Hot-Path Redesign",
   "692": "4.2 Internationalization inventory",
   "693": "Reconciliation addendum — Fable 5 second pass (2026-07-19)",
+  "694": "mission-manager.test.js",
   "695": "PROJECT ATLAS — Phase 2: Target Architecture",
   "696": "rules.test.js",
   "697": "{{title}} — Map of Content",
@@ -700,5 +705,6 @@
   "703": "aaa-policy-contract.js",
   "704": "governance-business-events.test.js",
   "705": "transport-scheduler.test.js",
-  "706": "workforce-ui.test.js"
+  "706": "workforce-ui.test.js",
+  "707": "sensing.test.js"
 }

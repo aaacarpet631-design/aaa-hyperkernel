@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1784962491.9289205,
-    "ast_hash": "585f5123e05e2cfd73a9c8074b46326f",
+    "mtime": 1784962980.2241304,
+    "ast_hash": "aedf96b514db255f568e587424e9ad98",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
@@ -1180,8 +1180,8 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "test/run.js": {
-    "mtime": 1784962483.7521217,
-    "ast_hash": "dbe3e96c25777ba24618d551c21fb68b",
+    "mtime": 1784962991.0361307,
+    "ast_hash": "a5ad8741f8a5bca38051a2d99a0e39a1",
     "semantic_hash": ""
   },
   "test/smoke/boot.test.js": {
@@ -1895,8 +1895,8 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "index.html": {
-    "mtime": 1784962482.6081216,
-    "ast_hash": "7c5e2e6773a47210029374f60135aba8",
+    "mtime": 1784962971.6281302,
+    "ast_hash": "414e15a3075e7a605fd435ae2565a85d",
     "semantic_hash": ""
   },
   "netlify/functions/RESEARCH.md": {
@@ -4027,6 +4027,16 @@
   "test/unit/model-record.test.js": {
     "mtime": 1784962464.5441213,
     "ast_hash": "c4bb21171456590df7715c05736c2458",
+    "semantic_hash": ""
+  },
+  "js/core/aaa-policy-decision.js": {
+    "mtime": 1784962819.3601277,
+    "ast_hash": "d52c263007f2fed888b59744bf36e1cf",
+    "semantic_hash": ""
+  },
+  "test/unit/policy-decision.test.js": {
+    "mtime": 1784962849.0281281,
+    "ast_hash": "3bf3a5ae9d683d96da47d7feb4476999",
     "semantic_hash": ""
   }
 }

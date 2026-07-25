@@ -13,6 +13,7 @@ const SUITES = [
   'unit/rbac.test.js',
   'unit/gateway.test.js',
   'unit/governance-policy.test.js',
+  'unit/policy-decision.test.js',
   'unit/model-router.test.js',
   'unit/model-record.test.js',
   'unit/action-safety-gate.test.js',
