@@ -86,6 +86,62 @@
       const base = ({ low: 20, medium: 45, high: 70 })[m ? m.riskTier : 'medium'] || 45;
       const bump = task === 'draft_customer_message' ? 15 : 0;
       return Math.min(100, base + bump);
+    },
+
+    // ---- LEVIATHAN canonical resolution (Domain 8 STEP 2: shadow reads) ------
+    // The registry stays the serving source; these ADDITIVE readers resolve a
+    // registry key into the canonical model record via the shared ID space
+    // (AAA_MODEL_RECORD providerIds.hyperkernel). Nothing in the call path is
+    // gated on them yet — the promotion gate arrives with the lifecycle move —
+    // so with the contract absent every reader degrades to null/ok:false.
+
+    /** Canonical record for a registry key, or null (shared ID space lookup). */
+    canonicalRecord(key) {
+      const C = global.AAA_MODEL_RECORD;
+      if (!key || !C || !C.seed) return null;
+      const hit = C.seed().filter(function (r) {
+        return r && r.providerIds && Array.isArray(r.providerIds.hyperkernel) && r.providerIds.hyperkernel.indexOf(key) !== -1;
+      });
+      return hit.length === 1 ? hit[0] : null;
+    },
+
+    /** Canonical modelUid for a registry key, or null. */
+    modelUidOf(key) { const r = this.canonicalRecord(key); return r ? r.modelUid : null; },
+
+    /**
+     * SHADOW lifecycle gate — what canonical enforcement WOULD decide, without
+     * deciding anything. productionApproved is honest: it is false for every
+     * seed today, and only a human-governed record can ever flip it.
+     */
+    lifecycleGate(key) {
+      const r = this.canonicalRecord(key);
+      if (!r) return { known: false, modelUid: null, lifecycle: null, productionApproved: false };
+      return { known: true, modelUid: r.modelUid, lifecycle: r.lifecycle, productionApproved: r.lifecycle === 'PRODUCTION_APPROVED' };
+    },
+
+    /**
+     * Drift check between this registry and the canonical record's shared ID
+     * space — the dual-read diff the LEVIATHAN roadmap requires in CI:
+     * every registry key maps to EXACTLY ONE canonical record, and every
+     * hyperkernel id the records reference exists here (mirror of the
+     * custonllm-side conformance test).
+     */
+    reconcile() {
+      const C = global.AAA_MODEL_RECORD;
+      if (!C || !C.seed) return { ok: false, error: 'NO_CANONICAL_CONTRACT', unmapped: [], unknownRefs: [], mapped: {} };
+      const self = this;
+      const mapped = {}, unmapped = [];
+      Object.keys(MODELS).forEach(function (key) {
+        const uid = self.modelUidOf(key);
+        if (uid) mapped[key] = uid; else unmapped.push(key);
+      });
+      const unknownRefs = [];
+      C.seed().forEach(function (r) {
+        ((r.providerIds && r.providerIds.hyperkernel) || []).forEach(function (id) {
+          if (!MODELS[id]) unknownRefs.push(id);
+        });
+      });
+      return { ok: unmapped.length === 0 && unknownRefs.length === 0, unmapped: unmapped, unknownRefs: unknownRefs, mapped: mapped };
     }
   };
 

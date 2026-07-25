@@ -240,14 +240,14 @@
     "semantic_hash": "2bc916a4c8933b29ad284e5f8d7127ca"
   },
   "js/ai/model-registry.js": {
-    "mtime": 1783050778.0560992,
-    "ast_hash": "75a9a9cd0919548290953a8985ca61f1",
-    "semantic_hash": "75a9a9cd0919548290953a8985ca61f1"
+    "mtime": 1784968928.7385285,
+    "ast_hash": "a272499d4b97f9741032f18b68e7a104",
+    "semantic_hash": ""
   },
   "js/ai/model-router.js": {
-    "mtime": 1783050778.0560992,
-    "ast_hash": "79ed38e497b93e32e65dd7fa24aba524",
-    "semantic_hash": "79ed38e497b93e32e65dd7fa24aba524"
+    "mtime": 1784968946.7105293,
+    "ast_hash": "e710ac806c0d86ea24a24c8e0a95b01f",
+    "semantic_hash": ""
   },
   "js/ai/providers/nemotron-transport.js": {
     "mtime": 1783050778.0560992,
@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1784962980.2241304,
-    "ast_hash": "aedf96b514db255f568e587424e9ad98",
+    "mtime": 1784969032.902533,
+    "ast_hash": "622b8ec2d7710eb3019be87d3b4dc16c",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
@@ -1180,8 +1180,8 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "test/run.js": {
-    "mtime": 1784968585.8625133,
-    "ast_hash": "a72a8be8e3bc940c0ceccfc771a3f135",
+    "mtime": 1784968966.5905302,
+    "ast_hash": "f448c19d359d0a2a52d7b0160e8e5985",
     "semantic_hash": ""
   },
   "test/smoke/boot.test.js": {
@@ -3995,13 +3995,13 @@
     "semantic_hash": ""
   },
   "docs/LEVIATHAN_PHASE0_INVENTORY.md": {
-    "mtime": 1784962606.8161237,
-    "ast_hash": "8572895657c5c6822da67ff0f29f824f",
+    "mtime": 1784969051.278534,
+    "ast_hash": "05bac006563254270b05a3d0cf0e9253",
     "semantic_hash": ""
   },
   "docs/PROJECT_ATLAS_MISSION.md": {
-    "mtime": 1784963174.172134,
-    "ast_hash": "91032870676d5b45fa56fa466f7443ab",
+    "mtime": 1784968831.2225242,
+    "ast_hash": "25a033c52be4877abaefb84167f91501",
     "semantic_hash": ""
   },
   "docs/SYSTEM_AUDIT.md": {
@@ -4077,6 +4077,16 @@
   "docs/PDP_DEPLOY_PLAN.md": {
     "mtime": 1784968695.3145182,
     "ast_hash": "a5d281dbf0047c870d96260e81077aaf",
+    "semantic_hash": ""
+  },
+  "test/unit/model-registry-canonical.test.js": {
+    "mtime": 1784968963.47053,
+    "ast_hash": "17d4b95710b5f228c5533e1810521234",
+    "semantic_hash": ""
+  },
+  "docs/ATLAS_ROADMAP.md": {
+    "mtime": 1784968824.7105238,
+    "ast_hash": "50417e8a387f5484b0aa9ea6e74d5cfb",
     "semantic_hash": ""
   }
 }

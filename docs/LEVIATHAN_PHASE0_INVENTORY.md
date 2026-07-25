@@ -148,11 +148,26 @@ contracts. It delivers the Phase-1 core:
   `noLabIndispensable()` flags any laboratory exceeding 60% of the
   production-approved fleet (vacuously ok until models are promoted).
 
+**Router unification, STEP 2 shadow reads (2026-07-25):** the HyperKernel
+serving registry (`AAA_MODEL_REGISTRY`) now resolves into the canonical
+record's shared ID space — `canonicalRecord()`/`modelUidOf()` (registry key →
+`modelUid`), `lifecycleGate()` (the SHADOW promotion gate: honest
+`productionApproved:false` for every seed), and `reconcile()` (the dual-read
+drift tripwire: every registry key maps to exactly one canonical record and
+every canonical hyperkernel id exists in the registry — the mirror of the
+Custonllm conformance test, enforced in CI by
+`test/unit/model-registry-canonical.test.js`). The governed router annotates
+its envelopes/status with `canonicalModelUid`/`canonical` — additive
+observability only; nothing routes or gates on the record until the ATLAS
+Wave-4 promotion gate, and with the contract absent every reader degrades to
+null rather than inventing identity.
+
 Still ahead in later phases (not built): automated discovery, real
 supply-chain verification (Gate 1), runtime adapters beyond the two present,
-the evaluation foundry, and the governed router unification onto this record.
-The record SHAPE and the shared identity are the Phase-1 deliverable; they ride
-the same server boundary as ATLAS Domain 1.
+the evaluation foundry, and the enforcement half of router unification (the
+promotion gate re-keying `tenant-model-policy` to `modelUid`). The record
+SHAPE and the shared identity are the Phase-1 deliverable; they ride the same
+server boundary as ATLAS Domain 1.
 
 ## Cross-reference
 

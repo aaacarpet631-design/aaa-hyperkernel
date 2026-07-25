@@ -85,6 +85,9 @@
       }
       return {
         ok: true, advisory: true, fallback: false, stub: !!(inv.raw && inv.raw.stub),
+        // Canonical fabric identity (LEVIATHAN shared ID space) — additive
+        // annotation only; routing/gating are unchanged until the promotion gate.
+        canonicalModelUid: reg.modelUidOf ? reg.modelUidOf(modelKey) : null,
         modelFamily: meta.family, modelId: modelId, modelVersion: gov.versionId, provider: content.provider || meta.provider,
         promptVersion: (r.context && r.context.promptVersion) || null, governanceVersion: gov.versionId,
         confidence: confidence, riskScore: riskScore, sourceContext: r.context || null, outputChecksum: checksum,
@@ -147,7 +150,9 @@
       const enabled = await this.isEnabled(modelKey);
       const metrics = mcp() && mcp().metrics ? await mcp().metrics(modelKey) : null;
       const content = gov && gov.content ? (typeof gov.content === 'string' ? safeParse(gov.content) : gov.content) : null;
-      return { modelKey: modelKey, governed: !!gov, governanceVersion: gov ? gov.versionId : null, enabled: enabled, modelId: content ? content.modelId : null, runtime: content ? content.runtime : null, verifiedId: content ? !!content.verifiedId : false, metrics: metrics };
+      const reg = registry();
+      const canonical = reg && reg.lifecycleGate ? reg.lifecycleGate(modelKey) : null;
+      return { modelKey: modelKey, governed: !!gov, governanceVersion: gov ? gov.versionId : null, enabled: enabled, modelId: content ? content.modelId : null, runtime: content ? content.runtime : null, verifiedId: content ? !!content.verifiedId : false, metrics: metrics, canonical: canonical };
     }
   };
 
