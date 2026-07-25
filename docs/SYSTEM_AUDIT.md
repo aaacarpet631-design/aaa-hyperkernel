@@ -568,3 +568,77 @@ Ranked from the themes above:
 7. **Horizontal-scale the hot paths.** Replace full-collection `data().list()` scans on per-tenant-growing collections (leads, quotes, events, audit_log, ads_conversion_events) with indexed/paginated queries before they bite at ~10–100 tenants.
 
 These are the Phase-2 inputs; none require weakening any existing human-authority guarantee — they move each guarantee to a boundary a tenant cannot cross.
+
+---
+
+## Reconciliation addendum — Fable 5 second pass (2026-07-19)
+
+An independent Fable 5 re-audit re-verified each lens against the code. Two of
+six lenses completed before a session usage limit halted the rest
+(architecture, governance done; **organizational-memory, i18n/tenancy,
+reliability-security, and scalability reconciliation are PENDING** and should
+be re-run when the limit resets). The completed lenses confirmed the
+measurement discipline of the first pass as high-fidelity and produced the
+following material corrections — including **one downgrade of a headline
+critical theme**:
+
+### Governance (Lens 2)
+
+- **C6 DOWNGRADED (critical → the claim was overstated).** "audit_log is not
+  hash-chained by default" is **incorrect**: `js/core/aaa-security.js` ships
+  loaded and `sealAudit` chains entries by default; the gateway seals through
+  it (`aaa-runtime-gateway.js:220`). The real, narrower finding is **NEW/high**:
+  the seal uses a **single workspace-wide sequence** (`_lastSealed` over all
+  entries, no per-writer chain), which is a multi-tenant integrity concern, not
+  an "unchained by default" one. Board implication: audit tamper-evidence is
+  *present*, but its sequencing model is single-tenant.
+- **C4 CONFIRMED (stays critical).** The AI hard-block (`aiAllowed:false`) is a
+  browser-gateway guarantee; Firestore rules and Netlify functions cannot
+  distinguish an AI-origin write from a human one. The first pass's phrasing
+  ("no server backstop *of any kind*") is slightly overstated — rules do gate
+  on member+role — but the core gap holds: **there is no server-side ORIGIN
+  check**, so the human-authority firewall has no backstop against a
+  replaced/compromised client or direct API call.
+- **CONFIRMED (high):** large ungoverned AI-writable surface — **221 `data().put`
+  sites across 109 files** vs only ~30 files touching the gateway. (The first
+  pass's "~79 of 109 bypass" framing is directionally right; the precise count
+  is 221 write sites.)
+- **CONFIRMED:** approval authority + tamper-evidence both collapse to one
+  owner identity; no legal-hold primitive.
+
+### Architecture (Lens 1)
+
+- **Circular dependencies DOWNGRADED (medium → low).** The "8 JS mutual pairs
+  incl. the kernel gateway↔security cycle" and the custonllm `core↔tools` cycle
+  are **lazy call-graph cycles, not load-time import cycles** — every
+  cross-module reference is a deferred `global.AAA_X` lookup (JS) or a
+  function-body import (Python), and the load-order DAG is acyclic. Phase-2
+  implication: **do not spend module-refactor budget "breaking" these** — they
+  create no load hazard and don't block bundling the way ES-module import
+  cycles would.
+- **Event taxonomy is STRONGER a finding than stated (100% dormant).** The
+  first pass said the classification axes are "consumed by exactly one file
+  (`outcome-spine.js`)" — that is **wrong**: `outcome-spine.js` has its own
+  local `classifyResult()` and never references the taxonomy. The canonical
+  30-event business spine has **zero external consumers AND zero publishers** —
+  defined-but-never-fired. What actually publishes is ~18 ad-hoc module events.
+- **Untyped-bus emit magnitude CORRECTED:** ~37 direct call sites across 22
+  files, not "58 across 26 files" (the 26 was files *referencing* the global).
+  Qualitative conclusion — untyped `AAA_EVENTS` is the real delivery spine and
+  bypasses the typed hash-chained bus — stands.
+- **NEW/medium:** identically-named local `emit()` wrapper functions in
+  different modules route to *opposite* buses (belief-registry / goal-capability
+  vs the untyped global) — a latent correctness trap for the Phase-2 event
+  unification.
+- **Netlify inventory CORRECTED:** 15 executable `.mjs` functions / 1,278 lines
+  (two `.md` docs were miscounted as functions), not "17 / 1,397".
+
+### Net effect on the critical themes
+
+Five of the six consolidated critical themes stand as written (C1 sync, C2
+proxies, C3 client-tenancy, C4 AI-block, C5 localStorage). **C6 (audit
+chaining) is downgraded** — tamper-evidence exists by default; the live concern
+is its single-tenant sequencing. The scalability and tenancy criticals (the
+`data().list()` full-scans, the grandfathered null-workspace records) were in
+the four lenses the limit cut short and remain **first-pass findings pending
+Fable-5 reconciliation**.
