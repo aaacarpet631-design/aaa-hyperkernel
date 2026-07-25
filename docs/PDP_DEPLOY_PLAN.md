@@ -126,7 +126,14 @@ gateway keeps the app fully functional throughout, so no rollout step can brick 
 - [x] C4 origin backstop proven un-spoofable (derived from principal class).
 - [x] `shadowCompare()` for STEP-1 rollout.
 - [x] Wired into `index.html`, `sw.js`, `test/run.js`; full suite + lint green.
-- [ ] *(owner)* Cloud Function shell deployed; server-set custom claims at sign-in.
+- [x] Cloud Function shell BUILT as tested code: `functions/pdp-authorize/`
+      (`lib.js` pure handler + `index.js` onRequest wrapper). Carries
+      byte-parity committed copies of the decision core + governance artifact
+      (Firebase deploys only the `functions/` tree); `test.js` asserts parity,
+      sha256 integrity fail-closed, no-default-role fail-closed, the C4
+      claims-only backstop, and shadow-default rollout semantics.
+- [ ] *(owner)* Shell deployed (`firebase deploy --only functions:pdpAuthorize`);
+      server-set custom claims stamped at sign-in.
 - [ ] *(owner)* STEP-1 shadow burn-in → STEP-2 enforce cutover.
 
 Items marked *(owner)* require live Firebase infrastructure and a production decision;

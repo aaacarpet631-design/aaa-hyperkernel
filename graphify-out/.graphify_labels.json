@@ -706,5 +706,6 @@
   "704": "governance-business-events.test.js",
   "705": "transport-scheduler.test.js",
   "706": "workforce-ui.test.js",
-  "707": "sensing.test.js"
+  "707": "sensing.test.js",
+  "708": "review-governance.test.js"
 }

@@ -1,8 +1,8 @@
 {
   ".eslintrc.json": {
-    "mtime": 1783050777.5472035,
-    "ast_hash": "1f3d0c801fa452aabc97b24ce2e738fa",
-    "semantic_hash": "1f3d0c801fa452aabc97b24ce2e738fa"
+    "mtime": 1784968664.2705166,
+    "ast_hash": "a1b59d4b0e602cd492d9872a46e87f35",
+    "semantic_hash": ""
   },
   "data/eval-golden.seed.json": {
     "mtime": 1783050777.5581279,
@@ -1180,8 +1180,8 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "test/run.js": {
-    "mtime": 1784962991.0361307,
-    "ast_hash": "a5ad8741f8a5bca38051a2d99a0e39a1",
+    "mtime": 1784968585.8625133,
+    "ast_hash": "a72a8be8e3bc940c0ceccfc771a3f135",
     "semantic_hash": ""
   },
   "test/smoke/boot.test.js": {
@@ -4000,8 +4000,8 @@
     "semantic_hash": ""
   },
   "docs/PROJECT_ATLAS_MISSION.md": {
-    "mtime": 1784957477.2583134,
-    "ast_hash": "704e8d03adc8e0feb2f4053d033e753e",
+    "mtime": 1784963174.172134,
+    "ast_hash": "91032870676d5b45fa56fa466f7443ab",
     "semantic_hash": ""
   },
   "docs/SYSTEM_AUDIT.md": {
@@ -4037,6 +4037,46 @@
   "test/unit/policy-decision.test.js": {
     "mtime": 1784962849.0281281,
     "ast_hash": "3bf3a5ae9d683d96da47d7feb4476999",
+    "semantic_hash": ""
+  },
+  "functions/pdp-authorize/aaa-policy-decision.js": {
+    "mtime": 1784968484.5181491,
+    "ast_hash": "d52c263007f2fed888b59744bf36e1cf",
+    "semantic_hash": ""
+  },
+  "functions/pdp-authorize/contracts/governance-policy-v1.json": {
+    "mtime": 1784968484.5124753,
+    "ast_hash": "cd2d897416850be28cd6dc3b69b19541",
+    "semantic_hash": ""
+  },
+  "functions/pdp-authorize/contracts/governance-policy.MANIFEST.json": {
+    "mtime": 1784968484.5150363,
+    "ast_hash": "52f44ebea70e982beff1b93f15ec739f",
+    "semantic_hash": ""
+  },
+  "functions/pdp-authorize/index.js": {
+    "mtime": 1784968528.5985107,
+    "ast_hash": "f686939c970512a3c243099b5647223f",
+    "semantic_hash": ""
+  },
+  "functions/pdp-authorize/lib.js": {
+    "mtime": 1784968511.82651,
+    "ast_hash": "152456750daabf15cd02f3f88d55e2be",
+    "semantic_hash": ""
+  },
+  "functions/pdp-authorize/package.json": {
+    "mtime": 1784968534.450511,
+    "ast_hash": "c2e5f31b7d487784d4a1ec370184996a",
+    "semantic_hash": ""
+  },
+  "functions/pdp-authorize/test.js": {
+    "mtime": 1784968571.2705126,
+    "ast_hash": "5fc2181b2afa6b7eb76914f7033c08c3",
+    "semantic_hash": ""
+  },
+  "docs/PDP_DEPLOY_PLAN.md": {
+    "mtime": 1784968695.3145182,
+    "ast_hash": "a5d281dbf0047c870d96260e81077aaf",
     "semantic_hash": ""
   }
 }

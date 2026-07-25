@@ -5998,6 +5998,526 @@
       "norm_label": "firebase-functions"
     },
     {
+      "label": "aaa-policy-decision.js",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/aaa-policy-decision.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_aaa_policy_decision",
+      "community": 527,
+      "norm_label": "aaa-policy-decision.js"
+    },
+    {
+      "label": "policy()",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/aaa-policy-decision.js",
+      "source_location": "L31",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_aaa_policy_decision_policy",
+      "community": 527,
+      "norm_label": "policy()"
+    },
+    {
+      "label": "originOf()",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/aaa-policy-decision.js",
+      "source_location": "L35",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_aaa_policy_decision_originof",
+      "community": 527,
+      "norm_label": "originof()"
+    },
+    {
+      "label": "gates()",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/aaa-policy-decision.js",
+      "source_location": "L37",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_aaa_policy_decision_gates",
+      "community": 527,
+      "norm_label": "gates()"
+    },
+    {
+      "label": "rolePerms()",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/aaa-policy-decision.js",
+      "source_location": "L42",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_aaa_policy_decision_roleperms",
+      "community": 527,
+      "norm_label": "roleperms()"
+    },
+    {
+      "label": "index.js",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/index.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_index",
+      "community": 379,
+      "norm_label": "index.js"
+    },
+    {
+      "label": "functions",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/index.js",
+      "source_location": "L25",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_index_functions",
+      "community": 379,
+      "norm_label": "functions"
+    },
+    {
+      "label": "admin",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/index.js",
+      "source_location": "L26",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_index_admin",
+      "community": 379,
+      "norm_label": "admin"
+    },
+    {
+      "label": "lib",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/index.js",
+      "source_location": "L27",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_index_lib",
+      "community": 379,
+      "norm_label": "lib"
+    },
+    {
+      "label": "lib.js",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/lib.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_lib",
+      "community": 379,
+      "norm_label": "lib.js"
+    },
+    {
+      "label": "crypto",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/lib.js",
+      "source_location": "L27",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_lib_crypto",
+      "community": 379,
+      "norm_label": "crypto"
+    },
+    {
+      "label": "fs",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/lib.js",
+      "source_location": "L28",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_lib_fs",
+      "community": 379,
+      "norm_label": "fs"
+    },
+    {
+      "label": "path",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/lib.js",
+      "source_location": "L29",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_lib_path",
+      "community": 379,
+      "norm_label": "path"
+    },
+    {
+      "label": "vm",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/lib.js",
+      "source_location": "L30",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_lib_vm",
+      "community": 379,
+      "norm_label": "vm"
+    },
+    {
+      "label": "ARTIFACT_PATH",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/lib.js",
+      "source_location": "L32",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_lib_artifact_path",
+      "community": 379,
+      "norm_label": "artifact_path"
+    },
+    {
+      "label": "MANIFEST_PATH",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/lib.js",
+      "source_location": "L33",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_lib_manifest_path",
+      "community": 379,
+      "norm_label": "manifest_path"
+    },
+    {
+      "label": "CORE_PATH",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/lib.js",
+      "source_location": "L34",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_lib_core_path",
+      "community": 379,
+      "norm_label": "core_path"
+    },
+    {
+      "label": "loadVerifiedArtifact()",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/lib.js",
+      "source_location": "L38",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_lib_loadverifiedartifact",
+      "community": 379,
+      "norm_label": "loadverifiedartifact()"
+    },
+    {
+      "label": "createPdp()",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/lib.js",
+      "source_location": "L49",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_lib_createpdp",
+      "community": 379,
+      "norm_label": "createpdp()"
+    },
+    {
+      "label": "handleAuthorize()",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/lib.js",
+      "source_location": "L72",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_lib_handleauthorize",
+      "community": 379,
+      "norm_label": "handleauthorize()"
+    },
+    {
+      "label": "package.json",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/package.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_package",
+      "community": 424,
+      "norm_label": "package.json"
+    },
+    {
+      "label": "name",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/package.json",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_package_name",
+      "community": 424,
+      "norm_label": "name"
+    },
+    {
+      "label": "version",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/package.json",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_package_version",
+      "community": 424,
+      "norm_label": "version"
+    },
+    {
+      "label": "description",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/package.json",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_package_description",
+      "community": 424,
+      "norm_label": "description"
+    },
+    {
+      "label": "main",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/package.json",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_package_main",
+      "community": 424,
+      "norm_label": "main"
+    },
+    {
+      "label": "engines",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/package.json",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_package_engines",
+      "community": 424,
+      "norm_label": "engines"
+    },
+    {
+      "label": "node",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/package.json",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_package_engines_node",
+      "community": 424,
+      "norm_label": "node"
+    },
+    {
+      "label": "scripts",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/package.json",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_package_scripts",
+      "community": 424,
+      "norm_label": "scripts"
+    },
+    {
+      "label": "deploy",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/package.json",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_package_scripts_deploy",
+      "community": 424,
+      "norm_label": "deploy"
+    },
+    {
+      "label": "test",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/package.json",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_package_scripts_test",
+      "community": 424,
+      "norm_label": "test"
+    },
+    {
+      "label": "dependencies",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/package.json",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_package_dependencies",
+      "community": 424,
+      "norm_label": "dependencies"
+    },
+    {
+      "label": "firebase-admin",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/package.json",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_package_dependencies_firebase_admin",
+      "community": 424,
+      "norm_label": "firebase-admin"
+    },
+    {
+      "label": "firebase-functions",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/package.json",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_package_dependencies_firebase_functions",
+      "community": 424,
+      "norm_label": "firebase-functions"
+    },
+    {
+      "label": "test.js",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_test",
+      "community": 379,
+      "norm_label": "test.js"
+    },
+    {
+      "label": "crypto",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_test_crypto",
+      "community": 379,
+      "norm_label": "crypto"
+    },
+    {
+      "label": "fs",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_test_fs",
+      "community": 379,
+      "norm_label": "fs"
+    },
+    {
+      "label": "path",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_test_path",
+      "community": 379,
+      "norm_label": "path"
+    },
+    {
+      "label": "lib",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_test_lib",
+      "community": 379,
+      "norm_label": "lib"
+    },
+    {
+      "label": "ok()",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_test_ok",
+      "community": 379,
+      "norm_label": "ok()"
+    },
+    {
+      "label": "sha()",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_test_sha",
+      "community": 379,
+      "norm_label": "sha()"
+    },
+    {
+      "label": "ROOT",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_test_root",
+      "community": 379,
+      "norm_label": "root"
+    },
+    {
+      "label": "artifact",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L26",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_test_artifact",
+      "community": 379,
+      "norm_label": "artifact"
+    },
+    {
+      "label": "pdp",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L32",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_test_pdp",
+      "community": 379,
+      "norm_label": "pdp"
+    },
+    {
+      "label": "expected()",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L37",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_test_expected",
+      "community": 379,
+      "norm_label": "expected()"
+    },
+    {
+      "label": "agentClaims",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L71",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_test_agentclaims",
+      "community": 379,
+      "norm_label": "agentclaims"
+    },
+    {
+      "label": "humanClaims",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L72",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_test_humanclaims",
+      "community": 379,
+      "norm_label": "humanclaims"
+    },
+    {
+      "label": "agentDeny",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L73",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_test_agentdeny",
+      "community": 379,
+      "norm_label": "agentdeny"
+    },
+    {
+      "label": "smuggled",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L76",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_test_smuggled",
+      "community": 379,
+      "norm_label": "smuggled"
+    },
+    {
+      "label": "humanAllow",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L79",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_test_humanallow",
+      "community": 379,
+      "norm_label": "humanallow"
+    },
+    {
+      "label": "crewDeny",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L81",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_test_crewdeny",
+      "community": 379,
+      "norm_label": "crewdeny"
+    },
+    {
+      "label": "shadowDeny",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L87",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_test_shadowdeny",
+      "community": 379,
+      "norm_label": "shadowdeny"
+    },
+    {
+      "label": "shadowAgree",
+      "file_type": "code",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L92",
+      "_origin": "ast",
+      "id": "functions_pdp_authorize_test_shadowagree",
+      "community": 379,
+      "norm_label": "shadowagree"
+    },
+    {
       "label": "index.js",
       "file_type": "code",
       "source_file": "functions/portal-proxy/index.js",
@@ -28914,7 +29434,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "js_governance_governance_supervisor",
-      "community": 17,
+      "community": 350,
       "norm_label": "governance-supervisor.js"
     },
     {
@@ -28924,7 +29444,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "js_governance_governance_supervisor_ledger",
-      "community": 17,
+      "community": 350,
       "norm_label": "ledger()"
     },
     {
@@ -28934,7 +29454,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "js_governance_governance_supervisor_cards",
-      "community": 17,
+      "community": 350,
       "norm_label": "cards()"
     },
     {
@@ -28944,7 +29464,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "js_governance_governance_supervisor_data",
-      "community": 17,
+      "community": 350,
       "norm_label": "data()"
     },
     {
@@ -28954,7 +29474,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "js_governance_governance_supervisor_clock",
-      "community": 17,
+      "community": 350,
       "norm_label": "clock()"
     },
     {
@@ -28964,7 +29484,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "js_governance_governance_supervisor_now",
-      "community": 17,
+      "community": 350,
       "norm_label": "now()"
     },
     {
@@ -28974,7 +29494,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "js_governance_governance_supervisor_audit",
-      "community": 17,
+      "community": 350,
       "norm_label": "audit()"
     },
     {
@@ -28984,7 +29504,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "js_governance_governance_supervisor_baseanalyzer",
-      "community": 17,
+      "community": 350,
       "norm_label": "baseanalyzer()"
     },
     {
@@ -28994,7 +29514,7 @@
       "source_location": "L59",
       "_origin": "ast",
       "id": "js_governance_governance_supervisor_registeranalyzer",
-      "community": 17,
+      "community": 350,
       "norm_label": "registeranalyzer()"
     },
     {
@@ -29004,7 +29524,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "js_governance_governance_supervisor_review",
-      "community": 17,
+      "community": 350,
       "norm_label": "review()"
     },
     {
@@ -29014,7 +29534,7 @@
       "source_location": "L96",
       "_origin": "ast",
       "id": "js_governance_governance_supervisor_recommendations",
-      "community": 17,
+      "community": 350,
       "norm_label": "recommendations()"
     },
     {
@@ -29024,7 +29544,7 @@
       "source_location": "L102",
       "_origin": "ast",
       "id": "js_governance_governance_supervisor_applychange",
-      "community": 17,
+      "community": 350,
       "norm_label": "applychange()"
     },
     {
@@ -38374,7 +38894,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center",
-      "community": 17,
+      "community": 350,
       "norm_label": "reliability-center.js"
     },
     {
@@ -38384,7 +38904,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center_cfg",
-      "community": 17,
+      "community": 350,
       "norm_label": "cfg()"
     },
     {
@@ -38394,7 +38914,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center_data",
-      "community": 17,
+      "community": 350,
       "norm_label": "data()"
     },
     {
@@ -38404,7 +38924,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center_ids",
-      "community": 17,
+      "community": 350,
       "norm_label": "ids()"
     },
     {
@@ -38414,7 +38934,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center_clock",
-      "community": 17,
+      "community": 350,
       "norm_label": "clock()"
     },
     {
@@ -38424,7 +38944,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center_ws",
-      "community": 17,
+      "community": 350,
       "norm_label": "ws()"
     },
     {
@@ -38434,7 +38954,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center_nowiso",
-      "community": 17,
+      "community": 350,
       "norm_label": "nowiso()"
     },
     {
@@ -38444,7 +38964,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center_mine",
-      "community": 17,
+      "community": 350,
       "norm_label": "mine()"
     },
     {
@@ -38454,7 +38974,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center_newid",
-      "community": 17,
+      "community": 350,
       "norm_label": "newid()"
     },
     {
@@ -38464,7 +38984,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center_num",
-      "community": 17,
+      "community": 350,
       "norm_label": "num()"
     },
     {
@@ -38474,7 +38994,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center_flag",
-      "community": 17,
+      "community": 350,
       "norm_label": "flag()"
     },
     {
@@ -38484,7 +39004,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center_quiet",
-      "community": 17,
+      "community": 350,
       "norm_label": "quiet()"
     },
     {
@@ -38494,7 +39014,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center_statuslow",
-      "community": 17,
+      "community": 350,
       "norm_label": "statuslow()"
     },
     {
@@ -38504,7 +39024,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center_statushigh",
-      "community": 17,
+      "community": 350,
       "norm_label": "statushigh()"
     },
     {
@@ -38514,7 +39034,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center_metric",
-      "community": 17,
+      "community": 350,
       "norm_label": "metric()"
     },
     {
@@ -38524,7 +39044,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center_metrics",
-      "community": 17,
+      "community": 350,
       "norm_label": "metrics()"
     },
     {
@@ -38534,7 +39054,7 @@
       "source_location": "L103",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center_health",
-      "community": 17,
+      "community": 350,
       "norm_label": "health()"
     },
     {
@@ -38544,7 +39064,7 @@
       "source_location": "L112",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center_alerts",
-      "community": 17,
+      "community": 350,
       "norm_label": "alerts()"
     },
     {
@@ -38554,7 +39074,7 @@
       "source_location": "L121",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center_snapshot",
-      "community": 17,
+      "community": 350,
       "norm_label": "snapshot()"
     },
     {
@@ -38564,7 +39084,7 @@
       "source_location": "L128",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center_snapshots",
-      "community": 17,
+      "community": 350,
       "norm_label": "snapshots()"
     },
     {
@@ -38574,7 +39094,7 @@
       "source_location": "L130",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center_trend",
-      "community": 17,
+      "community": 350,
       "norm_label": "trend()"
     },
     {
@@ -38584,7 +39104,7 @@
       "source_location": "L140",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center_evaluate",
-      "community": 17,
+      "community": 350,
       "norm_label": "evaluate()"
     },
     {
@@ -38594,7 +39114,7 @@
       "source_location": "L152",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center_incidents",
-      "community": 17,
+      "community": 350,
       "norm_label": "incidents()"
     },
     {
@@ -38604,7 +39124,7 @@
       "source_location": "L153",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center_recordincident",
-      "community": 17,
+      "community": 350,
       "norm_label": "recordincident()"
     },
     {
@@ -38614,7 +39134,7 @@
       "source_location": "L154",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center_resolveincident",
-      "community": 17,
+      "community": 350,
       "norm_label": "resolveincident()"
     },
     {
@@ -38624,7 +39144,7 @@
       "source_location": "L163",
       "_origin": "ast",
       "id": "js_intelligence_reliability_center_put",
-      "community": 17,
+      "community": 350,
       "norm_label": "put()"
     },
     {
@@ -43204,7 +43724,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "js_revenue_ads_reporting",
-      "community": 10,
+      "community": 380,
       "norm_label": "ads-reporting.js"
     },
     {
@@ -43214,7 +43734,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "js_revenue_ads_reporting_data",
-      "community": 10,
+      "community": 380,
       "norm_label": "data()"
     },
     {
@@ -43224,7 +43744,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "js_revenue_ads_reporting_attribution",
-      "community": 10,
+      "community": 380,
       "norm_label": "attribution()"
     },
     {
@@ -43234,7 +43754,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "js_revenue_ads_reporting_conversions",
-      "community": 10,
+      "community": 380,
       "norm_label": "conversions()"
     },
     {
@@ -43244,7 +43764,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "js_revenue_ads_reporting_leadsos",
-      "community": 10,
+      "community": 380,
       "norm_label": "leadsos()"
     },
     {
@@ -43254,7 +43774,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "js_revenue_ads_reporting_quotes",
-      "community": 10,
+      "community": 380,
       "norm_label": "quotes()"
     },
     {
@@ -43264,7 +43784,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "js_revenue_ads_reporting_num",
-      "community": 10,
+      "community": 380,
       "norm_label": "num()"
     },
     {
@@ -43274,7 +43794,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "js_revenue_ads_reporting_round2",
-      "community": 10,
+      "community": 380,
       "norm_label": "round2()"
     },
     {
@@ -43284,7 +43804,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "js_revenue_ads_reporting_fin",
-      "community": 10,
+      "community": 380,
       "norm_label": "fin()"
     },
     {
@@ -43294,7 +43814,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "js_revenue_ads_reporting_wonmargin",
-      "community": 10,
+      "community": 380,
       "norm_label": "wonmargin()"
     },
     {
@@ -43304,7 +43824,7 @@
       "source_location": "L53",
       "_origin": "ast",
       "id": "js_revenue_ads_reporting_emptyrow",
-      "community": 10,
+      "community": 380,
       "norm_label": "emptyrow()"
     },
     {
@@ -43314,7 +43834,7 @@
       "source_location": "L69",
       "_origin": "ast",
       "id": "js_revenue_ads_reporting_campaignscorecard",
-      "community": 10,
+      "community": 380,
       "norm_label": "campaignscorecard()"
     },
     {
@@ -43324,7 +43844,7 @@
       "source_location": "L154",
       "_origin": "ast",
       "id": "js_revenue_ads_reporting_diagnostics",
-      "community": 10,
+      "community": 380,
       "norm_label": "diagnostics()"
     },
     {
@@ -43334,7 +43854,7 @@
       "source_location": "L177",
       "_origin": "ast",
       "id": "js_revenue_ads_reporting_ownerbrief",
-      "community": 10,
+      "community": 380,
       "norm_label": "ownerbrief()"
     },
     {
@@ -44744,7 +45264,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "js_revenue_search_intent_engine",
-      "community": 10,
+      "community": 380,
       "norm_label": "search-intent-engine.js"
     },
     {
@@ -44754,7 +45274,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "js_revenue_search_intent_engine_marketing",
-      "community": 10,
+      "community": 380,
       "norm_label": "marketing()"
     },
     {
@@ -44764,7 +45284,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "js_revenue_search_intent_engine_world",
-      "community": 10,
+      "community": 380,
       "norm_label": "world()"
     },
     {
@@ -44774,7 +45294,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "js_revenue_search_intent_engine_clock",
-      "community": 10,
+      "community": 380,
       "norm_label": "clock()"
     },
     {
@@ -44784,7 +45304,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "js_revenue_search_intent_engine_nowms",
-      "community": 10,
+      "community": 380,
       "norm_label": "nowms()"
     },
     {
@@ -44794,7 +45314,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "js_revenue_search_intent_engine_baselinecloserate",
-      "community": 10,
+      "community": 380,
       "norm_label": "baselinecloserate()"
     },
     {
@@ -44804,7 +45324,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "js_revenue_search_intent_engine_classify",
-      "community": 10,
+      "community": 380,
       "norm_label": "classify()"
     },
     {
@@ -44814,7 +45334,7 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "js_revenue_search_intent_engine_clusterkeywords",
-      "community": 10,
+      "community": 380,
       "norm_label": "clusterkeywords()"
     },
     {
@@ -59914,7 +60434,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "schemas_google_ads_attribution_properties_keyword",
-      "community": 562,
+      "community": 90,
       "norm_label": "keyword"
     },
     {
@@ -59924,7 +60444,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "schemas_google_ads_attribution_keyword_type",
-      "community": 562,
+      "community": 90,
       "norm_label": "type"
     },
     {
@@ -59934,7 +60454,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "schemas_google_ads_attribution_keyword_maxlength",
-      "community": 562,
+      "community": 90,
       "norm_label": "maxlength"
     },
     {
@@ -60044,7 +60564,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "schemas_google_ads_attribution_properties_utmmedium",
-      "community": 90,
+      "community": 697,
       "norm_label": "utmmedium"
     },
     {
@@ -60054,7 +60574,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "schemas_google_ads_attribution_utmmedium_type",
-      "community": 90,
+      "community": 697,
       "norm_label": "type"
     },
     {
@@ -60064,7 +60584,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "schemas_google_ads_attribution_utmmedium_maxlength",
-      "community": 90,
+      "community": 697,
       "norm_label": "maxlength"
     },
     {
@@ -61284,7 +61804,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "test_helpers_harness_srcpath",
-      "community": 378,
+      "community": 12,
       "norm_label": "srcpath()"
     },
     {
@@ -61861,7 +62381,7 @@
       "label": "runSuite()",
       "file_type": "code",
       "source_file": "test/run.js",
-      "source_location": "L221",
+      "source_location": "L222",
       "_origin": "ast",
       "id": "test_run_runsuite",
       "community": 190,
@@ -61871,7 +62391,7 @@
       "label": "runExternal()",
       "file_type": "code",
       "source_file": "test/run.js",
-      "source_location": "L232",
+      "source_location": "L233",
       "_origin": "ast",
       "id": "test_run_runexternal",
       "community": 190,
@@ -61881,7 +62401,7 @@
       "label": "scrub()",
       "file_type": "code",
       "source_file": "test/run.js",
-      "source_location": "L243",
+      "source_location": "L244",
       "_origin": "ast",
       "id": "test_run_scrub",
       "community": 190,
@@ -61891,7 +62411,7 @@
       "label": "results",
       "file_type": "code",
       "source_file": "test/run.js",
-      "source_location": "L245",
+      "source_location": "L246",
       "_origin": "ast",
       "id": "test_run_results",
       "community": 190,
@@ -61901,7 +62421,7 @@
       "label": "totalPass",
       "file_type": "code",
       "source_file": "test/run.js",
-      "source_location": "L249",
+      "source_location": "L250",
       "_origin": "ast",
       "id": "test_run_totalpass",
       "community": 190,
@@ -61911,7 +62431,7 @@
       "label": "totalFail",
       "file_type": "code",
       "source_file": "test/run.js",
-      "source_location": "L250",
+      "source_location": "L251",
       "_origin": "ast",
       "id": "test_run_totalfail",
       "community": 190,
@@ -61974,7 +62494,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "test_smoke_boot_test_makewindow",
-      "community": 12,
+      "community": 60,
       "norm_label": "makewindow()"
     },
     {
@@ -62474,7 +62994,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "test_unit_agent_command_test",
-      "community": 0,
+      "community": 676,
       "norm_label": "agent-command.test.js"
     },
     {
@@ -62484,7 +63004,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "test_unit_agent_command_test_makerunner_setupenv_load",
-      "community": 0,
+      "community": 676,
       "norm_label": "{ makerunner, setupenv, load }"
     },
     {
@@ -62494,7 +63014,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "test_unit_agent_command_test_makeel",
-      "community": 0,
+      "community": 676,
       "norm_label": "makeel()"
     },
     {
@@ -62504,7 +63024,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "test_unit_agent_command_test_installdom",
-      "community": 0,
+      "community": 676,
       "norm_label": "installdom()"
     },
     {
@@ -62614,7 +63134,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "test_unit_agent_evaluation_ui_test",
-      "community": 5,
+      "community": 482,
       "norm_label": "agent-evaluation-ui.test.js"
     },
     {
@@ -62624,7 +63144,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "test_unit_agent_evaluation_ui_test_makerunner_setupenv_load",
-      "community": 5,
+      "community": 482,
       "norm_label": "{ makerunner, setupenv, load }"
     },
     {
@@ -62634,7 +63154,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "test_unit_agent_evaluation_ui_test_fakenode",
-      "community": 5,
+      "community": 482,
       "norm_label": "fakenode()"
     },
     {
@@ -62644,7 +63164,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "test_unit_agent_evaluation_ui_test_fakeui",
-      "community": 5,
+      "community": 482,
       "norm_label": "fakeui()"
     },
     {
@@ -62654,7 +63174,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "test_unit_agent_evaluation_ui_test_txt",
-      "community": 5,
+      "community": 482,
       "norm_label": "txt()"
     },
     {
@@ -62664,7 +63184,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "test_unit_agent_evaluation_ui_test_loadall",
-      "community": 5,
+      "community": 482,
       "norm_label": "loadall()"
     },
     {
@@ -62734,7 +63254,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "test_unit_ai_model_router_test",
-      "community": 0,
+      "community": 701,
       "norm_label": "ai-model-router.test.js"
     },
     {
@@ -62744,7 +63264,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "test_unit_ai_model_router_test_makerunner_setupenv_load",
-      "community": 0,
+      "community": 701,
       "norm_label": "{ makerunner, setupenv, load }"
     },
     {
@@ -62754,7 +63274,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "test_unit_ai_model_router_test_provisionandactivate",
-      "community": 0,
+      "community": 701,
       "norm_label": "provisionandactivate()"
     },
     {
@@ -62844,7 +63364,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "test_unit_approval_inbox_ui_test",
-      "community": 676,
+      "community": 0,
       "norm_label": "approval-inbox-ui.test.js"
     },
     {
@@ -62854,7 +63374,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "test_unit_approval_inbox_ui_test_makerunner_setupenv_load",
-      "community": 676,
+      "community": 0,
       "norm_label": "{ makerunner, setupenv, load }"
     },
     {
@@ -62864,7 +63384,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "test_unit_approval_inbox_ui_test_makehost",
-      "community": 676,
+      "community": 0,
       "norm_label": "makehost()"
     },
     {
@@ -62874,7 +63394,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "test_unit_approval_inbox_ui_test_makebtntarget",
-      "community": 676,
+      "community": 0,
       "norm_label": "makebtntarget()"
     },
     {
@@ -63064,7 +63584,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "test_unit_bluetooth_connect_test",
-      "community": 12,
+      "community": 419,
       "norm_label": "bluetooth-connect.test.js"
     },
     {
@@ -63074,7 +63594,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "test_unit_bluetooth_connect_test_path",
-      "community": 12,
+      "community": 419,
       "norm_label": "path"
     },
     {
@@ -63084,7 +63604,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "test_unit_bluetooth_connect_test_makerunner_root",
-      "community": 12,
+      "community": 419,
       "norm_label": "{ makerunner, root }"
     },
     {
@@ -63094,7 +63614,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "test_unit_bluetooth_connect_test_makechar",
-      "community": 12,
+      "community": 419,
       "norm_label": "makechar()"
     },
     {
@@ -63104,7 +63624,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "test_unit_bluetooth_connect_test_makeservice",
-      "community": 12,
+      "community": 419,
       "norm_label": "makeservice()"
     },
     {
@@ -63114,7 +63634,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "test_unit_bluetooth_connect_test_makefakebluetooth",
-      "community": 12,
+      "community": 419,
       "norm_label": "makefakebluetooth()"
     },
     {
@@ -63124,7 +63644,7 @@
       "source_location": "L95",
       "_origin": "ast",
       "id": "test_unit_bluetooth_connect_test_setnavigator",
-      "community": 12,
+      "community": 419,
       "norm_label": "setnavigator()"
     },
     {
@@ -63134,7 +63654,7 @@
       "source_location": "L99",
       "_origin": "ast",
       "id": "test_unit_bluetooth_connect_test_bt",
-      "community": 12,
+      "community": 419,
       "norm_label": "bt()"
     },
     {
@@ -63144,7 +63664,7 @@
       "source_location": "L103",
       "_origin": "ast",
       "id": "test_unit_bluetooth_connect_test_loadstack",
-      "community": 12,
+      "community": 419,
       "norm_label": "loadstack()"
     },
     {
@@ -63154,7 +63674,7 @@
       "source_location": "L118",
       "_origin": "ast",
       "id": "test_unit_bluetooth_connect_test_fakestore",
-      "community": 12,
+      "community": 419,
       "norm_label": "fakestore()"
     },
     {
@@ -63164,7 +63684,7 @@
       "source_location": "L212",
       "_origin": "ast",
       "id": "test_unit_bluetooth_connect_test_makepermitteddevice",
-      "community": 12,
+      "community": 419,
       "norm_label": "makepermitteddevice()"
     },
     {
@@ -63174,7 +63694,7 @@
       "source_location": "L250",
       "_origin": "ast",
       "id": "test_unit_bluetooth_connect_test_makeautobluetooth",
-      "community": 12,
+      "community": 419,
       "norm_label": "makeautobluetooth()"
     },
     {
@@ -63184,7 +63704,7 @@
       "source_location": "L258",
       "_origin": "ast",
       "id": "test_unit_bluetooth_connect_test_settle",
-      "community": 12,
+      "community": 419,
       "norm_label": "settle()"
     },
     {
@@ -63194,7 +63714,7 @@
       "source_location": "L265",
       "_origin": "ast",
       "id": "test_unit_bluetooth_connect_test_resetble",
-      "community": 12,
+      "community": 419,
       "norm_label": "resetble()"
     },
     {
@@ -63204,7 +63724,7 @@
       "source_location": "L315",
       "_origin": "ast",
       "id": "test_unit_bluetooth_connect_test_requestdevice",
-      "community": 12,
+      "community": 419,
       "norm_label": "requestdevice()"
     },
     {
@@ -63214,7 +63734,7 @@
       "source_location": "L315",
       "_origin": "ast",
       "id": "test_unit_bluetooth_connect_test_getavailability",
-      "community": 12,
+      "community": 419,
       "norm_label": "getavailability()"
     },
     {
@@ -63224,7 +63744,7 @@
       "source_location": "L323",
       "_origin": "ast",
       "id": "test_unit_bluetooth_connect_test_getdevices",
-      "community": 12,
+      "community": 419,
       "norm_label": "getdevices()"
     },
     {
@@ -63764,7 +64284,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "test_unit_copilot_contract_test",
-      "community": 378,
+      "community": 12,
       "norm_label": "copilot-contract.test.js"
     },
     {
@@ -63774,7 +64294,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "test_unit_copilot_contract_test_fs",
-      "community": 378,
+      "community": 12,
       "norm_label": "fs"
     },
     {
@@ -63784,7 +64304,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "test_unit_copilot_contract_test_path",
-      "community": 378,
+      "community": 12,
       "norm_label": "path"
     },
     {
@@ -63794,7 +64314,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "test_unit_copilot_contract_test_makerunner_setupenv_load_srcpath",
-      "community": 378,
+      "community": 12,
       "norm_label": "{ makerunner, setupenv, load, srcpath }"
     },
     {
@@ -65124,7 +65644,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "test_unit_governance_bridge_test",
-      "community": 679,
+      "community": 0,
       "norm_label": "governance-bridge.test.js"
     },
     {
@@ -65134,7 +65654,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "test_unit_governance_bridge_test_makerunner_setupenv_load",
-      "community": 679,
+      "community": 0,
       "norm_label": "{ makerunner, setupenv, load }"
     },
     {
@@ -65144,7 +65664,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "test_unit_governance_bridge_test_flush",
-      "community": 679,
+      "community": 0,
       "norm_label": "flush()"
     },
     {
@@ -65154,7 +65674,7 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "test_unit_governance_bridge_test_checkresponse",
-      "community": 679,
+      "community": 0,
       "norm_label": "checkresponse()"
     },
     {
@@ -65374,7 +65894,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "test_unit_governance_policy_test",
-      "community": 378,
+      "community": 12,
       "norm_label": "governance-policy.test.js"
     },
     {
@@ -65384,7 +65904,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "test_unit_governance_policy_test_fs",
-      "community": 378,
+      "community": 12,
       "norm_label": "fs"
     },
     {
@@ -65394,7 +65914,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "test_unit_governance_policy_test_crypto",
-      "community": 378,
+      "community": 12,
       "norm_label": "crypto"
     },
     {
@@ -65404,7 +65924,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "test_unit_governance_policy_test_makerunner_setupenv_load_srcpath",
-      "community": 378,
+      "community": 12,
       "norm_label": "{ makerunner, setupenv, load, srcpath }"
     },
     {
@@ -65514,7 +66034,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "test_unit_governance_sync_test",
-      "community": 686,
+      "community": 0,
       "norm_label": "governance-sync.test.js"
     },
     {
@@ -65524,7 +66044,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "test_unit_governance_sync_test_makerunner_setupenv_load",
-      "community": 686,
+      "community": 0,
       "norm_label": "{ makerunner, setupenv, load }"
     },
     {
@@ -65534,7 +66054,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "test_unit_governance_sync_test_flush",
-      "community": 686,
+      "community": 0,
       "norm_label": "flush()"
     },
     {
@@ -65544,7 +66064,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "test_unit_governance_sync_test_mockcloud",
-      "community": 686,
+      "community": 0,
       "norm_label": "mockcloud()"
     },
     {
@@ -65604,7 +66124,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "test_unit_hermes_gateway_test",
-      "community": 528,
+      "community": 0,
       "norm_label": "hermes-gateway.test.js"
     },
     {
@@ -65614,7 +66134,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "test_unit_hermes_gateway_test_makerunner_setupenv_load",
-      "community": 528,
+      "community": 0,
       "norm_label": "{ makerunner, setupenv, load }"
     },
     {
@@ -65624,7 +66144,7 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "test_unit_hermes_gateway_test_runagent",
-      "community": 528,
+      "community": 0,
       "norm_label": "runagent()"
     },
     {
@@ -65634,7 +66154,7 @@
       "source_location": "L64",
       "_origin": "ast",
       "id": "test_unit_hermes_gateway_test_runmeeting",
-      "community": 528,
+      "community": 0,
       "norm_label": "runmeeting()"
     },
     {
@@ -65804,7 +66324,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "test_unit_lead_attribution_test",
-      "community": 5,
+      "community": 0,
       "norm_label": "lead-attribution.test.js"
     },
     {
@@ -65814,7 +66334,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "test_unit_lead_attribution_test_makerunner_setupenv_load",
-      "community": 5,
+      "community": 0,
       "norm_label": "{ makerunner, setupenv, load }"
     },
     {
@@ -65984,7 +66504,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "test_unit_legal_war_room_ui_test",
-      "community": 0,
+      "community": 528,
       "norm_label": "legal-war-room-ui.test.js"
     },
     {
@@ -65994,7 +66514,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "test_unit_legal_war_room_ui_test_makerunner_setupenv_load",
-      "community": 0,
+      "community": 528,
       "norm_label": "{ makerunner, setupenv, load }"
     },
     {
@@ -66004,7 +66524,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "test_unit_legal_war_room_ui_test_fakenode",
-      "community": 0,
+      "community": 528,
       "norm_label": "fakenode()"
     },
     {
@@ -66014,7 +66534,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "test_unit_legal_war_room_ui_test_fakeui",
-      "community": 0,
+      "community": 528,
       "norm_label": "fakeui()"
     },
     {
@@ -66024,7 +66544,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "test_unit_legal_war_room_ui_test_txt",
-      "community": 0,
+      "community": 528,
       "norm_label": "txt()"
     },
     {
@@ -66034,7 +66554,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "test_unit_legal_test",
-      "community": 5,
+      "community": 0,
       "norm_label": "legal.test.js"
     },
     {
@@ -66044,7 +66564,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "test_unit_legal_test_makerunner_setupenv_load",
-      "community": 5,
+      "community": 0,
       "norm_label": "{ makerunner, setupenv, load }"
     },
     {
@@ -66184,7 +66704,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "test_unit_model_record_test",
-      "community": 378,
+      "community": 12,
       "norm_label": "model-record.test.js"
     },
     {
@@ -66194,7 +66714,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "test_unit_model_record_test_fs",
-      "community": 378,
+      "community": 12,
       "norm_label": "fs"
     },
     {
@@ -66204,7 +66724,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "test_unit_model_record_test_crypto",
-      "community": 378,
+      "community": 12,
       "norm_label": "crypto"
     },
     {
@@ -66214,7 +66734,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "test_unit_model_record_test_makerunner_setupenv_load_srcpath",
-      "community": 378,
+      "community": 12,
       "norm_label": "{ makerunner, setupenv, load, srcpath }"
     },
     {
@@ -66244,7 +66764,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "test_unit_native_model_ui_test",
-      "community": 424,
+      "community": 5,
       "norm_label": "native-model-ui.test.js"
     },
     {
@@ -66254,7 +66774,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "test_unit_native_model_ui_test_makerunner_setupenv_load",
-      "community": 424,
+      "community": 5,
       "norm_label": "{ makerunner, setupenv, load }"
     },
     {
@@ -66264,7 +66784,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "test_unit_native_model_ui_test_fakenode",
-      "community": 424,
+      "community": 5,
       "norm_label": "fakenode()"
     },
     {
@@ -66274,7 +66794,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "test_unit_native_model_ui_test_fakeui",
-      "community": 424,
+      "community": 5,
       "norm_label": "fakeui()"
     },
     {
@@ -66284,7 +66804,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "test_unit_native_model_ui_test_txt",
-      "community": 424,
+      "community": 5,
       "norm_label": "txt()"
     },
     {
@@ -66294,7 +66814,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "test_unit_native_model_ui_test_loadall",
-      "community": 424,
+      "community": 5,
       "norm_label": "loadall()"
     },
     {
@@ -67524,7 +68044,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "test_unit_reliability_ui_test",
-      "community": 701,
+      "community": 5,
       "norm_label": "reliability-ui.test.js"
     },
     {
@@ -67534,7 +68054,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "test_unit_reliability_ui_test_makerunner_setupenv_load",
-      "community": 701,
+      "community": 5,
       "norm_label": "{ makerunner, setupenv, load }"
     },
     {
@@ -67544,7 +68064,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "test_unit_reliability_ui_test_fakenode",
-      "community": 701,
+      "community": 5,
       "norm_label": "fakenode()"
     },
     {
@@ -67554,7 +68074,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "test_unit_reliability_ui_test_fakeui",
-      "community": 701,
+      "community": 5,
       "norm_label": "fakeui()"
     },
     {
@@ -67564,7 +68084,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "test_unit_reliability_ui_test_txt",
-      "community": 701,
+      "community": 5,
       "norm_label": "txt()"
     },
     {
@@ -67574,7 +68094,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "test_unit_reliability_ui_test_loadall",
-      "community": 701,
+      "community": 5,
       "norm_label": "loadall()"
     },
     {
@@ -67774,7 +68294,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "test_unit_review_governance_test",
-      "community": 0,
+      "community": 708,
       "norm_label": "review-governance.test.js"
     },
     {
@@ -67784,7 +68304,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "test_unit_review_governance_test_makerunner_setupenv_load",
-      "community": 0,
+      "community": 708,
       "norm_label": "{ makerunner, setupenv, load }"
     },
     {
@@ -67794,7 +68314,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "test_unit_review_governance_test_checkresponse",
-      "community": 0,
+      "community": 708,
       "norm_label": "checkresponse()"
     },
     {
@@ -68004,7 +68524,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "test_unit_security_test",
-      "community": 5,
+      "community": 0,
       "norm_label": "security.test.js"
     },
     {
@@ -68014,7 +68534,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "test_unit_security_test_makerunner_setupenv_load",
-      "community": 5,
+      "community": 0,
       "norm_label": "{ makerunner, setupenv, load }"
     },
     {
@@ -68324,7 +68844,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "test_unit_tenant_guard_test",
-      "community": 0,
+      "community": 5,
       "norm_label": "tenant-guard.test.js"
     },
     {
@@ -68334,7 +68854,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "test_unit_tenant_guard_test_makerunner_setupenv_load",
-      "community": 0,
+      "community": 5,
       "norm_label": "{ makerunner, setupenv, load }"
     },
     {
@@ -68554,7 +69074,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "test_unit_transport_native_test",
-      "community": 527,
+      "community": 0,
       "norm_label": "transport-native.test.js"
     },
     {
@@ -68564,7 +69084,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "test_unit_transport_native_test_makerunner_setupenv_load",
-      "community": 527,
+      "community": 0,
       "norm_label": "{ makerunner, setupenv, load }"
     },
     {
@@ -68574,7 +69094,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "test_unit_transport_native_test_send",
-      "community": 527,
+      "community": 0,
       "norm_label": "send()"
     },
     {
@@ -68584,7 +69104,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "test_unit_transport_scheduler_test",
-      "community": 0,
+      "community": 679,
       "norm_label": "transport-scheduler.test.js"
     },
     {
@@ -68594,7 +69114,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "test_unit_transport_scheduler_test_makerunner_setupenv_load",
-      "community": 0,
+      "community": 679,
       "norm_label": "{ makerunner, setupenv, load }"
     },
     {
@@ -68604,7 +69124,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "test_unit_transport_scheduler_test_now",
-      "community": 0,
+      "community": 679,
       "norm_label": "now"
     },
     {
@@ -68614,7 +69134,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "test_unit_transport_scheduler_test_ago",
-      "community": 0,
+      "community": 679,
       "norm_label": "ago()"
     },
     {
@@ -68844,7 +69364,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "test_unit_workforce_queue_test",
-      "community": 5,
+      "community": 0,
       "norm_label": "workforce-queue.test.js"
     },
     {
@@ -68854,7 +69374,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "test_unit_workforce_queue_test_makerunner_setupenv_load",
-      "community": 5,
+      "community": 0,
       "norm_label": "{ makerunner, setupenv, load }"
     },
     {
@@ -68904,7 +69424,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "test_unit_workforce_ui_test",
-      "community": 0,
+      "community": 686,
       "norm_label": "workforce-ui.test.js"
     },
     {
@@ -68914,7 +69434,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "test_unit_workforce_ui_test_makerunner_setupenv_load",
-      "community": 0,
+      "community": 686,
       "norm_label": "{ makerunner, setupenv, load }"
     },
     {
@@ -68924,7 +69444,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "test_unit_workforce_ui_test_makehost",
-      "community": 0,
+      "community": 686,
       "norm_label": "makehost()"
     },
     {
@@ -68934,7 +69454,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "test_unit_workforce_ui_test_makebtntarget",
-      "community": 0,
+      "community": 686,
       "norm_label": "makebtntarget()"
     },
     {
@@ -69074,7 +69594,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_changelog_changelog",
-      "community": 440,
+      "community": 348,
       "norm_label": "changelog"
     },
     {
@@ -69604,7 +70124,7 @@
       "source_location": "L365",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_changelog_1_5_1_2026_04_24_phase_3_6_hardening",
-      "community": 440,
+      "community": 348,
       "norm_label": "[1.5.1] - 2026-04-24 (phase 3.6 hardening)"
     },
     {
@@ -69614,7 +70134,7 @@
       "source_location": "L367",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_changelog_fixed_367",
-      "community": 440,
+      "community": 348,
       "norm_label": "fixed"
     },
     {
@@ -69674,7 +70194,7 @@
       "source_location": "L404",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_changelog_1_4_3_prior",
-      "community": 440,
+      "community": 348,
       "norm_label": "[1.4.3] - prior"
     },
     {
@@ -71344,7 +71864,7 @@
       "source_location": "L155",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_docs_audits_v1_7_0_audit_2026_05_17_6_retrieval_benchmark_results_phase_b",
-      "community": 427,
+      "community": 13,
       "norm_label": "6. retrieval benchmark results (phase b)"
     },
     {
@@ -71354,7 +71874,7 @@
       "source_location": "L157",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_docs_audits_v1_7_0_audit_2026_05_17_6_1_method",
-      "community": 427,
+      "community": 13,
       "norm_label": "6.1 method"
     },
     {
@@ -71364,7 +71884,7 @@
       "source_location": "L170",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_docs_audits_v1_7_0_audit_2026_05_17_6_2_aggregate_results",
-      "community": 427,
+      "community": 13,
       "norm_label": "6.2 aggregate results"
     },
     {
@@ -71374,7 +71894,7 @@
       "source_location": "L181",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_docs_audits_v1_7_0_audit_2026_05_17_6_3_ship_gate_verification",
-      "community": 427,
+      "community": 13,
       "norm_label": "6.3 ship-gate verification"
     },
     {
@@ -71384,7 +71904,7 @@
       "source_location": "L194",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_docs_audits_v1_7_0_audit_2026_05_17_6_4_per_category_interpretation",
-      "community": 427,
+      "community": 13,
       "norm_label": "6.4 per-category interpretation"
     },
     {
@@ -71394,7 +71914,7 @@
       "source_location": "L202",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_docs_audits_v1_7_0_audit_2026_05_17_6_5_new_findings_from_benchmark",
-      "community": 427,
+      "community": 13,
       "norm_label": "6.5 new findings from benchmark"
     },
     {
@@ -71464,7 +71984,7 @@
       "source_location": "L280",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_docs_audits_v1_7_0_audit_2026_05_17_8_findings_ledger_phase_a_partial_b_c_d_may_add",
-      "community": 482,
+      "community": 13,
       "norm_label": "8. findings ledger (phase a \u2014 partial; b/c/d may add)"
     },
     {
@@ -71474,7 +71994,7 @@
       "source_location": "L282",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_docs_audits_v1_7_0_audit_2026_05_17_8_1_blocker_1",
-      "community": 482,
+      "community": 13,
       "norm_label": "8.1 blocker (1)"
     },
     {
@@ -71484,7 +72004,7 @@
       "source_location": "L288",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_docs_audits_v1_7_0_audit_2026_05_17_8_2_high_6",
-      "community": 482,
+      "community": 13,
       "norm_label": "8.2 high (6)"
     },
     {
@@ -71494,7 +72014,7 @@
       "source_location": "L299",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_docs_audits_v1_7_0_audit_2026_05_17_8_3_medium_8",
-      "community": 482,
+      "community": 13,
       "norm_label": "8.3 medium (8)"
     },
     {
@@ -71504,7 +72024,7 @@
       "source_location": "L316",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_docs_audits_v1_7_0_audit_2026_05_17_8_4_low_5",
-      "community": 482,
+      "community": 13,
       "norm_label": "8.4 low (5)"
     },
     {
@@ -71514,7 +72034,7 @@
       "source_location": "L328",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_docs_audits_v1_7_0_audit_2026_05_17_8_5_counts",
-      "community": 482,
+      "community": 13,
       "norm_label": "8.5 counts"
     },
     {
@@ -74004,7 +74524,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_autoresearch_skill",
-      "community": 419,
+      "community": 104,
       "norm_label": "skill.md"
     },
     {
@@ -75094,7 +75614,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_save_skill",
-      "community": 419,
+      "community": 104,
       "norm_label": "skill.md"
     },
     {
@@ -75204,7 +75724,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_think_skill",
-      "community": 419,
+      "community": 104,
       "norm_label": "skill.md"
     },
     {
@@ -75224,7 +75744,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_think_skill_the_10_principles",
-      "community": 350,
+      "community": 54,
       "norm_label": "the 10 principles"
     },
     {
@@ -75234,7 +75754,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_think_skill_1_observe_the_external_input",
-      "community": 350,
+      "community": 54,
       "norm_label": "1. observe (the external input)"
     },
     {
@@ -75244,7 +75764,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_think_skill_2_observe_the_internal_metacognition",
-      "community": 350,
+      "community": 54,
       "norm_label": "2. observe (the internal metacognition)"
     },
     {
@@ -75254,7 +75774,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_think_skill_3_listen_active_receptivity",
-      "community": 350,
+      "community": 54,
       "norm_label": "3. listen (active receptivity)"
     },
     {
@@ -75264,7 +75784,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_think_skill_4_think_critical_processing",
-      "community": 350,
+      "community": 54,
       "norm_label": "4. think (critical processing)"
     },
     {
@@ -75274,7 +75794,7 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_think_skill_5_connect_associative_lateral_thinking",
-      "community": 350,
+      "community": 54,
       "norm_label": "5. connect (associative / lateral thinking)"
     },
     {
@@ -75284,7 +75804,7 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_think_skill_6_connect_system_orchestration",
-      "community": 350,
+      "community": 54,
       "norm_label": "6. connect (system orchestration)"
     },
     {
@@ -75294,7 +75814,7 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_think_skill_7_feel_emotional_intelligence_intuition",
-      "community": 350,
+      "community": 54,
       "norm_label": "7. feel (emotional intelligence + intuition)"
     },
     {
@@ -75304,7 +75824,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_think_skill_8_accept_intellectual_humility",
-      "community": 350,
+      "community": 54,
       "norm_label": "8. accept (intellectual humility)"
     },
     {
@@ -75314,7 +75834,7 @@
       "source_location": "L67",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_think_skill_9_create_generative_output",
-      "community": 350,
+      "community": 54,
       "norm_label": "9. create (generative output)"
     },
     {
@@ -75324,7 +75844,7 @@
       "source_location": "L73",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_think_skill_10_grow_the_iterative_loop",
-      "community": 350,
+      "community": 54,
       "norm_label": "10. grow (the iterative loop)"
     },
     {
@@ -75494,7 +76014,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_cli_skill",
-      "community": 419,
+      "community": 104,
       "norm_label": "skill.md"
     },
     {
@@ -75664,7 +76184,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_fold_skill",
-      "community": 419,
+      "community": 104,
       "norm_label": "skill.md"
     },
     {
@@ -75974,7 +76494,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_ingest_skill",
-      "community": 419,
+      "community": 104,
       "norm_label": "skill.md"
     },
     {
@@ -76204,7 +76724,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_lint_skill",
-      "community": 419,
+      "community": 104,
       "norm_label": "skill.md"
     },
     {
@@ -76344,7 +76864,7 @@
       "source_location": "L255",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_lint_skill_semantic_tiling_dragonscale_mechanism_3_mvp_opt_in",
-      "community": 425,
+      "community": 69,
       "norm_label": "semantic tiling (dragonscale mechanism 3 mvp, opt-in)"
     },
     {
@@ -76354,7 +76874,7 @@
       "source_location": "L259",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_lint_skill_detection_and_delegation",
-      "community": 425,
+      "community": 69,
       "norm_label": "detection and delegation"
     },
     {
@@ -76364,7 +76884,7 @@
       "source_location": "L298",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_lint_skill_scope_what_the_helper_scans",
-      "community": 425,
+      "community": 69,
       "norm_label": "scope (what the helper scans)"
     },
     {
@@ -76374,7 +76894,7 @@
       "source_location": "L308",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_lint_skill_how_the_helper_works",
-      "community": 425,
+      "community": 69,
       "norm_label": "how the helper works"
     },
     {
@@ -76384,7 +76904,7 @@
       "source_location": "L315",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_lint_skill_security_posture",
-      "community": 425,
+      "community": 69,
       "norm_label": "security posture"
     },
     {
@@ -76394,7 +76914,7 @@
       "source_location": "L320",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_lint_skill_default_bands_conservative_seeds_not_calibrated",
-      "community": 425,
+      "community": 69,
       "norm_label": "default bands (conservative seeds, not calibrated)"
     },
     {
@@ -76404,7 +76924,7 @@
       "source_location": "L330",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_lint_skill_calibration_procedure_manual_one_time_per_vault",
-      "community": 425,
+      "community": 69,
       "norm_label": "calibration procedure (manual, one-time per vault)"
     },
     {
@@ -76414,7 +76934,7 @@
       "source_location": "L339",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_lint_skill_scale",
-      "community": 425,
+      "community": 69,
       "norm_label": "scale"
     },
     {
@@ -76424,7 +76944,7 @@
       "source_location": "L344",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_lint_skill_lint_report_embed",
-      "community": 425,
+      "community": 69,
       "norm_label": "lint report embed"
     },
     {
@@ -76434,7 +76954,7 @@
       "source_location": "L354",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_lint_skill_invariants",
-      "community": 425,
+      "community": 69,
       "norm_label": "invariants"
     },
     {
@@ -76624,7 +77144,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_lyt_atomic_template",
-      "community": 104,
+      "community": 562,
       "norm_label": "atomic-template.md"
     },
     {
@@ -76634,7 +77154,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_lyt_atomic_template_title",
-      "community": 104,
+      "community": 562,
       "norm_label": "{{title}}"
     },
     {
@@ -76644,7 +77164,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_lyt_atomic_template_sources",
-      "community": 104,
+      "community": 562,
       "norm_label": "sources"
     },
     {
@@ -76654,7 +77174,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_lyt_atomic_template_see_also",
-      "community": 104,
+      "community": 562,
       "norm_label": "see also"
     },
     {
@@ -76664,7 +77184,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_lyt_moc_template",
-      "community": 697,
+      "community": 104,
       "norm_label": "moc-template.md"
     },
     {
@@ -76674,7 +77194,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_lyt_moc_template_title_map_of_content",
-      "community": 697,
+      "community": 104,
       "norm_label": "{{title}} \u2014 map of content"
     },
     {
@@ -76684,7 +77204,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_lyt_moc_template_why_this_moc_exists",
-      "community": 697,
+      "community": 104,
       "norm_label": "why this moc exists"
     },
     {
@@ -76694,7 +77214,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_lyt_moc_template_core_notes",
-      "community": 697,
+      "community": 104,
       "norm_label": "core notes"
     },
     {
@@ -76704,7 +77224,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_lyt_moc_template_adjacent_mocs",
-      "community": 697,
+      "community": 104,
       "norm_label": "adjacent mocs"
     },
     {
@@ -76714,7 +77234,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_lyt_moc_template_open_questions_frontier",
-      "community": 697,
+      "community": 104,
       "norm_label": "open questions / frontier"
     },
     {
@@ -76724,7 +77244,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_para_area_template",
-      "community": 104,
+      "community": 425,
       "norm_label": "area-template.md"
     },
     {
@@ -76734,7 +77254,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_para_area_template_title",
-      "community": 104,
+      "community": 425,
       "norm_label": "{{title}}"
     },
     {
@@ -76744,7 +77264,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_para_area_template_scope",
-      "community": 104,
+      "community": 425,
       "norm_label": "scope"
     },
     {
@@ -76754,7 +77274,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_para_area_template_standards",
-      "community": 104,
+      "community": 425,
       "norm_label": "standards"
     },
     {
@@ -76764,7 +77284,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_para_area_template_active_projects_in_this_area",
-      "community": 104,
+      "community": 425,
       "norm_label": "active projects in this area"
     },
     {
@@ -76774,7 +77294,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_para_area_template_reference_material",
-      "community": 104,
+      "community": 425,
       "norm_label": "reference material"
     },
     {
@@ -76784,7 +77304,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_para_area_template_review_cadence",
-      "community": 104,
+      "community": 425,
       "norm_label": "review cadence"
     },
     {
@@ -76794,7 +77314,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_para_project_template",
-      "community": 379,
+      "community": 104,
       "norm_label": "project-template.md"
     },
     {
@@ -76804,7 +77324,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_para_project_template_title",
-      "community": 379,
+      "community": 104,
       "norm_label": "{{title}}"
     },
     {
@@ -76814,7 +77334,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_para_project_template_outcome",
-      "community": 379,
+      "community": 104,
       "norm_label": "outcome"
     },
     {
@@ -76824,7 +77344,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_para_project_template_status",
-      "community": 379,
+      "community": 104,
       "norm_label": "status"
     },
     {
@@ -76834,7 +77354,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_para_project_template_notes",
-      "community": 379,
+      "community": 104,
       "norm_label": "notes"
     },
     {
@@ -76844,7 +77364,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_para_project_template_related",
-      "community": 379,
+      "community": 104,
       "norm_label": "related"
     },
     {
@@ -76914,7 +77434,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_zettel_atomic_template",
-      "community": 380,
+      "community": 104,
       "norm_label": "atomic-template.md"
     },
     {
@@ -76924,7 +77444,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_zettel_atomic_template_id_title",
-      "community": 380,
+      "community": 104,
       "norm_label": "{{id}} \u2014 {{title}}"
     },
     {
@@ -76934,7 +77454,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_zettel_atomic_template_claim",
-      "community": 380,
+      "community": 104,
       "norm_label": "claim"
     },
     {
@@ -76944,7 +77464,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_zettel_atomic_template_reasoning",
-      "community": 380,
+      "community": 104,
       "norm_label": "reasoning"
     },
     {
@@ -76954,7 +77474,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_zettel_atomic_template_sources",
-      "community": 380,
+      "community": 104,
       "norm_label": "sources"
     },
     {
@@ -76964,7 +77484,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_mode_templates_zettel_atomic_template_cross_references",
-      "community": 380,
+      "community": 104,
       "norm_label": "cross-references"
     },
     {
@@ -76974,7 +77494,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_query_skill",
-      "community": 419,
+      "community": 104,
       "norm_label": "skill.md"
     },
     {
@@ -77114,7 +77634,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_retrieve_skill",
-      "community": 419,
+      "community": 104,
       "norm_label": "skill.md"
     },
     {
@@ -77684,7 +78204,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "claude_marketplaces_claude_obsidian_skills_wiki_references_mcp_setup",
-      "community": 419,
+      "community": 104,
       "norm_label": "mcp-setup.md"
     },
     {
@@ -83068,6 +83588,76 @@
       "norm_label": "cross-reference"
     },
     {
+      "label": "PDP_DEPLOY_PLAN.md",
+      "file_type": "document",
+      "source_file": "docs/PDP_DEPLOY_PLAN.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_pdp_deploy_plan",
+      "community": 427,
+      "norm_label": "pdp_deploy_plan.md"
+    },
+    {
+      "label": "PDP Deploy Plan \u2014 the keystone thin-shell (Firebase Auth + Cloud Functions)",
+      "file_type": "document",
+      "source_file": "docs/PDP_DEPLOY_PLAN.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_pdp_deploy_plan_pdp_deploy_plan_the_keystone_thin_shell_firebase_auth_cloud_functions",
+      "community": 427,
+      "norm_label": "pdp deploy plan \u2014 the keystone thin-shell (firebase auth + cloud functions)"
+    },
+    {
+      "label": "1. What is already built and proven (in-repo, testable today)",
+      "file_type": "document",
+      "source_file": "docs/PDP_DEPLOY_PLAN.md",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "docs_pdp_deploy_plan_1_what_is_already_built_and_proven_in_repo_testable_today",
+      "community": 427,
+      "norm_label": "1. what is already built and proven (in-repo, testable today)"
+    },
+    {
+      "label": "2. The thin shell (Cloud Function) \u2014 spec",
+      "file_type": "document",
+      "source_file": "docs/PDP_DEPLOY_PLAN.md",
+      "source_location": "L42",
+      "_origin": "ast",
+      "id": "docs_pdp_deploy_plan_2_the_thin_shell_cloud_function_spec",
+      "community": 427,
+      "norm_label": "2. the thin shell (cloud function) \u2014 spec"
+    },
+    {
+      "label": "3. Rollout \u2014 shadow first, enforce second (never flip cold)",
+      "file_type": "document",
+      "source_file": "docs/PDP_DEPLOY_PLAN.md",
+      "source_location": "L82",
+      "_origin": "ast",
+      "id": "docs_pdp_deploy_plan_3_rollout_shadow_first_enforce_second_never_flip_cold",
+      "community": 427,
+      "norm_label": "3. rollout \u2014 shadow first, enforce second (never flip cold)"
+    },
+    {
+      "label": "4. What this environment cannot do (stated honestly)",
+      "file_type": "document",
+      "source_file": "docs/PDP_DEPLOY_PLAN.md",
+      "source_location": "L110",
+      "_origin": "ast",
+      "id": "docs_pdp_deploy_plan_4_what_this_environment_cannot_do_stated_honestly",
+      "community": 427,
+      "norm_label": "4. what this environment cannot do (stated honestly)"
+    },
+    {
+      "label": "5. Definition of done for the keystone",
+      "file_type": "document",
+      "source_file": "docs/PDP_DEPLOY_PLAN.md",
+      "source_location": "L122",
+      "_origin": "ast",
+      "id": "docs_pdp_deploy_plan_5_definition_of_done_for_the_keystone",
+      "community": 427,
+      "norm_label": "5. definition of done for the keystone"
+    },
+    {
       "label": "PROJECT_ATLAS_MISSION.md",
       "file_type": "document",
       "source_file": "docs/PROJECT_ATLAS_MISSION.md",
@@ -83131,7 +83721,7 @@
       "label": "Success criteria",
       "file_type": "document",
       "source_file": "docs/PROJECT_ATLAS_MISSION.md",
-      "source_location": "L57",
+      "source_location": "L58",
       "_origin": "ast",
       "id": "docs_project_atlas_mission_success_criteria",
       "community": 688,
@@ -83141,7 +83731,7 @@
       "label": "Final directive",
       "file_type": "document",
       "source_file": "docs/PROJECT_ATLAS_MISSION.md",
-      "source_location": "L65",
+      "source_location": "L66",
       "_origin": "ast",
       "id": "docs_project_atlas_mission_final_directive",
       "community": 688,
@@ -83151,7 +83741,7 @@
       "label": "Standing foundations this mission builds on",
       "file_type": "document",
       "source_file": "docs/PROJECT_ATLAS_MISSION.md",
-      "source_location": "L73",
+      "source_location": "L74",
       "_origin": "ast",
       "id": "docs_project_atlas_mission_standing_foundations_this_mission_builds_on",
       "community": 688,
@@ -95420,6 +96010,28 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/lib.js",
+      "source_location": "L28",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_lib",
+      "target": "claude_marketplaces_openai_codex_plugins_codex_scripts_lib_fs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_test",
+      "target": "claude_marketplaces_openai_codex_plugins_codex_scripts_lib_fs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "test/rules/rules.test.js",
       "source_location": "L28",
       "weight": 1.0,
@@ -99331,6 +99943,545 @@
       "weight": 1.0,
       "source": "functions_package_dependencies",
       "target": "functions_package_dependencies_firebase_functions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/aaa-policy-decision.js",
+      "source_location": "L37",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_aaa_policy_decision",
+      "target": "functions_pdp_authorize_aaa_policy_decision_gates",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/aaa-policy-decision.js",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_aaa_policy_decision",
+      "target": "functions_pdp_authorize_aaa_policy_decision_originof",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/aaa-policy-decision.js",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_aaa_policy_decision",
+      "target": "functions_pdp_authorize_aaa_policy_decision_policy",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/aaa-policy-decision.js",
+      "source_location": "L42",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_aaa_policy_decision",
+      "target": "functions_pdp_authorize_aaa_policy_decision_roleperms",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/aaa-policy-decision.js",
+      "source_location": "L38",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_aaa_policy_decision_gates",
+      "target": "functions_pdp_authorize_aaa_policy_decision_policy",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/aaa-policy-decision.js",
+      "source_location": "L43",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_aaa_policy_decision_roleperms",
+      "target": "functions_pdp_authorize_aaa_policy_decision_policy",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/index.js",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_index",
+      "target": "functions_pdp_authorize_index_admin",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/index.js",
+      "source_location": "L25",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_index",
+      "target": "functions_pdp_authorize_index_functions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/index.js",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_index",
+      "target": "functions_pdp_authorize_index_lib",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/index.js",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_index",
+      "target": "functions_pdp_authorize_lib",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/lib.js",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_lib",
+      "target": "functions_pdp_authorize_lib_artifact_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/lib.js",
+      "source_location": "L34",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_lib",
+      "target": "functions_pdp_authorize_lib_core_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "confidence": "INFERRED",
+      "source_file": "functions/pdp-authorize/lib.js",
+      "source_location": "L105",
+      "weight": 1.0,
+      "context": "collection",
+      "source": "functions_pdp_authorize_lib",
+      "target": "functions_pdp_authorize_lib_createpdp",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/lib.js",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_lib",
+      "target": "functions_pdp_authorize_lib_crypto",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/lib.js",
+      "source_location": "L28",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_lib",
+      "target": "functions_pdp_authorize_lib_fs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "confidence": "INFERRED",
+      "source_file": "functions/pdp-authorize/lib.js",
+      "source_location": "L105",
+      "weight": 1.0,
+      "context": "collection",
+      "source": "functions_pdp_authorize_lib",
+      "target": "functions_pdp_authorize_lib_handleauthorize",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "indirect_call",
+      "confidence": "INFERRED",
+      "source_file": "functions/pdp-authorize/lib.js",
+      "source_location": "L105",
+      "weight": 1.0,
+      "context": "collection",
+      "source": "functions_pdp_authorize_lib",
+      "target": "functions_pdp_authorize_lib_loadverifiedartifact",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/lib.js",
+      "source_location": "L33",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_lib",
+      "target": "functions_pdp_authorize_lib_manifest_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/lib.js",
+      "source_location": "L29",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_lib",
+      "target": "functions_pdp_authorize_lib_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/lib.js",
+      "source_location": "L30",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_lib",
+      "target": "functions_pdp_authorize_lib_vm",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_test",
+      "target": "functions_pdp_authorize_lib",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/lib.js",
+      "source_location": "L51",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_lib_createpdp",
+      "target": "functions_pdp_authorize_lib_loadverifiedartifact",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/lib.js",
+      "source_location": "L89",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_lib_handleauthorize",
+      "target": "functions_pdp_authorize_lib_createpdp",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/package.json",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_package",
+      "target": "functions_pdp_authorize_package_dependencies",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/package.json",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_package",
+      "target": "functions_pdp_authorize_package_description",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/package.json",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_package",
+      "target": "functions_pdp_authorize_package_engines",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/package.json",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_package",
+      "target": "functions_pdp_authorize_package_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/package.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_package",
+      "target": "functions_pdp_authorize_package_name",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/package.json",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_package",
+      "target": "functions_pdp_authorize_package_scripts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/package.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_package",
+      "target": "functions_pdp_authorize_package_version",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/package.json",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_package_engines",
+      "target": "functions_pdp_authorize_package_engines_node",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/package.json",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_package_scripts",
+      "target": "functions_pdp_authorize_package_scripts_deploy",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/package.json",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_package_scripts",
+      "target": "functions_pdp_authorize_package_scripts_test",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/package.json",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_package_dependencies",
+      "target": "functions_pdp_authorize_package_dependencies_firebase_admin",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/package.json",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_package_dependencies",
+      "target": "functions_pdp_authorize_package_dependencies_firebase_functions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L71",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_test",
+      "target": "functions_pdp_authorize_test_agentclaims",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L73",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_test",
+      "target": "functions_pdp_authorize_test_agentdeny",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_test",
+      "target": "functions_pdp_authorize_test_artifact",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L81",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_test",
+      "target": "functions_pdp_authorize_test_crewdeny",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_test",
+      "target": "functions_pdp_authorize_test_crypto",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L37",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_test",
+      "target": "functions_pdp_authorize_test_expected",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_test",
+      "target": "functions_pdp_authorize_test_fs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L79",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_test",
+      "target": "functions_pdp_authorize_test_humanallow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L72",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_test",
+      "target": "functions_pdp_authorize_test_humanclaims",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_test",
+      "target": "functions_pdp_authorize_test_lib",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_test",
+      "target": "functions_pdp_authorize_test_ok",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_test",
+      "target": "functions_pdp_authorize_test_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_test",
+      "target": "functions_pdp_authorize_test_pdp",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_test",
+      "target": "functions_pdp_authorize_test_root",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_test",
+      "target": "functions_pdp_authorize_test_sha",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L92",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_test",
+      "target": "functions_pdp_authorize_test_shadowagree",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L87",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_test",
+      "target": "functions_pdp_authorize_test_shadowdeny",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "functions/pdp-authorize/test.js",
+      "source_location": "L76",
+      "weight": 1.0,
+      "source": "functions_pdp_authorize_test",
+      "target": "functions_pdp_authorize_test_smuggled",
       "confidence_score": 1.0
     },
     {
@@ -222905,7 +224056,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "test/run.js",
-      "source_location": "L245",
+      "source_location": "L246",
       "weight": 1.0,
       "source": "test_run",
       "target": "test_run_results",
@@ -222915,7 +224066,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "test/run.js",
-      "source_location": "L232",
+      "source_location": "L233",
       "weight": 1.0,
       "source": "test_run",
       "target": "test_run_runexternal",
@@ -222925,7 +224076,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "test/run.js",
-      "source_location": "L221",
+      "source_location": "L222",
       "weight": 1.0,
       "source": "test_run",
       "target": "test_run_runsuite",
@@ -222935,7 +224086,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "test/run.js",
-      "source_location": "L243",
+      "source_location": "L244",
       "weight": 1.0,
       "source": "test_run",
       "target": "test_run_scrub",
@@ -222955,7 +224106,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "test/run.js",
-      "source_location": "L250",
+      "source_location": "L251",
       "weight": 1.0,
       "source": "test_run",
       "target": "test_run_totalfail",
@@ -222965,7 +224116,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "test/run.js",
-      "source_location": "L249",
+      "source_location": "L250",
       "weight": 1.0,
       "source": "test_run",
       "target": "test_run_totalpass",
@@ -222976,7 +224127,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "test/run.js",
-      "source_location": "L228",
+      "source_location": "L229",
       "weight": 1.0,
       "source": "test_run_runsuite",
       "target": "test_run_scrub",
@@ -242319,6 +243470,66 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "docs/PDP_DEPLOY_PLAN.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "docs_pdp_deploy_plan",
+      "target": "docs_pdp_deploy_plan_pdp_deploy_plan_the_keystone_thin_shell_firebase_auth_cloud_functions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PDP_DEPLOY_PLAN.md",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "docs_pdp_deploy_plan_pdp_deploy_plan_the_keystone_thin_shell_firebase_auth_cloud_functions",
+      "target": "docs_pdp_deploy_plan_1_what_is_already_built_and_proven_in_repo_testable_today",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PDP_DEPLOY_PLAN.md",
+      "source_location": "L42",
+      "weight": 1.0,
+      "source": "docs_pdp_deploy_plan_pdp_deploy_plan_the_keystone_thin_shell_firebase_auth_cloud_functions",
+      "target": "docs_pdp_deploy_plan_2_the_thin_shell_cloud_function_spec",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PDP_DEPLOY_PLAN.md",
+      "source_location": "L82",
+      "weight": 1.0,
+      "source": "docs_pdp_deploy_plan_pdp_deploy_plan_the_keystone_thin_shell_firebase_auth_cloud_functions",
+      "target": "docs_pdp_deploy_plan_3_rollout_shadow_first_enforce_second_never_flip_cold",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PDP_DEPLOY_PLAN.md",
+      "source_location": "L110",
+      "weight": 1.0,
+      "source": "docs_pdp_deploy_plan_pdp_deploy_plan_the_keystone_thin_shell_firebase_auth_cloud_functions",
+      "target": "docs_pdp_deploy_plan_4_what_this_environment_cannot_do_stated_honestly",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PDP_DEPLOY_PLAN.md",
+      "source_location": "L122",
+      "weight": 1.0,
+      "source": "docs_pdp_deploy_plan_pdp_deploy_plan_the_keystone_thin_shell_firebase_auth_cloud_functions",
+      "target": "docs_pdp_deploy_plan_5_definition_of_done_for_the_keystone",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "docs/PROJECT_ATLAS_MISSION.md",
       "source_location": "L1",
       "weight": 1.0,
@@ -242340,7 +243551,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/PROJECT_ATLAS_MISSION.md",
-      "source_location": "L65",
+      "source_location": "L66",
       "weight": 1.0,
       "source": "docs_project_atlas_mission_project_atlas_multi_agent_enterprise_hardening_evolution_initiative",
       "target": "docs_project_atlas_mission_final_directive",
@@ -242370,7 +243581,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/PROJECT_ATLAS_MISSION.md",
-      "source_location": "L73",
+      "source_location": "L74",
       "weight": 1.0,
       "source": "docs_project_atlas_mission_project_atlas_multi_agent_enterprise_hardening_evolution_initiative",
       "target": "docs_project_atlas_mission_standing_foundations_this_mission_builds_on",
@@ -242390,7 +243601,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/PROJECT_ATLAS_MISSION.md",
-      "source_location": "L57",
+      "source_location": "L58",
       "weight": 1.0,
       "source": "docs_project_atlas_mission_project_atlas_multi_agent_enterprise_hardening_evolution_initiative",
       "target": "docs_project_atlas_mission_success_criteria",
@@ -244502,5 +245713,5 @@
       "source_file": "SETUP-BLUETOOTH-MEASUREMENT.md"
     }
   ],
-  "built_at_commit": "22cc012bf9734a35c1038f109ba1a7a273478ebd"
+  "built_at_commit": "3008a8c634d1310ef774d94714e2d9261e3dabd9"
 }

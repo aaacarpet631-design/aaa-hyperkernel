@@ -52,6 +52,11 @@
       "parserOptions": { "sourceType": "script" }
     },
     {
+      "files": ["functions/pdp-authorize/aaa-policy-decision.js"],
+      "env": { "browser": true },
+      "rules": { "no-undef": "off" }
+    },
+    {
       "files": ["test/**/*.js", "test/**/*.cjs"],
       "env": { "node": true, "commonjs": true, "browser": false },
       "parserOptions": { "sourceType": "script" }

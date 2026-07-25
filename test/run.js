@@ -213,6 +213,7 @@ const SUITES = [
 const EXTERNAL = [
   'functions/qbo-proxy/test.js',
   'functions/portal-proxy/test.js',
+  'functions/pdp-authorize/test.js',
   'functions/nemotron-translate.test.js',
   'functions/private-gpu-translate.test.js',
   'functions/sense-normalize.test.js'

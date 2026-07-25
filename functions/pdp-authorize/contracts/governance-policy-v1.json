@@ -1,0 +1,263 @@
+{
+  "version": "1.0",
+  "hyperkernel": {
+    "rbac": {
+      "permissions": {
+        "VIEW_FINANCIALS": "See revenue, profit, accounting, business dashboard",
+        "VIEW_MARGINS": "See labor cost, material cost, margin on quotes",
+        "VIEW_PRICING_RATES": "See/edit the rate card",
+        "CREATE_QUOTE": "Create a quote / estimate",
+        "APPROVE_QUOTE": "Approve / finalize a customer price",
+        "EDIT_JOB": "Edit job details, schedule, assignments",
+        "CLOSE_JOB": "Close out a completed job",
+        "VIEW_ALL_JOBS": "See every job (not just assigned)",
+        "EDIT_CUSTOMER": "Create / edit customer records",
+        "CAPTURE_MEASUREMENT": "Capture measurements",
+        "CAPTURE_PHOTO": "Capture job photos",
+        "COMPLETE_CHECKLIST": "Complete the closure checklist",
+        "RUN_AI_AGENTS": "Run AI agents / meetings",
+        "MANAGE_AUTOMATION": "Turn automation/auto-pilot on/off",
+        "MANAGE_SETTINGS": "Cloud settings, members, integrations",
+        "MANAGE_CREW": "Manage employees / crew / tools",
+        "VIEW_AUDIT_LOG": "View the audit trail",
+        "OVERRIDE_AI_DECISION": "Override a blocked/queued high-risk AI decision (governance)",
+        "VIEW_LEGAL": "View the Legal War Room (risk, compliance, contracts, audit)",
+        "MANAGE_LEGAL": "Add / resolve legal records (contracts, compliance, reviews)",
+        "MANAGE_GOVERNANCE": "Create / approve / activate / roll back governed versions"
+      },
+      "roles": {
+        "owner": [
+          "VIEW_FINANCIALS",
+          "VIEW_MARGINS",
+          "VIEW_PRICING_RATES",
+          "CREATE_QUOTE",
+          "APPROVE_QUOTE",
+          "EDIT_JOB",
+          "CLOSE_JOB",
+          "VIEW_ALL_JOBS",
+          "EDIT_CUSTOMER",
+          "CAPTURE_MEASUREMENT",
+          "CAPTURE_PHOTO",
+          "COMPLETE_CHECKLIST",
+          "RUN_AI_AGENTS",
+          "MANAGE_AUTOMATION",
+          "MANAGE_SETTINGS",
+          "MANAGE_CREW",
+          "VIEW_AUDIT_LOG",
+          "OVERRIDE_AI_DECISION",
+          "VIEW_LEGAL",
+          "MANAGE_LEGAL",
+          "MANAGE_GOVERNANCE"
+        ],
+        "manager": [
+          "CREATE_QUOTE",
+          "APPROVE_QUOTE",
+          "EDIT_JOB",
+          "CLOSE_JOB",
+          "VIEW_ALL_JOBS",
+          "EDIT_CUSTOMER",
+          "CAPTURE_MEASUREMENT",
+          "CAPTURE_PHOTO",
+          "COMPLETE_CHECKLIST",
+          "RUN_AI_AGENTS",
+          "MANAGE_AUTOMATION",
+          "MANAGE_CREW",
+          "VIEW_AUDIT_LOG",
+          "VIEW_PRICING_RATES",
+          "VIEW_LEGAL",
+          "MANAGE_LEGAL"
+        ],
+        "crew": [
+          "CAPTURE_MEASUREMENT",
+          "CAPTURE_PHOTO",
+          "COMPLETE_CHECKLIST",
+          "CREATE_QUOTE"
+        ]
+      }
+    },
+    "actionGates": {
+      "FINALIZE_PRICE": {
+        "permission": "APPROVE_QUOTE",
+        "aiAllowed": false
+      },
+      "APPROVE_PAYMENT": {
+        "permission": "VIEW_FINANCIALS",
+        "aiAllowed": false
+      },
+      "MODIFY_ACCOUNTING": {
+        "permission": "VIEW_FINANCIALS",
+        "aiAllowed": false
+      },
+      "REVIEW_RECEIPTS": {
+        "permission": "VIEW_FINANCIALS",
+        "aiAllowed": false
+      },
+      "CLOSE_JOB": {
+        "permission": "CLOSE_JOB",
+        "aiAllowed": false
+      },
+      "CHANGE_CUSTOMER": {
+        "permission": "EDIT_CUSTOMER",
+        "aiAllowed": false
+      },
+      "EDIT_RATE_CARD": {
+        "permission": "VIEW_PRICING_RATES",
+        "aiAllowed": false
+      },
+      "ADD_ESTIMATE": {
+        "permission": "CREATE_QUOTE",
+        "aiAllowed": false
+      },
+      "EDIT_JOB": {
+        "permission": "EDIT_JOB",
+        "aiAllowed": false
+      },
+      "MODIFY_QUOTE": {
+        "permission": "CREATE_QUOTE",
+        "aiAllowed": false
+      },
+      "SEND_QUOTE": {
+        "permission": "APPROVE_QUOTE",
+        "aiAllowed": false
+      },
+      "RESOLVE_QUOTE": {
+        "permission": "CREATE_QUOTE",
+        "aiAllowed": false
+      },
+      "REVIEW_PRICING": {
+        "permission": "VIEW_FINANCIALS",
+        "aiAllowed": false
+      },
+      "REVIEW_LEARNING": {
+        "permission": "VIEW_FINANCIALS",
+        "aiAllowed": false
+      },
+      "APPLY_CALIBRATION": {
+        "permission": "VIEW_FINANCIALS",
+        "aiAllowed": false
+      },
+      "SEND_MESSAGE": {
+        "permission": "EDIT_CUSTOMER",
+        "aiAllowed": false
+      },
+      "INBOUND_MESSAGE": {
+        "permission": null,
+        "aiAllowed": true
+      },
+      "SENSE_SIGNAL": {
+        "permission": null,
+        "aiAllowed": true
+      },
+      "REVIEW_COUNCIL": {
+        "permission": "VIEW_FINANCIALS",
+        "aiAllowed": false
+      },
+      "REVIEW_EXECUTIVE": {
+        "permission": "VIEW_FINANCIALS",
+        "aiAllowed": false
+      },
+      "GOVERN_REGISTRY": {
+        "permission": "MANAGE_GOVERNANCE",
+        "aiAllowed": false
+      },
+      "REVIEW_PROPOSAL": {
+        "permission": "MANAGE_GOVERNANCE",
+        "aiAllowed": false
+      },
+      "RUN_MODEL": {
+        "permission": "VIEW_ALL_JOBS",
+        "aiAllowed": true
+      },
+      "MANAGE_MODEL_SETTINGS": {
+        "permission": "MANAGE_SETTINGS",
+        "aiAllowed": false
+      },
+      "APPROVE_ASSISTED_MSG": {
+        "permission": "EDIT_CUSTOMER",
+        "aiAllowed": false
+      },
+      "MANAGE_SECURITY": {
+        "permission": "MANAGE_SETTINGS",
+        "aiAllowed": false
+      },
+      "MANAGE_PRIVACY": {
+        "permission": "MANAGE_SETTINGS",
+        "aiAllowed": false
+      },
+      "ERASE_DATA": {
+        "permission": "MANAGE_SETTINGS",
+        "aiAllowed": false
+      },
+      "REPLAY_SANDBOX": {
+        "permission": "MANAGE_GOVERNANCE",
+        "aiAllowed": false
+      },
+      "ADD_LEGAL_RECORD": {
+        "permission": "MANAGE_LEGAL",
+        "aiAllowed": false
+      },
+      "FILE_INCIDENT": {
+        "permission": null,
+        "aiAllowed": false
+      },
+      "PREPARE_LEGAL_REVIEW": {
+        "permission": null,
+        "aiAllowed": true
+      },
+      "RESOLVE_LEGAL_REVIEW": {
+        "permission": "MANAGE_LEGAL",
+        "aiAllowed": false
+      },
+      "REVIEW_ADS_RECOMMENDATION": {
+        "permission": "VIEW_FINANCIALS",
+        "aiAllowed": false
+      },
+      "APPLY_ADS_CHANGE": {
+        "permission": "VIEW_FINANCIALS",
+        "aiAllowed": false
+      },
+      "EXPORT_CONVERSIONS": {
+        "permission": "VIEW_FINANCIALS",
+        "aiAllowed": false
+      }
+    }
+  },
+  "custonllm": {
+    "routePerms": {
+      "owner": [
+        "admin",
+        "any_model",
+        "any_persona",
+        "chat",
+        "copilot",
+        "diag",
+        "manage_keys",
+        "personas_write",
+        "tools"
+      ],
+      "admin": [
+        "admin",
+        "any_model",
+        "any_persona",
+        "chat",
+        "copilot",
+        "diag",
+        "personas_write",
+        "tools"
+      ],
+      "estimator": [
+        "any_persona",
+        "chat",
+        "copilot"
+      ],
+      "crew": [
+        "any_persona",
+        "chat",
+        "copilot"
+      ],
+      "customer": [
+        "chat"
+      ]
+    }
+  }
+}
