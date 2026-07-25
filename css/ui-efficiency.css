@@ -1,0 +1,36 @@
+/* Intelligent Command UI efficiency layer.
+ * Keeps one context-aware next action visible and removes duplicate controls. */
+#hk-command-orb{display:none!important}
+#hk-intelligence-strip{gap:8px;min-height:48px;padding:6px 8px 6px 12px}
+#hk-intelligence-strip .hk-strip-copy{white-space:nowrap}
+#hk-intelligence-strip .hk-strip-sep{flex:1;min-width:8px}
+.hk-strip-primary,.hk-strip-command{min-height:36px;border-radius:11px;border:1px solid rgba(255,255,255,.12);font:700 12px/1 system-ui,-apple-system,sans-serif;cursor:pointer}
+.hk-strip-primary{padding:0 14px;background:linear-gradient(135deg,#ef233c,#b90924);color:#fff;box-shadow:0 8px 20px rgba(239,35,60,.22)}
+.hk-strip-primary:hover{filter:brightness(1.08)}
+.hk-strip-command{width:38px;padding:0;background:rgba(255,255,255,.055);color:#d8d8df;font-size:15px}
+.hk-command-palette{max-height:min(620px,78vh)}
+.hk-command-head{position:sticky;top:0;z-index:2}
+.hk-command-list{padding-bottom:8px}
+.hk-command-item{min-height:58px;padding:9px 11px}
+.hk-command-copy span{line-height:1.25}
+.hk-command-item.is-active{transform:none}
+.hk-command-keyhint{margin-left:auto;color:#777783;font:600 10px/1 ui-monospace,monospace;border:1px solid rgba(255,255,255,.09);border-radius:6px;padding:4px 6px}
+@media(max-width:720px){
+  #hk-intelligence-strip{left:8px;right:8px;top:max(8px,env(safe-area-inset-top));border-radius:15px;padding-left:10px}
+  #hk-intelligence-strip .hk-strip-copy[data-hk-gate],#hk-intelligence-strip .hk-strip-sep{display:none}
+  #hk-intelligence-strip .hk-strip-copy{font-size:10.5px;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .hk-strip-primary{margin-left:auto;min-width:0;padding:0 11px;font-size:11px}
+  .hk-strip-command{width:36px}
+  .hk-command-palette{left:8px!important;right:8px!important;bottom:max(8px,env(safe-area-inset-bottom))!important;top:auto!important;max-height:72vh;border-radius:18px!important}
+  .hk-command-copy span{display:none}
+  .hk-command-item{min-height:52px;padding:8px 10px}
+  .hk-command-tag{display:none}
+  .hk-command-icon{width:34px;height:34px}
+  .hk-command-group{padding-top:9px}
+}
+@media(max-width:390px){
+  #hk-intelligence-strip [data-hk-runtime]{display:none}
+  #hk-intelligence-strip [data-hk-mode]::after{content:''}
+  .hk-strip-primary{max-width:128px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+}
+@media(prefers-reduced-motion:reduce){.hk-strip-primary,.hk-command-item{transition:none!important}}
