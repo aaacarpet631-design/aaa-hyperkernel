@@ -120,6 +120,40 @@ integrity-verified registry — the mission's own Phase 1:
 None of this sends a request to a new model or downloads a weight — Phase 1 is
 registry + license + identity only, exactly as the mission sequences it.
 
+## Phase 1 progress (2026-07-19)
+
+**The canonical model-record contract is built** — `js/ai/model-record-contract.js`
+(`AAA_MODEL_RECORD`) generated to `schemas/model-record-v1.json`, mirrored to
+Custonllm (`agent/core/model_record.py` + byte-identical committed copy +
+shared sha256 MANIFEST), same proven pattern as the copilot + governance-policy
+contracts. It delivers the Phase-1 core:
+
+- **One canonical record** keyed by `modelUid` with the openness/license/
+  integrity/lifecycle spine (O1–O5, license flags, `weightHashes`,
+  `signatureStatus`, the DISCOVERED→…→PRODUCTION_APPROVED state machine +
+  terminal states) — closing the mission's 0% openness/license/integrity gap
+  as record fields.
+- **The shared ID space** the audit found missing: `providerIds.{hyperkernel,
+  custonllm}` links the two routers' keys to one identity; a Custonllm
+  conformance test asserts every referenced id exists in the live
+  `FRONTIER_MODELS`, so the two routers can no longer drift apart.
+- **Honesty by construction** (mission's explicit "handle open source
+  carefully"): the 11-model seed (the families actually in both repos' code) is
+  entirely `classificationVerified:false`, integrity `unverified`, and at the
+  pre-production `LICENSE_REVIEW` state — **nothing is production-approved**;
+  unknown license → the most-restrictive default; O5 can never be
+  redistributable; `PRODUCTION_APPROVED` requires verified integrity — all
+  enforced by `validate()` and tested.
+- **"No lab indispensable"** (final directive) as an executable guard:
+  `noLabIndispensable()` flags any laboratory exceeding 60% of the
+  production-approved fleet (vacuously ok until models are promoted).
+
+Still ahead in later phases (not built): automated discovery, real
+supply-chain verification (Gate 1), runtime adapters beyond the two present,
+the evaluation foundry, and the governed router unification onto this record.
+The record SHAPE and the shared identity are the Phase-1 deliverable; they ride
+the same server boundary as ATLAS Domain 1.
+
 ## Cross-reference
 
 - ATLAS `docs/SYSTEM_AUDIT.md` C2 (unauthenticated proxies) and C4

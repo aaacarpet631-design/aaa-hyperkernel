@@ -14,6 +14,7 @@ const SUITES = [
   'unit/gateway.test.js',
   'unit/governance-policy.test.js',
   'unit/model-router.test.js',
+  'unit/model-record.test.js',
   'unit/action-safety-gate.test.js',
   'unit/country-packs.test.js',
   'unit/decision-envelope.test.js',
