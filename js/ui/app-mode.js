@@ -1,21 +1,21 @@
 /*
  * AAA App Mode — Field and Executive operating modes.
- * Includes an additive intelligent command shell for navigation and operator context.
- * The shell never mutates business data and only activates existing UI controls.
+ * Adds a context-aware command shell without changing business data or bypassing
+ * governance. Every action only activates an existing UI control or prepares chat.
  */
 ;(function (global) {
   'use strict';
 
-  function installPolishStylesheet() {
-    if (!global.document) return;
-    if (global.document.getElementById('aaa-ui-polish-css')) return;
+  function installStylesheet(id, href) {
+    if (!global.document || global.document.getElementById(id)) return;
     const link = global.document.createElement('link');
-    link.id = 'aaa-ui-polish-css';
+    link.id = id;
     link.rel = 'stylesheet';
-    link.href = '/css/ui-polish.css';
+    link.href = href;
     global.document.head.appendChild(link);
   }
-  installPolishStylesheet();
+  installStylesheet('aaa-ui-polish-css', '/css/ui-polish.css');
+  installStylesheet('aaa-ui-efficiency-css', '/css/ui-efficiency.css');
 
   function cfg() { return global.AAA_CONFIG || {}; }
   function rbac() { return global.AAA_RBAC; }
@@ -56,6 +56,7 @@
       if (cfg().set) cfg().set({ appMode: mode });
       try { if (events()) events().emit('appmode.changed', { mode: mode }); } catch (_) {}
       updateIntelligenceStrip();
+      if (paletteOpen) renderPalette();
       return { ok: true, mode: mode };
     },
 
@@ -71,21 +72,27 @@
   global.AAA_APP_MODE = AppMode;
 
   const COMMANDS = [
-    { group: 'Navigate', id: 'command', icon: '🛰', title: 'Open Command', detail: 'Owner focus, risks, priorities, and decisions', tag: 'Executive', run: function () { activateTab('focus'); } },
-    { group: 'Navigate', id: 'measure', icon: '📐', title: 'Start Measurement', detail: 'Open Field Mode and begin the field capture workflow', tag: 'Field', run: function () { ensureMode('field'); activateTab('measure'); } },
-    { group: 'Navigate', id: 'jobs', icon: '🗂', title: 'Open Jobs', detail: 'Review active work, attention items, and job details', tag: 'Work', run: function () { activateTab('jobs'); } },
-    { group: 'Navigate', id: 'chat', icon: '💬', title: 'Ask HyperKernel', detail: 'Open the business copilot and focus the message box', tag: 'AI', run: function () { openChat(''); } },
-    { group: 'Navigate', id: 'business', icon: '📊', title: 'Open Business', detail: 'Revenue, operations, and business intelligence', tag: 'Executive', run: function () { ensureMode('executive'); activateTab('business'); } },
-    { group: 'Intelligence', id: 'mission', icon: '◈', title: 'Start a governed mission', detail: 'Create a precise objective with review and evidence built in', tag: 'Governed', run: function () { openChat('Create a governed mission for this objective: '); } },
-    { group: 'Intelligence', id: 'briefing', icon: '☀', title: 'What needs attention?', detail: 'Ask for an honest owner briefing grounded in current data', tag: 'Brief', run: function () { openChat('What needs my attention right now? Prioritize by business impact and tell me what evidence supports each item.'); } },
-    { group: 'Intelligence', id: 'agents', icon: '🤖', title: 'Open Agent Workforce', detail: 'Inspect continuous agents, health, jobs, and approvals', tag: 'Agents', run: function () { clickByText(['Agent Workforce', 'AI Team']); } },
-    { group: 'Governance', id: 'approvals', icon: '✓', title: 'Open Approvals', detail: 'Review decisions waiting for human authority', tag: 'Human', run: function () { clickByText(['Approvals', 'Approval']); } },
-    { group: 'Governance', id: 'mode', icon: '↔', title: 'Switch operating mode', detail: 'Move between Field and Executive workflows', tag: 'Mode', run: function () { AppMode.toggle(); activateTab(AppMode.landingTab()); } }
+    { group: 'Navigate', id: 'command', icon: '🛰', title: 'Open Command', detail: 'Priorities, risks, and decisions', tag: 'Executive', shortcut: 'Alt 1', run: function () { ensureMode('executive'); activateTab('focus'); } },
+    { group: 'Navigate', id: 'measure', icon: '📐', title: 'Start Measurement', detail: 'Begin the field capture workflow', tag: 'Field', shortcut: 'Alt 1', run: function () { ensureMode('field'); activateTab('measure'); } },
+    { group: 'Navigate', id: 'jobs', icon: '🗂', title: 'Open Jobs', detail: 'Active work and attention items', tag: 'Work', shortcut: 'Alt 2', run: function () { activateTab('jobs'); } },
+    { group: 'Navigate', id: 'chat', icon: '💬', title: 'Ask HyperKernel', detail: 'Open the business copilot', tag: 'AI', shortcut: 'Alt 3', run: function () { openChat(''); } },
+    { group: 'Navigate', id: 'business', icon: '📊', title: 'Open Business', detail: 'Revenue and operating intelligence', tag: 'Executive', run: function () { ensureMode('executive'); activateTab('business'); } },
+    { group: 'Intelligence', id: 'briefing', icon: '☀', title: 'Owner briefing', detail: 'What needs attention, ranked by impact', tag: 'Brief', run: function () { openChat('What needs my attention right now? Prioritize by business impact and cite the evidence for each item.'); } },
+    { group: 'Intelligence', id: 'mission', icon: '◈', title: 'Start governed mission', detail: 'Objective, evidence, review, and rollback', tag: 'Governed', run: function () { openChat('Create a governed mission for this objective: '); } },
+    { group: 'Intelligence', id: 'agents', icon: '🤖', title: 'Agent Workforce', detail: 'Health, work, and approvals', tag: 'Agents', run: function () { clickByText(['Agent Workforce', 'AI Team']); } },
+    { group: 'Governance', id: 'approvals', icon: '✓', title: 'Open Approvals', detail: 'Decisions waiting for human authority', tag: 'Human', run: function () { clickByText(['Approvals', 'Approval']); } },
+    { group: 'Governance', id: 'mode', icon: '↔', title: 'Switch operating mode', detail: 'Field or Executive workflow', tag: 'Mode', run: function () { AppMode.toggle(); activateTab(AppMode.landingTab()); } }
   ];
+
+  const MODE_ORDER = {
+    field: ['measure', 'jobs', 'chat', 'mission', 'approvals', 'agents', 'mode', 'briefing', 'command', 'business'],
+    executive: ['briefing', 'command', 'approvals', 'jobs', 'business', 'chat', 'mission', 'agents', 'mode', 'measure']
+  };
 
   let shellInstalled = false;
   let paletteOpen = false;
   let commandQuery = '';
+  let activeIndex = 0;
 
   function textOf(node) { return String(node && node.textContent || '').replace(/\s+/g, ' ').trim(); }
 
@@ -125,7 +132,7 @@
     const exact = candidates.find(function (node) { return wanted.indexOf(textOf(node).toLowerCase()) !== -1; });
     const partial = candidates.find(function (node) {
       const t = textOf(node).toLowerCase();
-      return wanted.some(function (label) { return t.indexOf(label.toLowerCase()) !== -1; });
+      return wanted.some(function (label) { return t.indexOf(label) !== -1; });
     });
     const target = exact || partial;
     if (target && typeof target.click === 'function') { target.click(); return true; }
@@ -152,11 +159,12 @@
     const hermes = !!global.AAA_HERMES;
     const agentOS = !!global.AAA_AGENT_OS;
     const governance = !!(global.AAA_GOVERNANCE || global.AAA_RUNTIME_GATEWAY || global.AAA_DECISION_ENVELOPE);
-    const workforce = !!global.AAA_WORKFORCE;
     let level = online ? 'ready' : 'offline';
     if (online && !(hermes || agentOS)) level = 'warning';
-    return { online: online, hermes: hermes, agentOS: agentOS, governance: governance, workforce: workforce, level: level };
+    return { online: online, hermes: hermes, agentOS: agentOS, governance: governance, level: level };
   }
+
+  function primaryCommandId() { return AppMode.get() === 'field' ? 'measure' : 'briefing'; }
 
   function updateIntelligenceStrip() {
     if (!global.document) return;
@@ -171,6 +179,17 @@
     if (runtimeNode) runtimeNode.textContent = status.online ? ((status.hermes || status.agentOS) ? 'AI ready' : 'Core ready') : 'Offline';
     const gateNode = strip.querySelector('[data-hk-gate]');
     if (gateNode) gateNode.textContent = status.governance ? 'Governed' : 'Guard status unknown';
+    const primary = strip.querySelector('[data-hk-primary]');
+    if (primary) {
+      primary.textContent = AppMode.get() === 'field' ? 'Start measurement' : 'Owner briefing';
+      primary.setAttribute('data-command-id', primaryCommandId());
+    }
+  }
+
+  function runCommand(id) {
+    const command = COMMANDS.find(function (row) { return row.id === id; });
+    closePalette();
+    if (command) command.run();
   }
 
   function buildStrip() {
@@ -181,49 +200,51 @@
       '<span class="hk-strip-copy"><b data-hk-mode>Field Mode</b> · <span data-hk-runtime>Core ready</span></span>' +
       '<span class="hk-strip-sep"></span>' +
       '<span class="hk-strip-copy" data-hk-gate>Governed</span>' +
-      '<button class="hk-strip-command" type="button">Command</button>';
-    strip.querySelector('button').addEventListener('click', openPalette);
+      '<button class="hk-strip-primary" type="button" data-hk-primary data-command-id="measure">Start measurement</button>' +
+      '<button class="hk-strip-command" type="button" aria-label="Open command palette" title="Command palette (Ctrl+K)">⌘</button>';
+    strip.querySelector('[data-hk-primary]').addEventListener('click', function (event) { runCommand(event.currentTarget.getAttribute('data-command-id')); });
+    strip.querySelector('.hk-strip-command').addEventListener('click', openPalette);
     global.document.body.appendChild(strip);
+  }
 
-    const orb = global.document.createElement('button');
-    orb.id = 'hk-command-orb';
-    orb.type = 'button';
-    orb.setAttribute('aria-label', 'Open HyperKernel command palette');
-    orb.title = 'Command palette (Ctrl+K)';
-    orb.textContent = '⌘';
-    orb.addEventListener('click', openPalette);
-    global.document.body.appendChild(orb);
+  function orderedCommands() {
+    const order = MODE_ORDER[AppMode.get()] || MODE_ORDER.field;
+    return COMMANDS.slice().sort(function (a, b) { return order.indexOf(a.id) - order.indexOf(b.id); });
   }
 
   function filteredCommands() {
+    const rows = orderedCommands();
     const q = commandQuery.trim().toLowerCase();
-    if (!q) return COMMANDS.slice();
-    return COMMANDS.filter(function (command) {
+    if (!q) return rows;
+    return rows.filter(function (command) {
       return (command.title + ' ' + command.detail + ' ' + command.group + ' ' + command.tag).toLowerCase().indexOf(q) !== -1;
     });
+  }
+
+  function setActive(index) {
+    const items = Array.from(global.document.querySelectorAll('.hk-command-item'));
+    if (!items.length) return;
+    activeIndex = Math.max(0, Math.min(index, items.length - 1));
+    items.forEach(function (item, row) { item.classList.toggle('is-active', row === activeIndex); });
+    items[activeIndex].scrollIntoView({ block: 'nearest' });
   }
 
   function renderPalette() {
     const list = global.document.querySelector('.hk-command-list');
     if (!list) return;
     const rows = filteredCommands();
+    activeIndex = 0;
     if (!rows.length) { list.innerHTML = '<div class="hk-command-empty">No matching command.</div>'; return; }
-    let group = '';
     let html = '';
     rows.forEach(function (command, index) {
-      if (command.group !== group) { group = command.group; html += '<div class="hk-command-group">' + group + '</div>'; }
       html += '<button class="hk-command-item' + (index === 0 ? ' is-active' : '') + '" type="button" data-command-id="' + command.id + '">' +
         '<span class="hk-command-icon">' + command.icon + '</span>' +
         '<span class="hk-command-copy"><b>' + command.title + '</b><span>' + command.detail + '</span></span>' +
-        '<span class="hk-command-tag">' + command.tag + '</span></button>';
+        (command.shortcut ? '<span class="hk-command-keyhint">' + command.shortcut + '</span>' : '<span class="hk-command-tag">' + command.tag + '</span>') + '</button>';
     });
     list.innerHTML = html;
     list.querySelectorAll('[data-command-id]').forEach(function (button) {
-      button.addEventListener('click', function () {
-        const command = COMMANDS.find(function (row) { return row.id === button.getAttribute('data-command-id'); });
-        closePalette();
-        if (command) command.run();
-      });
+      button.addEventListener('click', function () { runCommand(button.getAttribute('data-command-id')); });
     });
   }
 
@@ -236,13 +257,16 @@
     palette.setAttribute('role', 'dialog');
     palette.setAttribute('aria-modal', 'true');
     palette.setAttribute('aria-label', 'HyperKernel command palette');
-    palette.innerHTML = '<div class="hk-command-head"><input class="hk-command-search" type="search" placeholder="Search actions, agents, approvals, jobs…" aria-label="Search commands"><span class="hk-command-key">ESC</span></div><div class="hk-command-list"></div>';
+    palette.innerHTML = '<div class="hk-command-head"><input class="hk-command-search" type="search" placeholder="Type an action…" aria-label="Search commands"><span class="hk-command-key">ESC</span></div><div class="hk-command-list"></div>';
     const input = palette.querySelector('input');
     input.addEventListener('input', function () { commandQuery = input.value || ''; renderPalette(); });
     input.addEventListener('keydown', function (event) {
+      if (event.key === 'ArrowDown') { event.preventDefault(); setActive(activeIndex + 1); }
+      if (event.key === 'ArrowUp') { event.preventDefault(); setActive(activeIndex - 1); }
       if (event.key === 'Enter') {
-        const active = palette.querySelector('.hk-command-item.is-active') || palette.querySelector('.hk-command-item');
-        if (active) active.click();
+        event.preventDefault();
+        const items = palette.querySelectorAll('.hk-command-item');
+        if (items[activeIndex]) items[activeIndex].click();
       }
     });
     global.document.body.appendChild(backdrop);
@@ -271,7 +295,7 @@
   }
 
   function installIntelligentShell() {
-    if (!global.document || shellInstalled || global.document.getElementById('hk-command-orb')) return;
+    if (!global.document || shellInstalled || global.document.getElementById('hk-intelligence-strip')) return;
     shellInstalled = true;
     buildStrip();
     createPalette();
@@ -279,7 +303,11 @@
     global.addEventListener('online', updateIntelligenceStrip);
     global.addEventListener('offline', updateIntelligenceStrip);
     global.document.addEventListener('keydown', function (event) {
-      if ((event.ctrlKey || event.metaKey) && String(event.key).toLowerCase() === 'k') { event.preventDefault(); paletteOpen ? closePalette() : openPalette(); }
+      const key = String(event.key).toLowerCase();
+      if ((event.ctrlKey || event.metaKey) && key === 'k') { event.preventDefault(); paletteOpen ? closePalette() : openPalette(); }
+      if (event.altKey && key === '1') { event.preventDefault(); runCommand(AppMode.get() === 'field' ? 'measure' : 'command'); }
+      if (event.altKey && key === '2') { event.preventDefault(); runCommand('jobs'); }
+      if (event.altKey && key === '3') { event.preventDefault(); runCommand('chat'); }
       if (event.key === 'Escape' && paletteOpen) closePalette();
     });
     global.setInterval(updateIntelligenceStrip, 10000);
