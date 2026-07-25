@@ -1,16 +1,16 @@
-# Graph Report - aaa-hyperkernel  (2026-07-20)
+# Graph Report - aaa-hyperkernel  (2026-07-25)
 
 ## Corpus Check
-- 788 files · ~677,438 words
+- 796 files · ~715,462 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 8390 nodes · 14853 edges · 691 communities (552 shown, 139 thin omitted)
+- 8577 nodes · 15042 edges · 708 communities (572 shown, 136 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 283 edges (avg confidence: 0.6)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `5e48a27a`
+- Built from commit: `3fd6af69`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -674,11 +674,28 @@
 - [[_COMMUNITY_governance-notifier.test.js|governance-notifier.test.js]]
 - [[_COMMUNITY_quickbooks-online.test.js|quickbooks-online.test.js]]
 - [[_COMMUNITY_sensing.test.js|sensing.test.js]]
+- [[_COMMUNITY_Domain 7 — Scalability & Hot-Path Redesign|Domain 7 — Scalability & Hot-Path Redesign]]
+- [[_COMMUNITY_4.2 Internationalization inventory|4.2 Internationalization inventory]]
+- [[_COMMUNITY_Reconciliation addendum — Fable 5 second pass (2026-07-19)|Reconciliation addendum — Fable 5 second pass (2026-07-19)]]
+- [[_COMMUNITY_search-intent-engine.js|search-intent-engine.js]]
+- [[_COMMUNITY_PROJECT ATLAS — Phase 2 Target Architecture|PROJECT ATLAS — Phase 2: Target Architecture]]
+- [[_COMMUNITY_rules.test.js|rules.test.js]]
+- [[_COMMUNITY_{{title}} — Map of Content|{{title}} — Map of Content]]
+- [[_COMMUNITY_Lens 3 — Organizational Memory (Learning & Memory Systems Audit)|Lens 3 — Organizational Memory (Learning & Memory Systems Audit)]]
+- [[_COMMUNITY_owner-copilot-ui.test.js|owner-copilot-ui.test.js]]
+- [[_COMMUNITY_provenance-ui.test.js|provenance-ui.test.js]]
+- [[_COMMUNITY_reliability-ui.test.js|reliability-ui.test.js]]
+- [[_COMMUNITY_Lens 5 — Reliability & Security|Lens 5 — Reliability & Security]]
+- [[_COMMUNITY_aaa-policy-contract.js|aaa-policy-contract.js]]
+- [[_COMMUNITY_governance-business-events.test.js|governance-business-events.test.js]]
+- [[_COMMUNITY_transport-scheduler.test.js|transport-scheduler.test.js]]
+- [[_COMMUNITY_workforce-ui.test.js|workforce-ui.test.js]]
+- [[_COMMUNITY_mission-manager.test.js|mission-manager.test.js]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `load()` - 231 edges
-2. `makeRunner()` - 195 edges
-3. `setupEnv()` - 190 edges
+1. `load()` - 232 edges
+2. `makeRunner()` - 196 edges
+3. `setupEnv()` - 191 edges
 4. `render()` - 30 edges
 5. `claude-obsidian: Self-Organizing AI Second Brain for Obsidian + Claude Code` - 27 edges
 6. `read()` - 24 edges
@@ -707,51 +724,51 @@
 - **HyperKernel Phase-1 founding architecture** — hyperkernel_event_taxonomy, hyperkernel_derived_graph, hyperkernel_five_primitives, hyperkernel_provenance, hyperkernel_closure_loops, hyperkernel_council_structure, hyperkernel_agent_lifecycle, hyperkernel_memory_lifecycle, hyperkernel_audit_architecture, hyperkernel_kernel_invariants, hyperkernel_hyperkernel [EXTRACTED 1.00]
 - **Bluetooth laser measurement pipeline (capture to quote)** — js_bluetooth_services_raw_reading_log_rawbluetoothreadinglog, js_bluetooth_services_measurement_parser_measurementparser, services_generic_ble_adapter_genericblemeasurementadapter, js_bluetooth_services_device_adapter_registry_deviceadapterregistry, js_bluetooth_services_huepar_s60_adapter_aaa_huepar_s60_adapter, js_bluetooth_hooks_use_bluetooth_connection_aaa_bluetooth, storage_measurement_store, measurements_measurement_ai_assistant, integrations_measurement_to_quote [EXTRACTED 1.00]
 
-## Communities (691 total, 139 thin omitted)
+## Communities (708 total, 136 thin omitted)
 
 ### Community 0 - "Unit Audit Ledger"
 Cohesion: 0.02
-Nodes (117): makeClock(), makeConfig(), makeData(), makeEvents(), makeIds(), makeRunner(), path, setupEnv() (+109 more)
+Nodes (115): makeClock(), makeConfig(), makeData(), makeEvents(), makeIds(), makeRunner(), path, setupEnv() (+107 more)
 
 ### Community 3 - "Asyncapi Events"
 Cohesion: 0.16
 Nodes (36): actor(), adapter(), applyVersion(), approveVersion(), audit(), canApprove(), cfg(), checksum() (+28 more)
 
 ### Community 4 - "Transport Transport Core"
-Cohesion: 0.13
-Nodes (44): adapters(), analytics(), applyStatusEvent(), _attachOutbound(), biz(), cfg(), clock(), closeThread() (+36 more)
+Cohesion: 0.08
+Nodes (66): cfg(), clock(), data(), ingest(), insights(), isWon(), listQuotes(), mean() (+58 more)
 
 ### Community 5 - "Core Privacy"
 Cohesion: 0.04
-Nodes (43): load(), loadAll(), { makeRunner, setupEnv, load }, loadCore(), { makeRunner, setupEnv, load }, BADOUT, GOOD, loadAll() (+35 more)
+Nodes (42): load(), { makeRunner, setupEnv, load }, { makeRunner, setupEnv, load }, loadAll(), { makeRunner, setupEnv, load }, loadCore(), { makeRunner, setupEnv, load }, BADOUT (+34 more)
 
 ### Community 6 - "Unit Bluetooth Connect"
 Cohesion: 0.08
 Nodes (51): architectFlow(), auditFlow(), data(), empty(), esc(), fmtPct(), improveFlow(), kv() (+43 more)
 
 ### Community 7 - "Command Center"
-Cohesion: 0.10
-Nodes (50): buildNativeReviewTarget(), buildReviewJobMetadata(), buildTaskJob(), buildTaskRequest(), buildTaskRunMetadata(), createCompanionJob(), ensureCodexAvailable(), executeTaskRun() (+42 more)
+Cohesion: 0.08
+Nodes (64): buildNativeReviewTarget(), buildReviewJobMetadata(), buildTaskJob(), buildTaskRequest(), buildTaskRunMetadata(), createCompanionJob(), createTrackedProgress(), enqueueBackgroundTask() (+56 more)
 
 ### Community 8 - "Core Security"
 Cohesion: 0.08
-Nodes (45): executeReviewRun(), CodexAppServerClient, applyTurnNotification(), belongsToTurn(), buildAppServerAuthStatus(), buildAuthStatus(), buildResumeParams(), buildTaskThreadName() (+37 more)
+Nodes (48): ensureCodexAvailable(), executeReviewRun(), executeTaskRun(), firstMeaningfulLine(), applyTurnNotification(), belongsToTurn(), buildAppServerAuthStatus(), buildAuthStatus() (+40 more)
 
 ### Community 9 - "Governance Prompt Registry"
 Cohesion: 0.10
 Nodes (46): audit(), autoEnforce(), ban(), canManage(), cfg(), clock(), data(), detector() (+38 more)
 
 ### Community 10 - "Quotes Quote Store"
-Cohesion: 0.07
-Nodes (65): clamp01(), confidenceFor(), learning(), mean(), num(), priceBandKey(), quotes(), recommend() (+57 more)
+Cohesion: 0.11
+Nodes (46): attribution(), campaignScorecard(), conversions(), data(), diagnostics(), fin(), leadsOS(), num() (+38 more)
 
 ### Community 11 - "Screens Measurement Hud"
 Cohesion: 0.04
 Nodes (46): additionalProperties, minLength, type, maximum, minimum, type, minLength, type (+38 more)
 
 ### Community 12 - "Transport Transport Store"
-Cohesion: 0.04
-Nodes (27): ROOT, fs, { makeRunner, ROOT }, path, vm, cp, fs, { makeRunner, ROOT } (+19 more)
+Cohesion: 0.03
+Nodes (40): ROOT, cp, dir, fs, path, r, fs, { makeRunner, ROOT } (+32 more)
 
 ### Community 13 - "Intelligence Prediction Closure"
 Cohesion: 0.04
@@ -770,8 +787,8 @@ Cohesion: 0.05
 Nodes (43): 10. GROW — feedback loop notes, 11. Push gate decision, 12. Punch list (ordered), 13. Critical files (paths used in audit), 14. Appendix — subagent dispatch summary, 1. Executive verdict (200 words), 2. Methodology — 10-principle spine in action, 3. Per-skill score table (+35 more)
 
 ### Community 17 - "Accounting Receipt Intake"
-Cohesion: 0.11
-Nodes (39): analyze(), baselineFor(), cfg(), clamp(), clock(), confFromSample(), createPrediction(), data() (+31 more)
+Cohesion: 0.06
+Nodes (73): analyze(), baselineFor(), cfg(), clamp(), clock(), confFromSample(), createPrediction(), data() (+65 more)
 
 ### Community 18 - "Storage Measurement Store"
 Cohesion: 0.10
@@ -798,8 +815,8 @@ Cohesion: 0.05
 Nodes (40): Changes, Changes, Changes, Changes, Changes, Changes, Changes, Commit message (+32 more)
 
 ### Community 24 - "Intelligence Financial Intelligence"
-Cohesion: 0.11
-Nodes (30): main(), STREAMING_METHODS, writePidFile(), DEFAULT_CAPABILITIES, DEFAULT_CLIENT_INFO, PLUGIN_MANIFEST, PLUGIN_MANIFEST_URL, parseArgs() (+22 more)
+Cohesion: 0.12
+Nodes (36): createBrokerEndpoint(), parseBrokerEndpoint(), sanitizePipeName(), clearBrokerSession(), connectToEndpoint(), createBrokerSessionDir(), ensureBrokerSession(), isBrokerEndpointReady() (+28 more)
 
 ### Community 25 - "Intelligence Governance Registry"
 Cohesion: 0.11
@@ -830,8 +847,8 @@ Cohesion: 0.14
 Nodes (32): appendHistory(), applyStatusEvent(), approve(), byNewest(), cancel(), cfg(), clock(), data() (+24 more)
 
 ### Community 32 - "Genesis Capability Ledger"
-Cohesion: 0.13
-Nodes (32): createTrackedProgress(), enqueueBackgroundTask(), handleCancel(), spawnDetachedTaskWorker(), readStoredJob(), defaultState(), ensureStateDir(), FALLBACK_STATE_ROOT_DIR (+24 more)
+Cohesion: 0.30
+Nodes (12): clamp01(), confidenceFor(), learning(), mean(), num(), priceBandKey(), quotes(), recommend() (+4 more)
 
 ### Community 33 - "Governance Governance Engine"
 Cohesion: 0.12
@@ -1066,8 +1083,8 @@ Cohesion: 0.12
 Nodes (16): env, browser, es2022, extends, ignorePatterns, overrides, parserOptions, ecmaVersion (+8 more)
 
 ### Community 94 - "Field Seam Layout"
-Cohesion: 0.12
-Nodes (5): AppServerClientBase, BrokerCodexAppServerClient, buildJsonRpcError(), createProtocolError(), SpawnedCodexAppServerClient
+Cohesion: 0.11
+Nodes (9): AppServerClientBase, BrokerCodexAppServerClient, buildJsonRpcError(), createProtocolError(), DEFAULT_CAPABILITIES, DEFAULT_CLIENT_INFO, PLUGIN_MANIFEST, PLUGIN_MANIFEST_URL (+1 more)
 
 ### Community 95 - "Intelligence Causal Hypothesis"
 Cohesion: 0.28
@@ -1114,8 +1131,8 @@ Cohesion: 0.10
 Nodes (20): Cards, Embedding in Notes, Entity index (people, orgs, repos), File Format, Filter operators, Filters, Formulas, How to think (10-principle mapping) (+12 more)
 
 ### Community 106 - "Genesis Goal Capability"
-Cohesion: 0.15
-Nodes (18): renderStatusPayload(), appendActiveJobsTable(), appendReasoningSection(), escapeMarkdownCell(), formatCodexResumeCommand(), formatJobLine(), formatLineRange(), isStructuredReviewStoredResult() (+10 more)
+Cohesion: 0.18
+Nodes (16): appendActiveJobsTable(), appendReasoningSection(), escapeMarkdownCell(), formatCodexResumeCommand(), formatJobLine(), formatLineRange(), isStructuredReviewStoredResult(), normalizeReviewResultData() (+8 more)
 
 ### Community 108 - "Intelligence World Model"
 Cohesion: 0.20
@@ -1402,8 +1419,8 @@ Cohesion: 0.27
 Nodes (14): answerCard(), ask(), briefing(), canvas(), cardRenderer(), chatRenderModel(), chatSend(), copilot() (+6 more)
 
 ### Community 181 - "Genesis Failure Pattern"
-Cohesion: 0.12
-Nodes (34): audit(), baseAnalyzer(), cards(), clock(), data(), ledger(), now(), recommendations() (+26 more)
+Cohesion: 0.19
+Nodes (7): main(), STREAMING_METHODS, writePidFile(), normalizeArgv(), CodexAppServerClient, parseArgs(), splitRawArgumentString()
 
 ### Community 182 - "Genesis Spawn Policy"
 Cohesion: 0.33
@@ -1786,8 +1803,8 @@ Cohesion: 0.20
 Nodes (9): metadata, description, version, name, owner, name, url, plugins (+1 more)
 
 ### Community 281 - "Test Run Rules"
-Cohesion: 0.08
-Nodes (19): check(), fs, { initializeTestEnvironment, assertSucceeds, assertFails }, main(), path, { setDoc, getDoc, updateDoc, deleteDoc, doc }, cp, dir (+11 more)
+Cohesion: 0.22
+Nodes (8): appMode, appModePath, assert, css, cssPath, fs, path, root
 
 ### Community 282 - "Hermes Console"
 Cohesion: 0.29
@@ -1938,8 +1955,8 @@ Cohesion: 0.39
 Nodes (7): baseline_query(), main(), page_paths(), Return list of {path, score, distinct, total} for top-K pages., Score by distinct-query-term-presence + boost if cited in hot/index.      Return, score_page(), tokenize()
 
 ### Community 321 - "Data Eval Golden"
-Cohesion: 0.20
-Nodes (22): cfg(), clock(), data(), ingest(), insights(), isWon(), listQuotes(), mean() (+14 more)
+Cohesion: 0.17
+Nodes (12): 1. System of Record — the per-tenant partition (extends `aaa-cloud.js` + `firestore.rules`), 2. Local-first as a durable cache (rewrites the guts of `local-first-storage.js`, keeps its API), 3. Outbox / write-ahead log + reconciliation (extends the existing mutation queue), 4. Sync-engine conflict model (replaces blob LWW), Decisions this domain surfaces, Domain 3 — Durable System-of-Record & Sync Redesign, Migration path — incremental, flagged, reversible, suites stay green, Migration sequencing (incremental, flagged, reversible) (+4 more)
 
 ### Community 322 - "Functions Transport Send"
 Cohesion: 0.25
@@ -1998,8 +2015,8 @@ Cohesion: 0.39
 Nodes (5): byZip(), data(), list(), mean(), opportunityIndex()
 
 ### Community 337 - "Unit Financial Intelligence"
-Cohesion: 0.14
-Nodes (17): items, additionalProperties, items, properties, required, type, action, agent (+9 more)
+Cohesion: 0.09
+Nodes (25): items, additionalProperties, items, properties, required, type, action, agent (+17 more)
 
 ### Community 338 - "Unit Innovation Council"
 Cohesion: 0.39
@@ -2150,8 +2167,8 @@ Cohesion: 0.06
 Nodes (35): 10. Audit architecture, 1. The 25 highest-value business events, 2. Event taxonomy, 3. Graph schema, 4. Primitive schemas, 5. Governance model, 6. Learning loops, 7. Council structure (+27 more)
 
 ### Community 378 - "Innovation Experiment Scorecard"
-Cohesion: 0.23
-Nodes (11): clone(), generateRequestMutants(), generateResponseMutants(), make(), REQUEST_REQUIRED, RESPONSE_REQUIRED, fs, { generateResponseMutants, generateRequestMutants } (+3 more)
+Cohesion: 0.12
+Nodes (18): clone(), generateRequestMutants(), generateResponseMutants(), make(), REQUEST_REQUIRED, RESPONSE_REQUIRED, srcPath(), fs (+10 more)
 
 ### Community 379 - "Simulation Policy Simulator"
 Cohesion: 0.33
@@ -2310,8 +2327,8 @@ Cohesion: 0.50
 Nodes (8): aggregate(), cfg(), flag(), laborHours(), materialPlan(), num(), r2(), serviceSelections()
 
 ### Community 428 - "Community 428"
-Cohesion: 0.10
-Nodes (21): type, $ref, items, type, responseEnvelope, $ref, discriminator, oneOf (+13 more)
+Cohesion: 0.11
+Nodes (18): type, $ref, items, type, responseEnvelope, $ref, discriminator, oneOf (+10 more)
 
 ### Community 429 - "Community 429"
 Cohesion: 0.40
@@ -2502,8 +2519,8 @@ Cohesion: 0.25
 Nodes (7): 1. Create / pick a Firebase project, 2. Deploy rules, indexes, and the Claude proxy, 3. Create your workspace + membership, 4. Point the app at Firebase, 5. Verify, AAA HyperKernel — Firebase (Google Cloud) Setup, Security notes
 
 ### Community 486 - "Community 486"
-Cohesion: 0.25
-Nodes (6): CONTRACTS, findRule(), fs, { makeRunner, ROOT }, path, rules()
+Cohesion: 0.17
+Nodes (12): Decisions this domain surfaces, Domain 1 — Server Trust Boundary & Origin-Aware Enforcement (the keystone), Identity & session model — workspace bound to identity, not asserted, Migration sequencing (incremental, flagged, reversible), Origin-aware enforcement — the AI-block backstop (C4), Projecting the existing gateway ACTIONS + tenant-model-policy onto the boundary, Target-state diagram, The finding this domain closes (+4 more)
 
 ### Community 487 - "Community 487"
 Cohesion: 0.50
@@ -2630,8 +2647,8 @@ Cohesion: 0.27
 Nodes (10): bump(), copyMap(), flag(), freshCounts(), isFiniteNum(), percentile(), record(), reset() (+2 more)
 
 ### Community 524 - "Community 524"
-Cohesion: 0.11
-Nodes (18): type, additionalProperties, properties, required, type, properties, required, type (+10 more)
+Cohesion: 0.13
+Nodes (15): type, additionalProperties, properties, required, type, properties, required, type (+7 more)
 
 ### Community 525 - "Community 525"
 Cohesion: 0.36
@@ -2718,8 +2735,8 @@ Cohesion: 0.14
 Nodes (14): pattern, type, type, sourceRef, type, type, asOf, collection (+6 more)
 
 ### Community 659 - "properties"
-Cohesion: 0.13
-Nodes (15): pattern, type, additionalProperties, properties, required, type, contextPacket, enum (+7 more)
+Cohesion: 0.09
+Nodes (23): pattern, type, additionalProperties, properties, required, type, contextPacket, identity (+15 more)
 
 ### Community 660 - "budgets"
 Cohesion: 0.18
@@ -2738,8 +2755,8 @@ Cohesion: 0.20
 Nodes (9): 1. HyperKernel chat path (browser, local-first), 2. HyperKernel data sources for the phase-one jobs, 3. Custonllm (Python 3.11, FastAPI), 4. Schema seams (what the versioned contract must bridge), 5. Authorization boundaries, 6. Integration risks (ranked), 7. What phase one does NOT need to build (already exists), 8. Recommended Slice B cut (+1 more)
 
 ### Community 664 - "identity"
-Cohesion: 0.20
-Nodes (10): identity, additionalProperties, properties, required, type, type, name, role (+2 more)
+Cohesion: 0.17
+Nodes (12): Decisions this domain surfaces, Domain 4 — Governance & Audit Evolution to Government-Grade, Migration sequencing (incremental, flagged, reversible), Move 1 — Unify the two audit trails: unconditional per-writer chaining (resolves C6 = A+B), Move 2 — Server-side seal authority + origin stamp (audit backstop for C4), Move 3 — Shrink the ungoverned AI-writable surface (resolves the 221-vs-30 finding), Move 4 — Delegation chains, segregation of duties, and risk scoring (Team-2 gaps D+E), Move 5 — Legal-hold / evidence-preservation primitive (Team-2 gap C) (+4 more)
 
 ### Community 665 - "contextSection"
 Cohesion: 0.15
@@ -2750,8 +2767,8 @@ Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
 ### Community 667 - "{{title}} — Map of Content"
-Cohesion: 0.14
-Nodes (11): Adjacent MOCs, Core notes, Open questions / frontier, {{title}} — Map of Content, Why this MOC exists, Active projects in this area, Reference material, Review cadence (+3 more)
+Cohesion: 0.29
+Nodes (6): Active projects in this area, Reference material, Review cadence, Scope, Standards, {{title}}
 
 ### Community 669 - "governance-bridge.test.js"
 Cohesion: 0.67
@@ -2774,41 +2791,121 @@ Cohesion: 0.67
 Nodes (3): installDom(), makeEl(), { makeRunner, setupEnv, load }
 
 ### Community 674 - "review-safety.test.js"
-Cohesion: 0.33
-Nodes (4): CURRENT, GOAL, loadAll(), { makeRunner, setupEnv, load }
+Cohesion: 0.18
+Nodes (11): Component 1 — `AAA_I18N`: the string-catalog substrate (resolves L4-4, L4-10), Component 2 — Currency/tax the quote pipeline actually consumes (resolves L4-3, L4-9), Component 3 — Regulatory abstraction: from label to enforcement (resolves Lens-2 findings 5 & 7), Component 4 — `AAA_PHONE`: E.164 normalization (resolves L4-7 — and it's a security fix), Custonllm seam (partial — L4-5), Decisions this domain surfaces, Design principle for this domain, Domain 6 — Internationalization & Regulatory Abstraction (+3 more)
 
 ### Community 675 - "workforce-ui.test.js"
-Cohesion: 0.67
-Nodes (3): installDom(), makeEl(), { makeRunner, setupEnv, load }
+Cohesion: 0.18
+Nodes (10): 1. HyperKernel model layer (governance owner), 2. Custonllm model layer (model-intelligence owner), 3. Server-side transports (Netlify functions), 4. What exists vs the 10 core objectives, 5. Distance to the fabric (honest), 6. Strengths to build ON (do not rebuild), 7. Recommended Phase 1 cut (Universal Registry), Cross-reference (+2 more)
 
 ### Community 678 - "security-ui.test.js"
 Cohesion: 0.40
 Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
 
 ### Community 681 - "governance-sync.test.js"
-Cohesion: 0.67
-Nodes (3): installDom(), makeEl(), { makeRunner, setupEnv, load }
+Cohesion: 0.18
+Nodes (11): 10. Limits of what was verified, 1. What actually exists (sizes, OBSERVED), 2. Bounded contexts that actually exist (named from code), 3. System map (OBSERVED seams; auth posture per edge), 4. God modules & dependency structure (measured), 5. Event topology: there is NOT one spine (OBSERVED), 6. Seams and the tenant boundary (the decisive ATLAS gaps), 7. Scalability & availability limits vs 99.95% (OBSERVED mechanisms, INFERRED ceilings) (+3 more)
+
+### Community 682 - "assisted-draft-queue.test.js"
+Cohesion: 0.18
+Nodes (11): 6.1 The universal full-scan data plane (HyperKernel) — HIGH, 6.2 Unbounded collections × hot paths that re-scan them — HIGH, 6.3 Ledger appends are O(N): hash chains re-read their whole history — HIGH, 6.4 localStorage is the entire database — CRITICAL, 6.5 Sync fan-out: full snapshots into one global blob — CRITICAL, 6.6 Custonllm: process-local state vs horizontal scaling — HIGH, 6.7 Custonllm: full-ledger scans in request paths — HIGH, 6.8 Test-suite runtime as a dev bottleneck — LOW (+3 more)
+
+### Community 683 - "audit-ledger-crypto.test.js"
+Cohesion: 0.20
+Nodes (10): Closing the null-grandfather hole (the migration), Decisions this domain surfaces, Design principle, Domain 2 — Tenancy as a Data-Layer Invariant, Firestore-rules alignment, Keeping `mine()` working, then retiring it (dual-guard), Migration sequencing (incremental, flagged, reversible), Problem, stated precisely (from the audit) (+2 more)
+
+### Community 684 - "governance-learning.test.js"
+Cohesion: 0.20
+Nodes (9): Consolidated critical risk themes (deduplicated across lenses), Critical gaps vs ATLAS, Executive summary, High-severity risk register (deduplicated), Lens 2 — Governance & Compliance, Limits of what I could verify, PROJECT ATLAS — Phase 1 System Audit, What exists and is genuinely strong (OBSERVED) (+1 more)
+
+### Community 685 - "planning-desk.test.js"
+Cohesion: 0.20
+Nodes (10): 4.1 Verdict in one paragraph, 4.3 Multi-tenancy inventory, 4.4 Distance to multi-tenant SaaS — honest rating, 4.5 Findings register (this lens), 4.6 Assets to build on (credit where due), 4.7 Limits of what was verified, Custonllm: structurally single-tenant — HIGH, Lens 4 — Internationalization & Multi-Tenancy (+2 more)
+
+### Community 687 - "company-brain.test.js"
+Cohesion: 0.22
+Nodes (9): Decisions this domain surfaces, Domain 8 — The LEVIATHAN Model-Fabric Seam, How this rides the Domain-1 boundary and bridges C2/C4, Migration sequencing (incremental, flagged, reversible), "No laboratory indispensable" as an executable guard, The mirror mechanism — copied verbatim from copilot contract v1, The one canonical record (`model-record v1`), The problem this domain closes (+1 more)
+
+### Community 688 - "governance-notifier.test.js"
+Cohesion: 0.22
+Nodes (8): Agent team structure, Final directive, Mission statement, Phase deliverables, PROJECT ATLAS — Multi-Agent Enterprise Hardening & Evolution Initiative, Standing foundations this mission builds on, Strategic objectives, Success criteria
+
+### Community 689 - "quickbooks-online.test.js"
+Cohesion: 0.25
+Nodes (8): 1. The problem in one paragraph, 2. Target state, 3. What this reuses vs. adds, 4. Boundaries with other domains, 5. Success criteria (measurable), Decisions this domain surfaces, Domain 5 — Event Spine Unification & Module System, Migration sequencing (incremental, flagged, reversible)
+
+### Community 691 - "Domain 7 — Scalability & Hot-Path Redesign"
+Cohesion: 0.25
+Nodes (8): 1. What exists today (grounded, keep the good parts), 2. Target state, 3. Which limits bite at 10 tenants vs 1000 (this orders the work), 4. Relation to other domains, 5. What this resolves, Decisions this domain surfaces, Domain 7 — Scalability & Hot-Path Redesign, Migration sequencing (incremental, flagged, reversible)
+
+### Community 692 - "4.2 Internationalization inventory"
+Cohesion: 0.25
+Nodes (8): 4.2 Internationalization inventory, Country packs: excellent abstraction, ~zero reach — HIGH, Currency: hardcoded `$` + en-US in the entire display and quote layer — HIGH, Custonllm i18n — MEDIUM, Date/time locale — LOW/MEDIUM, Language: no i18n layer exists — HIGH, Phone: US 10-digit assumptions — MEDIUM, Tax — MEDIUM
+
+### Community 693 - "Reconciliation addendum — Fable 5 second pass (2026-07-19)"
+Cohesion: 0.25
+Nodes (8): Architecture (Lens 1), Bottlenecks & Scalability (Lens 6), Governance (Lens 2), Internationalization & Multi-Tenancy (Lens 4), Net effect on the critical themes (full six-lens reconciliation), Organizational Memory (Lens 3), Reconciliation addendum — Fable 5 second pass (2026-07-19), Reliability & Security (Lens 5)
+
+### Community 694 - "search-intent-engine.js"
+Cohesion: 0.46
+Nodes (7): baselineCloseRate(), classify(), clock(), clusterKeywords(), marketing(), nowMs(), world()
+
+### Community 695 - "PROJECT ATLAS — Phase 2: Target Architecture"
+Cohesion: 0.29
+Nodes (6): Consolidated Decisions Required, Executive summary, How each critical theme is resolved, PROJECT ATLAS — Phase 2: Target Architecture, Target system map, What Phase 3 (ATLAS_ROADMAP.md) needs
+
+### Community 696 - "rules.test.js"
+Cohesion: 0.33
+Nodes (6): check(), fs, { initializeTestEnvironment, assertSucceeds, assertFails }, main(), path, { setDoc, getDoc, updateDoc, deleteDoc, doc }
+
+### Community 697 - "{{title}} — Map of Content"
+Cohesion: 0.33
+Nodes (5): Adjacent MOCs, Core notes, Open questions / frontier, {{title}} — Map of Content, Why this MOC exists
+
+### Community 698 - "Lens 3 — Organizational Memory (Learning & Memory Systems Audit)"
+Cohesion: 0.33
+Nodes (6): 3.1 Inventory of memory systems (OBSERVED), 3.2 One real loop traced end-to-end (OBSERVED), 3.3 Gaps vs the ATLAS institutional-memory bar (rated), 3.4 What is genuinely strong (credit where due), 3.5 Limits of this audit, Lens 3 — Organizational Memory (Learning & Memory Systems Audit)
+
+### Community 699 - "owner-copilot-ui.test.js"
+Cohesion: 0.40
+Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
+
+### Community 700 - "provenance-ui.test.js"
+Cohesion: 0.40
+Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
+
+### Community 701 - "reliability-ui.test.js"
+Cohesion: 0.40
+Nodes (3): fakeUI(), loadAll(), { makeRunner, setupEnv, load }
+
+### Community 702 - "Lens 5 — Reliability & Security"
+Cohesion: 0.40
+Nodes (5): Lens 5 — Reliability & Security, Limits of what I could verify, Reliability, Security, What a red team would try first
+
+### Community 703 - "aaa-policy-contract.js"
+Cohesion: 0.60
+Nodes (4): actionGates(), gateway(), rbac(), rbacSection()
 
 ## Ambiguous Edges - Review These
 - `HyperKernel PWA App Icon (512x512)` → `White glyph on transparent background (exact shape indiscernible against white viewer background)`  [AMBIGUOUS]
   icons/icon-512.png · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **1930 isolated node(s):** `session-start.sh script`, `$schema`, `name`, `name`, `url` (+1925 more)
+- **2085 isolated node(s):** `session-start.sh script`, `$schema`, `name`, `name`, `url` (+2080 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **139 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **136 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **What is the exact relationship between `HyperKernel PWA App Icon (512x512)` and `White glyph on transparent background (exact shape indiscernible against white viewer background)`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
-- **Why does `q()` connect `Replay Sandbox` to `Data Eval Golden`, `Quotes Quote Store`, `Simulation Counterfactual Runner`, `Business`, `Unit World Model`?**
-  _High betweenness centrality (0.011) - this node is a cross-community bridge._
+- **Why does `q()` connect `Replay Sandbox` to `Genesis Capability Ledger`, `Transport Transport Core`, `Quotes Quote Store`, `Simulation Counterfactual Runner`, `Business`, `Unit World Model`, `search-intent-engine.js`?**
+  _High betweenness centrality (0.015) - this node is a cross-community bridge._
 - **Why does `v()` connect `Field Layout Risk` to `Asyncapi Events`, `Agents Pricing Optimizer`, `Unit Bluetooth Connect`, `Quotes Quote Store`, `Community 427`, `governance-notifier.test.js`, `Intelligence Agent Evaluation`, `Community 527`, `Unit World Model`, `Genesis Tool Forge`?**
-  _High betweenness centrality (0.009) - this node is a cross-community bridge._
-- **Why does `load()` connect `Core Privacy` to `Unit Audit Ledger`, `Quote Lifecycle`, `Community 525`, `Community 526`, `Transport Transport Store`, `review-safety.test.js`, `ads-margin-join.test.js`, `Community 530`, `Community 531`, `Community 528`, `mission-manager.test.js`, `Community 408`, `Community 410`, `rules.test.js`, `agent-evaluation-ui.test.js`, `Community 411`, `Community 414`, `Community 415`, `assisted-draft-queue.test.js`, `company-brain.test.js`, `Community 416`, `workforce-ui.test.js`, `Community 417`, `sensing.test.js`, `workforce-ui.test.js`, `teleological.test.js`, `Community 424`, `Community 425`, `assisted-draft-queue.test.js`, `governance-sync.test.js`, `governance-learning.test.js`, `audit-ledger-crypto.test.js`, `ai-model-router.test.js`, `company-brain.test.js`, `governance-notifier.test.js`, `Community 430`, `planning-desk.test.js`, `Community 426`, `quickbooks-online.test.js`, `quote-lifecycle-ui.test.js`, `Community 429`, `sensing.test.js`, `Community 431`, `Community 433`, `Community 434`, `Copilot Governance Approval`, `review-safety.test.js`, `opportunity-scorer.test.js`, `Community 423`, `security-ui.test.js`, `Agents Marketing Intel`, `Claude Proxy Index`, `Replay Sandbox`, `Community 482`, `Community 483`, `Community 484`, `Community 487`, `Unit Review Safety`, `Unit Transport Scheduler`, `owner-copilot-ui.test.js`, `Innovation Experiment Scorecard`?**
-  _High betweenness centrality (0.008) - this node is a cross-community bridge._
+  _High betweenness centrality (0.013) - this node is a cross-community bridge._
+- **Why does `makeRunner()` connect `Unit Audit Ledger` to `Core Privacy`, `Transport Transport Store`, `Quote Lifecycle`, `Community 526`, `review-safety.test.js`, `Community 528`, `ads-margin-join.test.js`, `Community 530`, `Community 531`, `mission-manager.test.js`, `Community 408`, `Community 410`, `rules.test.js`, `agent-evaluation-ui.test.js`, `Community 411`, `Community 414`, `Community 415`, `assisted-draft-queue.test.js`, `company-brain.test.js`, `Community 416`, `Community 417`, `workforce-ui.test.js`, `Test Intelligence Smoke`, `sensing.test.js`, `teleological.test.js`, `Community 424`, `Community 425`, `Community 423`, `Community 426`, `opportunity-scorer.test.js`, `Community 429`, `ai-model-router.test.js`, `Community 430`, `quote-lifecycle-ui.test.js`, `Community 431`, `sensing.test.js`, `owner-copilot-ui.test.js`, `Community 433`, `Community 434`, `owner-copilot-ui.test.js`, `provenance-ui.test.js`, `reliability-ui.test.js`, `Copilot Governance Approval`, `governance-business-events.test.js`, `transport-scheduler.test.js`, `workforce-ui.test.js`, `mission-manager.test.js`, `security-ui.test.js`, `Agents Marketing Intel`, `Claude Proxy Index`, `Replay Sandbox`, `Community 482`, `Community 483`, `Community 484`, `Community 487`, `Unit Review Safety`, `Unit Transport Scheduler`, `Innovation Experiment Scorecard`?**
+  _High betweenness centrality (0.007) - this node is a cross-community bridge._
 - **Are the 16 inferred relationships involving `load()` (e.g. with `harness.js` and `require()`) actually correct?**
   _`load()` has 16 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 2 inferred relationships involving `makeRunner()` (e.g. with `harness.js` and `ok()`) actually correct?**

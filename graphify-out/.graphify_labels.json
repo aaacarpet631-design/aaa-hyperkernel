@@ -689,5 +689,22 @@
   "687": "company-brain.test.js",
   "688": "governance-notifier.test.js",
   "689": "quickbooks-online.test.js",
-  "690": "sensing.test.js"
+  "690": "sensing.test.js",
+  "691": "Domain 7 — Scalability & Hot-Path Redesign",
+  "692": "4.2 Internationalization inventory",
+  "693": "Reconciliation addendum — Fable 5 second pass (2026-07-19)",
+  "694": "search-intent-engine.js",
+  "695": "PROJECT ATLAS — Phase 2: Target Architecture",
+  "696": "rules.test.js",
+  "697": "{{title}} — Map of Content",
+  "698": "Lens 3 — Organizational Memory (Learning & Memory Systems Audit)",
+  "699": "owner-copilot-ui.test.js",
+  "700": "provenance-ui.test.js",
+  "701": "reliability-ui.test.js",
+  "702": "Lens 5 — Reliability & Security",
+  "703": "aaa-policy-contract.js",
+  "704": "governance-business-events.test.js",
+  "705": "transport-scheduler.test.js",
+  "706": "workforce-ui.test.js",
+  "707": "mission-manager.test.js"
 }

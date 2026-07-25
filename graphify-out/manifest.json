@@ -380,9 +380,9 @@
     "semantic_hash": "0fd4f4bb8549fe80aa4852d7a1356266"
   },
   "js/core/aaa-rbac.js": {
-    "mtime": 1783050778.0701277,
-    "ast_hash": "0f1aedb94fac0bed4e8759d4406e3d0c",
-    "semantic_hash": "0f1aedb94fac0bed4e8759d4406e3d0c"
+    "mtime": 1784961321.7959976,
+    "ast_hash": "d6b23cced7144d72110e08862550ebca",
+    "semantic_hash": ""
   },
   "js/core/aaa-runtime-gateway.js": {
     "mtime": 1783322888.0066454,
@@ -1135,8 +1135,8 @@
     "semantic_hash": "3346e70f1ab217dda6d0ddcb6b82fe51"
   },
   "sw.js": {
-    "mtime": 1783624429.6781704,
-    "ast_hash": "77a96e807f165dabd6398295d1b1df35",
+    "mtime": 1784961421.3511686,
+    "ast_hash": "fba1cf4807f7038148acf784814324aa",
     "semantic_hash": ""
   },
   "test/helpers/harness.js": {
@@ -1180,8 +1180,8 @@
     "semantic_hash": "7cbf96759e369c492968211daa5f9fd2"
   },
   "test/run.js": {
-    "mtime": 1783624419.507663,
-    "ast_hash": "6c14201d865c513680d4f28cb28531f5",
+    "mtime": 1784961413.0479991,
+    "ast_hash": "195f0c3fb125fbe0ed0461da7504309a",
     "semantic_hash": ""
   },
   "test/smoke/boot.test.js": {
@@ -1895,8 +1895,8 @@
     "semantic_hash": "4310586dd8401252308f7bfd1c21c356"
   },
   "index.html": {
-    "mtime": 1783624417.8996632,
-    "ast_hash": "7babdfc0d04ea3ac002dbf2395b670f9",
+    "mtime": 1784961411.7119992,
+    "ast_hash": "350c8ef53fbe01f95a4a10652805e59f",
     "semantic_hash": ""
   },
   "netlify/functions/RESEARCH.md": {
@@ -3967,6 +3967,46 @@
   "test/fixtures/copilot/invalid/README.md": {
     "mtime": 1783624160.479669,
     "ast_hash": "61ab96f8cae31b152d90c0292ea2747b",
+    "semantic_hash": ""
+  },
+  "js/core/aaa-policy-contract.js": {
+    "mtime": 1784961349.659998,
+    "ast_hash": "9082bcb9267fc0fb62ef22d597c06c16",
+    "semantic_hash": ""
+  },
+  "schemas/governance-policy-v1.json": {
+    "mtime": 1784961361.3519983,
+    "ast_hash": "cd2d897416850be28cd6dc3b69b19541",
+    "semantic_hash": ""
+  },
+  "schemas/governance-policy.MANIFEST.json": {
+    "mtime": 1784961361.3519983,
+    "ast_hash": "52f44ebea70e982beff1b93f15ec739f",
+    "semantic_hash": ""
+  },
+  "test/unit/governance-policy.test.js": {
+    "mtime": 1784961390.271999,
+    "ast_hash": "5be194efe3876d138c0224493720e971",
+    "semantic_hash": ""
+  },
+  "docs/ATLAS_TARGET_ARCHITECTURE.md": {
+    "mtime": 1784957465.392888,
+    "ast_hash": "d63970dc03c106249a093666957d846d",
+    "semantic_hash": ""
+  },
+  "docs/LEVIATHAN_PHASE0_INVENTORY.md": {
+    "mtime": 1784519864.8295941,
+    "ast_hash": "5dd4255a0a267a4a8110d9da80f24ce8",
+    "semantic_hash": ""
+  },
+  "docs/PROJECT_ATLAS_MISSION.md": {
+    "mtime": 1784957477.2583134,
+    "ast_hash": "704e8d03adc8e0feb2f4053d033e753e",
+    "semantic_hash": ""
+  },
+  "docs/SYSTEM_AUDIT.md": {
+    "mtime": 1784956127.0942855,
+    "ast_hash": "109ca528c947b3601758625a77edc536",
     "semantic_hash": ""
   }
 }
