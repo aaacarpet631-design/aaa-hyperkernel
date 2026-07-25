@@ -633,12 +633,101 @@ critical theme**:
 - **Netlify inventory CORRECTED:** 15 executable `.mjs` functions / 1,278 lines
   (two `.md` docs were miscounted as functions), not "17 / 1,397".
 
-### Net effect on the critical themes
+### Organizational Memory (Lens 3)
 
-Five of the six consolidated critical themes stand as written (C1 sync, C2
-proxies, C3 client-tenancy, C4 AI-block, C5 localStorage). **C6 (audit
-chaining) is downgraded** — tamper-evidence exists by default; the live concern
-is its single-tenant sequencing. The scalability and tenancy criticals (the
-`data().list()` full-scans, the grandfathered null-workspace records) were in
-the four lenses the limit cut short and remain **first-pass findings pending
-Fable-5 reconciliation**.
+- **CONFIRMED (critical):** institutional memory persists to the browser-local
+  store with a fire-and-forget cloud mirror wrapped in a swallowed `try/catch`
+  — memory can silently fail to replicate.
+- **CONFIRMED (high):** learning loops close only through human UI actions
+  (`prediction-closure.close()` has a single caller,
+  `learning-feedback-ui.js:45`); two parallel unreconciled agent-decision
+  registries (`agent_decisions` vs `gov_agent_decisions`); fragmentation is
+  **larger** than the first pass said — ~44 memory-specific collections in
+  `intelligence`+`epistemology` alone.
+- **CORRECTED (high, finding is *worse*):** `agent-scorecards.recompute()` /
+  `recomputeAll()` (`agent-scorecards.js:189,230`) have **ZERO callers anywhere
+  in `js/`** — not "no non-UI caller" as the first pass implied, but no caller
+  at all (no UI, scheduler, or event). Agent scorecards never recompute in
+  production.
+- **CORRECTED (accuracy):** `agent_decisions` has **~8 real writers**
+  (estimator, supervisor, pricing-optimizer, agent-council,
+  ephemeral-agent-runtime, + the `AAA_DATA.logDecision` helper), not the
+  "20+/+15 more modules" the first pass listed.
+- **CORRECTED:** the first pass said cross-repo references are "both empty" —
+  **they are not.** custonllm→HyperKernel references exist, exclusively in the
+  copilot request contract (`copilot_contracts.py:95,105`). The *calibration/
+  learning* split still holds (no shared calibration ledger, schema, or ID
+  space) — but the copilot contract is a real, existing bridge, not nothing.
+
+### Internationalization & Multi-Tenancy (Lens 4)
+
+- **CONFIRMED (critical ×3):** tenant isolation is per-module convention
+  (`aaa-data.js` `list()/get()/put()` are tenant-blind; the `mine()` filter is
+  copy-pasted across ~69 modules); **null-`workspaceId` records grandfather
+  into every tenant** on a shared unpartitioned local store, so a `workspaceId`
+  switch exposes the prior tenant's records; the Netlify AI proxy is
+  unauthenticated and tenant-blind. (These were first-pass criticals — now
+  reconciled-CONFIRMED.)
+- **CONFIRMED (high):** country-pack regulatory layer has exactly **3
+  consumers** while the quote/display pipeline is hardcoded USD/sqft/en-US; **no
+  i18n string catalog exists** (zero substrate for the EN/ES/FR/PT/DE target);
+  client-asserted tenancy + fixed 3-role RBAC defaulting to owner.
+- **CORRECTED (high):** the first pass said custonllm has "no tenant/org/
+  workspace claim *anywhere*" — **wrong.** `copilot_contracts.py:95,105` define
+  `workspace_id` and `copilot.py:106-110` rejects `workspace_mismatch`. The
+  refined finding: the **HMAC auth token** carries only `{name, role, exp}` over
+  5 fixed roles (no org model), while the **copilot wire contract** does carry
+  `workspaceId`. Server-authoritative org model is still absent; the wire is not.
+
+### Reliability & Security (Lens 5)
+
+- **CONFIRMED (critical ×2):** `/api/sync` unauthenticated with one global blob
+  (`STORE 'hyperkernel-sync'`, `KEY 'state'`) — GET returns the full
+  jobs/customers dataset; LLM proxy functions unauthenticated with CORS `*` — an
+  open relay draining the owner's paid keys. (C1, C2 — reconciled-CONFIRMED.)
+- **CONFIRMED (high):** transport webhook accepts forged Twilio/SendGrid events
+  (no signature check, always 2xx); custonllm auth **fails open** — when
+  `API_AUTH_KEY` is unset every caller resolves to `role=owner`; stateless HMAC
+  tokens have **no revocation store** (a leaked token is valid for its full TTL).
+- **CORRECTED (refinement):** the receipt-blob finding is **no-auth + key-leak**,
+  not merely an IDOR — the real exposure is broader than the first pass framed.
+- **NEW (medium):** `claude.mjs` passes a caller-chosen `model` and `max_tokens`
+  through unbounded, letting an unauthenticated attacker amplify cost per call —
+  a cost-exhaustion vector on top of the open-relay finding.
+
+### Bottlenecks & Scalability (Lens 6)
+
+- **CONFIRMED (critical ×2):** localStorage is the entire DB and on quota
+  `_flush` swallows the error while `put()` still returns success — new
+  jobs/audit/governance records silently lost; sync POSTs the full
+  jobs+customers snapshot into one global unauthenticated blob.
+- **CONFIRMED (high):** **universal full-scan data plane — 233 `data().list()`
+  sites across 130 files, no query/index/cursor/limit anywhere**; hash-chain
+  ledger appends are O(N) on the UI thread (re-list+sort the whole collection
+  per append); named hot paths re-scan unbounded per-tenant-growing collections
+  (`campaignScorecard` 5 scans, `context-packet` attention assembly); custonllm
+  single-process state (`_RATE` dict, `store.all()` full-collection stream in
+  per-request routing paths) breaks at replica ≥ 2.
+- **CORRECTED (immaterial):** `recentAudit` default is 50 rows, not 10 — still a
+  full scan+sort of unbounded `audit_log`, so the finding is unchanged.
+
+### Net effect on the critical themes (full six-lens reconciliation)
+
+The Fable-5 second pass reconciled all six lenses. **Five of the six
+consolidated critical themes stand reconciled-CONFIRMED** — C1 (sync), C2
+(proxies), C3 (client-tenancy, incl. the now-confirmed null-workspace
+grandfathering), C4 (browser-only AI-block), C5 (localStorage-as-DB with silent
+quota loss). **Only C6 (audit chaining) is downgraded** — tamper-evidence
+exists by default; the live concern is its single-tenant seal sequence. The
+high-severity scalability finding (233 unindexed `data().list()` full-scan
+sites) and the tenancy-isolation criticals are **reconciled-CONFIRMED**, not
+pending. Material accuracy corrections (all documented above): custonllm *does*
+carry `workspaceId` on the copilot wire (not "nowhere"); cross-repo references
+*do* exist via the copilot contract (not "both empty"); `agent-scorecards`
+recompute has zero callers (worse, not better); `agent_decisions` has ~8
+writers (not 20+); one new cost-amplification vector in `claude.mjs`. The
+first pass's mechanical measurement discipline was rated high-fidelity
+throughout (fan-in/fan-out counts reproduced to within off-by-one
+self-reference). Phase-2 note: **do not** spend module-refactor budget
+"breaking" the circular dependencies — they are lazy call-graph cycles with an
+acyclic load-order DAG, not import cycles.
