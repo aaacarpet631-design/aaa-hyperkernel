@@ -2,9 +2,11 @@
  * AAA Field Mode Home — land in a Field Mode OS, not a project-management screen.
  *
  * The first thing a tech sees walking into a house is one big action: START
- * MEASUREMENT. Below it, quick actions (Scan Room / Laser / Quick Estimate /
- * Voice Note) wired to the REAL capabilities that exist — each honestly marked
- * available:false when its engine isn't loaded. Today's jobs go BELOW the
+ * MEASUREMENT. Below it, quick actions (Scan Room / Laser / Manual Entry /
+ * Quick Estimate / Voice Note) wired to the REAL capabilities that exist —
+ * each honestly marked available:false when its engine isn't loaded. START
+ * MEASUREMENT prefers the laser HUD and falls back to manual (tape-measure)
+ * entry, so the button always leads somewhere real. Today's jobs go BELOW the
  * action, not above. "Ask HyperKernel" sits at the bottom.
  *
  * renderModel() is a pure, DOM-free read model (testable); mount() renders the
@@ -31,6 +33,7 @@
   const QUICK = [
     { id: 'scan_room', icon: '📷', label: 'Scan Room', needs: ['VISION_HUD_UI', 'CAPTURE_SEQUENCER'], boot: 'VISION_HUD_UI', entry: 'boot' },
     { id: 'laser_measure', icon: '📐', label: 'Laser Measure', needs: ['MEASUREMENT_HUD_UI', 'BLUETOOTH', 'DEVICE_ADAPTER_REGISTRY'], boot: 'MEASUREMENT_HUD_UI', entry: 'boot' },
+    { id: 'manual_measure', icon: '✏️', label: 'Manual Entry', needs: ['MANUAL_MEASURE_UI'], boot: 'MANUAL_MEASURE_UI', entry: 'open' },
     { id: 'quick_estimate', icon: '📝', label: 'Quick Estimate', needs: ['ESTIMATOR_UI'], boot: 'ESTIMATOR_UI', entry: 'open' },
     { id: 'voice_note', icon: '🎤', label: 'Voice Note', needs: ['VOICE_HUD_UI'], boot: 'VOICE_HUD_UI', entry: 'open' }
   ];
@@ -53,7 +56,7 @@
       const o = opts || {};
       return {
         greeting: greetingFor(o.now) + ', ' + ownerName(),
-        primaryAction: { id: 'start_measurement', label: 'START MEASUREMENT', icon: '📐', available: has('MEASUREMENT_HUD_UI') || has('CAPTURE_SEQUENCER') },
+        primaryAction: { id: 'start_measurement', label: 'START MEASUREMENT', icon: '📐', available: has('MEASUREMENT_HUD_UI') || has('CAPTURE_SEQUENCER') || has('MANUAL_MEASURE_UI') },
         quickActions: QUICK.map(function (a) { return { id: a.id, icon: a.icon, label: a.label, available: actionAvailable(a) }; }),
         todaysJobs: await this.todaysJobs(o),
         ask: { prompt: 'Ask HyperKernel', placeholder: 'What should I focus on?' }
@@ -62,7 +65,9 @@
 
     /**
      * Begin a job-optional Field Capture Session (measure rooms first, attach to
-     * a job later), then open the measurement HUD bound to it when present.
+     * a job later), then open the measurement HUD bound to it when present —
+     * falling back to MANUAL ENTRY when no laser HUD is loaded, so START
+     * MEASUREMENT always leads somewhere real.
      */
     async start(opts) {
       const o = opts || {};
@@ -71,6 +76,8 @@
       if (fcs && fcs.start) { try { const s = await fcs.start({ customerId: o.customerId || null, jobId: o.jobId || null }); sessionId = s && s.id; } catch (_) {} }
       const hud = global.AAA_MEASUREMENT_HUD_UI;
       if (hud && hud.boot && typeof document !== 'undefined') { hud.boot({ jobId: o.jobId || null, customerId: o.customerId || null, fieldSessionId: sessionId }); return { ok: true, routed: true, via: 'measurement_hud', sessionId: sessionId }; }
+      const manual = global.AAA_MANUAL_MEASURE_UI;
+      if (manual && manual.open && typeof document !== 'undefined') { manual.open({ jobId: o.jobId || null, customerId: o.customerId || null, fieldSessionId: sessionId }); return { ok: true, routed: true, via: 'manual_measure', sessionId: sessionId }; }
       return { ok: !!sessionId, routed: false, via: sessionId ? 'field_capture_session' : null, sessionId: sessionId, reason: sessionId ? (typeof document === 'undefined' ? 'no_dom' : 'no_hud') : 'measurement_unavailable' };
     },
 

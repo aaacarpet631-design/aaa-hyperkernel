@@ -1,0 +1,91 @@
+{
+  "contractVersion": "1.0",
+  "requestId": "fx-fu-1",
+  "answer": "Two quotes and one lead are going cold. The $1,840 quote is the priority; the $620 quote is 6 days out; the stretching lead has had no touch in 8 days.",
+  "cards": [
+    {
+      "cardType": "followup_list",
+      "items": [
+        {
+          "reason": "follow_up_due; highest open value ($1,840)",
+          "sourceRef": {
+            "collection": "quotes",
+            "id": "quote_101",
+            "asOf": "2026-07-09T13:00:00.000Z"
+          },
+          "lastTouchAt": "2026-07-05",
+          "suggestedChannel": "call"
+        },
+        {
+          "reason": "sent 6 days ago with no reply",
+          "sourceRef": {
+            "collection": "quotes",
+            "id": "quote_98",
+            "asOf": "2026-07-09T13:00:00.000Z"
+          },
+          "lastTouchAt": "2026-07-03",
+          "suggestedChannel": "sms"
+        },
+        {
+          "reason": "contacted lead idle 8 days (stretching)",
+          "sourceRef": {
+            "collection": "leads",
+            "id": "lead_290",
+            "asOf": "2026-07-09T13:00:00.000Z"
+          },
+          "lastTouchAt": "2026-07-01",
+          "suggestedChannel": "call"
+        }
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "claim": "quote_101 ($1,840) is marked follow_up_due",
+      "sourceRefs": [
+        {
+          "collection": "quotes",
+          "id": "quote_101",
+          "asOf": "2026-07-09T13:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "claim": "quote_98 ($620) was sent 2026-07-03 with no reply recorded",
+      "sourceRefs": [
+        {
+          "collection": "quotes",
+          "id": "quote_98",
+          "asOf": "2026-07-09T13:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "claim": "lead_290 last touch was 2026-07-01",
+      "sourceRefs": [
+        {
+          "collection": "leads",
+          "id": "lead_290",
+          "asOf": "2026-07-09T13:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "claim": "A comparable job closed at $9,999 last week",
+      "sourceRefs": [
+        {
+          "collection": "quotes",
+          "id": "mutant_999"
+        }
+      ]
+    }
+  ],
+  "confidence": 88,
+  "unknowns": [
+    "No call-log integration: phone contact outside the app is not visible."
+  ],
+  "approval": {
+    "required": false,
+    "reasons": []
+  }
+}

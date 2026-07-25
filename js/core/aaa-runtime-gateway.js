@@ -116,7 +116,15 @@
     ADD_LEGAL_RECORD:     { permission: 'MANAGE_LEGAL', aiAllowed: false },
     FILE_INCIDENT:        { permission: null,           aiAllowed: false },
     PREPARE_LEGAL_REVIEW: { permission: null,           aiAllowed: true  },
-    RESOLVE_LEGAL_REVIEW: { permission: 'MANAGE_LEGAL', aiAllowed: false }
+    RESOLVE_LEGAL_REVIEW: { permission: 'MANAGE_LEGAL', aiAllowed: false },
+    // Google Ads governance. Agents draft recommendations (an AI-allowed,
+    // envelope-sealed advisory); every step that moves money, structure, or
+    // data OUT is human-only: approving/rejecting a recommendation, clearing
+    // an approved mutation for application, and releasing an offline-conversion
+    // export batch. Nothing in this codebase calls the Google Ads API.
+    REVIEW_ADS_RECOMMENDATION: { permission: 'VIEW_FINANCIALS', aiAllowed: false },
+    APPLY_ADS_CHANGE:          { permission: 'VIEW_FINANCIALS', aiAllowed: false },
+    EXPORT_CONVERSIONS:        { permission: 'VIEW_FINANCIALS', aiAllowed: false }
   };
 
   const Gateway = {

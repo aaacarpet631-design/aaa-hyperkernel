@@ -1,0 +1,60 @@
+{
+  "contractVersion": "1.0",
+  "requestId": "fx-df-1",
+  "workspaceId": "ws_fixture",
+  "identity": {
+    "role": "owner",
+    "name": "Owner"
+  },
+  "job": "draft_followup",
+  "message": "Draft a follow-up for the customer on quote_101, but do not send it.",
+  "contextPacket": {
+    "packetVersion": 1,
+    "workspaceId": "ws_fixture",
+    "assembledAt": "2026-07-09T13:00:00.000Z",
+    "role": "owner",
+    "sections": [
+      {
+        "kind": "draft_context",
+        "items": [
+          {
+            "sourceRef": {
+              "collection": "quotes",
+              "id": "quote_101",
+              "asOf": "2026-07-09T13:00:00.000Z"
+            },
+            "data": {
+              "total": 1840,
+              "serviceType": "carpet_install",
+              "sentAt": "2026-07-05"
+            }
+          },
+          {
+            "sourceRef": {
+              "collection": "customers",
+              "id": "cust_12",
+              "asOf": "2026-07-09T13:00:00.000Z"
+            },
+            "data": {
+              "preferredChannel": "sms",
+              "note": "asked about pet-safe adhesive"
+            },
+            "untrusted": true
+          }
+        ]
+      }
+    ],
+    "redactions": [
+      "customer.phone",
+      "customer.email"
+    ]
+  },
+  "budgets": {
+    "p95LatencyMs": 6000,
+    "maxCostUSDPerConversation": 0.15
+  },
+  "thread": {
+    "conversationId": "thread_fx_1",
+    "turn": 2
+  }
+}

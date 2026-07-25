@@ -1,0 +1,83 @@
+{
+  "contractVersion": "1.0",
+  "requestId": "fx-aa-1",
+  "answer": "Overnight: the search-intent agent auto-applied a negative-keyword patch (guarded tier), the budget agent queued one recommendation for your approval, and one AI-origin export attempt was hard-blocked by the gateway, as designed.",
+  "cards": [
+    {
+      "cardType": "agent_activity",
+      "items": [
+        {
+          "agent": "agent:search-intent",
+          "action": "Applied NEGATIVE_KEYWORD_PATCH (advisory tier)",
+          "status": "completed",
+          "at": "2026-07-09T13:00:00.000Z",
+          "sourceRef": {
+            "collection": "ads_recommendations",
+            "id": "adsrec_4",
+            "asOf": "2026-07-09T13:00:00.000Z"
+          }
+        },
+        {
+          "agent": "agent:budget-bidding",
+          "action": "Proposed budget change — waiting on you",
+          "status": "awaiting_approval",
+          "at": "2026-07-09T13:00:00.000Z",
+          "sourceRef": {
+            "collection": "decision_envelopes",
+            "id": "env_9",
+            "asOf": "2026-07-09T13:00:00.000Z"
+          }
+        },
+        {
+          "agent": "system:gateway",
+          "action": "Denied AI-origin EXPORT_CONVERSIONS",
+          "status": "rejected",
+          "at": "2026-07-09T13:00:00.000Z",
+          "sourceRef": {
+            "collection": "audit_log",
+            "id": "audit_301",
+            "asOf": "2026-07-09T13:00:00.000Z"
+          }
+        }
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "claim": "A negative-keyword patch auto-approved on the advisory tier",
+      "sourceRefs": [
+        {
+          "collection": "ads_recommendations",
+          "id": "adsrec_4",
+          "asOf": "2026-07-09T13:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "claim": "A budget recommendation is awaiting approval",
+      "sourceRefs": [
+        {
+          "collection": "decision_envelopes",
+          "id": "env_9",
+          "asOf": "2026-07-09T13:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "claim": "The gateway denied an AI-origin export",
+      "sourceRefs": [
+        {
+          "collection": "audit_log",
+          "id": "audit_301",
+          "asOf": "2026-07-09T13:00:00.000Z"
+        }
+      ]
+    }
+  ],
+  "confidence": 95,
+  "unknowns": [],
+  "approval": {
+    "required": false,
+    "reasons": []
+  }
+}

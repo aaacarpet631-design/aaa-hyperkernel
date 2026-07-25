@@ -77,7 +77,7 @@
     /**
      * Create a DRAFT quote (the one AI-allowed write — a recommendation, not a
      * commitment). Accepts an estimator estimate plus business context.
-     * @param {Object} input { estimate, customer?, jobId?, leadSource?, zip?, sessions?, photos? }
+     * @param {Object} input { estimate, customer?, jobId?, leadId?, leadSource?, zip?, sessions?, photos? }
      */
     async createDraft(input) {
       const i = input || {};
@@ -97,6 +97,7 @@
         customerId: cust.id || i.customerId || null,
         customerName: cust.name || i.customerName || null,
         customerContact: { phone: cust.phone || null, address: cust.address || i.address || null },
+        leadId: sanitizeLeadId(i.leadId),           // ties the quote to Lead OS / ad attribution (internal-only)
         leadSource: i.leadSource || cust.source || null,
         zip: i.zip || extractZip(cust.address || i.address) || null,
         jobId: i.jobId || est.jobId || null,
@@ -258,6 +259,7 @@
     async _recordOutcome(quote, result) {
       const outcome = {
         id: newId('out'), jobId: quote.jobId || null, quoteId: quote.quoteId,
+        leadId: quote.leadId || null,
         result: result,                                   // 'won' | 'lost'
         finalAmount: result === 'won' ? num(quote.finalPrice) : null,
         serviceType: quote.serviceType, zip: quote.zip, leadSource: quote.leadSource,
@@ -279,6 +281,7 @@
   function measSummary(s) { return s ? { roomName: s.roomName, squareFeet: s.squareFeet, linearFeet: s.linearFeet, stairsCount: s.stairsCount } : null; }
   function flattenRuleNotes(q) { return [].concat.apply([], ((q && q.lines) || []).map((l) => l._ruleNotes || [])); }
   function extractZip(addr) { if (!addr) return null; const m = String(addr).match(/\b(\d{5})(?:-\d{4})?\b/); return m ? m[1] : null; }
+  function sanitizeLeadId(v) { if (v == null) return null; const s = String(v).trim().slice(0, 64); return s || null; }
   async function put(rec) {
     await data().put(QUOTES, rec.id, rec);
     try { if (data().cloudReady && data().cloudReady() && global.AAA_CLOUD) global.AAA_CLOUD.upsertEntity(QUOTES, rec.id, rec); } catch (_) {}

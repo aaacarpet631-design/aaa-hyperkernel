@@ -80,6 +80,10 @@
   const RBAC = {
     ROLES: ROLES,
     PERMISSIONS: PERMISSIONS,
+    // Read-only role→permission matrix (owner = all). Exposed so the governance
+    // policy contract can generate the shared policy artifact from the live
+    // source of truth. Additive; changes no behavior.
+    MATRIX: MATRIX,
 
     /** Current role for this device/session. Defaults to 'owner' for a
      *  single-operator install; multi-user installs set it from the member doc. */

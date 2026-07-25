@@ -55,6 +55,47 @@
       return { ok: true, draft: rec, modelUnavailable: unavailable };
     },
 
+    /**
+     * File a PRE-WRITTEN draft (e.g. the remote copilot's draft_message card,
+     * source 'copilot') straight into the pending-approval flow. No model
+     * call, no send — the body (placeholders like {{customer_name}} intact)
+     * lands as `pending_owner` and rides the exact same human approve/reject
+     * path as draft(). AI may file; only a human can ever approve.
+     */
+    async file(input) {
+      const i = input || {};
+      const body = String(i.body == null ? '' : i.body);
+      if (!body.trim()) return { ok: false, error: 'NO_BODY' };
+      // Role parity with draft(): local drafting runs through RUN_MODEL
+      // (office-level — crew denied by the gateway). Filing a remotely
+      // drafted message is the same capability, so the same roles hold it;
+      // the remote path must not be a side door around the local gate.
+      // FAIL CLOSED: absence of the RBAC module is not permission (draft()
+      // likewise refuses without its router).
+      const rb = global.AAA_RBAC;
+      if (!rb || !rb.can) return { ok: false, error: 'NO_RBAC' };
+      if (!rb.can('VIEW_ALL_JOBS')) return { ok: false, error: 'FORBIDDEN', permission: 'VIEW_ALL_JOBS' };
+      const source = i.source || 'filed';
+      const by = i.actor || (i.origin === 'ai' ? 'ai' : null);
+      const id = newId('adraft');
+      const rec = {
+        id: id, workspaceId: ws(), customerId: i.customerId || null, to: i.to != null ? String(i.to) : null,
+        channel: i.channel || 'sms', intent: i.intent || 'follow_up',
+        suggestedText: body, editedText: null, finalText: null,
+        status: 'pending_owner', modelUnavailable: false, source: source, model: null,
+        createdBy: by, createdAt: nowISO(), updatedAt: nowISO(),
+        approvedBy: null, approvedAt: null, rejectionReason: null,
+        history: [{ type: 'filed', at: nowISO(), by: by, source: source }]
+      };
+      await put(rec);
+      // Audit parity with the drafting path — ids only, never the body.
+      try {
+        const led = global.AAA_AUDIT_LEDGER;
+        if (led && led.append) await led.append('assisted_draft.filed', { draftId: id, source: source, channel: rec.channel, by: by });
+      } catch (_) { /* advisory — the pending draft record itself is the fallback trail */ }
+      return { ok: true, draft: rec };
+    },
+
     async list(status) { const all = (await data().list(DRAFTS)).filter(mine); return (status ? all.filter((d) => d.status === status) : all).sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || ''))); },
     async pending() { return this.list('pending_owner'); },
     async get(id) { const r = await data().get(DRAFTS, id); return mine(r) ? r : null; },

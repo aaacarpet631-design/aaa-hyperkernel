@@ -1,0 +1,522 @@
+{
+  "version": "1.0",
+  "opennessClasses": [
+    "O1",
+    "O2",
+    "O3",
+    "O4",
+    "O5"
+  ],
+  "lifecycleStates": {
+    "ladder": [
+      "DISCOVERED",
+      "LICENSE_REVIEW",
+      "QUARANTINED",
+      "INTEGRITY_VERIFIED",
+      "COMPATIBILITY_TESTING",
+      "CAPABILITY_EVALUATION",
+      "SAFETY_EVALUATION",
+      "SHADOW_APPROVED",
+      "PRODUCTION_APPROVED"
+    ],
+    "terminal": [
+      "RESTRICTED",
+      "DEPRECATED",
+      "REVOKED",
+      "REJECTED"
+    ]
+  },
+  "transitions": {
+    "DISCOVERED": [
+      "LICENSE_REVIEW",
+      "QUARANTINED",
+      "REJECTED"
+    ],
+    "LICENSE_REVIEW": [
+      "INTEGRITY_VERIFIED",
+      "RESTRICTED",
+      "REJECTED"
+    ],
+    "QUARANTINED": [
+      "INTEGRITY_VERIFIED",
+      "REJECTED"
+    ],
+    "INTEGRITY_VERIFIED": [
+      "COMPATIBILITY_TESTING",
+      "REJECTED"
+    ],
+    "COMPATIBILITY_TESTING": [
+      "CAPABILITY_EVALUATION",
+      "REJECTED"
+    ],
+    "CAPABILITY_EVALUATION": [
+      "SAFETY_EVALUATION",
+      "REJECTED"
+    ],
+    "SAFETY_EVALUATION": [
+      "SHADOW_APPROVED",
+      "REJECTED"
+    ],
+    "SHADOW_APPROVED": [
+      "PRODUCTION_APPROVED",
+      "REJECTED"
+    ],
+    "PRODUCTION_APPROVED": [
+      "DEPRECATED",
+      "REVOKED",
+      "RESTRICTED"
+    ]
+  },
+  "seed": [
+    {
+      "modelUid": "anthropic:claude-opus",
+      "laboratory": "anthropic",
+      "family": "claude",
+      "displayName": "Claude Opus",
+      "opennessClass": "O5",
+      "classificationVerified": false,
+      "license": {
+        "licenseId": "anthropic-commercial-tos",
+        "licenseTextHash": null,
+        "commercialUseAllowed": true,
+        "redistributionAllowed": false,
+        "fineTuningAllowed": false
+      },
+      "integrity": {
+        "signatureStatus": "unverified",
+        "weightHashes": [],
+        "artifactRevision": null
+      },
+      "capabilities": {
+        "modalities": [
+          "text",
+          "image"
+        ],
+        "contextWindow": null,
+        "toolCalling": true,
+        "structuredOutput": true
+      },
+      "runtimes": [
+        "anthropic"
+      ],
+      "providerIds": {
+        "hyperkernel": [],
+        "custonllm": [
+          "claude-opus"
+        ]
+      },
+      "lifecycle": "LICENSE_REVIEW",
+      "approvedTaskClasses": [],
+      "prohibitedTaskClasses": []
+    },
+    {
+      "modelUid": "anthropic:claude-sonnet",
+      "laboratory": "anthropic",
+      "family": "claude",
+      "displayName": "Claude Sonnet",
+      "opennessClass": "O5",
+      "classificationVerified": false,
+      "license": {
+        "licenseId": "anthropic-commercial-tos",
+        "licenseTextHash": null,
+        "commercialUseAllowed": true,
+        "redistributionAllowed": false,
+        "fineTuningAllowed": false
+      },
+      "integrity": {
+        "signatureStatus": "unverified",
+        "weightHashes": [],
+        "artifactRevision": null
+      },
+      "capabilities": {
+        "modalities": [
+          "text",
+          "image"
+        ],
+        "contextWindow": null,
+        "toolCalling": true,
+        "structuredOutput": true
+      },
+      "runtimes": [
+        "anthropic"
+      ],
+      "providerIds": {
+        "hyperkernel": [],
+        "custonllm": [
+          "claude-sonnet"
+        ]
+      },
+      "lifecycle": "LICENSE_REVIEW",
+      "approvedTaskClasses": [],
+      "prohibitedTaskClasses": []
+    },
+    {
+      "modelUid": "nousresearch:hermes-4-405b",
+      "laboratory": "nousresearch",
+      "family": "hermes-4",
+      "displayName": "Hermes 4 405B",
+      "opennessClass": "O3",
+      "classificationVerified": false,
+      "license": {
+        "licenseId": "llama-3.1-community",
+        "licenseTextHash": null,
+        "commercialUseAllowed": true,
+        "redistributionAllowed": false,
+        "fineTuningAllowed": true
+      },
+      "integrity": {
+        "signatureStatus": "unverified",
+        "weightHashes": [],
+        "artifactRevision": null
+      },
+      "capabilities": {
+        "modalities": [
+          "text"
+        ],
+        "contextWindow": null,
+        "toolCalling": true,
+        "structuredOutput": false
+      },
+      "runtimes": [
+        "openrouter",
+        "nous"
+      ],
+      "providerIds": {
+        "hyperkernel": [],
+        "custonllm": [
+          "hermes-4-405b",
+          "hermes-4-405b-nous"
+        ]
+      },
+      "lifecycle": "LICENSE_REVIEW",
+      "approvedTaskClasses": [],
+      "prohibitedTaskClasses": []
+    },
+    {
+      "modelUid": "nousresearch:hermes-4-70b",
+      "laboratory": "nousresearch",
+      "family": "hermes-4",
+      "displayName": "Hermes 4 70B",
+      "opennessClass": "O3",
+      "classificationVerified": false,
+      "license": {
+        "licenseId": "llama-3.1-community",
+        "licenseTextHash": null,
+        "commercialUseAllowed": true,
+        "redistributionAllowed": false,
+        "fineTuningAllowed": true
+      },
+      "integrity": {
+        "signatureStatus": "unverified",
+        "weightHashes": [],
+        "artifactRevision": null
+      },
+      "capabilities": {
+        "modalities": [
+          "text"
+        ],
+        "contextWindow": null,
+        "toolCalling": true,
+        "structuredOutput": false
+      },
+      "runtimes": [
+        "openrouter"
+      ],
+      "providerIds": {
+        "hyperkernel": [],
+        "custonllm": [
+          "hermes-4-70b"
+        ]
+      },
+      "lifecycle": "LICENSE_REVIEW",
+      "approvedTaskClasses": [],
+      "prohibitedTaskClasses": []
+    },
+    {
+      "modelUid": "nousresearch:hermes-3-405b",
+      "laboratory": "nousresearch",
+      "family": "hermes-3",
+      "displayName": "Hermes 3 405B",
+      "opennessClass": "O3",
+      "classificationVerified": false,
+      "license": {
+        "licenseId": "llama-3.1-community",
+        "licenseTextHash": null,
+        "commercialUseAllowed": true,
+        "redistributionAllowed": false,
+        "fineTuningAllowed": true
+      },
+      "integrity": {
+        "signatureStatus": "unverified",
+        "weightHashes": [],
+        "artifactRevision": null
+      },
+      "capabilities": {
+        "modalities": [
+          "text"
+        ],
+        "contextWindow": null,
+        "toolCalling": true,
+        "structuredOutput": false
+      },
+      "runtimes": [
+        "openrouter"
+      ],
+      "providerIds": {
+        "hyperkernel": [],
+        "custonllm": [
+          "hermes-3-405b"
+        ]
+      },
+      "lifecycle": "LICENSE_REVIEW",
+      "approvedTaskClasses": [],
+      "prohibitedTaskClasses": []
+    },
+    {
+      "modelUid": "nvidia:nemotron-super-49b",
+      "laboratory": "nvidia",
+      "family": "nemotron",
+      "displayName": "Llama Nemotron Super 49B",
+      "opennessClass": "O3",
+      "classificationVerified": false,
+      "license": {
+        "licenseId": "nvidia-open-model",
+        "licenseTextHash": null,
+        "commercialUseAllowed": true,
+        "redistributionAllowed": false,
+        "fineTuningAllowed": true
+      },
+      "integrity": {
+        "signatureStatus": "unverified",
+        "weightHashes": [],
+        "artifactRevision": null
+      },
+      "capabilities": {
+        "modalities": [
+          "text"
+        ],
+        "contextWindow": null,
+        "toolCalling": true,
+        "structuredOutput": false
+      },
+      "runtimes": [
+        "nvidia"
+      ],
+      "providerIds": {
+        "hyperkernel": [],
+        "custonllm": [
+          "nemotron-super-49b"
+        ]
+      },
+      "lifecycle": "LICENSE_REVIEW",
+      "approvedTaskClasses": [],
+      "prohibitedTaskClasses": []
+    },
+    {
+      "modelUid": "nvidia:nemotron-3-ultra",
+      "laboratory": "nvidia",
+      "family": "nemotron",
+      "displayName": "Nemotron 3 Ultra 550B",
+      "opennessClass": "O3",
+      "classificationVerified": false,
+      "license": {
+        "licenseId": "nvidia-open-model",
+        "licenseTextHash": null,
+        "commercialUseAllowed": true,
+        "redistributionAllowed": false,
+        "fineTuningAllowed": true
+      },
+      "integrity": {
+        "signatureStatus": "unverified",
+        "weightHashes": [],
+        "artifactRevision": null
+      },
+      "capabilities": {
+        "modalities": [
+          "text"
+        ],
+        "contextWindow": null,
+        "toolCalling": true,
+        "structuredOutput": false
+      },
+      "runtimes": [
+        "nvidia"
+      ],
+      "providerIds": {
+        "hyperkernel": [],
+        "custonllm": [
+          "nemotron-3-ultra"
+        ]
+      },
+      "lifecycle": "LICENSE_REVIEW",
+      "approvedTaskClasses": [],
+      "prohibitedTaskClasses": []
+    },
+    {
+      "modelUid": "nvidia:nemotron-4-340b",
+      "laboratory": "nvidia",
+      "family": "nemotron-4",
+      "displayName": "Nemotron-4 340B",
+      "opennessClass": "O3",
+      "classificationVerified": false,
+      "license": {
+        "licenseId": "nvidia-open-model",
+        "licenseTextHash": null,
+        "commercialUseAllowed": true,
+        "redistributionAllowed": false,
+        "fineTuningAllowed": true
+      },
+      "integrity": {
+        "signatureStatus": "unverified",
+        "weightHashes": [],
+        "artifactRevision": null
+      },
+      "capabilities": {
+        "modalities": [
+          "text"
+        ],
+        "contextWindow": null,
+        "toolCalling": false,
+        "structuredOutput": false
+      },
+      "runtimes": [
+        "nim",
+        "huggingface"
+      ],
+      "providerIds": {
+        "hyperkernel": [
+          "nvidia.nemotron4_340b_base",
+          "nvidia.nemotron4_340b_instruct",
+          "nvidia.nemotron4_340b_reward"
+        ],
+        "custonllm": []
+      },
+      "lifecycle": "LICENSE_REVIEW",
+      "approvedTaskClasses": [],
+      "prohibitedTaskClasses": []
+    },
+    {
+      "modelUid": "google:diffusiongemma-26b",
+      "laboratory": "google",
+      "family": "gemma-4",
+      "displayName": "DiffusionGemma 26B",
+      "opennessClass": "O3",
+      "classificationVerified": false,
+      "license": {
+        "licenseId": "gemma",
+        "licenseTextHash": null,
+        "commercialUseAllowed": true,
+        "redistributionAllowed": false,
+        "fineTuningAllowed": true
+      },
+      "integrity": {
+        "signatureStatus": "unverified",
+        "weightHashes": [],
+        "artifactRevision": null
+      },
+      "capabilities": {
+        "modalities": [
+          "text"
+        ],
+        "contextWindow": null,
+        "toolCalling": false,
+        "structuredOutput": false
+      },
+      "runtimes": [
+        "nvidia"
+      ],
+      "providerIds": {
+        "hyperkernel": [],
+        "custonllm": [
+          "diffusiongemma-26b"
+        ]
+      },
+      "lifecycle": "LICENSE_REVIEW",
+      "approvedTaskClasses": [],
+      "prohibitedTaskClasses": []
+    },
+    {
+      "modelUid": "minimax:minimax-m3",
+      "laboratory": "minimax",
+      "family": "minimax-m3",
+      "displayName": "MiniMax M3",
+      "opennessClass": "O3",
+      "classificationVerified": false,
+      "license": {
+        "licenseId": "minimax-open-weight",
+        "licenseTextHash": null,
+        "commercialUseAllowed": true,
+        "redistributionAllowed": false,
+        "fineTuningAllowed": false
+      },
+      "integrity": {
+        "signatureStatus": "unverified",
+        "weightHashes": [],
+        "artifactRevision": null
+      },
+      "capabilities": {
+        "modalities": [
+          "text",
+          "image",
+          "video"
+        ],
+        "contextWindow": 1000000,
+        "toolCalling": true,
+        "structuredOutput": false
+      },
+      "runtimes": [
+        "nvidia"
+      ],
+      "providerIds": {
+        "hyperkernel": [],
+        "custonllm": [
+          "minimax-m3"
+        ]
+      },
+      "lifecycle": "LICENSE_REVIEW",
+      "approvedTaskClasses": [],
+      "prohibitedTaskClasses": []
+    },
+    {
+      "modelUid": "private:local-gpu",
+      "laboratory": "operator",
+      "family": "private-gpu",
+      "displayName": "Private GPU Model (operator-supplied)",
+      "opennessClass": "O5",
+      "classificationVerified": false,
+      "license": {
+        "licenseId": "UNKNOWN",
+        "licenseTextHash": null,
+        "commercialUseAllowed": false,
+        "redistributionAllowed": false,
+        "fineTuningAllowed": false
+      },
+      "integrity": {
+        "signatureStatus": "unverified",
+        "weightHashes": [],
+        "artifactRevision": null
+      },
+      "capabilities": {
+        "modalities": [
+          "text"
+        ],
+        "contextWindow": null,
+        "toolCalling": false,
+        "structuredOutput": false
+      },
+      "runtimes": [
+        "openai_compat",
+        "vllm"
+      ],
+      "providerIds": {
+        "hyperkernel": [
+          "privategpu.local"
+        ],
+        "custonllm": []
+      },
+      "lifecycle": "LICENSE_REVIEW",
+      "approvedTaskClasses": [],
+      "prohibitedTaskClasses": []
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "contractVersion": "1.0",
+  "requestId": "fx-att-1",
+  "workspaceId": "ws_fixture",
+  "identity": {
+    "role": "owner",
+    "name": "Owner"
+  },
+  "job": "attention_today",
+  "message": "What needs attention today?",
+  "contextPacket": {
+    "packetVersion": 1,
+    "workspaceId": "ws_fixture",
+    "assembledAt": "2026-07-09T13:00:00.000Z",
+    "role": "owner",
+    "sections": [
+      {
+        "kind": "attention",
+        "items": [
+          {
+            "sourceRef": {
+              "collection": "quotes",
+              "id": "quote_101",
+              "asOf": "2026-07-09T13:00:00.000Z"
+            },
+            "data": {
+              "status": "follow_up_due",
+              "total": 1840,
+              "daysSinceSent": 4
+            }
+          },
+          {
+            "sourceRef": {
+              "collection": "jobs",
+              "id": "job_55",
+              "asOf": "2026-07-09T13:00:00.000Z"
+            },
+            "data": {
+              "currentState": "SCHEDULED",
+              "scheduledFor": "2026-07-09"
+            }
+          },
+          {
+            "sourceRef": {
+              "collection": "decision_envelopes",
+              "id": "env_9",
+              "asOf": "2026-07-09T13:00:00.000Z"
+            },
+            "data": {
+              "status": "awaiting_approval",
+              "agent": "agent:budget-bidding"
+            }
+          },
+          {
+            "sourceRef": {
+              "collection": "leads",
+              "id": "lead_301",
+              "asOf": "2026-07-09T13:00:00.000Z"
+            },
+            "data": {
+              "stage": "NEW_LEAD",
+              "ageHours": 18,
+              "note": "water damage hallway ASAP"
+            },
+            "untrusted": true
+          }
+        ]
+      }
+    ],
+    "redactions": [
+      "customer.phone",
+      "customer.email"
+    ]
+  },
+  "budgets": {
+    "p95LatencyMs": 6000,
+    "maxCostUSDPerConversation": 0.15
+  }
+}

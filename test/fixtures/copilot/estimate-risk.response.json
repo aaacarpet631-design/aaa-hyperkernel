@@ -1,0 +1,67 @@
+{
+  "contractVersion": "1.0",
+  "requestId": "fx-er-1",
+  "answer": "quote_101 looks underpriced: 17% gross margin against your recent comparable install that closed at $2,100. The dimensions are recorded, so the risk is price, not scope.",
+  "cards": [
+    {
+      "cardType": "estimate_risk",
+      "quoteRef": {
+        "collection": "quotes",
+        "id": "quote_101",
+        "asOf": "2026-07-09T13:00:00.000Z"
+      },
+      "risk": "underpriced",
+      "confidence": 74,
+      "factors": [
+        {
+          "note": "Gross margin 17% is below the healthy floor for installs.",
+          "sourceRef": {
+            "collection": "quotes",
+            "id": "quote_101",
+            "asOf": "2026-07-09T13:00:00.000Z",
+            "field": "grossMargin"
+          }
+        },
+        {
+          "note": "Comparable won job closed at $2,100 for similar sqft.",
+          "sourceRef": {
+            "collection": "outcomes",
+            "id": "out_77",
+            "asOf": "2026-07-09T13:00:00.000Z",
+            "field": "finalAmount"
+          }
+        }
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "claim": "quote_101 carries $320 gross margin (17%)",
+      "sourceRefs": [
+        {
+          "collection": "quotes",
+          "id": "quote_101",
+          "asOf": "2026-07-09T13:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "claim": "A comparable install won at $2,100",
+      "sourceRefs": [
+        {
+          "collection": "outcomes",
+          "id": "out_77",
+          "asOf": "2026-07-09T13:00:00.000Z"
+        }
+      ]
+    }
+  ],
+  "confidence": 74,
+  "unknowns": [
+    "Job-site condition factors (stairs, furniture moves) are not in the packet."
+  ],
+  "approval": {
+    "required": false,
+    "reasons": []
+  }
+}

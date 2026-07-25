@@ -149,7 +149,7 @@
     /**
      * Persist this estimate as a DRAFT quote in the lifecycle store (the one
      * AI-allowed write — a draft, never a commitment). Returns the quote record.
-     * @param {Object} input { sessions, services?, customer?, jobId?, leadSource?, zip?, actor?, origin? }
+     * @param {Object} input { sessions, services?, customer?, jobId?, leadId?, leadSource?, zip?, actor?, origin? }
      */
     async draftQuote(input) {
       const est = await this.recommend(input);
@@ -158,7 +158,7 @@
       const i = input || {};
       const draft = await global.AAA_QUOTES.createDraft({
         estimate: est, customer: i.customer, customerId: i.customerId, customerName: i.customerName,
-        jobId: i.jobId, leadSource: i.leadSource, zip: i.zip, address: i.address,
+        jobId: i.jobId, leadId: i.leadId, leadSource: i.leadSource, zip: i.zip, address: i.address,
         sessions: i.sessions, photos: i.photos, actor: i.actor, origin: i.origin
       });
       est.quoteId = draft.quoteId;

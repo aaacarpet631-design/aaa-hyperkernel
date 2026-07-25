@@ -4,9 +4,13 @@
  * send(text) stores the user message, routes it through the existing Executive
  * Copilot (via the chat intent router), and produces an embedded RICH CARD from
  * real council/read-model output — executive briefing, simulation, goal,
- * software-factory, or governance-approval. Offline messages queue locally and
- * replay when online. No fake answers (insufficient_data shown honestly), no
- * production mutation (protected actions render an approval card, never act).
+ * software-factory, or governance-approval. Phase-one owner questions may be
+ * pre-empted by the remote copilot bridge (contract-validated, evidence-cited
+ * cards) when it is configured — any remote failure falls through here, so
+ * remote can only add capability, never take chat offline. Offline messages
+ * queue locally and replay when online. No fake answers (insufficient_data
+ * shown honestly), no production mutation (protected actions render an
+ * approval card, never act).
  */
 ;(function (global) {
   'use strict';
@@ -39,6 +43,23 @@
       if (!online && !o._replay) {
         if (queue()) await queue().enqueue({ text: text, opts: o });
         return { queued: true, userMessage: userMsg };
+      }
+
+      // HyperKernel × Custonllm copilot (mission Slice E): when the message
+      // maps to a phase-one job AND the remote copilot is configured, answer
+      // over the versioned contract — evidence-cited cards, approval states,
+      // validated fail-closed by the adapter. ANY failure falls through to
+      // the local Executive Copilot path below; remote can only add
+      // capability, never take chat offline.
+      const bridge = global.AAA_COPILOT_CHAT_BRIDGE;
+      if (bridge && bridge.canHandle && bridge.canHandle(text)) {
+        try {
+          const remote = await bridge.ask(text, o);
+          if (remote && remote.ok) {
+            const remoteMsg = store() ? await store().add({ role: 'assistant', text: remote.summary, card: remote.card, threadId: o.threadId, status: 'sent' }) : null;
+            return { queued: false, intent: 'copilot.' + remote.job, cardType: 'copilot_contract', confidence: remote.response.confidence, userMessage: userMsg, assistantMessage: remoteMsg, card: remote.card, answer: remote.response };
+          }
+        } catch (_) { /* fall through to the local copilot path */ }
       }
 
       const route = router() ? router().classify(text) : { intent: 'unknown', cardType: 'text', confidence: 0 };

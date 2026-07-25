@@ -45,7 +45,10 @@
     LOST: ['NEW_LEAD']
   };
 
-  const SOURCES = ['website', 'referral', 'lsa', 'walk_in', 'other'];
+  const SOURCES = ['website', 'referral', 'lsa', 'walk_in', 'google_ads', 'other'];
+  // Sources that come from paid channels — a lead from these with no
+  // attribution record is a measurement gap the reporting layer surfaces.
+  const PAID_SOURCES = ['google_ads', 'lsa'];
 
   // '7_touch_standard' follow-up sequence, ported from the Lead OS seed data
   // and DEDUPLICATED (one set, 7 touches). Static drafts only — the owner
@@ -90,6 +93,7 @@
     STAGES: STAGES,
     TRANSITIONS: TRANSITIONS,
     SOURCES: SOURCES,
+    PAID_SOURCES: PAID_SOURCES,
 
     /** Idempotent startup hook. Templates are static; nothing to seed. */
     async boot() {
@@ -100,6 +104,12 @@
     /**
      * Create a lead. Required: name, phone, source, serviceType. A duplicate
      * (same normalized phone + name) is a no-op returning the existing lead.
+     *
+     * Optional input.attribution (gclid/gbraid/wbraid, utm*, campaign, adGroup,
+     * keyword, searchTerm, landingPage, channel, city, zip, consent) is handed
+     * to the Ad Attribution ledger — a SEPARATE, PII-free collection keyed by
+     * leadId — never merged into the lead record itself, so PII and click data
+     * stay apart. The lead only carries attributionCaptured: true|false.
      */
     async createLead(input) {
       if (!data()) return { ok: false, error: 'NO_DATA' };
@@ -128,12 +138,41 @@
         name: name, phone: phone, source: source, serviceType: serviceType,
         stage: 'NEW_LEAD',
         notes: clean(input.notes, 2000),
+        attributionCaptured: false,
         createdAt: t, updatedAt: t,
         stageHistory: [{ stage: 'NEW_LEAD', at: t }]
       };
+
+      // Attribution rides in a separate PII-free ledger keyed by leadId.
+      const attrLedger = global.AAA_AD_ATTRIBUTION;
+      if (input.attribution && attrLedger && attrLedger.attach) {
+        try {
+          const att = await attrLedger.attach(lead.leadId, input.attribution);
+          lead.attributionCaptured = !!(att && att.ok);
+        } catch (_) { lead.attributionCaptured = false; }
+      }
+
       await data().put(COLLECTION, lead.leadId, lead);
       emit('LEAD_CREATED', { leadId: lead.leadId, source: source, serviceType: serviceType });
       return { ok: true, lead: lead };
+    },
+
+    /**
+     * Measurement-gap report: paid-channel leads with NO attribution record.
+     * "Missing attribution is visible" (Slice 1 done-when). Ids only, no PII.
+     */
+    async missingAttribution() {
+      if (!data()) return [];
+      const attrLedger = global.AAA_AD_ATTRIBUTION;
+      const leads = (await data().list(COLLECTION)).filter(function (l) {
+        return l && PAID_SOURCES.indexOf(l.source) !== -1;
+      });
+      const out = [];
+      for (const l of leads) {
+        const att = attrLedger && attrLedger.get ? await attrLedger.get(l.leadId) : null;
+        if (!att) out.push({ leadId: l.leadId, source: l.source, createdAt: l.createdAt });
+      }
+      return out;
     },
 
     async getLead(id) {
