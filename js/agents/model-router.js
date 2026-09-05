@@ -12,10 +12,11 @@
  *   - Sonnet → coding, execution, refactor, review (the default executor)
  *   - Haiku  → triage, classification, tagging, summarization, routing
  *
- * It is pure and config-free. `route(kind)` is the source of truth; `forAgent`
- * is backward-compatible: with no/unknown task kind it returns the agent's
- * declared model unchanged (so existing meetings/synthesis keep using Opus and
- * workers keep using Sonnet), and only routes when a caller names a task kind.
+ * The owner can select GPT-6 Astra for the premium tier in Cloud Settings.
+ * `route(kind)` is the source of truth; `forAgent`
+ * is backward-compatible with default settings: with no/unknown task kind it
+ * uses the agent's declared model, applying the optional premium selection.
+ * Routine workers keep their declared tier.
  * `effort`/`tier`/pricing are advisory metadata for logging and cost control —
  * the router never sends unverified params to the proxy.
  */
@@ -25,15 +26,19 @@
   const MODELS = {
     OPUS: 'claude-opus-4-8',
     SONNET: 'claude-sonnet-4-6',
-    HAIKU: 'claude-haiku-4-5'
+    HAIKU: 'claude-haiku-4-5',
+    ASTRA: 'gpt-6-astra'
   };
 
-  // Capability rank (low → high) and public $/MTok (input, output) for cost notes.
-  const RANK = { 'claude-haiku-4-5': 1, 'claude-sonnet-4-6': 2, 'claude-opus-4-8': 3 };
+  // Cost tier rank (low → high) and public $/MTok (input, output) for cost notes.
+  const RANK = { 'claude-haiku-4-5': 1, 'claude-sonnet-4-6': 2, 'claude-opus-4-8': 3, 'gpt-6-astra': 4 };
   const PRICE = {
     'claude-haiku-4-5': { in: 1, out: 5, tier: 'economy' },
     'claude-sonnet-4-6': { in: 3, out: 15, tier: 'standard' },
-    'claude-opus-4-8': { in: 5, out: 25, tier: 'premium' }
+    'claude-opus-4-8': { in: 5, out: 25, tier: 'premium' },
+    // Standard rates; long-context and service-tier multipliers are not included.
+    // https://developers.openai.com/api/docs/models/gpt-6-astra
+    'gpt-6-astra': { in: 10, out: 50, tier: 'premium' }
   };
 
   // Task kind → model. Keys are normalized (lowercase, non-alnum → _).
@@ -63,6 +68,7 @@
   // Adaptive-thinking effort hint per model (advisory; not sent to the proxy
   // unless a caller opts in). Opus on coding/high-autonomy wants the most.
   function effortFor(model) {
+    if (model === MODELS.ASTRA) return 'medium';
     if (model === MODELS.OPUS) return 'xhigh';
     if (model === MODELS.SONNET) return 'medium';
     return 'low';
@@ -73,17 +79,26 @@
   }
 
   function decorate(model, reason) {
+    const resolved = resolveModel(model);
+    if (resolved !== model) reason += ' → owner-selected GPT-6 Astra';
+    model = resolved;
     const p = PRICE[model] || {};
     return { model: model, tier: p.tier || 'standard', effort: effortFor(model), priceInPerMTok: p.in, priceOutPerMTok: p.out, reason: reason };
   }
 
+  function resolveModel(model) {
+    const c = global.AAA_CONFIG || {};
+    return model === MODELS.OPUS && c.premiumModel === MODELS.ASTRA ? MODELS.ASTRA : model;
+  }
+
   const Router = {
     MODELS: MODELS,
+    resolveModel: resolveModel,
 
     /** Is this a model id the router knows how to rank/price? */
     isKnownModel(model) { return Object.prototype.hasOwnProperty.call(RANK, String(model)); },
 
-    /** Route purely by task kind. Unknown kind → the default (Sonnet) executor. */
+    /** Route by task kind and premium selection. Unknown kind → Sonnet. */
     route(kind) {
       const k = normalizeKind(kind);
       if (k && Object.prototype.hasOwnProperty.call(KIND_MODEL, k)) {

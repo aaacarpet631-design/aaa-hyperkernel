@@ -87,7 +87,7 @@
     },
 
     // ---- the single AI funnel -------------------------------------------
-    /** Call Claude through the server-side proxy. { ok, text, content, usage }.
+    /** Call the selected model through its server-side proxy. { ok, text, content, usage }.
      *  Structured-output fallback: if the proxy/endpoint rejects the request
      *  and the payload carried output_config, retry once without it and nudge
      *  the model toward JSON in the system prompt. This keeps agents working
@@ -97,11 +97,29 @@
       if (!cloud() || !cfg().isProxyConfigured || !cfg().isProxyConfigured()) {
         return { ok: false, error: 'PROXY_NOT_CONFIGURED' };
       }
-      const res = await cloud().callProxy(payload);
-      if ((res && res.ok) || !payload || !payload.output_config) return res;
-      const retry = Object.assign({}, payload);
+      let request = payload;
+      const router = global.AAA_MODEL_ROUTER;
+      const resolved = router && router.resolveModel ? router.resolveModel(payload && payload.model) : payload && payload.model;
+      if (resolved === 'gpt-6-astra') {
+        request = Object.assign({}, payload, { model: resolved });
+        // Check the actual OpenAI model, including legacy callers with pinned
+        // Opus ids. A tenant refusal must never be bypassed by a later remap.
+        const policy = global.AAA_TENANT_MODEL_POLICY;
+        if (policy && policy.pick) {
+          const picked = await policy.pick(request.model);
+          if (!picked.ok) return { ok: false, error: 'NO_ALLOWED_MODEL_FOR_TENANT', denial: picked.denial };
+          request.model = picked.model;
+        }
+      }
+      const isOpenAI = request && request.model === 'gpt-6-astra';
+      const res = await cloud().callProxy(request, isOpenAI ? cfg().openaiProxyUrl || '/api/openai' : undefined);
+      // An incomplete/refused OpenAI result is an error, not an invitation to
+      // repeat a paid call with its structured-output contract removed.
+      if (isOpenAI) return res;
+      if ((res && res.ok) || !request || !request.output_config) return res;
+      const retry = Object.assign({}, request);
       delete retry.output_config;
-      retry.system = (payload.system ? payload.system + '\n\n' : '') +
+      retry.system = (request.system ? request.system + '\n\n' : '') +
         'Respond with ONLY a single valid JSON object matching the required fields. No prose, no markdown code fences.';
       const res2 = await cloud().callProxy(retry);
       // Surface the original error if the fallback also failed (more diagnostic).
