@@ -60,15 +60,17 @@
 
     /** Persist a single collection to localStorage. Never throws. */
     _flush(collection) {
-      if (!hasLocalStorage()) return;
+      if (!hasLocalStorage()) return false;
       try {
         global.localStorage.setItem(
           STORAGE_PREFIX + collection,
           JSON.stringify(this.data[collection])
         );
+        return true;
       } catch (err) {
         // Quota exceeded or value not serialisable: keep going in memory.
         console.warn('Storage: failed to persist collection', collection, err);
+        return false;
       }
     },
 
@@ -79,10 +81,15 @@
     },
 
     /** Insert or replace a record and persist its collection. */
-    async put(collection, key, value) {
+    async put(collection, key, value, opts) {
       if (!this.data[collection]) this.data[collection] = {};
+      const previous = this.data[collection][key];
       this.data[collection][key] = value;
-      this._flush(collection);
+      if (!this._flush(collection) && opts && opts.requirePersistent) {
+        if (previous === undefined) delete this.data[collection][key];
+        else this.data[collection][key] = previous;
+        throw new Error('DEVICE_STORAGE_UNAVAILABLE: This change could not be saved on this device. Free storage and retry.');
+      }
       return value;
     },
 

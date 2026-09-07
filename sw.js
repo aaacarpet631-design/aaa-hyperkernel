@@ -6,7 +6,7 @@
  * app fully usable offline. Old caches are purged on activate, and the worker
  * takes control immediately to avoid serving a stale shell after an update.
  */
-const CACHE_NAME = 'hyperkernel-v103';
+const CACHE_NAME = 'hyperkernel-v105';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -27,6 +27,7 @@ const PRECACHE = [
   '/css/agent-command.css',
   '/css/digital-twin.css',
   '/css/field-mode.css',
+  '/css/quote-builder.css',
   '/js/core/runtime-clock.js',
   '/js/core/id-factory.js',
   '/js/core/local-first-storage.js',
@@ -276,6 +277,7 @@ const PRECACHE = [
   '/js/bluetooth/services/huepar-s60-adapter.js',
   '/js/bluetooth/hooks/use-bluetooth-connection.js',
   '/js/quotes/integrations/measurement-to-quote.js',
+  '/js/quotes/quote-builder.js',
   '/js/measurements/capture-sequencer.js',
   '/js/measurements/measurement-ai-assistant.js',
   '/js/bluetooth/screens/measurement-hud-ui.js',
@@ -298,6 +300,7 @@ const PRECACHE = [
   '/js/ui/financial-intelligence-ui.js',
   '/js/ui/estimator-ui.js',
   '/js/ui/quote-lifecycle-ui.js',
+  '/js/ui/quote-builder-ui.js',
   '/js/ui/quote-win-probability-ui.js',
   '/js/ui/pricing-optimizer-ui.js',
   '/js/ui/learning-feedback-ui.js',
@@ -363,7 +366,7 @@ const PRECACHE = [
 self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE)).catch(() => {})
+    caches.open(CACHE_NAME).then((cache) => Promise.all(PRECACHE.map((url) => cache.add(url).catch(() => {})))).catch(() => {})
   );
 });
 
@@ -385,11 +388,11 @@ self.addEventListener('fetch', (event) => {
       .then((response) => {
         // Refresh the cache copy for offline use.
         const copy = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(req, copy)).catch(() => {});
+        if (response.ok) caches.open(CACHE_NAME).then((cache) => cache.put(req, copy)).catch(() => {});
         return response;
       })
       .catch(() =>
-        caches.match(req).then((cached) => cached || caches.match('/index.html'))
+        caches.match(req).then(async (cached) => cached || (req.mode === 'navigate' && await caches.match('/index.html')) || Response.error())
       )
   );
 });

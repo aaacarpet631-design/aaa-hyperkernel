@@ -46,6 +46,8 @@ const SUITES = [
   'unit/estimator-agent.test.js',
   'unit/estimator-ui.test.js',
   'unit/quote-store.test.js',
+  'unit/quote-builder.test.js',
+  'unit/quote-builder-ui.test.js',
   'unit/quote-lifecycle-ui.test.js',
   'unit/outcome-learning.test.js',
   'unit/visual-memory.test.js',

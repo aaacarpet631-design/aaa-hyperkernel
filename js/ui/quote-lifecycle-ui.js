@@ -14,7 +14,7 @@
   function store() { return global.AAA_QUOTES; }
   function rbac() { return global.AAA_RBAC; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
-  function money(v) { const n = Number(v); return isFinite(n) ? '$' + n.toFixed(2) : '—'; }
+  function money(v) { const n = Number(v); return v != null && isFinite(n) ? '$' + n.toFixed(2) : '—'; }
 
   const state = { filter: 'pipeline' };
   const STATUS_COLOR = { draft: '#94A3B8', reviewed: '#3B82F6', sent: '#8B5CF6', follow_up_due: '#F59E0B', won: '#10B981', lost: '#EF4444', expired: '#A1A1AA', archived: '#71717A' };
@@ -52,6 +52,8 @@
     else quotes = await store().byStatus(state.filter);
     container.innerHTML = '';
 
+    if (global.AAA_QUOTE_BUILDER_UI) container.appendChild(ui.button({ label: 'Build a quote', variant: 'primary', full: true, onClick: () => global.AAA_QUOTE_BUILDER_UI.open() }));
+
     // Snapshot.
     container.appendChild(ui.el('section', { className: 'aaa-summary' }, [
       chip(money(stats.pipelineValue), 'Pipeline', '#8B5CF6'),
@@ -88,6 +90,7 @@
   function renderDetail(container, q) {
     const ui = U();
     container.innerHTML = '';
+    if (!rbac() || !rbac().can('VIEW_FINANCIALS')) { container.appendChild(empty('Quotes are owner-only.')); return; }
     if (!q) { container.appendChild(empty('Quote not found.')); return; }
 
     container.appendChild(ui.el('div', { className: 'aaa-list-row', html:
@@ -125,14 +128,16 @@
     const actions = ui.el('div', { className: 'aaa-form', style: { display: 'flex', gap: '8px', flexWrap: 'wrap' } });
     const refresh = async () => { const fresh = await store().get(q.id); renderDetail(container, fresh); };
     const act = async (fn) => { const res = await fn(); if (!res.ok) await ui.confirm({ title: 'Not allowed', message: res.message || res.error, confirmLabel: 'OK' }); await refresh(); };
-    if (q.status === 'draft') actions.appendChild(ui.button({ label: 'Mark reviewed', size: 'sm', variant: 'primary', onClick: () => act(() => store().markReviewed(q.id, { actor: actor })) }));
-    if (q.status === 'reviewed') actions.appendChild(ui.button({ label: 'Send to customer', size: 'sm', variant: 'primary', onClick: () => act(() => store().send(q.id, { actor: actor })) }));
-    if (['sent', 'follow_up_due'].indexOf(q.status) !== -1) actions.appendChild(ui.button({ label: 'Set follow-up', size: 'sm', variant: 'secondary', onClick: () => act(() => store().setFollowUp(q.id, { actor: actor })) }));
-    if (['sent', 'follow_up_due', 'reviewed'].indexOf(q.status) !== -1) {
+    const opts = { actor: actor, expectedRevision: q.revision || 1 };
+    if (q.builderInput && ['draft', 'reviewed'].includes(q.status) && global.AAA_QUOTE_BUILDER_UI) actions.appendChild(ui.button({ label: 'Edit / review quote', size: 'sm', variant: 'primary', onClick: () => global.AAA_QUOTE_BUILDER_UI.open({ id: q.id }) }));
+    if (q.status === 'draft' && !q.builderInput) actions.appendChild(ui.button({ label: 'Mark reviewed', size: 'sm', variant: 'primary', onClick: () => act(() => store().markReviewed(q.id, opts)) }));
+    if (['reviewed', 'sent', 'follow_up_due'].includes(q.status) && global.AAA_QUOTE_BUILDER_UI) actions.appendChild(ui.button({ label: 'Share customer quote', size: 'sm', variant: 'primary', onClick: () => global.AAA_QUOTE_BUILDER_UI.openShare(q.id, q.revision || 1) }));
+    if (['sent', 'follow_up_due'].indexOf(q.status) !== -1) actions.appendChild(ui.button({ label: 'Set follow-up', size: 'sm', variant: 'secondary', onClick: () => act(() => store().setFollowUp(q.id, opts)) }));
+    if (['sent', 'follow_up_due'].indexOf(q.status) !== -1) {
       actions.appendChild(ui.button({ label: 'Mark WON', size: 'sm', variant: 'success', onClick: () => resolveSheet(q, 'won', container) }));
       actions.appendChild(ui.button({ label: 'Mark LOST', size: 'sm', variant: 'ghost', onClick: () => resolveSheet(q, 'lost', container) }));
     }
-    if (['won', 'lost', 'expired'].indexOf(q.status) !== -1) actions.appendChild(ui.button({ label: 'Archive', size: 'sm', variant: 'ghost', onClick: () => act(() => store().archive(q.id, { actor: actor })) }));
+    if (['won', 'lost', 'expired'].indexOf(q.status) !== -1) actions.appendChild(ui.button({ label: 'Archive', size: 'sm', variant: 'ghost', onClick: () => act(() => store().archive(q.id, opts)) }));
     container.appendChild(actions);
     if (q.wonLostReason) container.appendChild(ui.el('div', { className: 'aaa-list-row', html: '<div class="aaa-list-sub">Outcome reason: ' + esc(q.wonLostReason) + '</div>' }));
 
@@ -165,8 +170,8 @@
     s.body.appendChild(ui.button({ label: 'Save', variant: 'primary', full: true, onClick: async () => {
       if (!reason.value.trim()) return;
       const res = result === 'won'
-        ? await store().markWon(q.id, { actor: actor, reason: reason.value.trim(), finalPrice: finalPrice && finalPrice.value, jobCost: jobCost && jobCost.value })
-        : await store().markLost(q.id, { actor: actor, reason: reason.value.trim() });
+        ? await store().markWon(q.id, { actor: actor, expectedRevision: q.revision || 1, reason: reason.value.trim(), finalPrice: finalPrice && finalPrice.value, jobCost: jobCost && jobCost.value })
+        : await store().markLost(q.id, { actor: actor, expectedRevision: q.revision || 1, reason: reason.value.trim() });
       s.close();
       if (!res.ok) { await ui.confirm({ title: 'Not allowed', message: res.message || res.error, confirmLabel: 'OK' }); }
       const fresh = await store().get(q.id); renderDetail(dashContainer, fresh);
@@ -176,6 +181,7 @@
 
   async function openDetail(id) {
     const ui = U();
+    if (!rbac() || !rbac().can('VIEW_FINANCIALS')) return;
     const sheet = ui.sheet({ title: 'Quote', subtitle: 'AAA Carpet — quote detail' });
     document.body.appendChild(sheet.overlay);
     const q = await store().get(id);
@@ -189,5 +195,5 @@
     render(sheet.body);
   }
 
-  global.AAA_QUOTE_LIFECYCLE_UI = { render: render, renderDetail: renderDetail, open: open, _state: state };
+  global.AAA_QUOTE_LIFECYCLE_UI = { render: render, renderDetail: renderDetail, open: open, openDetail: openDetail, _state: state };
 })(typeof window !== 'undefined' ? window : this);

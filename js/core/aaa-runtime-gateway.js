@@ -53,6 +53,7 @@
     // transitions are gated. Sending to a customer requires APPROVE_QUOTE so a
     // person reviews before anything leaves the building.
     MODIFY_QUOTE:      { permission: 'CREATE_QUOTE',    aiAllowed: false },
+    CREATE_QUOTE_DRAFT:{ permission: 'CREATE_QUOTE',    aiAllowed: true },
     SEND_QUOTE:        { permission: 'APPROVE_QUOTE',   aiAllowed: false },
     RESOLVE_QUOTE:     { permission: 'CREATE_QUOTE',    aiAllowed: false },
     // Marking a pricing recommendation reviewed/acted-on. Audited; never changes

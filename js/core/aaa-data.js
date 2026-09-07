@@ -30,8 +30,8 @@
     // ---- local-first entity access (source of truth) --------------------
     async list(collection) { return store().getAll(collection); },
     async get(collection, id) { return store().get(collection, id); },
-    async put(collection, id, value) {
-      const r = await store().put(collection, id, value);
+    async put(collection, id, value, opts) {
+      const r = await store().put(collection, id, value, opts);
       // Governance cloud persistence (additive, best-effort, non-blocking).
       try {
         const gs = global.AAA_GOVERNANCE_SYNC;
