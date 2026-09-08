@@ -6,7 +6,7 @@
  * app fully usable offline. Old caches are purged on activate, and the worker
  * takes control immediately to avoid serving a stale shell after an update.
  */
-const CACHE_NAME = 'hyperkernel-v105';
+const CACHE_NAME = 'hyperkernel-v106';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -386,9 +386,9 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(req)
       .then((response) => {
-        // Refresh the cache copy for offline use.
+        // Keep the worker alive until the refreshed offline copy is durable.
         const copy = response.clone();
-        if (response.ok) caches.open(CACHE_NAME).then((cache) => cache.put(req, copy)).catch(() => {});
+        if (response.ok) event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.put(req, copy)).catch(() => {}));
         return response;
       })
       .catch(() =>

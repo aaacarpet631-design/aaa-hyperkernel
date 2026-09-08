@@ -60,6 +60,59 @@ module.exports = async function () {
   t.ok('share panel closes after confirmation', sheets[sheets.length - 1].closed);
   await UI.openShare(q.id, (await Q.get(q.id)).revision);
   t.eq('sent quote sharing has no duplicate send confirmation', !!byLabel(sheets[sheets.length - 1].body, 'I sent this quote'), false);
+
+  await UI.open();
+  t.eq('reopening after sending starts with an empty customer', byLabel(sheets[sheets.length - 1].body, 'Name').value, '');
+  t.eq('reopening does not create a duplicate quote', (await Q.list()).length, 1);
+
+  const B = G.AAA_QUOTE_BUILDER;
+  const input = Object.assign(B.fresh(), { customer: { name: 'Resume Test' }, lines: [{ serviceId: 'carpet_shampoo', rooms: 3 }] });
+  const initial = (await B.save(input)).quote;
+  await B.saveWorking({ input: initial.builderInput, id: initial.id, revision: initial.revision, dirty: false });
+  const updated = JSON.parse(JSON.stringify(initial.builderInput));
+  updated.customer.name = 'Latest saved customer';
+  const latest = (await B.save(updated, { id: initial.id, expectedRevision: initial.revision })).quote;
+  await UI.open();
+  const resumed = sheets[sheets.length - 1].body;
+  t.eq('clean working copy loads the latest saved quote', byLabel(resumed, 'Name').value, 'Latest saved customer');
+  await click(resumed, 'Continue to pricing');
+  await click(resumed, 'Save draft');
+  t.eq('restored quote uses the current revision for saving', (await Q.get(initial.id)).revision, latest.revision + 1);
+
+  const unsaved = JSON.parse(JSON.stringify(initial.builderInput));
+  unsaved.customer.name = 'My unsaved changes'; unsaved.lines[0].rooms = 4;
+  await B.saveWorking({ input: unsaved, id: initial.id, revision: initial.revision, dirty: true });
+  await UI.open();
+  const conflict = sheets[sheets.length - 1].body;
+  t.eq('conflicting work cannot proceed directly to pricing', !!byLabel(conflict, 'Continue to pricing'), false);
+  t.ok('conflicting work offers the current saved version', !!byLabel(conflict, 'Open latest saved version'));
+  await click(conflict, 'Keep my changes as a new quote');
+  t.eq('recovery preserves the unsaved customer', byLabel(conflict, 'Name').value, 'My unsaved changes');
+  t.eq('recovery preserves unsaved service quantities', byLabel(conflict, 'Number of rooms').value, 4);
+  await click(conflict, 'Continue to pricing');
+  t.eq('recovered copy requires saving and new approval', byLabel(conflict, 'Review & approve').disabled, true);
+  await click(conflict, 'Save draft');
+  const recovered = (await Q.list()).find((row) => row.customerName === 'My unsaved changes');
+  t.ok('recovery creates a separate draft with recalculated totals', recovered && recovered.id !== initial.id && recovered.status === 'draft' && recovered.customerTotal === 180);
+  t.eq('recovery does not overwrite the latest saved customer', (await Q.get(initial.id)).customerName, 'Latest saved customer');
+
+  await B.saveWorking({ input: unsaved, id: initial.id, revision: initial.revision, dirty: true });
+  await UI.open();
+  const latestChoice = sheets[sheets.length - 1].body;
+  await click(latestChoice, 'Open latest saved version');
+  t.eq('choosing the latest version restores its saved customer', byLabel(latestChoice, 'Name').value, 'Latest saved customer');
+  t.eq('choosing the latest version records its current revision', (await B.loadWorking()).revision, (await Q.get(initial.id)).revision);
+  t.eq('choosing the latest version clears unsaved work only after confirmation', (await B.loadWorking()).dirty, false);
+
+  await B.saveWorking({ input: unsaved, id: q.id, revision: 1, dirty: true });
+  await UI.open();
+  const locked = sheets[sheets.length - 1].body;
+  t.eq('unsaved work on a sent quote cannot overwrite it', !!byLabel(locked, 'Continue to pricing'), false);
+  t.ok('unsaved work on a sent quote is recoverable separately', !!byLabel(locked, 'Keep my changes as a new quote'));
+
+  await B.saveWorking({ input: null });
+  await UI.open();
+  t.ok('an invalid working copy still provides a new quote form', !!byLabel(sheets[sheets.length - 1].body, 'Name'));
   const before = sheets.length;
   G.AAA_RBAC.setRole('crew');
   await UI.open();

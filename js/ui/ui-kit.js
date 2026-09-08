@@ -106,7 +106,13 @@
   function confirm(opts) {
     opts = opts || {};
     return new Promise((resolve) => {
-      const s = sheet({ title: opts.title || 'Are you sure?', size: 'sm' });
+      let settled = false;
+      function finish(result) {
+        if (settled) return;
+        settled = true;
+        resolve(result);
+      }
+      const s = sheet({ title: opts.title || 'Are you sure?', size: 'sm', onClose: () => finish(null) });
       if (opts.message) s.body.appendChild(el('p', { className: 'aaa-dialog__message', text: opts.message }));
 
       let reasonInput = null;
@@ -124,13 +130,13 @@
           if (opts.requireReason) {
             const r = reasonInput.value.trim();
             if (!r) { reasonInput.classList.add('aaa-input--error'); reasonInput.focus(); return; }
-            s.close(); resolve({ reason: r });
+            finish({ reason: r }); s.close();
           } else {
-            s.close(); resolve({ reason: '' });
+            finish({ reason: '' }); s.close();
           }
         }
       });
-      const cancelBtn = button({ label: opts.cancelLabel || 'Cancel', variant: 'ghost', full: true, onClick: () => { s.close(); resolve(null); } });
+      const cancelBtn = button({ label: opts.cancelLabel || 'Cancel', variant: 'ghost', full: true, onClick: () => s.close() });
       if (reasonInput) reasonInput.addEventListener('input', () => reasonInput.classList.remove('aaa-input--error'));
       s.body.appendChild(el('div', { className: 'aaa-dialog__actions' }, [cancelBtn, confirmBtn]));
       document.body.appendChild(s.overlay);

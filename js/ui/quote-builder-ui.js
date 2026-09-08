@@ -11,6 +11,15 @@
   const para = (s, cls) => U().el('p', { text: s, className: cls || 'qb-help' });
   const heading = (s) => U().el('h3', { text: s, className: 'qb-heading' });
   function errorText(err) { return err && (err.message || err.error) || 'Could not complete this step. Please retry.'; }
+  function copyInput(input) {
+    const record = (v) => v && typeof v === 'object' && !Array.isArray(v);
+    if (!record(input) || input.version !== B().VERSION || !record(input.customer) || !record(input.rateSnapshot) ||
+      !Array.isArray(input.lines) || input.lines.some((line) => !record(line))) {
+      throw new Error('The working form could not be restored. Open Saved quotes or start a new quote.');
+    }
+    return clone(input);
+  }
+  function editable(q) { return q && q.builderInput && ['draft', 'reviewed'].includes(q.status); }
   function button(label, fn, variant) { return U().button({ label: label, onClick: fn, variant: variant || 'secondary' }); }
   function field(label, value, onInput, opts) {
     const o = opts || {};
@@ -42,9 +51,10 @@
     if (!owner()) return U().confirm({ title: 'Owner access required', message: 'The quote builder contains pricing details. Use the field estimator to submit measurements for owner review.', confirmLabel: 'OK' });
     const sheet = U().sheet({ title: 'Build a quote', subtitle: 'Customer → Work → Price & review' });
     document.body.appendChild(sheet.overlay);
-    const state = { input: B().fresh(), id: null, revision: null, dirty: true, stage: 'edit', busy: false, changeVersion: 0 };
+    const state = { input: B().fresh(), id: null, revision: null, dirty: true, stage: 'edit', busy: false, changeVersion: 0, recovery: null };
     const status = U().el('p', { className: 'qb-save-status', attrs: { role: 'status', 'aria-live': 'polite' } });
     let workingWrite = Promise.resolve();
+    let importedInput = false;
     function persist() {
       const value = { input: clone(state.input), id: state.id, revision: state.revision, dirty: state.dirty };
       workingWrite = workingWrite.catch(() => {}).then(() => B().saveWorking(value)).then(() => { status.textContent = state.dirty ? 'Work in progress saved on this device.' : 'Draft saved. Review before sharing.'; }, (e) => { status.textContent = errorText(e); });
@@ -62,15 +72,31 @@
     try {
       if (o.id) {
         const q = await Q().get(o.id);
-        if (!q || !q.builderInput || !['draft', 'reviewed'].includes(q.status)) throw new Error('This quote cannot be edited here.');
-        state.input = clone(q.builderInput); state.id = q.id; state.revision = q.revision || 1; state.dirty = false;
+        if (!editable(q)) throw new Error('This quote cannot be edited here. Open Saved quotes to view it.');
+        state.input = copyInput(q.builderInput); state.id = q.id; state.revision = q.revision || 1; state.dirty = false;
       } else if (o.input) {
-        state.input = clone(o.input);
+        state.input = copyInput(o.input);
+        importedInput = true;
       } else {
         const saved = await B().loadWorking();
-        if (saved && saved.input && saved.input.version === B().VERSION) Object.assign(state, saved);
+        if (saved) {
+          const input = copyInput(saved.input);
+          const q = saved.id ? await Q().get(saved.id) : null;
+          if (!saved.id) {
+            state.input = input;
+          } else if (saved.dirty !== false && (!editable(q) || saved.revision !== (q.revision || 1))) {
+            // Keep unsaved work separate until the owner chooses how to recover it.
+            Object.assign(state, { input: input, id: saved.id, revision: saved.revision, recovery: { editable: !!editable(q) } });
+          } else if (editable(q)) {
+            state.input = saved.dirty === false ? copyInput(q.builderInput) : input;
+            state.id = q.id; state.revision = q.revision || 1; state.dirty = saved.dirty !== false;
+            status.textContent = saved.revision !== state.revision ? 'Opened the latest saved version of this quote.' : 'Restored your working quote.';
+          } else {
+            status.textContent = q ? 'Your previous quote is ' + q.status.replace(/_/g, ' ') + '. Start a new quote below.' : 'The previous quote is unavailable. Start a new quote below.';
+          }
+        }
       }
-    } catch (e) { sheet.body.appendChild(para(errorText(e))); return; }
+    } catch (e) { status.textContent = errorText(e); }
 
     function render() {
       const root = sheet.body;
@@ -81,11 +107,30 @@
       top.appendChild(button('New quote', () => guarded(async () => {
         const ok = await U().confirm({ title: 'Start a new quote?', message: 'This clears the current work form. Quotes already saved in the pipeline are kept.', confirmLabel: 'New quote' });
         if (!ok) return;
-        Object.assign(state, { input: B().fresh(), id: null, revision: null, dirty: true, stage: 'edit' });
+        Object.assign(state, { input: B().fresh(), id: null, revision: null, dirty: true, stage: 'edit', recovery: null });
         await persist(); render();
       })));
       top.appendChild(button('Saved quotes', () => { if (global.AAA_QUOTE_LIFECYCLE_UI) global.AAA_QUOTE_LIFECYCLE_UI.open(); }));
       root.appendChild(top);
+      if (state.recovery) {
+        root.appendChild(heading('Recover your unsaved changes'));
+        root.appendChild(para('The saved quote has changed or can no longer be edited. Your unsaved changes are still on this device.'));
+        const actions = U().el('div', { className: 'qb-actions' });
+        actions.appendChild(button('Keep my changes as a new quote', () => guarded(async () => {
+          Object.assign(state, { id: null, revision: null, dirty: true, stage: 'edit', recovery: null });
+          await persist(); render();
+        }), 'primary'));
+        if (state.recovery.editable) actions.appendChild(button('Open latest saved version', () => guarded(async () => {
+          const ok = await U().confirm({ title: 'Open the saved version?', message: 'This replaces the unsaved changes in this working form with the latest saved quote.', confirmLabel: 'Open saved version' });
+          if (!ok) return;
+          const q = await Q().get(state.id);
+          if (!editable(q)) throw new Error('This quote can no longer be edited. Keep your changes as a new quote.');
+          Object.assign(state, { input: copyInput(q.builderInput), revision: q.revision || 1, dirty: false, stage: 'edit', recovery: null });
+          await persist(); render();
+        })));
+        root.appendChild(actions);
+        return;
+      }
       if (state.stage === 'pricing') renderPricing(root);
       else renderWork(root);
     }
@@ -198,7 +243,7 @@
       refresh();
     }
     render();
-    if (o.input) await persist();
+    if (importedInput) await persist();
   }
 
   async function openShare(id, revision) {
