@@ -36,7 +36,7 @@
     });
   }
 
-  // Endpoint of the Claude-backed vision function (overridable via AAA_CONFIG).
+  // Endpoint of the vision function (overridable via AAA_CONFIG).
   function visionEndpoint() {
     return (global.AAA_CONFIG && global.AAA_CONFIG.visionEndpoint) || '/api/vision';
   }
@@ -52,10 +52,24 @@
    */
   async function analyzeCarpetDamage(base64Image, mediaType) {
     try {
+      const c = global.AAA_CONFIG || {};
+      const model = c.visionModel || 'claude-opus-4-8';
+      const headers = { 'content-type': 'application/json' };
+      if (model === 'gpt-6-astra') {
+        const policy = global.AAA_TENANT_MODEL_POLICY;
+        if (policy && policy.getPolicy && policy.evaluate) {
+          const verdict = policy.evaluate(model, await policy.getPolicy());
+          if (!verdict.allowed) throw new Error('MODEL_NOT_ALLOWED_FOR_TENANT');
+        }
+        const provider = global.AAA_CLOUD && global.AAA_CLOUD.provider();
+        const token = provider === 'firebase' ? c.firebaseAuthToken : provider === 'supabase' ? c.accessToken : null;
+        if (!token) throw new Error('SIGN_IN_REQUIRED');
+        headers.authorization = 'Bearer ' + token;
+      }
       const res = await fetch(visionEndpoint(), {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ image: base64Image, mediaType: mediaType || 'image/jpeg' })
+        headers: headers,
+        body: JSON.stringify({ image: base64Image, mediaType: mediaType || 'image/jpeg', model: model })
       });
       if (res.ok) {
         const data = await res.json();

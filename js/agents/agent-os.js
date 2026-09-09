@@ -108,8 +108,9 @@
       if (!decision) return { ok: false, error: 'BAD_OUTPUT', roleId: roleId, raw: res.text };
 
       // Record which model actually ran (and why) for cost/audit transparency.
-      decision.model = routed.model;
-      decision.routing = { model: routed.model, tier: routed.tier, reason: routed.reason };
+      decision.model = res.model || routed.model;
+      decision.routing = { model: decision.model, tier: routed.tier, reason: routed.reason };
+      if (res.provider) decision.routing.provider = res.provider;
 
       // Flag any recommended next_action that is destructive / external /
       // spend-bearing so the operator sees it needs approval before execution.
@@ -133,6 +134,8 @@
       try {
         logged = await data().logDecision({
           agent: roleId,
+          model: decision.model,
+          routing: decision.routing,
           jobId: context && context.jobId ? context.jobId : null,
           decision: decision.recommendation,
           rationale: decision.rationale,

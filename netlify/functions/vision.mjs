@@ -9,7 +9,8 @@
  *
  * Requires ANTHROPIC_API_KEY to be set in the Netlify site environment.
  */
-import Anthropic from '@anthropic-ai/sdk';
+import { authorizeOpenAI } from '../lib/openai-auth.mjs';
+import { MODEL as ASTRA, callOpenAI, readBody, errorResponse } from '../lib/openai.mjs';
 
 const MODEL = 'claude-opus-4-8';
 
@@ -55,27 +56,23 @@ export default async (req) => {
   if (req.method !== 'POST') {
     return json({ ok: false, error: 'METHOD_NOT_ALLOWED' }, 405);
   }
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    return json({ ok: false, error: 'MISSING_API_KEY', message: 'Set ANTHROPIC_API_KEY in the Netlify site environment.' }, 500);
-  }
-
   let body;
   try {
-    body = await req.json();
-  } catch {
-    return json({ ok: false, error: 'INVALID_JSON' }, 400);
+    body = await readBody(req);
+  } catch (err) {
+    return errorResponse(err);
   }
+  const model = (body && body.model) || MODEL;
+  if (model !== MODEL && model !== ASTRA) return json({ ok: false, error: 'UNSUPPORTED_MODEL' }, 400);
   const image = body && body.image;
   const mediaType = (body && body.mediaType) || 'image/jpeg';
   if (!image || typeof image !== 'string') {
     return json({ ok: false, error: 'NO_IMAGE' }, 400);
   }
 
-  const client = new Anthropic({ apiKey });
   try {
-    const response = await client.messages.create({
-      model: MODEL,
+    const payload = {
+      model: model,
       max_tokens: 1024,
       system: [
         { type: 'text', text: SYSTEM_INSTRUCTIONS, cache_control: { type: 'ephemeral' } }
@@ -90,12 +87,24 @@ export default async (req) => {
           ]
         }
       ]
-    });
+    };
+
+    let response;
+    if (model === ASTRA) {
+      await authorizeOpenAI(req);
+      response = await callOpenAI(payload);
+    } else {
+      const apiKey = process.env.ANTHROPIC_API_KEY;
+      if (!apiKey) return json({ ok: false, error: 'MISSING_API_KEY', message: 'Set ANTHROPIC_API_KEY in the Netlify site environment.' }, 500);
+      const { default: Anthropic } = await import('@anthropic-ai/sdk');
+      response = await new Anthropic({ apiKey }).messages.create(payload);
+    }
 
     const textBlock = response.content.find((b) => b.type === 'text');
     const analysis = JSON.parse(textBlock ? textBlock.text : '{}');
-    return json({ ok: true, analysis });
+    return json({ ok: true, analysis, model: response.model || model });
   } catch (err) {
+    if (model === ASTRA) return errorResponse(err);
     const status = err && typeof err.status === 'number' ? err.status : 500;
     console.error('Vision function error', err);
     return json(

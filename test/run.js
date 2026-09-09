@@ -13,6 +13,7 @@ const SUITES = [
   'unit/rbac.test.js',
   'unit/gateway.test.js',
   'unit/model-router.test.js',
+  'unit/openai.test.js',
   'unit/action-safety-gate.test.js',
   'unit/country-packs.test.js',
   'unit/decision-envelope.test.js',

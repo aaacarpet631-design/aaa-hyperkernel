@@ -512,6 +512,22 @@
     ];
     fields.forEach((f) => s.body.appendChild(f.wrap));
 
+    const aiFields = [];
+    if (global.AAA_RBAC && global.AAA_RBAC.can('MANAGE_SETTINGS')) {
+      s.body.appendChild(ui.el('h2', { className: 'aaa-section-title', text: 'AI models' }));
+      [['Advanced reasoning', 'premiumModel'], ['Photo analysis', 'visionModel']].forEach(([label, key]) => {
+        const select = ui.el('select', { className: 'aaa-input', attrs: { 'aria-label': label } });
+        select._key = key;
+        [['claude-opus-4-8', 'Claude Opus'], ['gpt-6-astra', 'GPT-6 Astra']].forEach(([value, text]) => {
+          select.appendChild(ui.el('option', { text: text, attrs: { value: value } }));
+        });
+        select.value = cfg[key] || 'claude-opus-4-8';
+        aiFields.push(select);
+        s.body.appendChild(ui.el('div', { className: 'aaa-form' }, [ui.el('label', { className: 'aaa-field-label', text: label }), select]));
+      });
+      s.body.appendChild(ui.el('p', { className: 'aaa-detail-notes', text: 'GPT-6 Astra requires a configured OpenAI connection and an authorized signed-in account. Routine tasks keep their current models.' }));
+    }
+
     // ---- Role (RBAC) — who is using this device. Owner-only to change. ----
     if (global.AAA_RBAC) {
       const rbac = global.AAA_RBAC;
@@ -552,8 +568,8 @@
       const ready = !!(global.AAA_AGENT_OS && global.AAA_AGENT_OS.isReady && global.AAA_AGENT_OS.isReady());
       let ping;
       if (global.AAA_DATA && global.AAA_DATA.callAgent) {
-        const r = await global.AAA_DATA.callAgent({ agent: 'diagnostic', model: 'claude-haiku-4-5', max_tokens: 16, messages: [{ role: 'user', content: 'Reply with exactly: OK' }] });
-        if (r && r.ok) ping = { text: '✓ reachable — "' + String(r.text || '').slice(0, 40) + '"', color: '#10B981' };
+        const r = await global.AAA_DATA.callAgent({ agent: 'diagnostic', model: cfg.premiumModel === 'gpt-6-astra' ? 'gpt-6-astra' : 'claude-haiku-4-5', max_tokens: 16, messages: [{ role: 'user', content: 'Reply with exactly: OK' }] });
+        if (r && r.ok) ping = { text: '✓ reachable — "' + String(r.text || '').slice(0, 40) + '"', color: '#10B981', model: r.model };
         else {
           const det = r && r.detail; const dmsg = det && (det.error || det.message) ? (' (' + (det.error || det.message) + ')') : '';
           ping = { text: '✗ ' + ((r && r.error) || 'failed') + dmsg, color: '#EF4444' };
@@ -565,7 +581,7 @@
       // run means the proxy is fine but the model output isn't parsing.
       let agentProbe = null;
       if (ping.color === '#10B981' && global.AAA_AGENT_OS && global.AAA_AGENT_OS.runAgent) {
-        const a = await global.AAA_AGENT_OS.runAgent('kpi', 'Reply that the connection test succeeded.', { test: true });
+        const a = await global.AAA_AGENT_OS.runAgent(cfg.premiumModel === 'gpt-6-astra' ? 'ceo' : 'kpi', 'Reply that the connection test succeeded.', { test: true });
         if (a && a.ok) agentProbe = { text: '✓ decision parsed — "' + String(a.recommendation || '').slice(0, 40) + '"', color: '#10B981' };
         else agentProbe = { text: '✗ ' + ((a && a.error) || 'failed') + (a && a.raw ? ' — model said: "' + String(a.raw).slice(0, 50) + '"' : ''), color: '#EF4444' };
       }
@@ -576,6 +592,7 @@
       diag.appendChild(kvRow('Proxy configured', (cfg.isProxyConfigured && cfg.isProxyConfigured()) ? 'yes' : 'no', (cfg.isProxyConfigured && cfg.isProxyConfigured()) ? '#10B981' : '#F59E0B'));
       diag.appendChild(kvRow('Agents ready', ready ? 'yes' : 'no', ready ? '#10B981' : '#F59E0B'));
       diag.appendChild(kvRow('AI ping', ping.text, ping.color));
+      if (ping.model) diag.appendChild(kvRow('Responding model', ping.model));
       if (agentProbe) diag.appendChild(kvRow('Agent run', agentProbe.text, agentProbe.color));
     }
 
@@ -583,6 +600,9 @@
       ui.button({ label: 'Save', variant: 'primary', full: true, onClick: async () => {
         const patch = {};
         fields.forEach((f) => { patch[f.input._key] = f.input.value.trim() || null; });
+        if (global.AAA_RBAC && global.AAA_RBAC.can('MANAGE_SETTINGS')) {
+          aiFields.forEach((input) => { patch[input._key] = input.value; });
+        }
         if (cfg.set) cfg.set(patch);
         status.textContent = 'Saved. Now tap “Test AI connection”.';
       } }),

@@ -24,6 +24,11 @@
   status = 200
 
 [[redirects]]
+  from = "/api/openai"
+  to = "/.netlify/functions/openai"
+  status = 200
+
+[[redirects]]
   from = "/api/transcribe"
   to = "/.netlify/functions/transcribe"
   status = 200
