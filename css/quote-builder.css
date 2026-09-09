@@ -7,6 +7,9 @@
 .qb-line legend { padding: 0 .5rem; font-weight: 650; }
 .qb-help, .qb-save-status { color: var(--muted, #a1a1aa); font-size: .9375rem; overflow-wrap: anywhere; }
 .qb-save-status { min-height: 1.5rem; }
+.qb-action-status { color: #fecaca; background: #451a1a; border-left: 3px solid #f87171; border-radius: 6px; padding: .75rem 1rem; margin: .5rem 0; overflow-wrap: anywhere; }
+.qb-action-status:empty { display: none; }
+.qb-workspace[inert] { opacity: .7; }
 .qb-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin: 1rem 0; }
 .qb-actions .aaa-btn { min-height: 48px; flex: 1 1 160px; }
 .qb-bottom { border-top: 1px solid var(--border, #3f3f46); padding-top: 1rem; }

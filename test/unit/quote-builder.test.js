@@ -18,6 +18,18 @@ module.exports = async function () {
   const install = draft([{ serviceId: 'carpet_install', length: '10', width: '12', carpetName: 'Selected carpet', materialRate: '2', padRate: '0.5' }]);
   install.rateSnapshot.min_job = 0;
   t.eq('installation uses area, selected material and allowance', B.preview(install).estimate.quote.total, 420);
+  for (const key of ['materialRate', 'padRate']) {
+    const blank = JSON.parse(JSON.stringify(install)); blank.lines[0][key] = '';
+    const result = B.preview(blank);
+    t.eq('cleared ' + key + ' must not silently use a default price', result.ok, false);
+    t.ok('cleared material price explains what is missing', /price is required/.test(result.message));
+    blank.lines[0][key] = 0;
+    t.eq('explicit zero ' + key + ' is allowed for customer-supplied material', B.preview(blank).ok, true);
+  }
+  const missingRooms = clean(); missingRooms.lines[0].rooms = '';
+  t.eq('cleared room count is required instead of silently becoming one', B.preview(missingRooms).ok, false);
+  const belowFloor = clean(); belowFloor.rateSnapshot.shampoo_min_per_room = 1;
+  t.eq('displayed cleaning rate cannot disagree with the enforced floor', B.preview(belowFloor).ok, false);
   const cleared = B.preview(install).input;
   cleared.lines[0].length = ''; cleared.lines[0].width = '';
   t.eq('cleared dimensions cannot reuse a stale calculated area', B.preview(cleared).ok, false);
@@ -115,6 +127,20 @@ module.exports = async function () {
   cfg.set({ workspaceId: 'different' });
   t.eq('working copy does not cross workspaces', await B.loadWorking(), null);
   cfg.set({ workspaceId: 'ws_test' });
+  const firstForm = Object.assign(clean(), { customer: { name: 'Unfinished first customer' } });
+  await local.put('quote_builder_working', 'ws_test', { workspaceId: 'ws_test', value: { input: firstForm, dirty: true } }, { requirePersistent: true });
+  await B.saveWorking({ workingKey: 'first', input: firstForm, dirty: true });
+  t.eq('upgrading from the old single-slot format preserves unfinished work', (await B.loadWorking('legacy')).input.customer.name, 'Unfinished first customer');
+  await B.saveWorking({ workingKey: 'second', input: edited, dirty: true });
+  await local.boot();
+  t.eq('switching forms preserves the first unfinished customer', (await B.loadWorking('first')).input.customer.name, 'Unfinished first customer');
+  t.eq('latest form pointer restores the active form', (await B.loadWorking()).workingKey, 'second');
+  t.ok('unfinished forms are discoverable for recovery', (await B.listWorking()).some((form) => form.key === 'first'));
+  await B.saveWorking({ workingKey: 'second', input: edited, dirty: false });
+  t.eq('clean saved forms are excluded from unfinished work', (await B.listWorking()).some((form) => form.key === 'second'), false);
+  cfg.set({ workspaceId: 'different' });
+  t.eq('recovery list does not cross workspaces', (await B.listWorking()).length, 0);
+  cfg.set({ workspaceId: 'ws_test' });
   data.put = (collection, key, value, opts) => local.put(collection, key, value, opts);
   data.get = (collection, key) => local.get(collection, key);
   data.list = (collection) => local.getAll(collection);
@@ -138,6 +164,48 @@ module.exports = async function () {
   console.warn = oldWarn;
   t.eq('unsaved won status is reported as failure', failedWon.ok, false);
   t.eq('failed won save creates no outcome signal', (await data.list('outcomes')).length, 0);
+  broken = false;
+  // A stalled remote backup must not hold the field workflow hostage.
+  const mirrors = []; let finishFirstMirror;
+  data.cloudReady = () => true;
+  G.AAA_CLOUD = {
+    insertEvent: () => new Promise(() => {}),
+    upsertEntity: (collection, key, record) => {
+      mirrors.push({ collection, key, record });
+      if (collection === 'quotes' && !finishFirstMirror) return new Promise((resolve) => { finishFirstMirror = resolve; });
+      if (collection === 'agent_decisions') return new Promise(() => {});
+      return Promise.resolve();
+    }
+  };
+  async function bounded(task) {
+    let timer;
+    try { return await Promise.race([task, new Promise((resolve) => { timer = setTimeout(() => resolve({ ok: false, error: 'REMOTE_BLOCKED_LOCAL_SAVE' }), 250); })]); }
+    finally { clearTimeout(timer); }
+  }
+  load('js/agents/supervisor.js');
+  const offlineInput = clean(); offlineInput.jobId = 'job-with-slow-backup';
+  await data.put('agent_decisions', 'decision-with-slow-backup', { id: 'decision-with-slow-backup', jobId: offlineInput.jobId, confidence: 80 });
+  const offlineDraft = await bounded(B.save(offlineInput));
+  t.ok('draft save completes while remote quote and audit mirrors hang', offlineDraft.ok);
+  if (offlineDraft.ok) {
+    const offlineReview = await bounded(Q.markReviewed(offlineDraft.quote.id, { expectedRevision: 1, confirmRates: true }));
+    t.ok('human approval completes while cloud backup hangs', offlineReview.ok);
+    if (offlineReview.ok) {
+      const offlineSend = await bounded(Q.send(offlineDraft.quote.id, { expectedRevision: 2, confirmedSent: true }));
+      t.ok('send recording completes while cloud backup hangs', offlineSend.ok);
+      t.eq('new revisions wait behind the first cloud snapshot', mirrors.filter((m) => m.collection === 'quotes').length, 1);
+      finishFirstMirror();
+      await Promise.resolve(); await Promise.resolve();
+      const pushed = mirrors.filter((m) => m.collection === 'quotes');
+      t.eq('pending cloud updates coalesce to the latest saved revision', pushed[pushed.length - 1].record.revision, 3);
+      t.eq('initial cloud snapshot cannot be mutated by later local changes', pushed[0].record.status, 'draft');
+      t.ok('audit records still persist locally before confirmation', (await data.list('audit_log')).length >= 3);
+      const offlineWon = await bounded(Q.markWon(offlineDraft.quote.id, { expectedRevision: 3, reason: 'Customer accepted' }));
+      t.ok('recording won does not wait for the supervisor cloud backup', offlineWon.ok);
+      t.eq('won status is saved locally despite stalled cloud backup', (await Q.get(offlineDraft.quote.id)).status, 'won');
+      t.ok('supervisor scoring still updates the local decision', (await data.get('agent_decisions', 'decision-with-slow-backup')).score != null);
+    }
+  }
   delete G.localStorage;
   return t.report();
 };

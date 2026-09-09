@@ -309,7 +309,7 @@
       };
       try {
         await data().put(OUTCOMES, outcome.id, outcome);
-        if (data().cloudReady && data().cloudReady() && global.AAA_CLOUD) await global.AAA_CLOUD.upsertEntity(OUTCOMES, outcome.id, outcome);
+        if (data().cloudReady && data().cloudReady() && global.AAA_CLOUD) Promise.resolve(global.AAA_CLOUD.upsertEntity(OUTCOMES, outcome.id, outcome)).catch(() => {});
       } catch (_) {}
       try { if (supervisor() && supervisor().scoreOutcome) await supervisor().scoreOutcome(outcome); } catch (_) {}
       if (events()) events().emit('outcome.recorded', { quoteId: quote.quoteId, result: result });
@@ -328,9 +328,29 @@
     const total = q.total != null ? q.total : r && r.total;
     return Number.isFinite(total) && total >= 0 && (!r || (Number.isFinite(r.total) && r.total === total && Array.isArray(r.items) && r.items.every((it) => Number.isFinite(it.amount) && it.amount >= 0) && round(r.items.reduce((n, it) => n + it.amount, 0)) === total));
   }
+  // Local confirmation must not wait for the network. Keep at most the latest
+  // pending snapshot per quote, and mirror revisions in order within this runtime.
+  const mirrors = new Map();
+  function mirror(rec) {
+    if (!data().cloudReady || !data().cloudReady() || !global.AAA_CLOUD) return;
+    const key = rec.workspaceId + ':' + rec.id;
+    const snapshot = clone(rec);
+    if (mirrors.has(key)) { mirrors.get(key).next = snapshot; return; }
+    const entry = { next: snapshot };
+    const backend = global.AAA_CLOUD;
+    mirrors.set(key, entry);
+    (async () => {
+      try {
+        while (entry.next) {
+          const next = entry.next; entry.next = null;
+          try { await backend.upsertEntity(QUOTES, next.id, next); } catch (_) {}
+        }
+      } finally { mirrors.delete(key); }
+    })().catch(() => {});
+  }
   async function put(rec) {
     await data().put(QUOTES, rec.id, rec, { requirePersistent: true });
-    try { if (data().cloudReady && data().cloudReady() && global.AAA_CLOUD) await global.AAA_CLOUD.upsertEntity(QUOTES, rec.id, rec); } catch (_) {}
+    try { mirror(rec); } catch (_) {}
   }
 
   // Serialize competing writes in this runtime. This is not a distributed lock.

@@ -10,6 +10,8 @@
   const actor = () => global.AAA_RBAC.label();
   const para = (s, cls) => U().el('p', { text: s, className: cls || 'qb-help' });
   const heading = (s) => U().el('h3', { text: s, className: 'qb-heading' });
+  let activeEditor = null;
+  let opening = Promise.resolve();
   function errorText(err) { return err && (err.message || err.error) || 'Could not complete this step. Please retry.'; }
   function copyInput(input) {
     const record = (v) => v && typeof v === 'object' && !Array.isArray(v);
@@ -49,26 +51,47 @@
   async function open(opts) {
     const o = opts || {};
     if (!owner()) return U().confirm({ title: 'Owner access required', message: 'The quote builder contains pricing details. Use the field estimator to submit measurements for owner review.', confirmLabel: 'OK' });
-    const sheet = U().sheet({ title: 'Build a quote', subtitle: 'Customer → Work → Price & review' });
+    // Only one editor owns the form controls. Switching keeps the previous
+    // unfinished form, including inputs that cannot yet become a valid quote.
+    if (activeEditor) {
+      if (!await activeEditor.flush()) return;
+      activeEditor.close();
+    }
+    let editor;
+    const sheet = U().sheet({ title: 'Build a quote', subtitle: 'Customer → Work → Price & review', onClose: () => { if (activeEditor === editor) activeEditor = null; } });
     document.body.appendChild(sheet.overlay);
-    const state = { input: B().fresh(), id: null, revision: null, dirty: true, stage: 'edit', busy: false, changeVersion: 0, recovery: null };
-    const status = U().el('p', { className: 'qb-save-status', attrs: { role: 'status', 'aria-live': 'polite' } });
+    const state = { input: B().fresh(), workingKey: B().workingKey(), id: null, revision: null, dirty: true, stage: 'edit', busy: false, changeVersion: 0, recovery: null };
+    const status = U().el('p', { className: 'qb-action-status', attrs: { role: 'alert' } });
+    const saveStatus = U().el('p', { className: 'qb-save-status', attrs: { role: 'status', 'aria-live': 'polite' } });
     let workingWrite = Promise.resolve();
     let importedInput = false;
     function persist() {
-      const value = { input: clone(state.input), id: state.id, revision: state.revision, dirty: state.dirty };
-      workingWrite = workingWrite.catch(() => {}).then(() => B().saveWorking(value)).then(() => { status.textContent = state.dirty ? 'Work in progress saved on this device.' : 'Draft saved. Review before sharing.'; }, (e) => { status.textContent = errorText(e); });
+      const value = { input: clone(state.input), workingKey: state.workingKey, id: state.id, revision: state.revision, dirty: state.dirty };
+      const version = state.changeVersion;
+      saveStatus.textContent = 'Saving on this device…';
+      workingWrite = workingWrite.catch(() => {}).then(() => B().saveWorking(value)).then(() => {
+        if (version === state.changeVersion) saveStatus.textContent = value.dirty ? 'Unfinished form saved on this device.' : 'Draft saved on this device. Review before sharing.';
+        return true;
+      }, (e) => { saveStatus.textContent = errorText(e); return false; });
       return workingWrite;
     }
-    function changed() { state.dirty = true; state.changeVersion++; persist(); }
+    function changed() { state.dirty = true; state.changeVersion++; status.textContent = ''; persist(); }
     function set(key, v) { state.input[key] = v; changed(); }
     async function guarded(fn) {
       if (state.busy) return;
       if (!owner()) { status.textContent = 'Owner access is required to continue.'; return; }
       state.busy = true;
+      sheet.body.inert = true;
       try { await fn(); } catch (e) { status.textContent = errorText(e); }
-      finally { state.busy = false; }
+      finally { state.busy = false; sheet.body.inert = false; }
     }
+    editor = { close: () => sheet.close(), flush: async () => {
+      if (state.busy) { status.textContent = 'Finish the current save or confirmation before opening another quote.'; return false; }
+      const saved = await persist();
+      if (!saved) status.textContent = 'Your unfinished form could not be saved. Keep this form open and retry when device storage is available.';
+      return saved;
+    } };
+    activeEditor = editor;
     try {
       if (o.id) {
         const q = await Q().get(o.id);
@@ -78,8 +101,10 @@
         state.input = copyInput(o.input);
         importedInput = true;
       } else {
-        const saved = await B().loadWorking();
+        const saved = await B().loadWorking(o.workingKey);
+        if (o.workingKey && !saved) throw new Error('This unfinished form is unavailable. Open another form or a saved quote.');
         if (saved) {
+          state.workingKey = saved.workingKey || state.workingKey;
           const input = copyInput(saved.input);
           const q = saved.id ? await Q().get(saved.id) : null;
           if (!saved.id) {
@@ -102,14 +127,30 @@
       const root = sheet.body;
       root.innerHTML = '';
       root.classList.add('qb-workspace');
-      root.appendChild(status);
+      root.appendChild(saveStatus);
       const top = U().el('div', { className: 'qb-actions' });
       top.appendChild(button('New quote', () => guarded(async () => {
-        const ok = await U().confirm({ title: 'Start a new quote?', message: 'This clears the current work form. Quotes already saved in the pipeline are kept.', confirmLabel: 'New quote' });
+        const ok = await U().confirm({ title: 'Start a new quote?', message: 'Your current form stays available under Resume unfinished work. Saved quotes remain in the pipeline.', confirmLabel: 'New quote' });
         if (!ok) return;
-        Object.assign(state, { input: B().fresh(), id: null, revision: null, dirty: true, stage: 'edit', recovery: null });
+        if (!await persist()) { status.textContent = 'Save the current form before starting another quote. Device storage is unavailable.'; return; }
+        Object.assign(state, { input: B().fresh(), workingKey: B().workingKey(), id: null, revision: null, dirty: true, stage: 'edit', recovery: null });
         await persist(); render();
       })));
+      top.appendChild(button('Resume unfinished work', async () => {
+        try {
+          const forms = (await B().listWorking()).filter((form) => form.key !== state.workingKey);
+          const chooser = U().sheet({ title: 'Unfinished quote forms' });
+          document.body.appendChild(chooser.overlay);
+          if (!forms.length) chooser.body.appendChild(para('No other unfinished forms on this device.'));
+          forms.forEach((form) => {
+            const card = U().el('section', { className: 'qb-line' });
+            card.appendChild(heading(form.input.customer && form.input.customer.name || 'Customer not entered yet'));
+            card.appendChild(para((form.input.lines || []).length + ' service lines · unfinished'));
+            card.appendChild(button('Resume form', () => { chooser.close(); return openQueued({ workingKey: form.key }); }, 'primary'));
+            chooser.body.appendChild(card);
+          });
+        } catch (e) { status.textContent = errorText(e); }
+      }));
       top.appendChild(button('Saved quotes', () => { if (global.AAA_QUOTE_LIFECYCLE_UI) global.AAA_QUOTE_LIFECYCLE_UI.open(); }));
       root.appendChild(top);
       if (state.recovery) {
@@ -129,10 +170,12 @@
           await persist(); render();
         })));
         root.appendChild(actions);
+        root.appendChild(status);
         return;
       }
       if (state.stage === 'pricing') renderPricing(root);
       else renderWork(root);
+      root.appendChild(status);
     }
 
     function renderWork(root) {
@@ -201,7 +244,7 @@
         resultBox.innerHTML = '';
         const p = B().preview(state.input);
         if (p.ok) { p.warnings.forEach((w) => resultBox.appendChild(para(w))); receipt(resultBox, p); }
-        else resultBox.appendChild(para(errorText(p)));
+        else resultBox.appendChild(U().el('p', { text: errorText(p), className: 'qb-action-status', attrs: { role: 'alert' } }));
         if (saveBtn) saveBtn.disabled = !p.ok;
         if (reviewBtn) reviewBtn.disabled = !p.ok || state.dirty || !state.id;
       }
@@ -219,7 +262,14 @@
       saveBtn = button('Save draft', () => guarded(async () => {
         const changeVersion = state.changeVersion;
         const result = await B().save(state.input, { id: state.id, expectedRevision: state.revision, actor: actor() });
-        if (!result.ok) { status.textContent = errorText(result); return; }
+        if (!result.ok) {
+          status.textContent = errorText(result);
+          if (['REVISION_CONFLICT', 'QUOTE_LOCKED'].includes(result.error)) {
+            const current = await Q().get(state.id);
+            state.recovery = { editable: !!editable(current) }; render();
+          }
+          return;
+        }
         state.id = result.quote.id; state.revision = result.quote.revision;
         if (state.changeVersion === changeVersion) { state.input = clone(result.quote.builderInput); state.dirty = false; }
         await persist(); render();
@@ -235,7 +285,8 @@
         if (state.dirty) { status.textContent = 'The quote was edited. Save and review it again.'; return; }
         const res = await Q().markReviewed(state.id, { actor: actor(), expectedRevision: state.revision, confirmRates: true });
         if (!res.ok) { status.textContent = errorText(res); return; }
-        state.revision = res.quote.revision; await persist();
+        state.revision = res.quote.revision;
+        if (!await persist()) { status.textContent = 'Quote approved, but the working form could not be saved. Retry or open the approved quote from Saved quotes.'; return; }
         sheet.close(); openShare(state.id, state.revision);
       }), 'success');
       actions.appendChild(saveBtn); actions.appendChild(reviewBtn); root.appendChild(actions);
@@ -293,5 +344,9 @@
       }, 'primary'));
     });
   }
-  global.AAA_QUOTE_BUILDER_UI = { open: open, openShare: openShare };
+  function openQueued(opts) {
+    opening = opening.catch(() => {}).then(() => open(opts));
+    return opening;
+  }
+  global.AAA_QUOTE_BUILDER_UI = { open: openQueued, openShare: openShare };
 })(typeof window !== 'undefined' ? window : this);

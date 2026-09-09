@@ -213,7 +213,11 @@
       try { if (security() && security().sealAudit) sealed = await security().sealAudit(rec); } catch (_) { sealed = rec; }
       try { if (data() && data().put) await data().put('audit_log', id, sealed); } catch (_) {}
       // Best-effort cloud mirror (rules make audit_log append-only / owner-read).
-      try { if (data() && data().cloudReady && data().cloudReady() && cloud()) await cloud().insertEvent('audit_log', sealed); } catch (_) {}
+      try {
+        if (data() && data().cloudReady && data().cloudReady() && cloud()) {
+          Promise.resolve(cloud().insertEvent('audit_log', sealed)).catch(() => {});
+        }
+      } catch (_) {}
       return id;
     },
 

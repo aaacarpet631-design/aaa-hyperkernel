@@ -6,6 +6,7 @@
  */
 ;(function (global) {
   'use strict';
+  const sheets = [];
 
   /** Tiny hyperscript helper. */
   function el(tag, props, children) {
@@ -69,6 +70,9 @@
    */
   function sheet(opts) {
     opts = opts || {};
+    const entry = {};
+    sheets.push(entry);
+    let closed = false;
     const overlay = el('div', { className: 'aaa-sheet-overlay' });
     const closeBtn = el('button', {
       className: 'aaa-sheet__close', attrs: { 'aria-label': 'Close', type: 'button' }, html: '&times;'
@@ -84,14 +88,17 @@
     overlay.appendChild(card);
 
     function close() {
+      if (closed) return;
+      closed = true;
+      sheets.splice(sheets.indexOf(entry), 1);
       overlay.classList.remove('aaa-sheet-overlay--in');
       document.removeEventListener('keydown', onKey);
       setTimeout(() => overlay.remove(), 180);
       if (opts.onClose) opts.onClose();
     }
-    function onKey(e) { if (e.key === 'Escape') close(); }
+    function onKey(e) { if (e.key === 'Escape' && sheets[sheets.length - 1] === entry) close(); }
     closeBtn.addEventListener('click', close);
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+    overlay.addEventListener('click', (e) => { if (e.target === overlay && sheets[sheets.length - 1] === entry) close(); });
     document.addEventListener('keydown', onKey);
     // animate in (guard rAF for non-browser/test contexts)
     var raf = global.requestAnimationFrame || function (f) { return setTimeout(f, 0); };

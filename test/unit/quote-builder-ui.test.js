@@ -19,10 +19,10 @@ module.exports = async function () {
   const sheets = [];
   G.document = { body: node('body') };
   G.location = { href: '' };
-  G.AAA_LOCAL_FIRST_STORAGE = { put: data.put, get: data.get };
+  G.AAA_LOCAL_FIRST_STORAGE = { put: data.put, get: data.get, getAll: data.list };
   G.AAA_UI = {
     el: node, button: (o) => { const n = node('button', o); n.disabled = !!o.disabled; return n; },
-    sheet: (o) => { const s = { overlay: node('overlay'), body: node('body'), close() { s.closed = true; }, opts: o }; sheets.push(s); return s; },
+    sheet: (o) => { const s = { overlay: node('overlay'), body: node('body'), close() { if (!s.closed) { s.closed = true; if (o.onClose) o.onClose(); } }, opts: o }; sheets.push(s); return s; },
     confirm: async () => ({ reason: '' })
   };
   load('js/ui/quote-builder-ui.js');
@@ -68,6 +68,7 @@ module.exports = async function () {
   const B = G.AAA_QUOTE_BUILDER;
   const input = Object.assign(B.fresh(), { customer: { name: 'Resume Test' }, lines: [{ serviceId: 'carpet_shampoo', rooms: 3 }] });
   const initial = (await B.save(input)).quote;
+  sheets[sheets.length - 1].close();
   await B.saveWorking({ input: initial.builderInput, id: initial.id, revision: initial.revision, dirty: false });
   const updated = JSON.parse(JSON.stringify(initial.builderInput));
   updated.customer.name = 'Latest saved customer';
@@ -81,6 +82,7 @@ module.exports = async function () {
 
   const unsaved = JSON.parse(JSON.stringify(initial.builderInput));
   unsaved.customer.name = 'My unsaved changes'; unsaved.lines[0].rooms = 4;
+  sheets[sheets.length - 1].close();
   await B.saveWorking({ input: unsaved, id: initial.id, revision: initial.revision, dirty: true });
   await UI.open();
   const conflict = sheets[sheets.length - 1].body;
@@ -96,6 +98,7 @@ module.exports = async function () {
   t.ok('recovery creates a separate draft with recalculated totals', recovered && recovered.id !== initial.id && recovered.status === 'draft' && recovered.customerTotal === 180);
   t.eq('recovery does not overwrite the latest saved customer', (await Q.get(initial.id)).customerName, 'Latest saved customer');
 
+  sheets[sheets.length - 1].close();
   await B.saveWorking({ input: unsaved, id: initial.id, revision: initial.revision, dirty: true });
   await UI.open();
   const latestChoice = sheets[sheets.length - 1].body;
@@ -104,15 +107,54 @@ module.exports = async function () {
   t.eq('choosing the latest version records its current revision', (await B.loadWorking()).revision, (await Q.get(initial.id)).revision);
   t.eq('choosing the latest version clears unsaved work only after confirmation', (await B.loadWorking()).dirty, false);
 
+  sheets[sheets.length - 1].close();
   await B.saveWorking({ input: unsaved, id: q.id, revision: 1, dirty: true });
   await UI.open();
   const locked = sheets[sheets.length - 1].body;
   t.eq('unsaved work on a sent quote cannot overwrite it', !!byLabel(locked, 'Continue to pricing'), false);
   t.ok('unsaved work on a sent quote is recoverable separately', !!byLabel(locked, 'Keep my changes as a new quote'));
 
+  sheets[sheets.length - 1].close();
   await B.saveWorking({ input: null });
   await UI.open();
   t.ok('an invalid working copy still provides a new quote form', !!byLabel(sheets[sheets.length - 1].body, 'Name'));
+  const unfinished = Object.assign(B.fresh(), { customer: { name: 'First unfinished customer' } });
+  await UI.open({ input: unfinished });
+  const firstSheet = sheets[sheets.length - 1];
+  const firstKey = (await B.loadWorking()).workingKey;
+  await UI.open({ input: input });
+  t.eq('opening another form closes the previous editor', firstSheet.closed, true);
+  t.eq('opening another form preserves incomplete work without requiring a price', (await B.loadWorking(firstKey)).input.customer.name, 'First unfinished customer');
+  t.ok('previous unfinished work appears in the recovery list', (await B.listWorking()).some((entry) => entry.key === firstKey));
+  await click(sheets[sheets.length - 1].body, 'Resume unfinished work');
+  const unfinishedPicker = sheets[sheets.length - 1].body;
+  const firstCard = all(unfinishedPicker).find((n) => n.tag === 'section' && all(n).some((child) => child.opts.text === 'First unfinished customer'));
+  await click(firstCard, 'Resume form');
+  const firstRestored = sheets[sheets.length - 1].body;
+  t.eq('recovered unfinished work restores the original customer', byLabel(firstRestored, 'Name').value, 'First unfinished customer');
+  await click(firstRestored, 'New quote');
+  t.eq('new quote starts with an empty customer', byLabel(firstRestored, 'Name').value, '');
+  t.eq('new quote keeps the unfinished previous form', (await B.loadWorking(firstKey)).input.customer.name, 'First unfinished customer');
+  const realSaveWorking = B.saveWorking;
+  B.saveWorking = async () => { throw new Error('Device storage is full'); };
+  const beforeFailedSwitch = sheets.length;
+  await UI.open({ input: input });
+  t.eq('failed working-form save prevents switching away and losing inputs', sheets.length, beforeFailedSwitch);
+  t.ok('storage error is visible beside the form actions', all(firstRestored).some((n) => n.opts.className === 'qb-action-status' && /could not be saved/.test(n.textContent)));
+  B.saveWorking = realSaveWorking;
+
+  const conflictQuote = (await B.save(input)).quote;
+  await UI.open({ id: conflictQuote.id });
+  const live = sheets[sheets.length - 1].body;
+  fill(live, 'Name', 'Keep this local customer');
+  await click(live, 'Continue to pricing');
+  const external = JSON.parse(JSON.stringify(input)); external.customer.name = 'Changed in the pipeline';
+  await B.save(external, { id: conflictQuote.id, expectedRevision: 1 });
+  await click(live, 'Save draft');
+  t.ok('a conflict while saving offers recovery immediately', !!byLabel(live, 'Keep my changes as a new quote'));
+  t.eq('conflicting local changes do not overwrite the stored quote', (await Q.get(conflictQuote.id)).customerName, 'Changed in the pipeline');
+  await click(live, 'Keep my changes as a new quote');
+  t.eq('immediate recovery retains the conflicting local customer', byLabel(live, 'Name').value, 'Keep this local customer');
   const before = sheets.length;
   G.AAA_RBAC.setRole('crew');
   await UI.open();

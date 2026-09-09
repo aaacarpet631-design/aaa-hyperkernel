@@ -53,6 +53,18 @@ module.exports = async function () {
   await Promise.resolve();
   t.eq('confirmed reason is preserved', reason.value && reason.value.reason, 'Rates verified');
   t.eq('closed confirmations release their keyboard listeners', keys.size, 0);
+  let parentClosed = 0;
+  const parent = U.sheet({ title: 'Build a quote', onClose: () => { parentClosed++; } });
+  G.document.body.appendChild(parent.overlay);
+  const nested = start();
+  [...keys].forEach((fn) => fn({ key: 'Escape' }));
+  await Promise.resolve();
+  t.eq('Escape cancels only the approval dialog', nested.value, null);
+  t.eq('Escape leaves the underlying quote editor open', parentClosed, 0);
+  t.eq('underlying quote editor retains its keyboard listener', keys.size, 1);
+  parent.close(); parent.close();
+  t.eq('closing a sheet twice invokes its cleanup once', parentClosed, 1);
+  t.eq('nested sheet cleanup leaves no keyboard listeners', keys.size, 0);
   delete G.document; delete G.requestAnimationFrame;
   return t.report();
 };

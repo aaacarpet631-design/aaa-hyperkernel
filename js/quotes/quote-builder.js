@@ -22,7 +22,7 @@
     return n;
   }
   function count(v, label, fallback) {
-    const n = number(v == null || v === '' ? fallback : v, label, 1000);
+    const n = number(v == null ? fallback : v, label, 1000);
     if (n < 1 || !Number.isInteger(n)) throw new Error(label + ' must be a whole number of at least 1.');
     return n;
   }
@@ -32,6 +32,7 @@
       r[key] = number(raw[key] == null && key === 'shampoo_min_per_room' ? 45 : raw[key], key);
     });
     if (r.waste_factor > 1 || r.range_spread > 1) throw new Error('Waste and range percentages must be between 0 and 100.');
+    if (r.shampoo_min_per_room < engine().rules().SHAMPOO_HARD_FLOOR_PER_ROOM) throw new Error('The cleaning minimum must be at least $45 per room.');
     return r;
   }
   function fresh() {
@@ -87,7 +88,7 @@
           const rates = Object.assign({}, normalized.rateSnapshot);
           if (svc.material) {
             ['materialRate', 'padRate'].forEach((key) => {
-              if (raw[key] != null && raw[key] !== '') row[key] = number(raw[key], label + ' ' + key);
+              if (raw[key] != null) row[key] = number(raw[key], label + (key === 'materialRate' ? ' carpet price' : ' padding price'));
             });
             row.carpetName = text(raw.carpetName);
             row.padName = text(raw.padName);
@@ -171,15 +172,37 @@
       emailUrl: /^[^\s@,;?&#]+@[^\s@,;?&#]+\.[^\s@,;?&#]+$/.test(email) ? 'mailto:' + encodeURIComponent(email) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(content) : null };
   }
 
+  function workingKey() {
+    return global.AAA_ID_FACTORY ? global.AAA_ID_FACTORY.createId('quote_form') : 'form_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+  }
   async function saveWorking(value) {
     const local = global.AAA_LOCAL_FIRST_STORAGE;
     if (!local) throw new Error('Device storage unavailable.');
-    await local.put(WORKING, ws(), { workspaceId: ws(), value: clone(value) }, { requirePersistent: true });
+    const workspaceId = ws();
+    const current = await local.get(WORKING, workspaceId);
+    // Preserve the single-slot form written by earlier versions on first use.
+    if (current && current.value && !current.activeKey) {
+      const legacy = { workspaceId: workspaceId, workingKey: 'legacy', value: clone(current.value), updatedAt: new Date().toISOString() };
+      await local.put(WORKING, workspaceId + ':legacy', legacy, { requirePersistent: true });
+    }
+    const key = value.workingKey || 'legacy';
+    const record = { workspaceId: workspaceId, workingKey: key, value: clone(value), updatedAt: new Date().toISOString() };
+    await local.put(WORKING, workspaceId + ':' + key, record, { requirePersistent: true });
+    await local.put(WORKING, workspaceId, { workspaceId: workspaceId, activeKey: key, value: clone(value) }, { requirePersistent: true });
+    return key;
   }
-  async function loadWorking() {
+  async function loadWorking(key) {
     const local = global.AAA_LOCAL_FIRST_STORAGE;
-    const rec = local && await local.get(WORKING, ws());
-    return rec && rec.workspaceId === ws() ? clone(rec.value) : null;
+    const rec = local && await local.get(WORKING, key ? ws() + ':' + key : ws());
+    return rec && rec.workspaceId === ws() ? Object.assign(clone(rec.value), { workingKey: rec.workingKey || rec.activeKey || 'legacy' }) : null;
+  }
+  async function listWorking() {
+    const local = global.AAA_LOCAL_FIRST_STORAGE;
+    if (!local) return [];
+    const records = await local.getAll(WORKING);
+    return records.filter((r) => r && r.workspaceId === ws() && r.workingKey && r.value && r.value.dirty !== false && r.value.input &&
+      (r.value.input.customer && Object.values(r.value.input.customer).some(Boolean) || r.value.input.lines && r.value.input.lines.length || r.value.input.note))
+      .sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt))).map((r) => ({ key: r.workingKey, input: clone(r.value.input), updatedAt: r.updatedAt }));
   }
   async function scopedMeasurements(context) {
     const c = context || {}, measurements = global.AAA_MEASUREMENT_STORE;
@@ -210,5 +233,5 @@
     return input;
   }
   global.AAA_QUOTE_BUILDER = { VERSION: VERSION, fresh: fresh, preview: preview, save: save, propose: propose,
-    prepareShare: prepareShare, receiptText: receiptText, saveWorking: saveWorking, loadWorking: loadWorking, fromMeasurements: fromMeasurements, scopedMeasurements: scopedMeasurements };
+    prepareShare: prepareShare, receiptText: receiptText, workingKey: workingKey, saveWorking: saveWorking, loadWorking: loadWorking, listWorking: listWorking, fromMeasurements: fromMeasurements, scopedMeasurements: scopedMeasurements };
 })(typeof window !== 'undefined' ? window : this);
