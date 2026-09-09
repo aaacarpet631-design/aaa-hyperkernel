@@ -204,7 +204,7 @@
       actions.appendChild(ui.button({ label: 'Financial Intelligence', icon: '📊', variant: 'secondary', full: true, onClick: () => global.AAA_FINANCIAL_INTEL_UI.open() }));
     }
     if (global.AAA_ESTIMATOR_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('CREATE_QUOTE'))) {
-      actions.appendChild(ui.button({ label: 'AI Estimator', icon: '📐', variant: 'secondary', full: true, onClick: () => global.AAA_ESTIMATOR_UI.open() }));
+      actions.appendChild(ui.button({ label: global.AAA_RBAC && global.AAA_RBAC.can('VIEW_FINANCIALS') ? 'Quote builder' : 'AI Estimator', icon: '📐', variant: 'secondary', full: true, onClick: () => global.AAA_ESTIMATOR_UI.open() }));
     }
     if (global.AAA_QUOTE_LIFECYCLE_UI && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_FINANCIALS'))) {
       actions.appendChild(ui.button({ label: 'Quotes', icon: '📋', variant: 'secondary', full: true, onClick: () => global.AAA_QUOTE_LIFECYCLE_UI.open() }));

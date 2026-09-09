@@ -73,10 +73,12 @@
      * @param {string} serviceId  key of SERVICES
      * @param {MeasurementSession[]} sessions
      */
-    priceService(serviceId, sessions) {
+    priceService(serviceId, sessions, opts) {
       const svc = SERVICES[serviceId];
       if (!svc) return null;
-      const r = rates();
+      // The builder captures the rate card once per quote. Legacy callers keep
+      // their existing defaults; a combined quote applies its trip minimum once.
+      const r = Object.assign({}, rates(), opts && opts.rates || {});
       const list = Array.isArray(sessions) ? sessions : [sessions];
 
       let area = 0, linear = 0, stairs = 0, units = list.length;
@@ -125,7 +127,7 @@
         }
       }
 
-      const belowMin = subtotal < (r.min_job || 0);
+      const belowMin = !(opts && opts.applyMinimum === false) && subtotal < (r.min_job || 0);
       if (belowMin) subtotal = r.min_job || 0;
 
       const spread = r.range_spread || 0;

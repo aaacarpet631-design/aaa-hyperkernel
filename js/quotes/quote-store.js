@@ -89,14 +89,17 @@
       const marginPct = customerTotal > 0 ? Math.round((margin / customerTotal) * 100) : null;
       const cust = i.customer || {};
       const id = i.id || newId('quote');
+      if (await data().get(QUOTES, id)) throw new Error('QUOTE_ID_EXISTS');
+      if (!validEstimate(est)) throw new Error('INVALID_QUOTE_AMOUNT');
       const at = nowISO();
 
       const rec = {
-        quoteId: id, id: id, workspaceId: ws(), status: S.DRAFT,
+        quoteId: id, id: id, workspaceId: ws(), status: S.DRAFT, revision: 1,
+        builderInput: i.builderInput ? clone(i.builderInput) : null,
         // customer + context
         customerId: cust.id || i.customerId || null,
         customerName: cust.name || i.customerName || null,
-        customerContact: { phone: cust.phone || null, address: cust.address || i.address || null },
+        customerContact: { phone: cust.phone || null, email: cust.email || null, address: cust.address || i.address || null },
         leadSource: i.leadSource || cust.source || null,
         zip: i.zip || extractZip(cust.address || i.address) || null,
         jobId: i.jobId || est.jobId || null,
@@ -110,8 +113,8 @@
           inferredServices: !!est.inferredServices, decisionId: est.decisionId || null
         },
         // INTERNAL (owner-only collection): cost logic + margin
-        internalCost: { labor: round(num(q._laborTotal)), material: round(num(q._materialTotal)), total: internalCost, ruleNotes: flattenRuleNotes(q) },
-        marginEstimate: margin, marginPct: marginPct,
+        internalCost: i.builderInput ? { labor: null, material: null, total: null, known: false, ruleNotes: flattenRuleNotes(q) } : { labor: round(num(q._laborTotal)), material: round(num(q._materialTotal)), total: internalCost, ruleNotes: flattenRuleNotes(q) },
+        marginEstimate: i.builderInput ? null : margin, marginPct: i.builderInput ? null : marginPct,
         // customer-facing receipt (no internal numbers)
         customerReceipt: est.receipt || null,
         customerTotal: customerTotal,
@@ -135,11 +138,49 @@
     },
 
     // ---- committing transitions (human-only, audited) ------------------
-    async markReviewed(id, opts) { return this._transition(id, S.REVIEWED, 'MODIFY_QUOTE', opts, (rec, o) => { rec.review = { reviewedBy: o.actor || null, reviewedAt: nowISO(), notes: o.notes || null }; }); },
+    async markReviewed(id, opts) { return this._transition(id, S.REVIEWED, 'MODIFY_QUOTE', opts, (rec, o) => {
+      if (!global.AAA_RBAC || !global.AAA_RBAC.can('APPROVE_QUOTE')) throw new Error('APPROVE_QUOTE_REQUIRED');
+      if (rec.builderInput && o.confirmRates !== true) throw new Error('Confirm the measurements, rates and total before approving.');
+      rec.review = { reviewedBy: o.actor || null, reviewedAt: nowISO(), notes: o.notes || null, revision: rec.revision };
+    }); },
     async send(id, opts) {
       const q = await this.get(id); if (!q) return { ok: false, error: 'NOT_FOUND' };
       if (q.status !== S.REVIEWED) return { ok: false, error: 'NEEDS_REVIEW', message: 'A person must review the quote before it can be sent.' };
+      if (q.builderInput && (!opts || opts.confirmedSent !== true)) return { ok: false, error: 'DELIVERY_CONFIRMATION_REQUIRED', message: 'Confirm that you sent the quote in your messaging app.' };
       return this._transition(id, S.SENT, 'SEND_QUOTE', opts, (rec) => { rec.sentAt = nowISO(); });
+    },
+
+    /** Update an unsent quote in place. Every edit invalidates prior approval. */
+    async reviseDraft(id, input, opts) {
+      const o = opts || {}, i = input || {};
+      const q = await this.get(id);
+      if (!q) return { ok: false, error: 'NOT_FOUND' };
+      if (!['draft', 'reviewed'].includes(q.status)) return { ok: false, error: 'QUOTE_LOCKED', message: 'Sent quotes are preserved. Create a new quote for revised work.' };
+      if (o.expectedRevision !== (q.revision || 1)) return { ok: false, error: 'REVISION_CONFLICT', message: 'This quote changed. Reopen it before saving.' };
+      if (!validEstimate(i.estimate)) return { ok: false, error: 'INVALID_QUOTE_AMOUNT' };
+      const gw = gateway();
+      if (!gw) return { ok: false, error: 'NO_GATEWAY' };
+      const res = await gw.run({ action: 'MODIFY_QUOTE', origin: o.origin === 'ai' ? 'ai' : 'human', actor: o.actor,
+        target: { type: 'quote', id: id }, detail: { revision: q.revision || 1, edit: true }, mutate: async () => {
+          const est = i.estimate, priced = est.quote, c = i.customer || {};
+          const rec = Object.assign({}, q, {
+            status: S.DRAFT, revision: (q.revision || 1) + 1, builderInput: clone(i.builderInput),
+            customerName: c.name || null, customerId: c.id || null,
+            customerContact: { phone: c.phone || null, email: c.email || null, address: c.address || null },
+            customerReceipt: clone(est.receipt), customerTotal: priced.total, serviceType: est.services.slice(),
+            measurement: clone(i.sessions || []), jobId: i.jobId || null,
+            internalCost: { labor: null, material: null, total: null, known: false, ruleNotes: flattenRuleNotes(priced) },
+            marginEstimate: null, marginPct: null,
+            confidence: null, risk: null, severity: null,
+            estimatorRecommendation: { reasoning: est.reasoning || null, services: est.services.slice(), inferredServices: false, decisionId: null },
+            review: { reviewedBy: null, reviewedAt: null, notes: null }, updatedAt: nowISO(),
+            statusHistory: (q.statusHistory || []).concat([{ status: S.DRAFT, at: nowISO(), by: o.actor, origin: 'human', reason: 'Quote edited; review required' }])
+          });
+          await put(rec);
+          if (events()) events().emit('quote.updated', { quoteId: id, revision: rec.revision });
+          return rec;
+        } });
+      return res.ok ? { ok: true, quote: res.result, auditId: res.auditId } : res;
     },
     async setFollowUp(id, opts) { const o = opts || {}; return this._transition(id, S.FOLLOW_UP, 'MODIFY_QUOTE', o, (rec) => { rec.followUpDueAt = o.dueAt || nowISO(); }); },
     async expire(id, opts) { return this._transition(id, S.EXPIRED, 'MODIFY_QUOTE', opts); },
@@ -149,15 +190,15 @@
     async markWon(id, opts) {
       const o = opts || {};
       if (!o.reason) return { ok: false, error: 'REASON_REQUIRED', message: 'Record why the job was won.' };
+      if ((o.finalPrice != null && o.finalPrice !== '' && (!Number.isFinite(Number(o.finalPrice)) || Number(o.finalPrice) < 0)) || (o.jobCost != null && o.jobCost !== '' && (!Number.isFinite(Number(o.jobCost)) || Number(o.jobCost) < 0))) return { ok: false, error: 'INVALID_AMOUNT' };
       const finalPrice = round(num(o.finalPrice));
-      const jobCost = o.jobCost != null ? round(num(o.jobCost)) : null;
+      const jobCost = o.jobCost != null && o.jobCost !== '' ? round(num(o.jobCost)) : null;
       return this._transition(id, S.WON, 'RESOLVE_QUOTE', o, async (rec) => {
         rec.wonLostReason = String(o.reason);
         rec.finalPrice = finalPrice > 0 ? finalPrice : rec.customerTotal;
         rec.jobCost = jobCost;
         rec.grossMargin = (jobCost != null) ? round(rec.finalPrice - jobCost) : null;
         rec.resolvedAt = nowISO();
-        await this._recordOutcome(rec, 'won');
       });
     },
     /** Mark LOST → writes a training signal (reason captured for learning). */
@@ -167,7 +208,6 @@
       return this._transition(id, S.LOST, 'RESOLVE_QUOTE', o, async (rec) => {
         rec.wonLostReason = String(o.reason);
         rec.resolvedAt = nowISO();
-        await this._recordOutcome(rec, 'lost');
       });
     },
 
@@ -230,6 +270,8 @@
       const o = opts || {};
       const q = await this.get(id);
       if (!q) return { ok: false, error: 'NOT_FOUND' };
+      if (o.expectedRevision != null && o.expectedRevision !== (q.revision || 1)) return { ok: false, error: 'REVISION_CONFLICT', message: 'This quote changed. Reopen it before continuing.' };
+      if (q.builderInput && o.expectedRevision == null) return { ok: false, error: 'REVISION_REQUIRED' };
       const allowed = TRANSITIONS[q.status] || [];
       if (allowed.indexOf(toStatus) === -1) return { ok: false, error: 'INVALID_TRANSITION', message: 'Cannot move a ' + q.status + ' quote to ' + toStatus + '.' };
       const gw = gateway();
@@ -238,10 +280,11 @@
         action: action, origin: o.origin === 'ai' ? 'ai' : 'human', actor: o.actor || null,
         target: { type: 'quote', id: id }, detail: { from: q.status, to: toStatus },
         mutate: async () => {
-          const rec = Object.assign({}, q, { status: toStatus, updatedAt: nowISO() });
+          const rec = Object.assign({}, q, { status: toStatus, revision: (q.revision || 1) + 1, updatedAt: nowISO() });
           rec.statusHistory = (q.statusHistory || []).concat([{ status: toStatus, at: nowISO(), by: o.actor || null, origin: o.origin === 'ai' ? 'ai' : 'human', reason: o.reason || null }]);
           if (applyFn) await applyFn(rec, o);
           await put(rec);
+          if (toStatus === S.WON || toStatus === S.LOST) await this._recordOutcome(rec, toStatus);
           if (events()) events().emit('quote.' + toStatus, { quoteId: id, jobId: rec.jobId });
           return rec;
         }
@@ -266,7 +309,7 @@
       };
       try {
         await data().put(OUTCOMES, outcome.id, outcome);
-        if (data().cloudReady && data().cloudReady() && global.AAA_CLOUD) await global.AAA_CLOUD.upsertEntity(OUTCOMES, outcome.id, outcome);
+        if (data().cloudReady && data().cloudReady() && global.AAA_CLOUD) Promise.resolve(global.AAA_CLOUD.upsertEntity(OUTCOMES, outcome.id, outcome)).catch(() => {});
       } catch (_) {}
       try { if (supervisor() && supervisor().scoreOutcome) await supervisor().scoreOutcome(outcome); } catch (_) {}
       if (events()) events().emit('outcome.recorded', { quoteId: quote.quoteId, result: result });
@@ -279,10 +322,49 @@
   function measSummary(s) { return s ? { roomName: s.roomName, squareFeet: s.squareFeet, linearFeet: s.linearFeet, stairsCount: s.stairsCount } : null; }
   function flattenRuleNotes(q) { return [].concat.apply([], ((q && q.lines) || []).map((l) => l._ruleNotes || [])); }
   function extractZip(addr) { if (!addr) return null; const m = String(addr).match(/\b(\d{5})(?:-\d{4})?\b/); return m ? m[1] : null; }
-  async function put(rec) {
-    await data().put(QUOTES, rec.id, rec);
-    try { if (data().cloudReady && data().cloudReady() && global.AAA_CLOUD) global.AAA_CLOUD.upsertEntity(QUOTES, rec.id, rec); } catch (_) {}
+  function clone(v) { return v == null ? null : JSON.parse(JSON.stringify(v)); }
+  function validEstimate(est) {
+    const q = est && est.quote || {}, r = est && est.receipt;
+    const total = q.total != null ? q.total : r && r.total;
+    return Number.isFinite(total) && total >= 0 && (!r || (Number.isFinite(r.total) && r.total === total && Array.isArray(r.items) && r.items.every((it) => Number.isFinite(it.amount) && it.amount >= 0) && round(r.items.reduce((n, it) => n + it.amount, 0)) === total));
   }
+  // Local confirmation must not wait for the network. Keep at most the latest
+  // pending snapshot per quote, and mirror revisions in order within this runtime.
+  const mirrors = new Map();
+  function mirror(rec) {
+    if (!data().cloudReady || !data().cloudReady() || !global.AAA_CLOUD) return;
+    const key = rec.workspaceId + ':' + rec.id;
+    const snapshot = clone(rec);
+    if (mirrors.has(key)) { mirrors.get(key).next = snapshot; return; }
+    const entry = { next: snapshot };
+    const backend = global.AAA_CLOUD;
+    mirrors.set(key, entry);
+    (async () => {
+      try {
+        while (entry.next) {
+          const next = entry.next; entry.next = null;
+          try { await backend.upsertEntity(QUOTES, next.id, next); } catch (_) {}
+        }
+      } finally { mirrors.delete(key); }
+    })().catch(() => {});
+  }
+  async function put(rec) {
+    await data().put(QUOTES, rec.id, rec, { requirePersistent: true });
+    try { mirror(rec); } catch (_) {}
+  }
+
+  // Serialize competing writes in this runtime. This is not a distributed lock.
+  const pending = new Map();
+  ['reviseDraft', '_transition'].forEach((method) => {
+    const run = Store[method];
+    Store[method] = function (id, ...args) {
+      const key = ws() + ':' + id;
+      const task = (pending.get(key) || Promise.resolve()).catch(() => {}).then(() => run.call(this, id, ...args));
+      pending.set(key, task);
+      task.finally(() => { if (pending.get(key) === task) pending.delete(key); }).catch(() => {});
+      return task;
+    };
+  });
 
   global.AAA_QUOTES = Store;
 })(typeof window !== 'undefined' ? window : this);

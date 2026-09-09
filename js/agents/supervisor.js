@@ -36,7 +36,7 @@
     // Best-effort cloud sync of the new score + outcome link (any backend).
     try {
       if (data().cloudReady && data().cloudReady() && global.AAA_CLOUD) {
-        await global.AAA_CLOUD.upsertEntity('agent_decisions', dec.id, dec);
+        Promise.resolve(global.AAA_CLOUD.upsertEntity('agent_decisions', dec.id, dec)).catch(() => {});
       }
     } catch (_) {}
   }

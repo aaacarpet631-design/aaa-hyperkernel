@@ -164,6 +164,7 @@
   }
 
   function open() {
+    if (global.AAA_QUOTE_BUILDER_UI && rbac() && rbac().can('VIEW_FINANCIALS')) return global.AAA_QUOTE_BUILDER_UI.open();
     const ui = U();
     const sheet = ui.sheet({ title: 'AI Estimator', subtitle: 'AAA Carpet — field quoting' });
     document.body.appendChild(sheet.overlay);

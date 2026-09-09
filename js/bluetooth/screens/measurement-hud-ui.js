@@ -23,7 +23,11 @@
   function events() { return global.AAA_EVENTS; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
-  const state = { jobId: null, customerId: null, sheet: null, view: 'setup', unsub: null, draft: null, seq: null };
+  const state = { jobId: null, customerId: null, fieldSessionId: null, sessionIds: [], sheet: null, view: 'setup', unsub: null, draft: null, seq: null };
+  async function currentSessions() {
+    if (global.AAA_QUOTE_BUILDER) return global.AAA_QUOTE_BUILDER.scopedMeasurements(state);
+    return state.jobId ? (await store().listSessions({ jobId: state.jobId })).filter((s) => !s.deleted) : [];
+  }
 
   // Tear down any running auto-measure sequence (on save, nav away, or close).
   function stopSeq() { if (state.seq) { try { state.seq.stop(); } catch (_) {} state.seq = null; } }
@@ -32,6 +36,8 @@
     opts = opts || {};
     state.jobId = opts.jobId || null;
     state.customerId = opts.customerId || null;
+    state.fieldSessionId = opts.fieldSessionId || null;
+    state.sessionIds = [];
     state.draft = null;
     const ui = U();
     const sheet = ui.sheet({ title: 'Room Measurement', subtitle: 'AAA Carpet — field capture' });
@@ -379,11 +385,15 @@
       source: d.source, manualOverride: d.manualOverride,
       confidenceScore: d.source === 'bluetooth' ? 0.9 : null
     });
-    const existing = await store().listSessions({ jobId: state.jobId });
+    const existing = await currentSessions();
     const v = models().validateSession(session, { existing: existing });
     if (!v.ok) { toast(body, v.errors.join(' '), '#EF4444'); return; }
-    const res = await store().saveSession(session);
+    const res = state.fieldSessionId && global.AAA_FIELD_CAPTURE_SESSION
+      ? await global.AAA_FIELD_CAPTURE_SESSION.addRoom(state.fieldSessionId, session)
+      : await store().saveSession(session);
     if (!res.ok) { toast(body, 'Could not save: ' + (res.error || ''), '#EF4444'); return; }
+    const savedRoom = res.room || res.session;
+    if (savedRoom && savedRoom.id) state.sessionIds.push(savedRoom.id);
     if (v.warnings.length) toast(body, '⚠ ' + v.warnings.join(' '), '#F59E0B');
     else toast(body, 'Saved “' + session.roomName + '”.', '#10B981');
     state.draft = blankDraft(d.source); // ready for next room
@@ -394,7 +404,7 @@
   async function renderReview(body) {
     const ui = U();
     body.appendChild(title('Review Rooms'));
-    const sessions = await store().listSessions({ jobId: state.jobId });
+    const sessions = await currentSessions();
     if (!sessions.length) { body.appendChild(ui.el('p', { className: 'aaa-empty', text: 'No rooms captured yet.' })); }
     let totalSq = 0;
     sessions.forEach((s) => {
@@ -438,7 +448,7 @@
   async function renderSendToQuote(body) {
     const ui = U();
     body.appendChild(title('Send to Quote'));
-    const sessions = await store().listSessions({ jobId: state.jobId });
+    const sessions = await currentSessions();
     if (!sessions.length) { body.appendChild(ui.el('p', { className: 'aaa-empty', text: 'No rooms to quote.' })); body.appendChild(navRow([{ label: 'Back', onClick: () => go('review') }])); return; }
 
     body.appendChild(ui.el('p', { className: 'aaa-voice-hint', text: 'Pick the services to price from these measurements.' }));
@@ -451,9 +461,18 @@
     });
 
     const out = ui.el('div', {});
-    body.appendChild(ui.button({ label: 'Build draft quote', icon: '🧮', variant: 'primary', full: true, onClick: () => {
+    body.appendChild(ui.button({ label: 'Build draft quote', icon: '🧮', variant: 'primary', full: true, onClick: async () => {
       const selections = Object.keys(chosen).filter((k) => chosen[k]).map((id) => ({ serviceId: id, sessions: sessions }));
       if (!selections.length) { toast(body, 'Pick at least one service.', '#F59E0B'); return; }
+      if (global.AAA_QUOTE_BUILDER_UI && global.AAA_QUOTE_BUILDER && global.AAA_RBAC && global.AAA_RBAC.can('VIEW_FINANCIALS')) {
+        let customer = {};
+        try {
+          const job = state.jobId && await global.AAA_DATA.get('jobs', state.jobId);
+          if (job) customer = { name: job.customerName || '', phone: job.customerPhone || job.phone || '', address: job.address || '' };
+        } catch (_) {}
+        const input = global.AAA_QUOTE_BUILDER.fromMeasurements(sessions, selections.map((sel) => sel.serviceId), { jobId: state.jobId, customer: customer });
+        return global.AAA_QUOTE_BUILDER_UI.open({ input: input });
+      }
       const q = quote().buildQuote(selections);
       state._lastQuote = q; state._lastSessions = sessions;
       // RBAC: only roles that may see margins get the labor/material breakdown.
