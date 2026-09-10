@@ -61,13 +61,13 @@
       try {
         if (c.variant === 'reward') {
           if (!state.rewardEndpoint) return { ok: false, error: 'REWARD_NOT_SUPPORTED' };
-          const r = await f(state.rewardEndpoint, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ model: c.modelId, input: c.input }) });
+          const r = await f(state.rewardEndpoint, { method: 'POST', headers: Object.assign({ 'content-type': 'application/json' }, global.AAA_CONFIG && global.AAA_CONFIG.sessionHeaders ? global.AAA_CONFIG.sessionHeaders() : {}), body: JSON.stringify({ model: c.modelId, input: c.input }) });
           const j = await r.json();
           return this.parse(j, 'reward');
         }
         const url = endpoint();
         if (!url) return { ok: false, error: 'NO_ENDPOINT' };
-        const r = await f(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(this.build(c)) });
+        const r = await f(url, { method: 'POST', headers: Object.assign({ 'content-type': 'application/json' }, global.AAA_CONFIG && global.AAA_CONFIG.sessionHeaders ? global.AAA_CONFIG.sessionHeaders() : {}), body: JSON.stringify(this.build(c)) });
         const j = await r.json();
         return this.parse(j, c.variant);
       } catch (e) { return { ok: false, error: 'TRANSPORT_FAILED', detail: String((e && e.message) || e) }; }

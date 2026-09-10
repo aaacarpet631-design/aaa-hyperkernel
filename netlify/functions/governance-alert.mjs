@@ -1,3 +1,4 @@
+import { withAppAuth } from '../lib/app-auth.mjs';
 /*
  * governance-alert — Netlify Function: owner/admin EMAIL delivery for
  * high-priority governance escalations.
@@ -126,7 +127,7 @@ export function parseProviderResponse(provider, status, data) {
   return { ok: false, error: 'PROVIDER_ERROR', status, message: String(msg) };
 }
 
-export default async (req) => {
+export const deliverAlert = async (req) => {
   if (req.method === 'OPTIONS') return json({ ok: true });
   if (req.method !== 'POST') return json({ ok: false, error: 'METHOD_NOT_ALLOWED' }, 405);
 
@@ -150,5 +151,7 @@ export default async (req) => {
     return json({ ok: false, error: 'DELIVERY_FAILED', message: String((err && err.message) || err) }, 502);
   }
 };
+
+export default withAppAuth(deliverAlert);
 
 export const config = { path: '/api/governance-alert' };

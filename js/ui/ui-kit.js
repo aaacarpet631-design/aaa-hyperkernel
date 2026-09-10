@@ -7,6 +7,19 @@
 ;(function (global) {
   'use strict';
   const sheets = [];
+  let sequence = 0, bodyOverflow = '';
+  const background = new Map();
+  function syncBackground() {
+    const top = sheets[sheets.length - 1];
+    for (const [node, inert] of background) { node.inert = inert; }
+    background.clear();
+    if (!top) { document.body.style.overflow = bodyOverflow; return; }
+    for (const node of Array.from(document.body.children)) {
+      if (node === top.overlay) continue;
+      background.set(node, !!node.inert); node.inert = true;
+    }
+    document.body.style.overflow = 'hidden';
+  }
 
   /** Tiny hyperscript helper. */
   function el(tag, props, children) {
@@ -32,7 +45,8 @@
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'aaa-btn aaa-btn--' + (opts.variant || 'primary') + (opts.full ? ' aaa-btn--full' : '') + (opts.size === 'sm' ? ' aaa-btn--sm' : '');
-    b.innerHTML = (opts.icon ? '<span class="aaa-btn__icon" aria-hidden="true">' + opts.icon + '</span>' : '') + '<span>' + (opts.label || '') + '</span>';
+    if (opts.icon) b.appendChild(el('span', { className: 'aaa-btn__icon', text: opts.icon, attrs: { 'aria-hidden': 'true' } }));
+    b.appendChild(el('span', { text: opts.label || '' }));
     if (opts.ariaLabel) b.setAttribute('aria-label', opts.ariaLabel);
     if (opts.disabled) b.disabled = true;
     if (opts.onClick) b.addEventListener('click', opts.onClick);
@@ -70,39 +84,74 @@
    */
   function sheet(opts) {
     opts = opts || {};
-    const entry = {};
+    if (!sheets.length) bodyOverflow = document.body.style.overflow || '';
+    const entry = { previousFocus: document.activeElement };
     sheets.push(entry);
     let closed = false;
     const overlay = el('div', { className: 'aaa-sheet-overlay' });
+    entry.overlay = overlay;
     const closeBtn = el('button', {
-      className: 'aaa-sheet__close', attrs: { 'aria-label': 'Close', type: 'button' }, html: '&times;'
+      className: 'aaa-sheet__close', attrs: { 'aria-label': 'Close', type: 'button' }, text: '×'
     });
-    const titleEl = opts.title ? el('h2', { className: 'aaa-sheet__title', text: opts.title }) : null;
-    const subEl = opts.subtitle ? el('p', { className: 'aaa-sheet__subtitle', text: opts.subtitle }) : null;
+    const titleId = 'aaa-dialog-title-' + (++sequence);
+    const titleEl = opts.title ? el('h2', { id: titleId, className: 'aaa-sheet__title', text: opts.title }) : null;
+    const subEl = opts.subtitle ? el('p', { id: titleId + '-description', className: 'aaa-sheet__subtitle', text: opts.subtitle }) : null;
     const header = el('div', { className: 'aaa-sheet__header' }, [
       el('div', { className: 'aaa-sheet__heading' }, [titleEl, subEl]),
       closeBtn
     ]);
     const body = el('div', { className: 'aaa-sheet__body' });
-    const card = el('div', { className: 'aaa-sheet' + (opts.size === 'sm' ? ' aaa-sheet--sm' : ''), attrs: { role: 'dialog', 'aria-modal': 'true' } }, [header, body]);
+    const card = el('div', { className: 'aaa-sheet' + (opts.size === 'sm' ? ' aaa-sheet--sm' : ''), attrs: Object.assign({ role: 'dialog', 'aria-modal': 'true', tabindex: '-1' }, titleEl ? { 'aria-labelledby': titleId } : { 'aria-label': opts.ariaLabel || 'Dialog' }) }, [header, body]);
+    entry.card = card;
+    if (subEl) card.setAttribute('aria-describedby', subEl.id);
     overlay.appendChild(card);
 
     function close() {
       if (closed) return;
       closed = true;
+      const wasTop = sheets[sheets.length - 1] === entry;
       sheets.splice(sheets.indexOf(entry), 1);
       overlay.classList.remove('aaa-sheet-overlay--in');
       document.removeEventListener('keydown', onKey);
+      syncBackground();
+      overlay.inert = true;
+      if (wasTop) {
+        const previous = entry.previousFocus;
+        const target = previous && previous.isConnected && !previous.closest('[inert]') ? previous : sheets.length ? sheets[sheets.length - 1].card : null;
+        if (target && target.focus) target.focus({ preventScroll: true });
+      }
       setTimeout(() => overlay.remove(), 180);
       if (opts.onClose) opts.onClose();
     }
-    function onKey(e) { if (e.key === 'Escape' && sheets[sheets.length - 1] === entry) close(); }
-    closeBtn.addEventListener('click', close);
-    overlay.addEventListener('click', (e) => { if (e.target === overlay && sheets[sheets.length - 1] === entry) close(); });
+    function onKey(e) {
+      if (sheets[sheets.length - 1] !== entry) return;
+      if (e.key === 'Escape') { if (e.preventDefault) e.preventDefault(); if (e.stopPropagation) e.stopPropagation(); requestClose(); }
+      if (e.key !== 'Tab') return;
+      const focusable = Array.from(card.querySelectorAll('button, a[href], input, select, textarea, [tabindex]'))
+        .filter((n) => !n.disabled && n.tabIndex >= 0 && !n.closest('[inert]') && n.getClientRects().length);
+      const first = focusable[0], last = focusable[focusable.length - 1], active = document.activeElement;
+      if (!first || !card.contains(active) || e.shiftKey && (active === first || active === card) || !e.shiftKey && active === last) {
+        e.preventDefault(); (e.shiftKey ? last || card : first || card).focus();
+      }
+    }
+    let checkingClose = false;
+    async function requestClose() {
+      if (closed || checkingClose) return;
+      if (!opts.beforeClose) { close(); return; }
+      checkingClose = true;
+      try { if (await opts.beforeClose()) close(); }
+      finally { checkingClose = false; }
+    }
+    closeBtn.addEventListener('click', requestClose);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay && sheets[sheets.length - 1] === entry) requestClose(); });
     document.addEventListener('keydown', onKey);
     // animate in (guard rAF for non-browser/test contexts)
     var raf = global.requestAnimationFrame || function (f) { return setTimeout(f, 0); };
-    raf(function () { overlay.classList.add('aaa-sheet-overlay--in'); });
+    raf(function () {
+      if (closed) return;
+      overlay.classList.add('aaa-sheet-overlay--in'); syncBackground();
+      if (sheets[sheets.length - 1] === entry) card.focus({ preventScroll: true });
+    });
     return { overlay: overlay, body: body, header: header, close: close };
   }
 
@@ -124,8 +173,9 @@
 
       let reasonInput = null;
       if (opts.requireReason) {
-        s.body.appendChild(el('label', { className: 'aaa-field-label', text: opts.reasonLabel || 'Reason (required)' }));
-        reasonInput = el('textarea', { className: 'aaa-input aaa-textarea', attrs: { placeholder: opts.reasonPlaceholder || 'Explain why…' } });
+        const reasonId = 'aaa-dialog-reason-' + (++sequence);
+        s.body.appendChild(el('label', { className: 'aaa-field-label', text: opts.reasonLabel || 'Reason (required)', attrs: { for: reasonId } }));
+        reasonInput = el('textarea', { id: reasonId, className: 'aaa-input aaa-textarea', attrs: { required: '', placeholder: opts.reasonPlaceholder || 'Explain why…' } });
         s.body.appendChild(reasonInput);
       }
 
@@ -136,7 +186,7 @@
         onClick: () => {
           if (opts.requireReason) {
             const r = reasonInput.value.trim();
-            if (!r) { reasonInput.classList.add('aaa-input--error'); reasonInput.focus(); return; }
+            if (!r) { reasonInput.classList.add('aaa-input--error'); reasonInput.setAttribute('aria-invalid', 'true'); reasonInput.focus(); return; }
             finish({ reason: r }); s.close();
           } else {
             finish({ reason: '' }); s.close();
@@ -144,7 +194,7 @@
         }
       });
       const cancelBtn = button({ label: opts.cancelLabel || 'Cancel', variant: 'ghost', full: true, onClick: () => s.close() });
-      if (reasonInput) reasonInput.addEventListener('input', () => reasonInput.classList.remove('aaa-input--error'));
+      if (reasonInput) reasonInput.addEventListener('input', () => { reasonInput.classList.remove('aaa-input--error'); reasonInput.setAttribute('aria-invalid', 'false'); });
       s.body.appendChild(el('div', { className: 'aaa-dialog__actions' }, [cancelBtn, confirmBtn]));
       document.body.appendChild(s.overlay);
     });

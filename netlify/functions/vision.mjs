@@ -1,3 +1,4 @@
+import { withAppAuth } from '../lib/app-auth.mjs';
 /*
  * Vision estimating function (Netlify, Claude-backed).
  *
@@ -52,7 +53,7 @@ function json(body, status = 200) {
   });
 }
 
-export default async (req) => {
+export function createHandler({ budget } = {}) { return withAppAuth(async (req, context) => {
   if (req.method !== 'POST') {
     return json({ ok: false, error: 'METHOD_NOT_ALLOWED' }, 405);
   }
@@ -112,6 +113,8 @@ export default async (req) => {
       status >= 400 && status <= 599 ? status : 500
     );
   }
-};
+}, { budget, methods: ['POST'] }); }
+
+export default createHandler();
 
 export const config = { path: '/api/vision' };

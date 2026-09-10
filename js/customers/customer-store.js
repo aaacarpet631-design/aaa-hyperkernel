@@ -51,13 +51,15 @@
       const customer = {
         id: idFactory ? idFactory.createId('cust') : String(Date.now()),
         name: String((data && data.name) || '').trim(),
+        workspaceId: global.AAA_CONFIG && global.AAA_CONFIG.workspaceId || 'default',
+        email: (data && data.email) || '',
         address: (data && data.address) || '',
         phone: (data && data.phone) || '',
         gateCode: (data && data.gateCode) || '',
         source: (data && data.source) || null,
         createdAt: clock ? clock.now() : Date.now()
       };
-      await s.put(COLLECTION, customer.id, customer);
+      await s.put(COLLECTION, customer.id, customer, { requirePersistent: true });
       return customer;
     },
 

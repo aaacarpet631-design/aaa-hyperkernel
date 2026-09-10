@@ -1,3 +1,4 @@
+import { withAppAuth } from '../lib/app-auth.mjs';
 /*
  * Receipt OCR function (Netlify, Claude-backed).
  *
@@ -13,7 +14,6 @@
  *
  * Requires ANTHROPIC_API_KEY in the Netlify site environment.
  */
-import Anthropic from '@anthropic-ai/sdk';
 
 const MODEL = 'claude-opus-4-8';
 
@@ -70,7 +70,7 @@ function json(body, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 }
 
-export default async (req) => {
+export default withAppAuth(async (req, context) => {
   if (req.method !== 'POST') return json({ ok: false, error: 'METHOD_NOT_ALLOWED' }, 405);
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return json({ ok: false, error: 'MISSING_API_KEY', message: 'Set ANTHROPIC_API_KEY in the Netlify site environment.' }, 500);
@@ -81,8 +81,10 @@ export default async (req) => {
   const mediaType = (body && body.mediaType) || 'image/jpeg';
   if (!image || typeof image !== 'string') return json({ ok: false, error: 'NO_IMAGE' }, 400);
 
-  const client = new Anthropic({ apiKey });
   try {
+    // Load the provider only after the shared authorization and request checks.
+    const { default: Anthropic } = await import('@anthropic-ai/sdk');
+    const client = new Anthropic({ apiKey, timeout: 30000, maxRetries: 0 });
     const response = await client.messages.create({
       model: MODEL,
       max_tokens: 1500,
@@ -104,8 +106,8 @@ export default async (req) => {
   } catch (err) {
     const status = err && typeof err.status === 'number' ? err.status : 500;
     console.error('Receipt OCR function error', err);
-    return json({ ok: false, error: 'OCR_FAILED', message: String((err && err.message) || err) }, status >= 400 && status <= 599 ? status : 500);
+    return json({ ok: false, error: 'OCR_FAILED', message: 'Receipt extraction failed. Try a clearer image or retry shortly.' }, status >= 400 && status <= 599 ? status : 500);
   }
-};
+});
 
 export const config = { path: '/api/receipt-ocr' };

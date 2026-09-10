@@ -12,6 +12,9 @@ const cp = require('child_process');
 const SUITES = [
   'unit/rbac.test.js',
   'unit/gateway.test.js',
+  'unit/storage-concurrency.test.js',
+  'unit/backup.test.js',
+  'unit/reliability-policy.test.js',
   'unit/model-router.test.js',
   'unit/openai.test.js',
   'unit/action-safety-gate.test.js',

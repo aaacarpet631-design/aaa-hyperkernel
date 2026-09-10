@@ -16,7 +16,7 @@ jobs:
           node-version: 20
       # Only the lint toolchain is needed here.
       - name: Install dev dependencies
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
       - name: Lint
         run: npm run lint
 
@@ -53,7 +53,7 @@ jobs:
           node-version: 20
       # Function bundling needs the runtime dependencies installed.
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
       # Verifies netlify.toml is valid and every function bundles.
       # --offline keeps it self-contained: no site link or auth token needed.
       - name: Verify Netlify build
@@ -73,3 +73,23 @@ jobs:
       - name: Run Firestore rules tests (emulator)
         working-directory: test/rules
         run: npx firebase emulators:exec --only firestore "npm test"
+
+  security:
+    name: CodeQL security scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: github/codeql-action/init@v4
+        with:
+          languages: javascript-typescript
+          build-mode: none
+          queries: security-extended
+      - uses: github/codeql-action/analyze@v4
+        with:
+          output: sarif-results
+          upload: false
+      - name: Gate endpoint and high severity findings
+        run: node test/static/security-gate.cjs sarif-results

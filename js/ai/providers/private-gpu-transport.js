@@ -74,7 +74,7 @@
       let lastErr = 'GPU_UNAVAILABLE';
       for (let i = 0; i < attempts; i++) {
         try {
-          const r = await withTimeout(f(endpoint(), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }), state.timeoutMs);
+          const r = await withTimeout(f(endpoint(), { method: 'POST', headers: Object.assign({ 'content-type': 'application/json' }, global.AAA_CONFIG && global.AAA_CONFIG.sessionHeaders ? global.AAA_CONFIG.sessionHeaders() : {}), body: JSON.stringify(body) }), state.timeoutMs);
           const j = await r.json();
           const parsed = this.parse(j);
           if (parsed.ok) { onSuccess(); return parsed; }

@@ -215,7 +215,7 @@
       const form = new FormData();
       form.append('audio', blob, 'note.webm');
       if (jobId) form.append('jobId', jobId);
-      const res = await global.fetch(endpoint, { method: 'POST', body: form });
+      const res = await global.fetch(endpoint, { method: 'POST', headers: global.AAA_CONFIG && global.AAA_CONFIG.sessionHeaders ? global.AAA_CONFIG.sessionHeaders() : {}, body: form });
       if (!res || !res.ok) { await logErr('TRANSCRIPTION_FAILED', jobId, 'audio_recording', 'http ' + (res && res.status)); return { ok: false, code: 'TRANSCRIPTION_FAILED' }; }
       const json = await res.json();
       const transcript = String((json && (json.transcript || json.text)) || '').trim();

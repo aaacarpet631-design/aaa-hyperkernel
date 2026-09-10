@@ -166,13 +166,13 @@ module.exports = async function () {
   t.eq('failed won save creates no outcome signal', (await data.list('outcomes')).length, 0);
   broken = false;
   // A stalled remote backup must not hold the field workflow hostage.
-  const mirrors = []; let finishFirstMirror;
+  const mirrors = [];
   data.cloudReady = () => true;
   G.AAA_CLOUD = {
     insertEvent: () => new Promise(() => {}),
     upsertEntity: (collection, key, record) => {
       mirrors.push({ collection, key, record });
-      if (collection === 'quotes' && !finishFirstMirror) return new Promise((resolve) => { finishFirstMirror = resolve; });
+      if (collection === 'quotes') return new Promise(() => {});
       if (collection === 'agent_decisions') return new Promise(() => {});
       return Promise.resolve();
     }
@@ -193,12 +193,8 @@ module.exports = async function () {
     if (offlineReview.ok) {
       const offlineSend = await bounded(Q.send(offlineDraft.quote.id, { expectedRevision: 2, confirmedSent: true }));
       t.ok('send recording completes while cloud backup hangs', offlineSend.ok);
-      t.eq('new revisions wait behind the first cloud snapshot', mirrors.filter((m) => m.collection === 'quotes').length, 1);
-      finishFirstMirror();
-      await Promise.resolve(); await Promise.resolve();
-      const pushed = mirrors.filter((m) => m.collection === 'quotes');
-      t.eq('pending cloud updates coalesce to the latest saved revision', pushed[pushed.length - 1].record.revision, 3);
-      t.eq('initial cloud snapshot cannot be mutated by later local changes', pushed[0].record.status, 'draft');
+      t.eq('saved quotes never blindly overwrite another device’s shared cloud quote', mirrors.filter((m) => m.collection === 'quotes').length, 0);
+      t.eq('latest quote revision stays durable for the backup outbox', (await local.entries('quotes'))[offlineDraft.quote.id].revision, 3);
       t.ok('audit records still persist locally before confirmation', (await data.list('audit_log')).length >= 3);
       const offlineWon = await bounded(Q.markWon(offlineDraft.quote.id, { expectedRevision: 3, reason: 'Customer accepted' }));
       t.ok('recording won does not wait for the supervisor cloud backup', offlineWon.ok);

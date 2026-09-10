@@ -34,7 +34,14 @@
     { id: 'quick_estimate', icon: '📝', label: 'Quick Estimate', needs: ['ESTIMATOR_UI'], boot: 'ESTIMATOR_UI', entry: 'open' },
     { id: 'voice_note', icon: '🎤', label: 'Voice Note', needs: ['VOICE_HUD_UI'], boot: 'VOICE_HUD_UI', entry: 'open' }
   ];
-  function actionAvailable(a) { return a.needs.some(has); }
+  function actionAvailable(a) {
+    const target = global['AAA_' + a.boot];
+    return !!target && typeof target[a.entry] === 'function';
+  }
+  function localDay(value) {
+    const d = new Date(value);
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
 
   const Home = {
     QUICK_ACTIONS: QUICK.map(function (a) { return a.id; }),
@@ -44,7 +51,13 @@
       const o = opts || {};
       let jobs = [];
       try { jobs = (await data().list('jobs')) || []; } catch (_) { jobs = []; }
-      const active = jobs.filter(function (j) { const s = String(j.currentState || j.status || '').toUpperCase(); return s !== 'CLOSED' && s !== 'LOST'; });
+      const today = localDay(o.now == null ? nowMs() : o.now), ws = cfg().workspaceId || 'default';
+      const active = jobs.filter(function (j) {
+        const state = String(j.currentState || j.status || '').toUpperCase();
+        const date = String(j.scheduledDate || '');
+        const day = /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : date ? localDay(date) : null;
+        return (j.workspaceId === ws || j.workspaceId == null && ws === 'default') && day === today && !['CLOSED', 'LOST', 'CANCELLED', 'CANCELED'].includes(state);
+      }).sort((a, b) => (a.scheduledStartMins ?? 1440) - (b.scheduledStartMins ?? 1440) || String(a.scheduledDate).localeCompare(String(b.scheduledDate)));
       return active.slice(0, o.limit || 6).map(function (j) { return { id: j.id, label: j.customerName || j.name || j.address || 'Job', state: j.currentState || j.status || 'active', address: j.address || null }; });
     },
 
@@ -53,7 +66,7 @@
       const o = opts || {};
       return {
         greeting: greetingFor(o.now) + ', ' + ownerName(),
-        primaryAction: { id: 'start_measurement', label: 'START MEASUREMENT', icon: '📐', available: has('MEASUREMENT_HUD_UI') || has('CAPTURE_SEQUENCER') },
+        primaryAction: { id: 'start_measurement', label: 'START MEASUREMENT', icon: '📐', available: has('MEASUREMENT_HUD_UI') || has('FIELD_CAPTURE_SESSION') },
         quickActions: QUICK.map(function (a) { return { id: a.id, icon: a.icon, label: a.label, available: actionAvailable(a) }; }),
         todaysJobs: await this.todaysJobs(o),
         ask: { prompt: 'Ask HyperKernel', placeholder: 'What should I focus on?' }
@@ -80,9 +93,8 @@
       if (!a) return { ok: false, reason: 'UNKNOWN_ACTION' };
       if (!actionAvailable(a)) return { ok: false, routed: false, reason: 'unavailable', action: id };
       const target = global['AAA_' + a.boot];
-      // Honor the action's declared entry, then fall back to whatever launch
-      // method the target actually exposes (HUDs use boot, panels use open).
-      const fn = target && (target[a.entry] || target.boot || target.open || target.start);
+      // Call the declared visible entry; boot-only wiring is not an open panel.
+      const fn = target && (target[a.entry]);
       if (typeof fn === 'function' && typeof document !== 'undefined') { fn.call(target, (opts || {})); return { ok: true, routed: true, via: a.boot, entry: a.entry }; }
       return { ok: true, routed: false, via: a.boot, reason: (typeof document === 'undefined' ? 'no_dom' : 'no_boot') };
     },
@@ -95,13 +107,24 @@
       const wrap = document.createElement('div'); wrap.className = 'fm-home';
       wrap.innerHTML =
         '<h2 class="fm-greeting">' + esc(m.greeting) + '</h2>' +
-        '<button class="fm-primary" type="button">' + esc(m.primaryAction.icon) + ' ' + esc(m.primaryAction.label) + '</button>' +
-        '<div class="fm-quick">' + m.quickActions.map(function (q) { return '<button class="fm-q' + (q.available ? '' : ' fm-q--off') + '" data-q="' + esc(q.id) + '">' + esc(q.icon) + '<span>' + esc(q.label) + '</span></button>'; }).join('') + '</div>' +
+        '<button class="fm-primary" type="button"' + (m.primaryAction.available ? '' : ' disabled') + '>' + esc(m.primaryAction.icon) + ' ' + esc(m.primaryAction.label) + '</button>' +
+        '<div class="fm-quick">' + m.quickActions.map(function (q) { return '<button class="fm-q' + (q.available ? '' : ' fm-q--off') + '" type="button" data-q="' + esc(q.id) + '"' + (q.available ? '' : ' disabled') + '>' + esc(q.icon) + '<span>' + esc(q.label) + '</span></button>'; }).join('') + '</div>' +
         '<h3 class="fm-sec">Today\'s Jobs</h3>' +
-        '<div class="fm-jobs">' + (m.todaysJobs.length ? m.todaysJobs.map(function (j) { return '<div class="fm-job" data-job="' + esc(j.id) + '">' + esc(j.label) + ' · ' + esc(j.state) + '</div>'; }).join('') : '<div class="fm-empty">No active jobs — tap START MEASUREMENT to begin.</div>') + '</div>' +
+        '<div class="fm-jobs">' + (m.todaysJobs.length ? m.todaysJobs.map(function (j) { return '<button type="button" class="fm-job" data-job="' + esc(j.id) + '">' + esc(j.label) + ' · ' + esc(j.state.replace(/_/g, ' ')) + '</button>'; }).join('') : '<div class="fm-empty">No jobs scheduled for today. Open Jobs to find other work.</div>') + '</div>' +
         '<button class="fm-ask" type="button">🤖 ' + esc(m.ask.prompt) + ' — "' + esc(m.ask.placeholder) + '"</button>';
       wrap.querySelector('.fm-primary').onclick = function () { self.start(opts); };
       wrap.querySelectorAll('.fm-q').forEach(function (b) { b.onclick = function () { self.startQuick(b.getAttribute('data-q'), opts); }; });
+      wrap.querySelectorAll('[data-job]').forEach(function (b) { b.onclick = () => {
+        const jobs = global.AAA_JOB_LIST_UI;
+        if (jobs) { jobs.tab = 'jobs'; jobs.view = { name: 'detail', jobId: b.getAttribute('data-job') }; jobs.render(); }
+      }; });
+      if (global.AAA_TOOLS_HOME && global.AAA_UI) {
+        const shortcuts = global.AAA_UI.el('div', { className: 'fm-work-shortcuts' });
+        global.AAA_TOOLS_HOME.available().filter(t => ['quote', 'quotes', 'schedule'].includes(t[0])).forEach(t => {
+          shortcuts.appendChild(global.AAA_UI.button({ label: t[1], variant: 'secondary', onClick: () => global.AAA_TOOLS_HOME.launch(t[0]) }));
+        });
+        wrap.insertBefore(shortcuts, wrap.querySelector('.fm-sec'));
+      }
       const ask = wrap.querySelector('.fm-ask'); ask.onclick = function () { if (global.AAA_JOB_LIST_UI && global.AAA_JOB_LIST_UI._switchTab) global.AAA_JOB_LIST_UI._switchTab('chat'); };
       root.appendChild(wrap);
       return { mounted: true };

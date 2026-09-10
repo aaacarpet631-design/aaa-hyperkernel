@@ -1,3 +1,4 @@
+import { withAppAuth } from '../lib/app-auth.mjs';
 /*
  * Receipt blob storage (Netlify Blobs).
  *
@@ -13,7 +14,7 @@
  * is layered by the caller + site access controls; keys are namespaced per
  * receipt media id.
  */
-import { getStore } from '@netlify/blobs';
+import { createHash } from 'node:crypto';
 
 const STORE = 'aaa-receipts';
 
@@ -21,8 +22,10 @@ function json(body, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 }
 
-export default async (req) => {
+export default withAppAuth(async (req, context) => {
+  const { getStore } = await import('@netlify/blobs');
   const store = getStore(STORE);
+  const prefix = 'v2/' + createHash('sha256').update(context.userId).digest('hex') + '/';
 
   if (req.method === 'POST') {
     let body;
@@ -30,11 +33,12 @@ export default async (req) => {
     const key = body && body.key;
     const data = body && body.data;
     const mediaType = (body && body.mediaType) || 'image/jpeg';
-    if (!key || typeof key !== 'string') return json({ ok: false, error: 'NO_KEY' }, 400);
+    if (!key || typeof key !== 'string' || key.length > 160) return json({ ok: false, error: 'NO_KEY' }, 400);
+    if (!['image/jpeg', 'image/png', 'image/webp', 'application/pdf'].includes(mediaType)) return json({ ok: false, error: 'UNSUPPORTED_MEDIA' }, 400);
     if (!data || typeof data !== 'string') return json({ ok: false, error: 'NO_DATA' }, 400);
     try {
       const bytes = Buffer.from(data, 'base64');
-      await store.set(key, bytes, { metadata: { mediaType, storedAt: new Date().toISOString() } });
+      await store.set(prefix + encodeURIComponent(key), bytes, { metadata: { mediaType, storedAt: new Date().toISOString() } });
       return json({ ok: true, key });
     } catch (err) {
       console.error('Receipt blob store error', err);
@@ -45,12 +49,12 @@ export default async (req) => {
   if (req.method === 'GET') {
     const url = new URL(req.url);
     const key = url.searchParams.get('key');
-    if (!key) return json({ ok: false, error: 'NO_KEY' }, 400);
+    if (!key || key.length > 160) return json({ ok: false, error: 'NO_KEY' }, 400);
     try {
-      const res = await store.getWithMetadata(key, { type: 'arrayBuffer' });
+      const res = await store.getWithMetadata(prefix + encodeURIComponent(key), { type: 'arrayBuffer' });
       if (!res) return json({ ok: false, error: 'NOT_FOUND' }, 404);
       const mediaType = (res.metadata && res.metadata.mediaType) || 'application/octet-stream';
-      return new Response(res.data, { status: 200, headers: { 'content-type': mediaType } });
+      return new Response(res.data, { status: 200, headers: { 'content-type': mediaType, 'content-disposition': 'attachment', 'x-content-type-options': 'nosniff' } });
     } catch (err) {
       console.error('Receipt blob fetch error', err);
       return json({ ok: false, error: 'FETCH_FAILED', message: String((err && err.message) || err) }, 500);
@@ -58,6 +62,6 @@ export default async (req) => {
   }
 
   return json({ ok: false, error: 'METHOD_NOT_ALLOWED' }, 405);
-};
+});
 
 export const config = { path: '/api/receipt-blob' };

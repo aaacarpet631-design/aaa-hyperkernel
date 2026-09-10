@@ -14,12 +14,15 @@
  * No secrets are exposed. Unknown/intermediate statuses are ignored. The
  * normalization mirrors AAA_TRANSPORT.normalizeProviderEvent on the client.
  */
-import { getStore } from '@netlify/blobs';
+import { createHash } from 'node:crypto';
+import { boundedBody, appEnv } from '../lib/app-auth.mjs';
+import { errorResponse } from '../lib/openai.mjs';
+import { verifyWebhook } from '../lib/webhook-auth.mjs';
 
 const FEED = 'comms-status-events';
 
 function json(body, status = 200) {
-  return new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
+  return new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' } });
 }
 
 function normTwilio(p) {
@@ -33,39 +36,36 @@ function normSendgrid(p) {
   return { provider: 'sendgrid', providerId: p.sg_message_id || p.smtp_id || null, status, reason: p.reason || p.response || null };
 }
 
-async function parse(provider, req) {
-  if (provider === 'sendgrid') {
-    const arr = await req.json().catch(() => []);
-    return (Array.isArray(arr) ? arr : []).map(normSendgrid);
-  }
-  // Twilio posts urlencoded
-  const text = await req.text().catch(() => '');
-  const form = Object.fromEntries(new URLSearchParams(text));
-  return [normTwilio(form)];
-}
 
 export default async (req) => {
   if (req.method !== 'POST') return json({ ok: false, error: 'METHOD_NOT_ALLOWED' }, 405);
   const provider = new URL(req.url).searchParams.get('provider');
   if (provider !== 'twilio' && provider !== 'sendgrid') return json({ ok: false, error: 'UNKNOWN_PROVIDER' }, 400);
 
-  let events;
-  try { events = await parse(provider, req); } catch (e) { return json({ ok: false, error: 'PARSE_FAILED' }, 400); }
-  const actionable = events.filter((e) => e && e.status && e.status !== 'ignored' && e.providerId);
-
-  // Persist actionable events for the client to drain + apply. Best-effort.
-  let stored = 0;
   try {
-    const store = getStore(FEED);
-    for (const e of actionable) {
-      const key = e.providerId + ':' + e.status + ':' + Date.now();
-      await store.setJSON(key, Object.assign({ receivedAt: new Date().toISOString() }, e));
-      stored++;
+    const raw = Buffer.from(await boundedBody(req, 1024 * 1024));
+    verifyWebhook(req, raw, appEnv());
+    let events;
+    if (provider === 'sendgrid') {
+      let values;
+      try { values = JSON.parse(raw.toString('utf8')); } catch (_) { return json({ ok: false, error: 'INVALID_JSON' }, 400); }
+      if (!Array.isArray(values) || values.length > 1000 || values.some(v => !v || typeof v !== 'object' || Array.isArray(v))) return json({ ok: false, error: 'INVALID_EVENTS' }, 400);
+      events = values.map(normSendgrid);
+    } else events = [normTwilio(Object.fromEntries(new URLSearchParams(raw.toString('utf8'))))];
+    const actionable = events.filter(e => e.status !== 'ignored' && typeof e.providerId === 'string' && e.providerId.length <= 500);
+    const { getStore } = await import('@netlify/blobs');
+    const store = getStore({ name: FEED, consistency: 'strong' });
+    let stored = 0;
+    for (const event of actionable) {
+      const key = createHash('sha256').update(JSON.stringify(event)).digest('hex');
+      const result = await store.setJSON(key, { receivedAt: new Date().toISOString(), ...event }, { onlyIfNew: true });
+      if (result.modified) stored++;
     }
-  } catch (err) { console.warn('status feed unavailable', err); }
+    // Storage failure must be retried by the provider, not acknowledged as a
+    // delivered status that was never persisted.
+    return json({ ok: true, received: events.length, actionable: actionable.length, stored });
+  } catch (err) { return errorResponse(err); }
 
-  // Always ack 2xx so providers don't hammer retries.
-  return json({ ok: true, received: events.length, actionable: actionable.length, stored });
 };
 
 export const config = { path: '/api/transport-webhook' };

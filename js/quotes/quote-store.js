@@ -216,7 +216,7 @@
       const i = input || {};
       const q = await this.get(id); if (!q) return { ok: false, error: 'NOT_FOUND' };
       const note = { note: String(i.note || ''), qualityScore: i.qualityScore != null ? num(i.qualityScore) : null, riskScore: i.riskScore != null ? num(i.riskScore) : null, by: i.by || 'supervisor', at: nowISO() };
-      const rec = Object.assign({}, q, { supervisorNotes: (q.supervisorNotes || []).concat([note]), updatedAt: nowISO() });
+      const rec = Object.assign({}, q, { supervisorNotes: (q.supervisorNotes || []).concat([note]), revision: (q.revision || 1) + 1, updatedAt: nowISO() });
       await put(rec);
       return { ok: true, quote: rec };
     },
@@ -226,7 +226,8 @@
       const q = await this.get(id); if (!q) return { ok: false, error: 'NOT_FOUND' };
       const l = links || {};
       const rec = Object.assign({}, q, {
-        linkedReceiptIds: l.receiptId ? (q.linkedReceiptIds || []).concat([l.receiptId]) : q.linkedReceiptIds,
+        revision: (q.revision || 1) + 1,
+        linkedReceiptIds: l.receiptId ? Array.from(new Set((q.linkedReceiptIds || []).concat([l.receiptId]))) : q.linkedReceiptIds,
         invoiceId: l.invoiceId || q.invoiceId, paymentId: l.paymentId || q.paymentId, updatedAt: nowISO()
       });
       await put(rec); return { ok: true, quote: rec };
@@ -328,34 +329,15 @@
     const total = q.total != null ? q.total : r && r.total;
     return Number.isFinite(total) && total >= 0 && (!r || (Number.isFinite(r.total) && r.total === total && Array.isArray(r.items) && r.items.every((it) => Number.isFinite(it.amount) && it.amount >= 0) && round(r.items.reduce((n, it) => n + it.amount, 0)) === total));
   }
-  // Local confirmation must not wait for the network. Keep at most the latest
-  // pending snapshot per quote, and mirror revisions in order within this runtime.
-  const mirrors = new Map();
-  function mirror(rec) {
-    if (!data().cloudReady || !data().cloudReady() || !global.AAA_CLOUD) return;
-    const key = rec.workspaceId + ':' + rec.id;
-    const snapshot = clone(rec);
-    if (mirrors.has(key)) { mirrors.get(key).next = snapshot; return; }
-    const entry = { next: snapshot };
-    const backend = global.AAA_CLOUD;
-    mirrors.set(key, entry);
-    (async () => {
-      try {
-        while (entry.next) {
-          const next = entry.next; entry.next = null;
-          try { await backend.upsertEntity(QUOTES, next.id, next); } catch (_) {}
-        }
-      } finally { mirrors.delete(key); }
-    })().catch(() => {});
-  }
+  // The persistent quote collection is included in the authenticated device
+  // backup. Never blindly upsert a shared cloud quote from an older device.
   async function put(rec) {
-    await data().put(QUOTES, rec.id, rec, { requirePersistent: true });
-    try { mirror(rec); } catch (_) {}
+    await data().put(QUOTES, rec.id, rec, { requirePersistent: true, expectedRevision: rec.revision - 1 });
   }
 
   // Serialize competing writes in this runtime. This is not a distributed lock.
   const pending = new Map();
-  ['reviseDraft', '_transition'].forEach((method) => {
+  ['reviseDraft', '_transition', 'addSupervisorNote', 'link'].forEach((method) => {
     const run = Store[method];
     Store[method] = function (id, ...args) {
       const key = ws() + ':' + id;

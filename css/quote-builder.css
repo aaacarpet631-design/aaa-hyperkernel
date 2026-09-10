@@ -21,3 +21,4 @@
 .qb-total { font-size: 1.25rem; border-bottom: 0; border-top: 2px solid #18181b; margin-top: .5rem; }
 .qb-share-text { width: 100%; min-height: 270px; font-size: 1rem; line-height: 1.5; box-sizing: border-box; }
 @media (max-width: 520px) { .qb-grid { grid-template-columns: 1fr; gap: 0; } .qb-receipt { padding: 1rem; } }
+.qb-diff-value { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 180px; overflow-y: auto; font: inherit; padding: 10px; background: rgba(0,0,0,.2); border-radius: 8px; }

@@ -3,20 +3,20 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "AAA HyperKernel — local-first field PWA with Claude-backed vision estimating and Netlify Blobs sync.",
+  "description": "AAA HyperKernel \u2014 local-first field PWA with Claude-backed vision estimating and Netlify Blobs sync.",
   "scripts": {
     "test": "node test/run.js && node test/intelligence-smoke.mjs",
     "test:harness": "node test/run.js",
     "test:intel": "node test/intelligence-smoke.mjs",
     "test:rules": "node test/run-rules.js",
-    "lint": "eslint .",
+    "lint": "eslint . --ext .js,.mjs,.cjs",
     "build:check": "npx --yes netlify-cli@26 build --offline"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "latest",
-    "@netlify/blobs": "latest"
+    "@anthropic-ai/sdk": "0.124.0",
+    "@netlify/blobs": "11.0.3"
   },
   "devDependencies": {
-    "eslint": "^8.57.0"
+    "eslint": "8.57.1"
   }
 }

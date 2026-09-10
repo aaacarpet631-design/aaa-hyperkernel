@@ -57,16 +57,25 @@
       if (!await activeEditor.flush()) return;
       activeEditor.close();
     }
-    let editor;
-    const sheet = U().sheet({ title: 'Build a quote', subtitle: 'Customer → Work → Price & review', onClose: () => { if (activeEditor === editor) activeEditor = null; } });
+    let editor, releaseForm, unsubscribeBackup;
+    const sheet = U().sheet({ title: 'Build a quote', subtitle: 'Customer → Work → Price & review', beforeClose: () => editor ? editor.flush() : true, onClose: () => {
+      if (activeEditor === editor) activeEditor = null;
+      if (releaseForm) releaseForm();
+      if (unsubscribeBackup) unsubscribeBackup();
+    } });
     document.body.appendChild(sheet.overlay);
-    const state = { input: B().fresh(), workingKey: B().workingKey(), id: null, revision: null, dirty: true, stage: 'edit', busy: false, changeVersion: 0, recovery: null };
+    const state = { input: B().fresh(), workingKey: B().workingKey(), id: null, revision: null, dirty: true, stage: 'edit', busy: false, changeVersion: 0, baseInput: null, recovery: null };
     const status = U().el('p', { className: 'qb-action-status', attrs: { role: 'alert' } });
     const saveStatus = U().el('p', { className: 'qb-save-status', attrs: { role: 'status', 'aria-live': 'polite' } });
+    const backupStatus = U().el('p', { className: 'qb-help', attrs: { role: 'status', 'aria-live': 'polite' } });
+    if (global.AAA_SYNC_ENGINE) {
+      backupStatus.textContent = global.AAA_SYNC_ENGINE.status.message;
+      unsubscribeBackup = global.AAA_SYNC_ENGINE.subscribe((s) => { backupStatus.textContent = s.message; });
+    }
     let workingWrite = Promise.resolve();
     let importedInput = false;
     function persist() {
-      const value = { input: clone(state.input), workingKey: state.workingKey, id: state.id, revision: state.revision, dirty: state.dirty };
+      const value = { input: clone(state.input), workingKey: state.workingKey, id: state.id, revision: state.revision, dirty: state.dirty, baseInput: state.baseInput && clone(state.baseInput) };
       const version = state.changeVersion;
       saveStatus.textContent = 'Saving on this device…';
       workingWrite = workingWrite.catch(() => {}).then(() => B().saveWorking(value)).then(() => {
@@ -96,7 +105,7 @@
       if (o.id) {
         const q = await Q().get(o.id);
         if (!editable(q)) throw new Error('This quote cannot be edited here. Open Saved quotes to view it.');
-        state.input = copyInput(q.builderInput); state.id = q.id; state.revision = q.revision || 1; state.dirty = false;
+        state.input = copyInput(q.builderInput); state.baseInput = clone(q.builderInput); state.id = q.id; state.revision = q.revision || 1; state.dirty = false;
       } else if (o.input) {
         state.input = copyInput(o.input);
         importedInput = true;
@@ -106,6 +115,7 @@
         if (saved) {
           state.workingKey = saved.workingKey || state.workingKey;
           const input = copyInput(saved.input);
+          state.baseInput = saved.baseInput ? copyInput(saved.baseInput) : null;
           const q = saved.id ? await Q().get(saved.id) : null;
           if (!saved.id) {
             state.input = input;
@@ -114,6 +124,7 @@
             Object.assign(state, { input: input, id: saved.id, revision: saved.revision, recovery: { editable: !!editable(q) } });
           } else if (editable(q)) {
             state.input = saved.dirty === false ? copyInput(q.builderInput) : input;
+            if (saved.dirty === false || saved.revision === (q.revision || 1)) state.baseInput = clone(q.builderInput);
             state.id = q.id; state.revision = q.revision || 1; state.dirty = saved.dirty !== false;
             status.textContent = saved.revision !== state.revision ? 'Opened the latest saved version of this quote.' : 'Restored your working quote.';
           } else {
@@ -123,18 +134,40 @@
       }
     } catch (e) { status.textContent = errorText(e); }
 
+    // A working form has one editing tab. Opening it elsewhere creates an
+    // independent copy; the saved business quote still uses revision checks.
+    const locks = global.navigator && global.navigator.locks;
+    if (locks && locks.request) {
+      const claimForm = async () => {
+        return new Promise((resolve) => {
+          const held = new Promise((release) => { releaseForm = release; });
+          locks.request('aaa:quote-form:' + (global.AAA_CONFIG.workspaceId || 'default') + ':' + state.workingKey, { ifAvailable: true }, async (lock) => {
+            resolve(!!lock); if (lock) await held;
+          }).catch(() => resolve(false));
+        });
+      };
+      if (!await claimForm()) {
+        state.workingKey = B().workingKey();
+        if (!await claimForm()) { sheet.close(); return; }
+        status.textContent = 'This form is open in another tab. You are editing a separate working copy.';
+      }
+      if (activeEditor !== editor) { releaseForm(); return; }
+    }
+
     function render() {
       const root = sheet.body;
       root.innerHTML = '';
       root.classList.add('qb-workspace');
       root.appendChild(saveStatus);
+      if (global.AAA_SYNC_ENGINE) root.appendChild(backupStatus);
       const top = U().el('div', { className: 'qb-actions' });
+      if (global.AAA_BACKUP_UI) top.appendChild(button('Backups & recovery', () => global.AAA_BACKUP_UI.open()));
       top.appendChild(button('New quote', () => guarded(async () => {
         const ok = await U().confirm({ title: 'Start a new quote?', message: 'Your current form stays available under Resume unfinished work. Saved quotes remain in the pipeline.', confirmLabel: 'New quote' });
         if (!ok) return;
         if (!await persist()) { status.textContent = 'Save the current form before starting another quote. Device storage is unavailable.'; return; }
-        Object.assign(state, { input: B().fresh(), workingKey: B().workingKey(), id: null, revision: null, dirty: true, stage: 'edit', recovery: null });
-        await persist(); render();
+        sheet.close();
+        await openQueued({ input: B().fresh() });
       })));
       top.appendChild(button('Resume unfinished work', async () => {
         try {
@@ -166,9 +199,10 @@
           if (!ok) return;
           const q = await Q().get(state.id);
           if (!editable(q)) throw new Error('This quote can no longer be edited. Keep your changes as a new quote.');
-          Object.assign(state, { input: copyInput(q.builderInput), revision: q.revision || 1, dirty: false, stage: 'edit', recovery: null });
+          Object.assign(state, { input: copyInput(q.builderInput), baseInput: clone(q.builderInput), revision: q.revision || 1, dirty: false, stage: 'edit', recovery: null });
           await persist(); render();
         })));
+        if (state.baseInput && state.recovery.editable && global.AAA_QUOTE_CONFLICTS) actions.appendChild(button('Compare & resolve changes', () => guarded(resolveConflict)));
         root.appendChild(actions);
         root.appendChild(status);
         return;
@@ -178,8 +212,60 @@
       root.appendChild(status);
     }
 
+    async function resolveConflict() {
+      const remote = await Q().get(state.id);
+      if (!editable(remote)) throw new Error('This quote can no longer be edited. Keep your changes as a new quote.');
+      const merger = global.AAA_QUOTE_CONFLICTS, choices = {};
+      const diff = merger.merge(state.baseInput, state.input, remote.builderInput);
+      await new Promise(resolve => {
+        let applying = false;
+        const failure = para('');
+        const modal = U().sheet({ beforeClose: () => !applying, title: 'Resolve quote changes', subtitle: 'Choose which conflicting fields to keep. Your draft and saved quote remain unchanged until you finish.', onClose: resolve });
+        if (!diff.conflicts.length) modal.body.appendChild(para('The edits affect different fields and can be combined.'));
+        const apply = button('Use resolved draft', async () => {
+          if (applying) return;
+          applying = true;
+          try {
+          const merged = merger.merge(state.baseInput, state.input, remote.builderInput, choices);
+          if (merged.conflicts.length) return;
+          // Save the original working form before opening the resolved draft
+          // under a new key. The original remains in unfinished work.
+          if (!await persist()) return;
+          const previousKey = state.workingKey;
+          const resolvedKey = B().workingKey();
+          await B().saveWorking({ input: merged.input, baseInput: clone(remote.builderInput), workingKey: resolvedKey, id: state.id, revision: remote.revision, dirty: true });
+          state.workingKey = previousKey;
+          modal.close(); sheet.close(); await openQueued({ workingKey: resolvedKey });
+          } catch (error) { failure.textContent = errorText(error); }
+          finally { applying = false; }
+        }, 'primary');
+        apply.disabled = diff.conflicts.length > 0;
+        for (const conflict of diff.conflicts) {
+          const card = U().el('fieldset', { className: 'qb-line' });
+          card.appendChild(U().el('legend', { text: conflict.path.join(' › ').replace(/_/g, ' ') || 'Quote' }));
+          for (const [label, value] of [['Before your edits', conflict.base], ['Your draft', conflict.local], ['Latest saved', conflict.remote]]) {
+            card.appendChild(U().el('strong', { text: label }));
+            card.appendChild(U().el('pre', { className: 'qb-diff-value', text: value === undefined ? 'Removed' : JSON.stringify(value, null, 2) }));
+          }
+          card.appendChild(select('Keep which value?', '', [{ id: '', label: 'Choose a value…' }, { id: 'local', label: 'Your draft' }, { id: 'remote', label: 'Latest saved' }], value => {
+            choices[conflict.id] = value;
+            apply.disabled = merger.merge(state.baseInput, state.input, remote.builderInput, choices).conflicts.length > 0;
+          }));
+          modal.body.appendChild(card);
+        }
+        modal.body.appendChild(para('Combined prices are recalculated. Save the resulting draft and approve it again before sharing. Service lines are resolved together to preserve room order.'));
+        modal.body.appendChild(apply); modal.body.appendChild(failure); document.body.appendChild(modal.overlay);
+      });
+    }
+
     function renderWork(root) {
       root.appendChild(heading('Customer'));
+      if (global.AAA_CUSTOMER_PICKER_UI) root.appendChild(button('Use a saved customer', () => guarded(async () => {
+        const customer = await global.AAA_CUSTOMER_PICKER_UI.pick();
+        if (!customer) return;
+        state.input.customer = { id: customer.id, name: customer.name || '', phone: customer.phone || '', email: customer.email || '', address: customer.address || '' };
+        changed(); render();
+      })));
       const customer = U().el('div', { className: 'qb-grid' });
       [['Name', 'name', 'text'], ['Phone', 'phone', 'tel'], ['Email', 'email', 'email'], ['Job address', 'address', 'text']].forEach(([label, key, type]) => customer.appendChild(field(label, state.input.customer[key], (v) => { state.input.customer[key] = v; changed(); }, { type: type })));
       root.appendChild(customer);
@@ -270,7 +356,7 @@
           }
           return;
         }
-        state.id = result.quote.id; state.revision = result.quote.revision;
+        state.id = result.quote.id; state.revision = result.quote.revision; state.baseInput = clone(result.quote.builderInput);
         if (state.changeVersion === changeVersion) { state.input = clone(result.quote.builderInput); state.dirty = false; }
         await persist(); render();
       }), 'primary');

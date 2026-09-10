@@ -26,6 +26,11 @@
   }
 
   const config = {
+    /** Session header for private app endpoints; provider keys stay server-side. */
+    sessionHeaders() {
+      const token = this.firebaseProjectId ? this.firebaseAuthToken : this.accessToken;
+      return token ? { authorization: 'Bearer ' + token } : {};
+    },
     /** Supabase project URL, e.g. https://abc.supabase.co */
     get supabaseUrl() { return read('supabaseUrl', null); },
     /** Supabase anon/public key (safe for the browser). */
@@ -113,6 +118,7 @@
     set(patch) {
       overrides = Object.assign({}, overrides, patch || {});
       try { global.localStorage.setItem(LS_KEY, JSON.stringify(overrides)); } catch (_) {}
+      try { if (global.AAA_EVENTS) global.AAA_EVENTS.emit('config.changed', { keys: Object.keys(patch || {}) }); } catch (_) {}
       return overrides;
     },
     all() {
