@@ -1,5 +1,5 @@
 /* Private, per-account/workspace/device backups. Legacy global state is never
- * read or automatically assigned to an account. See docs/RELIABILITY_RELEASE.md.
+ * read or automatically assigned to an account. See docs/RELIABILITY_RELEASE_REVIEW.md.
  */
 import { withAppAuth } from '../lib/app-auth.mjs';
 import { handleBackup } from '../lib/backup.mjs';

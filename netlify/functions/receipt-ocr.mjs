@@ -14,7 +14,6 @@ import { withAppAuth } from '../lib/app-auth.mjs';
  *
  * Requires ANTHROPIC_API_KEY in the Netlify site environment.
  */
-import Anthropic from '@anthropic-ai/sdk';
 
 const MODEL = 'claude-opus-4-8';
 
@@ -82,8 +81,10 @@ export default withAppAuth(async (req, context) => {
   const mediaType = (body && body.mediaType) || 'image/jpeg';
   if (!image || typeof image !== 'string') return json({ ok: false, error: 'NO_IMAGE' }, 400);
 
-  const client = new Anthropic({ apiKey });
   try {
+    // Load the provider only after the shared authorization and request checks.
+    const { default: Anthropic } = await import('@anthropic-ai/sdk');
+    const client = new Anthropic({ apiKey, timeout: 30000, maxRetries: 0 });
     const response = await client.messages.create({
       model: MODEL,
       max_tokens: 1500,
@@ -105,7 +106,7 @@ export default withAppAuth(async (req, context) => {
   } catch (err) {
     const status = err && typeof err.status === 'number' ? err.status : 500;
     console.error('Receipt OCR function error', err);
-    return json({ ok: false, error: 'OCR_FAILED', message: String((err && err.message) || err) }, status >= 400 && status <= 599 ? status : 500);
+    return json({ ok: false, error: 'OCR_FAILED', message: 'Receipt extraction failed. Try a clearer image or retry shortly.' }, status >= 400 && status <= 599 ? status : 500);
   }
 });
 
