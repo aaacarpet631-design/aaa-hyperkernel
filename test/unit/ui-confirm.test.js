@@ -28,7 +28,7 @@ module.exports = async function () {
     const result = { value: 'pending' };
     U.confirm(Object.assign({ title: 'Approve quote?', confirmLabel: 'Approve quote' }, options)).then((v) => { result.value = v; });
     result.overlay = G.document.body.children[G.document.body.children.length - 1];
-    result.button = (label) => all(result.overlay).find((n) => n.innerHTML === '<span>' + label + '</span>');
+    result.button = (label) => all(result.overlay).find((n) => n.tag === 'button' && n.children.some((c) => c.textContent === label));
     return result;
   }
   for (const exit of ['close', 'escape', 'backdrop', 'cancel']) {

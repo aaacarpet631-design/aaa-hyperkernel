@@ -188,6 +188,9 @@
       actions.appendChild(ui.button({ label: 'Agent Marketplace', icon: '🏪', variant: 'secondary', full: true, onClick: () => marketplaceFlow(body) }));
     }
     actions.appendChild(ui.button({ label: 'Cloud Settings', icon: '⚙️', variant: 'secondary', full: true, onClick: () => settingsFlow(body) }));
+    if (global.AAA_BACKUP_UI && global.AAA_RBAC && global.AAA_RBAC.can('MANAGE_SETTINGS')) {
+      actions.appendChild(ui.button({ label: 'Backups & recovery', variant: 'secondary', full: true, onClick: () => global.AAA_BACKUP_UI.open() }));
+    }
     if (global.AAA_MEASUREMENT_QUOTE && (!global.AAA_RBAC || global.AAA_RBAC.can('VIEW_PRICING_RATES'))) {
       actions.appendChild(ui.button({ label: 'Pricing / Rate Card', icon: '💲', variant: 'secondary', full: true, onClick: () => rateCardFlow(body) }));
     }

@@ -24,6 +24,7 @@
 
     const jobRecord = {
       id: idFactory && idFactory.newId ? idFactory.newId() : String(Date.now()),
+      workspaceId: global.AAA_CONFIG && global.AAA_CONFIG.workspaceId || 'default',
       customerId: data.customerId || null,
       customerName: data.customerName || null,
       serviceAddress: data.serviceAddress || null,
@@ -70,6 +71,7 @@
       await storage.queueMutation({
         mutationId: idFactory ? idFactory.createId('mut') : String(Date.now()),
         entityId: job.id,
+        workspaceId: job.workspaceId || 'default',
         entityType: 'job',
         operation: 'CREATE_JOB',
         payload: job,

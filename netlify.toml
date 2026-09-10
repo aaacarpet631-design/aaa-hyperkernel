@@ -37,3 +37,14 @@
   from = "/api/research"
   to = "/.netlify/functions/research"
   status = 200
+
+# The current app includes inline boot code and styles. Keep script CSP in
+# report-only mode until those legacy paths have been extracted and exercised.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "object-src 'none'; base-uri 'self'; frame-ancestors 'none'"
+    Content-Security-Policy-Report-Only = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' https: wss:; media-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"

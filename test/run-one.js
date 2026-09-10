@@ -4,6 +4,9 @@
 const path = require('path');
 const rel = process.argv[2];
 if (!rel) { console.log('RESULT unknown 0 1'); process.exit(1); }
+// An unresolved Promise alone does not keep Node alive. Report a real failure
+// instead of silently exiting successfully before a suite has finished.
+setTimeout(() => { console.log('RESULT ' + rel + ' 0 1'); process.exit(1); }, 45000);
 
 (async () => {
   try {

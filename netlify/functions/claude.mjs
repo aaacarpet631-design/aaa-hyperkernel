@@ -1,3 +1,5 @@
+import { validateModelRequest } from '../lib/request-policy.mjs';
+import { withAppAuth } from '../lib/app-auth.mjs';
 /*
  * claude — Netlify-hosted Claude proxy for the agent system.
  *
@@ -25,7 +27,7 @@ function json(body, status = 200) {
   });
 }
 
-export default async (req) => {
+export default withAppAuth(async (req, context) => {
   if (req.method === 'OPTIONS') return json({ ok: true });
   if (req.method !== 'POST') return json({ ok: false, error: 'METHOD_NOT_ALLOWED' }, 405);
 
@@ -38,6 +40,7 @@ export default async (req) => {
     return json({ ok: false, error: 'NO_MESSAGES' }, 400);
   }
 
+  validateModelRequest(body);
   const payload = { model: body.model || DEFAULT_MODEL, max_tokens: body.max_tokens || 1024, messages: body.messages };
   if (body.system) payload.system = body.system;
   if (body.output_config) payload.output_config = body.output_config;
@@ -46,17 +49,17 @@ export default async (req) => {
     const res = await fetch(ANTHROPIC_URL, {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload), signal: AbortSignal.timeout(30000)
     });
     const data = await res.json();
-    if (!res.ok) return json({ ok: false, error: 'ANTHROPIC_ERROR', detail: data }, res.status);
+    if (!res.ok) return json({ ok: false, error: 'ANTHROPIC_ERROR' }, res.status);
     const text = Array.isArray(data.content)
       ? data.content.filter((b) => b.type === 'text').map((b) => b.text).join('')
       : '';
     return json({ ok: true, text, content: data.content, usage: data.usage, stop_reason: data.stop_reason });
   } catch (err) {
-    return json({ ok: false, error: 'PROXY_FAILED', message: String((err && err.message) || err) }, 502);
+    return json({ ok: false, error: 'PROXY_FAILED' }, 502);
   }
-};
+});
 
 export const config = { path: '/api/claude' };

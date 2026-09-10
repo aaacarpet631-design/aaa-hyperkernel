@@ -67,6 +67,10 @@ function setupEnv(opts) {
   const o = opts || {};
   const G = global;
   G.window = G;
+  // Node's native navigator/LockManager is not a browser tab and can let the
+  // process exit while a lock is pending. Cross-tab tests provide their own
+  // LockManager; ordinary unit suites use the app's runtime fallback.
+  Object.defineProperty(G, 'navigator', { configurable: true, writable: true, value: { onLine: true } });
   if (typeof G.URLSearchParams === 'undefined') G.URLSearchParams = require('url').URLSearchParams;
   if (typeof G.crypto === 'undefined') { try { G.crypto = require('crypto').webcrypto; } catch (_) {} }
   const cfg = makeConfig(o.config);

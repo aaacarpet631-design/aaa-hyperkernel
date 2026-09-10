@@ -1,3 +1,5 @@
+import { validateModelRequest } from '../lib/request-policy.mjs';
+import { withAppAuth } from '../lib/app-auth.mjs';
 /*
  * private-gpu — Netlify-hosted proxy to a PRIVATE GPU model server.
  *
@@ -29,7 +31,7 @@ function json(body, status = 200) {
   });
 }
 
-export default async (req) => {
+export default withAppAuth(async (req, context) => {
   if (req.method === 'OPTIONS') return json({ ok: true });
   if (req.method !== 'POST') return json({ ok: false, error: 'METHOD_NOT_ALLOWED' }, 405);
 
@@ -43,6 +45,7 @@ export default async (req) => {
   let appBody;
   try { appBody = await req.json(); } catch { return json({ ok: false, error: 'BAD_REQUEST' }, 400); }
 
+  validateModelRequest(appBody);
   const upstream = gpu.toRequest(appBody, { defaultModel: process.env.PRIVATE_GPU_MODEL || undefined });
 
   const ctrl = new AbortController();
@@ -60,4 +63,4 @@ export default async (req) => {
   } finally {
     clearTimeout(timer);
   }
-};
+});

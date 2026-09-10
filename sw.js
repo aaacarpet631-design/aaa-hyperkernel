@@ -6,7 +6,7 @@
  * app fully usable offline. Old caches are purged on activate, and the worker
  * takes control immediately to avoid serving a stale shell after an update.
  */
-const CACHE_NAME = 'hyperkernel-v107';
+const CACHE_NAME = 'hyperkernel-v108';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -47,6 +47,7 @@ const PRECACHE = [
   '/js/core/aaa-data.js',
   '/js/core/knowledge-graph.js',
   '/js/core/spatial-event-ledger.js',
+  '/js/core/backup-format.js',
   '/js/core/sync-engine.js',
   '/js/governance/governance-sync.js',
   '/js/governance/audit-ledger.js',
@@ -80,6 +81,7 @@ const PRECACHE = [
   '/js/legal/legal-risk-engine.js',
   '/js/legal/legal-division.js',
   '/js/ui/ui-kit.js',
+  '/js/ui/backup-ui.js',
   '/js/ui/governance-badge-ui.js',
   '/js/ui/governance-learning-ui.js',
   '/js/agents/model-router.js',
@@ -300,6 +302,7 @@ const PRECACHE = [
   '/js/ui/financial-intelligence-ui.js',
   '/js/ui/estimator-ui.js',
   '/js/ui/quote-lifecycle-ui.js',
+  '/js/quotes/quote-conflicts.js',
   '/js/ui/quote-builder-ui.js',
   '/js/ui/quote-win-probability-ui.js',
   '/js/ui/pricing-optimizer-ui.js',
@@ -350,6 +353,7 @@ const PRECACHE = [
   '/js/bluetooth/services/bosch-glm-adapter.js',
   '/js/field/bluetooth-bridge.js',
   '/js/ui/app-mode.js',
+  '/js/ui/tools-home.js',
   '/js/ui/field-mode-home.js',
   '/js/ui/command-deck-ui.js',
   '/js/ui/decision-card-ui.js',
@@ -364,35 +368,43 @@ const PRECACHE = [
 ];
 
 self.addEventListener('install', (event) => {
-  self.skipWaiting();
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => Promise.all(PRECACHE.map((url) => cache.add(url).catch(() => {})))).catch(() => {})
-  );
+  // Activate only after every script, stylesheet and the shell is durable.
+  // A failed deployment keeps the previous working offline version installed.
+  event.waitUntil(caches.open(CACHE_NAME).then(async (cache) => {
+    await Promise.all(PRECACHE.map((url) => /\.(js|css)$/.test(url) || url === '/index.html'
+      ? cache.add(url) : cache.add(url).catch(() => {})));
+    await self.skipWaiting();
+  }));
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))))
-      .then(() => self.clients.claim())
-  );
+  event.waitUntil(caches.keys()
+    .then((keys) => Promise.all(keys.filter((k) => k.startsWith('hyperkernel-') && k !== CACHE_NAME).map((k) => caches.delete(k))))
+    .then(() => self.clients.claim()));
 });
 
 self.addEventListener('fetch', (event) => {
-  const req = event.request;
-  if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) {
-    return;
-  }
-  event.respondWith(
-    fetch(req)
-      .then((response) => {
-        // Keep the worker alive until the refreshed offline copy is durable.
-        const copy = response.clone();
-        if (response.ok) event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.put(req, copy)).catch(() => {}));
-        return response;
-      })
-      .catch(() =>
-        caches.match(req).then(async (cached) => cached || (req.mode === 'navigate' && await caches.match('/index.html')) || Response.error())
-      )
-  );
+  const req = event.request, url = new URL(req.url);
+  // Private data, authenticated responses, and API errors never enter the
+  // offline asset cache. These requests retain normal browser semantics.
+  if (req.method !== 'GET' || url.origin !== self.location.origin ||
+      url.pathname.startsWith('/api/') || url.pathname.startsWith('/.netlify/functions/') ||
+      req.headers && req.headers.has('authorization')) return;
+  if (req.mode !== 'navigate' && !PRECACHE.includes(url.pathname) && !/\.(js|css)$/.test(url.pathname)) return;
+  event.respondWith((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    const fallback = async () => (await cache.match(req)) || (req.mode === 'navigate' && await cache.match('/index.html')) || Response.error();
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 4000);
+    try {
+      const response = await fetch(req, { signal: controller.signal });
+      if (response.status >= 500) return await fallback();
+      if (response.ok && !/no-store|private/i.test(response.headers.get('cache-control') || '') &&
+          (req.mode !== 'navigate' || url.pathname === '/' || url.pathname === '/index.html') && !url.search) {
+        event.waitUntil(cache.put(req, response.clone()).catch(() => {}));
+      }
+      return response;
+    } catch (_) { return fallback(); }
+    finally { clearTimeout(timer); }
+  })());
 });

@@ -103,6 +103,7 @@
     // Security hardening admin (configure step-up/MFA, toggle enforcement).
     // Owner-only (MANAGE_SETTINGS) + audited; AI can never reconfigure security.
     MANAGE_SECURITY:   { permission: 'MANAGE_SETTINGS',   aiAllowed: false },
+    RESTORE_BACKUP:    { permission: 'MANAGE_SETTINGS',   aiAllowed: false },
     // Privacy & data governance. Configuring retention/vault is owner-only +
     // audited; executing an erasure (right to be forgotten) is its own action so
     // the destructive step is separately gated + audited. AI can never erase data.
@@ -136,7 +137,7 @@
      */
     async run(req) {
       const r = req || {};
-      const policy = ACTIONS[r.action];
+      const policy = Object.prototype.hasOwnProperty.call(ACTIONS, r.action) ? ACTIONS[r.action] : null;
       const origin = r.origin === 'ai' ? 'ai' : 'human';
 
       if (!policy) {
@@ -151,8 +152,8 @@
       }
 
       // 2) RBAC check for human-origin actions.
-      if (origin === 'human' && policy.permission && rbac() && !rbac().can(policy.permission)) {
-        const a = await this._audit({ action: r.action, origin: origin, actor: r.actor || (rbac() && rbac().role()), decision: 'denied', reason: 'FORBIDDEN', target: r.target, detail: r.detail });
+      if (origin === 'human' && !this.canHuman(r.action)) {
+        const a = await this._audit({ action: r.action, origin: origin, actor: r.actor, decision: 'denied', reason: 'FORBIDDEN', target: r.target, detail: r.detail });
         return { ok: false, error: 'FORBIDDEN', message: 'Your role cannot perform this action.', permission: policy.permission, auditId: a };
       }
 
@@ -160,23 +161,25 @@
       // enforcement, a privileged action needs a valid session + a fresh step-up
       // (MFA). Inert until configured — absent/off behaves exactly as before.
       if (origin === 'human' && security() && security().gateCheck) {
-        let gate = { allow: true };
-        try { gate = await security().gateCheck(r.action, origin); } catch (_) { gate = { allow: true }; }
-        if (gate && !gate.allow) {
-          const a = await this._audit({ action: r.action, origin: origin, actor: r.actor || (rbac() && rbac().role()), decision: 'denied', reason: gate.error || 'SECURITY_BLOCKED', target: r.target, detail: r.detail });
+        let gate;
+        try { gate = await security().gateCheck(r.action, origin); } catch (_) { /* A failed security check never grants permission. */ }
+        if (!gate || gate.allow !== true) {
+          gate = gate || { error: 'SECURITY_UNAVAILABLE' };
+          const a = await this._audit({ action: r.action, origin: origin, actor: r.actor, decision: 'denied', reason: gate.error || 'SECURITY_BLOCKED', target: r.target, detail: r.detail });
           return { ok: false, error: gate.error || 'SECURITY_BLOCKED', message: gate.error === 'STEP_UP_REQUIRED' ? 'Verify your identity (step-up) to perform this privileged action.' : 'Your session must be re-validated.', auditId: a };
         }
       }
 
       // 3) Allowed — record intent, run the mutation, record outcome.
-      const auditId = await this._audit({ action: r.action, origin: origin, actor: r.actor || (rbac() && rbac().role()), decision: 'allowed', target: r.target, detail: r.detail });
+      const auditId = await this._audit({ action: r.action, origin: origin, actor: r.actor, decision: 'allowed', target: r.target, detail: r.detail });
+      if (!auditId) return { ok: false, error: 'AUDIT_UNAVAILABLE', message: 'This action could not be recorded safely. Check device storage and retry.' };
       let result = null;
       if (typeof r.mutate === 'function') {
         try {
           result = await r.mutate();
         } catch (err) {
           await this._audit({ action: r.action, origin: origin, actor: r.actor, decision: 'error', reason: String((err && err.message) || err), target: r.target });
-          return { ok: false, error: 'MUTATION_FAILED', message: String((err && err.message) || err), auditId: auditId };
+          return { ok: false, error: err && err.code === 'REVISION_CONFLICT' ? 'REVISION_CONFLICT' : 'MUTATION_FAILED', message: String((err && err.message) || err), auditId: auditId };
         }
       }
       if (events()) events().emit('gateway.mutation', { action: r.action, origin: origin, target: r.target });
@@ -185,14 +188,17 @@
 
     /** Convenience: can the CURRENT human role perform this action? */
     canHuman(action) {
-      const p = ACTIONS[action];
+      const p = Object.prototype.hasOwnProperty.call(ACTIONS, action) ? ACTIONS[action] : null;
       if (!p) return false;
-      return !p.permission || !rbac() || rbac().can(p.permission);
+      if (!p.permission) return true;
+      try { return !!rbac() && rbac().can(p.permission) === true; } catch (_) { return false; }
     },
 
     /** Append an immutable audit entry (local-first; mirrored to cloud). */
     async _audit(entry) {
       const id = ids() ? ids().createId('audit') : ('audit_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8));
+      let role = null;
+      try { role = rbac() && rbac().role ? rbac().role() : null; } catch (_) {}
       const rec = {
         id: id,
         at: nowISO(),
@@ -200,7 +206,7 @@
         action: entry.action,
         origin: entry.origin || 'human',
         actor: entry.actor || null,
-        role: rbac() ? rbac().role() : null,
+        role: role,
         decision: entry.decision,            // allowed | denied | error
         reason: entry.reason || null,
         target: entry.target || null,
@@ -210,8 +216,11 @@
       // its predecessor (seq + prevHash + hash) and sign privileged approvals.
       // Inert (no extra fields) when the module isn't loaded — fully backward-compatible.
       let sealed = rec;
-      try { if (security() && security().sealAudit) sealed = await security().sealAudit(rec); } catch (_) { sealed = rec; }
-      try { if (data() && data().put) await data().put('audit_log', id, sealed); } catch (_) {}
+      try {
+        if (security() && security().sealAudit) sealed = await security().sealAudit(rec);
+        if (!sealed || !data() || !data().put) return null;
+        await data().put('audit_log', id, sealed, { requirePersistent: true });
+      } catch (_) { return null; }
       // Best-effort cloud mirror (rules make audit_log append-only / owner-read).
       try {
         if (data() && data().cloudReady && data().cloudReady() && cloud()) {

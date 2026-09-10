@@ -54,7 +54,7 @@
     try {
       const c = global.AAA_CONFIG || {};
       const model = c.visionModel || 'claude-opus-4-8';
-      const headers = { 'content-type': 'application/json' };
+      const headers = Object.assign({ 'content-type': 'application/json' }, c.sessionHeaders ? c.sessionHeaders() : {});
       if (model === 'gpt-6-astra') {
         const policy = global.AAA_TENANT_MODEL_POLICY;
         if (policy && policy.getPolicy && policy.evaluate) {

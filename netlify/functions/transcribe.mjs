@@ -1,3 +1,4 @@
+import { withAppAuth } from '../lib/app-auth.mjs';
 /*
  * Audio transcription function (Netlify) — the server side of voice Layer 2.
  *
@@ -80,7 +81,7 @@ export function json(body, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 }
 
-export default async (req) => {
+export default withAppAuth(async (req, context) => {
   if (req.method !== 'POST') return json({ ok: false, error: 'METHOD_NOT_ALLOWED' }, 405);
 
   const apiKey = process.env.OPENAI_API_KEY;
@@ -129,7 +130,7 @@ export default async (req) => {
     console.error('Transcribe function error', err);
     return json({ ok: false, error: mapped.code, message: mapped.message }, 502);
   }
-};
+});
 
 // Friendly route; the client defaults cfg.transcriptionEndpoint to /api/transcribe.
 // Matches the proven vision/sync/claude functions — only `path` (no unverified keys).

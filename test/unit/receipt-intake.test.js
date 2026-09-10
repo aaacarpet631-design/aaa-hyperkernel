@@ -8,6 +8,7 @@ module.exports = async function run() {
   // Load the whole spine: classifier + accounting + gateway + intake.
   load('js/accounting/expense-classifier.js');
   load('js/accounting/accounting-store.js');
+  load('js/core/aaa-rbac.js');
   load('js/core/aaa-runtime-gateway.js');
   load('js/accounting/receipt-intake-store.js');
   const R = G.AAA_RECEIPT_INTAKE;

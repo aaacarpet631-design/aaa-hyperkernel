@@ -70,7 +70,7 @@
       async send(message) {
         const endpoint = cfg().transportEndpoint || '/api/transport-send';
         const res = await fetch(endpoint, {
-          method: 'POST', headers: { 'content-type': 'application/json' },
+          method: 'POST', headers: Object.assign({ 'content-type': 'application/json' }, global.AAA_CONFIG && global.AAA_CONFIG.sessionHeaders ? global.AAA_CONFIG.sessionHeaders() : {}),
           body: JSON.stringify({ provider: providerKey || name, channel: message.channel, to: message.to, subject: message.subject || null, body: message.body })
         });
         const data = await res.json().catch(() => ({}));

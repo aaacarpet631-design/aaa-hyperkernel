@@ -1,3 +1,4 @@
+import { withAppAuth } from '../lib/app-auth.mjs';
 /*
  * Transport send function (Netlify) — the server-side SMS/email dispatcher.
  *
@@ -23,7 +24,7 @@ async function sendSms(to, body) {
   const res = await fetch('https://api.twilio.com/2010-04-01/Accounts/' + sid + '/Messages.json', {
     method: 'POST',
     headers: { 'authorization': 'Basic ' + Buffer.from(sid + ':' + token).toString('base64'), 'content-type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({ To: to, From: from, Body: body })
+    body: new URLSearchParams({ To: to, From: from, Body: body }), signal: AbortSignal.timeout(20000)
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) return { ok: false, error: 'PROVIDER_ERROR', message: (data && data.message) || ('Twilio HTTP ' + res.status) };
@@ -36,18 +37,19 @@ async function sendEmail(to, subject, body) {
   const res = await fetch('https://api.sendgrid.com/v3/mail/send', {
     method: 'POST',
     headers: { 'authorization': 'Bearer ' + key, 'content-type': 'application/json' },
-    body: JSON.stringify({ personalizations: [{ to: [{ email: to }] }], from: { email: from }, subject: subject || '(no subject)', content: [{ type: 'text/plain', value: body }] })
+    body: JSON.stringify({ personalizations: [{ to: [{ email: to }] }], from: { email: from }, subject: subject || '(no subject)', content: [{ type: 'text/plain', value: body }] }), signal: AbortSignal.timeout(20000)
   });
   if (!(res.status >= 200 && res.status < 300)) { const data = await res.json().catch(() => ({})); return { ok: false, error: 'PROVIDER_ERROR', message: (data && data.errors && data.errors[0] && data.errors[0].message) || ('SendGrid HTTP ' + res.status) }; }
   return { ok: true, providerId: res.headers.get('x-message-id') || null };
 }
 
-export default async (req) => {
+export default withAppAuth(async (req, context) => {
   if (req.method !== 'POST') return json({ ok: false, error: 'METHOD_NOT_ALLOWED' }, 405);
   let body;
   try { body = await req.json(); } catch { return json({ ok: false, error: 'INVALID_JSON' }, 400); }
   const channel = body && body.channel, to = body && body.to;
-  if (!to) return json({ ok: false, error: 'NO_RECIPIENT' }, 400);
+  if (!body || Object.keys(body).some(k => !['provider', 'channel', 'to', 'subject', 'body'].includes(k)) || typeof to !== 'string' || to.length > 254 || typeof body.body !== 'string' || !body.body.trim() || body.body.length > 20000 || body.subject != null && (typeof body.subject !== 'string' || body.subject.length > 200)) return json({ ok: false, error: 'INVALID_MESSAGE' }, 400);
+  if (channel === 'sms' && !/^\+[1-9]\d{7,14}$/.test(to) || channel === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) return json({ ok: false, error: 'INVALID_RECIPIENT' }, 400);
   try {
     const r = channel === 'sms' ? await sendSms(to, body.body || '')
       : channel === 'email' ? await sendEmail(to, body.subject, body.body || '')
@@ -57,6 +59,6 @@ export default async (req) => {
     console.error('transport-send error', err);
     return json({ ok: false, error: 'SEND_FAILED', message: String((err && err.message) || err) }, 500);
   }
-};
+});
 
 export const config = { path: '/api/transport-send' };

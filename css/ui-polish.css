@@ -361,3 +361,16 @@ a.aaa-btn--secondary {
   .aaa-chip__value, .jl-tile__value { font-size: clamp(22px, 8vw, 34px); }
   .aaa-section-title, .fm-sec { margin-top: 20px; }
 }
+
+/* Daily tools use stable, readable targets and keep secondary detail quiet. */
+.tools-home { margin-bottom: 28px; }
+.tools-list { display: grid; gap: 10px; }
+.tools-list h3 { margin: 20px 0 0; font-size: 1rem; color: var(--aaa-muted); }
+.tools-row { display: grid; gap: 5px; width: 100%; min-height: 72px; padding: 16px; text-align: left; color: var(--aaa-ink); background: var(--aaa-card); border: 1px solid var(--aaa-line-soft); border-radius: 14px; font: inherit; cursor: pointer; }
+.tools-row span { color: #b8c0cd; font-size: .9rem; line-height: 1.4; }
+.fm-work-shortcuts { display: flex; gap: 8px; flex-wrap: wrap; margin: 20px 0; }
+.fm-work-shortcuts .aaa-btn { flex: 1 1 130px; min-height: 48px; }
+button.fm-job { width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; min-height: 52px; }
+.tools-row:focus-visible, .fm-job:focus-visible, .aaa-btn:focus-visible, .aaa-input:focus-visible { outline: 3px solid #fca5a5; outline-offset: 3px; }
+.fm-q:disabled, .fm-primary:disabled { opacity: .45; cursor: not-allowed; }
+@media (prefers-reduced-motion: reduce) { .aaa-sheet, .aaa-sheet-overlay, .aaa-btn, .fm-q, .fm-primary { animation: none !important; transition: none !important; } }

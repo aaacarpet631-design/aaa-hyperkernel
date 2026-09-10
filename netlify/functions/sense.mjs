@@ -1,7 +1,7 @@
 /*
  * sense — Netlify webhook endpoint for real-world signals (Option: event-driven
  * sensing). Providers (Twilio SMS/voice, a web-lead form) POST here; this function
- * optionally verifies a shared secret (SENSE_WEBHOOK_SECRET), normalizes the
+ * requires and verifies a shared secret (SENSE_WEBHOOK_SECRET), normalizes the
  * payload via the pure sense-normalize module, and records it for the app to
  * ingest. It performs NO business action — the app's sensing layer turns the
  * signal into a PENDING owner-approval draft; nothing is sent without a human.
@@ -28,8 +28,9 @@ export default async (req) => {
   if (req.method === 'OPTIONS') return json({ ok: true });
   if (req.method !== 'POST') return json({ ok: false, error: 'METHOD_NOT_ALLOWED' }, 405);
 
-  // Optional shared-secret check (set SENSE_WEBHOOK_SECRET to require it).
+  // Required shared-secret check (set SENSE_WEBHOOK_SECRET to require it).
   const secret = process.env.SENSE_WEBHOOK_SECRET;
+  if (!secret) return json({ ok: false, error: 'WEBHOOK_NOT_CONFIGURED' }, 503);
   if (secret) {
     const provided = req.headers.get('x-sense-secret') || new URL(req.url).searchParams.get('secret');
     if (provided !== secret) return json({ ok: false, error: 'UNAUTHORIZED' }, 401);

@@ -227,6 +227,7 @@
         const main = UI().el('main', { className: 'aaa-main' });
         root.appendChild(main);
         const ui = UI();
+        if (global.AAA_TOOLS_HOME) global.AAA_TOOLS_HOME.mount(main);
         if (global.AAA_APP_MODE) main.appendChild(ui.button({ label: 'Switch to ' + (global.AAA_APP_MODE.get() === 'field' ? 'Executive' : 'Field') + ' Mode', icon: '🔀', variant: 'primary', full: true, onClick: () => { global.AAA_APP_MODE.toggle(); this._landed = false; this.render(); } }));
         // Launch preference: on (default) → open straight to Measure every time;
         // off → remember whichever mode you were last in.

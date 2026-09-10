@@ -21,7 +21,8 @@ module.exports = async function () {
       const entries = buckets.get(name);
       return {
         async add(request) { const response = await network(request); if (!response.ok) throw new Error('Bad response'); entries.set(key(request), response); },
-        async put(request, response) { entries.set(key(request), response); }
+        async put(request, response) { entries.set(key(request), response); },
+        async match(request) { const response = entries.get(key(request)); return response && response.clone(); }
       };
     },
     async keys() { return [...buckets.keys()]; },
@@ -32,7 +33,7 @@ module.exports = async function () {
     }
   };
   vm.runInNewContext(fs.readFileSync(srcPath('sw.js'), 'utf8'), {
-    URL, Response, caches, fetch: network,
+    URL, Response, caches, fetch: network, AbortController, setTimeout, clearTimeout,
     self: { location: { origin }, skipWaiting() {}, clients: { claim: async () => {} }, addEventListener: (name, fn) => { handlers[name] = fn; } }
   });
   async function dispatch(name, request) {
@@ -48,8 +49,10 @@ module.exports = async function () {
   t.ok('a failed optional asset does not prevent quote scripts from being cached', !!(await caches.match('/js/ui/quote-builder-ui.js')));
   t.ok('quote styling is cached during installation', !!(await caches.match('/css/quote-builder.css')));
   await caches.open('old-test-cache');
+  await caches.open('hyperkernel-obsolete');
   await dispatch('activate');
-  t.eq('activation removes an obsolete cache', buckets.has('old-test-cache'), false);
+  t.eq('activation keeps caches belonging to other apps', buckets.has('old-test-cache'), true);
+  t.eq('activation removes its obsolete caches', buckets.has('hyperkernel-obsolete'), false);
 
   offline = true;
   t.eq('offline navigation falls back to the cached app shell', await (await dispatch('fetch', req('/reopened', 'navigate'))).response.text(), 'asset:/index.html');
@@ -61,9 +64,13 @@ module.exports = async function () {
   t.eq('a successful fetch keeps the worker alive until its cache write finishes', online.keptAlive, 1);
   t.eq('successful responses update the offline cache', await (await caches.match('/new-asset.js')).text(), 'asset:/new-asset.js');
   httpFailure = true;
-  t.eq('HTTP failures are returned without claiming a successful fetch', (await dispatch('fetch', req('/new-asset.js'))).response.status, 503);
+  t.eq('temporary server errors use a working offline asset', await (await dispatch('fetch', req('/new-asset.js'))).response.text(), 'asset:/new-asset.js');
   t.eq('an HTTP error cannot overwrite a good cached asset', await (await caches.match('/new-asset.js')).text(), 'asset:/new-asset.js');
   t.eq('cross-origin requests are left to the browser', (await dispatch('fetch', { url: 'https://other.example/script.js', method: 'GET' })).response, undefined);
   t.eq('write requests bypass the asset cache', (await dispatch('fetch', Object.assign(req('/api/sync'), { method: 'POST' }))).response, undefined);
+  for (const path of ['/api/sync?workspace=private', '/api/receipt-blob?key=receipt', '/.netlify/functions/sync', '/customer-private-data.json']) {
+    t.eq('private response bypasses caching: ' + path, (await dispatch('fetch', req(path))).response, undefined);
+  }
+  t.eq('authenticated GET never uses the offline cache', (await dispatch('fetch', Object.assign(req('/private.js'), { headers: new Headers({ authorization: 'Bearer session' }) }))).response, undefined);
   return t.report();
 };

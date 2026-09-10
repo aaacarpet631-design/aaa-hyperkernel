@@ -1,3 +1,4 @@
+import { deliverAlert } from './governance-alert.mjs';
 /*
  * governance-ledger-audit — Netlify SCHEDULED function: continuous integrity
  * monitoring of the governance audit ledger.
@@ -52,7 +53,7 @@ async function fetchLedger(env) {
 
 async function sendAlert(env, alert) {
   const base = env.URL || env.DEPLOY_URL || '';
-  try { await fetch(base + '/api/governance-alert', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(alert) }); } catch (_) { /* best-effort */ }
+  try { await deliverAlert(new Request((base || 'https://app.local') + '/api/governance-alert', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(alert) })); } catch (_) { /* best-effort */ }
 }
 
 export default async (req) => {

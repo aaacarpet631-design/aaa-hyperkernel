@@ -1,149 +1,52 @@
-/*
- * AAA Customer Picker UI
- *
- * A modal for choosing the customer a job belongs to. It lists existing
- * customers (filterable) and offers an inline "add new customer" form. The
- * public pick() method resolves with the chosen/created customer record, or
- * null if the user cancels. It owns no global state beyond the single modal it
- * builds on demand.
- */
+/* Shared customer picker: search and create in the accessible sheet system. */
 ;(function (global) {
   'use strict';
-
-  function el(tag, className, text) {
-    const node = document.createElement(tag);
-    if (className) node.className = className;
-    if (text != null) node.textContent = text;
-    return node;
-  }
-
-  function createPicker() {
-    /**
-     * Open the picker. Resolves with a customer object or null on cancel.
-     * @returns {Promise<Object|null>}
-     */
-    function pick() {
-      return new Promise(async (resolve) => {
-        const customerStore = global.AAA_CUSTOMER_STORE;
-        let customers = [];
-        try {
-          customers = customerStore ? await customerStore.list() : [];
-        } catch (_) {
-          customers = [];
+  async function pick() {
+    const U = global.AAA_UI, store = global.AAA_CUSTOMER_STORE;
+    const customers = store ? await store.list() : [];
+    return new Promise(resolve => {
+      let result = null, busy = false;
+      const sheet = U.sheet({ title: 'Choose a customer', subtitle: 'Reuse saved contact details.', beforeClose: () => !busy, onClose: () => resolve(result) });
+      const search = U.el('input', { className: 'aaa-input', attrs: { type: 'search', 'aria-label': 'Search customers', placeholder: 'Name, address, phone or email' } });
+      const list = U.el('div', { className: 'aaa-picker-list' });
+      function render() {
+        list.innerHTML = '';
+        const query = search.value.trim().toLowerCase();
+        const matches = customers.filter(c => [c.name, c.address, c.phone, c.email].join(' ').toLowerCase().includes(query));
+        if (!matches.length) list.appendChild(U.el('p', { text: customers.length ? 'No matching customers.' : 'No saved customers yet.' }));
+        for (const customer of matches) {
+          const row = U.button({ label: customer.name + (customer.address ? ' · ' + customer.address : ''), variant: 'secondary', full: true, onClick: () => { result = customer; sheet.close(); } });
+          list.appendChild(row);
         }
-
-        const overlay = el('div', 'aaa-modal-overlay');
-        const modal = el('div', 'aaa-modal');
-        const title = el('h2', 'aaa-modal-title', 'Select Customer');
-
-        const search = el('input', 'aaa-input');
-        search.type = 'search';
-        search.placeholder = 'Search customers…';
-
-        const listWrap = el('div', 'aaa-picker-list');
-
-        function close(result) {
-          overlay.remove();
-          document.removeEventListener('keydown', onKey);
-          resolve(result || null);
+      }
+      search.addEventListener('input', render);
+      sheet.body.appendChild(search); sheet.body.appendChild(list);
+      if (store && global.AAA_RBAC && global.AAA_RBAC.can('EDIT_CUSTOMER')) {
+        const details = U.el('details'); details.appendChild(U.el('summary', { text: 'Add a new customer' }));
+        const form = U.el('form', { className: 'aaa-form' });
+        const fields = {};
+        for (const [key, label, type] of [['name', 'Name', 'text'], ['address', 'Service address', 'text'], ['phone', 'Phone', 'tel'], ['email', 'Email', 'email'], ['gateCode', 'Access code', 'text'], ['source', 'Lead source', 'text']]) {
+          fields[key] = U.el('input', { className: 'aaa-input', attrs: { type, 'aria-label': label, maxlength: key === 'address' ? '500' : '200' } });
+          if (key === 'name') fields[key].required = true;
+          form.appendChild(U.el('label', { text: label }, [fields[key]]));
         }
-
-        function onKey(e) {
-          if (e.key === 'Escape') close(null);
-        }
-
-        function renderList(filter) {
-          listWrap.innerHTML = '';
-          const f = (filter || '').trim().toLowerCase();
-          const matches = customers.filter(
-            (c) =>
-              !f ||
-              String(c.name || '').toLowerCase().includes(f) ||
-              String(c.address || '').toLowerCase().includes(f)
-          );
-          if (matches.length === 0) {
-            listWrap.appendChild(
-              el('p', 'aaa-empty', customers.length ? 'No matches.' : 'No customers yet — add one below.')
-            );
-            return;
-          }
-          matches.forEach((c) => {
-            const row = el('button', 'aaa-picker-row');
-            row.type = 'button';
-            row.appendChild(el('span', 'aaa-picker-name', c.name || 'Unnamed'));
-            if (c.address) row.appendChild(el('span', 'aaa-picker-sub', c.address));
-            row.addEventListener('click', () => close(c));
-            listWrap.appendChild(row);
-          });
-        }
-
-        search.addEventListener('input', () => renderList(search.value));
-
-        // --- Add new customer form ---
-        const addTitle = el('h3', 'aaa-modal-subtitle', 'Add New Customer');
-        const nameInput = el('input', 'aaa-input');
-        nameInput.placeholder = 'Name *';
-        const addrInput = el('input', 'aaa-input');
-        addrInput.placeholder = 'Service address';
-        const phoneInput = el('input', 'aaa-input');
-        phoneInput.placeholder = 'Phone';
-        const gateInput = el('input', 'aaa-input');
-        gateInput.placeholder = 'Gate / access code';
-        const sourceInput = el('input', 'aaa-input');
-        sourceInput.placeholder = 'Lead source (e.g. Google, referral)';
-
-        const addBtn = el('button', 'aaa-btn aaa-btn-primary', 'Add & Select');
-        addBtn.type = 'button';
-        addBtn.addEventListener('click', async () => {
-          const name = nameInput.value.trim();
-          if (!name) {
-            nameInput.classList.add('aaa-input-error');
-            nameInput.focus();
-            return;
-          }
-          if (!customerStore) return close(null);
-          const customer = await customerStore.add({
-            name,
-            address: addrInput.value.trim(),
-            phone: phoneInput.value.trim(),
-            gateCode: gateInput.value.trim(),
-            source: sourceInput.value.trim() || null
-          });
-          close(customer);
+        const error = U.el('p', { attrs: { role: 'alert' } });
+        const submit = U.button({ label: 'Save & use customer', variant: 'primary' }); submit.type = 'submit';
+        form.addEventListener('submit', async event => {
+          event.preventDefault(); if (busy) return;
+          if (!fields.name.value.trim()) { fields.name.focus(); return; }
+          busy = true; form.inert = true; list.inert = true;
+          try {
+            result = await store.add(Object.fromEntries(Object.entries(fields).map(([key, input]) => [key, input.value.trim()])));
+            sheet.close();
+          } catch (_) { error.textContent = 'Customer could not be saved. Keep this form open and retry when device storage is available.'; }
+          finally { busy = false; form.inert = false; list.inert = false; }
         });
-
-        const cancelBtn = el('button', 'aaa-btn aaa-btn-ghost', 'Cancel');
-        cancelBtn.type = 'button';
-        cancelBtn.addEventListener('click', () => close(null));
-
-        const actions = el('div', 'aaa-modal-actions');
-        actions.appendChild(cancelBtn);
-        actions.appendChild(addBtn);
-
-        const addForm = el('div', 'aaa-form');
-        [nameInput, addrInput, phoneInput, gateInput, sourceInput].forEach((i) => addForm.appendChild(i));
-
-        modal.appendChild(title);
-        modal.appendChild(search);
-        modal.appendChild(listWrap);
-        modal.appendChild(addTitle);
-        modal.appendChild(addForm);
-        modal.appendChild(actions);
-        overlay.appendChild(modal);
-        overlay.addEventListener('click', (e) => {
-          if (e.target === overlay) close(null);
-        });
-        document.addEventListener('keydown', onKey);
-        document.body.appendChild(overlay);
-
-        renderList('');
-        nameInput.addEventListener('input', () => nameInput.classList.remove('aaa-input-error'));
-        setTimeout(() => search.focus(), 0);
-      });
-    }
-
-    return { pick };
+        form.appendChild(submit); details.appendChild(form); details.appendChild(error); sheet.body.appendChild(details);
+      }
+      sheet.body.appendChild(U.button({ label: 'Cancel', variant: 'ghost', onClick: () => { if (!busy) sheet.close(); } }));
+      document.body.appendChild(sheet.overlay); render();
+    });
   }
-
-  global.AAA_CUSTOMER_PICKER_UI = createPicker();
+  global.AAA_CUSTOMER_PICKER_UI = { pick };
 })(typeof window !== 'undefined' ? window : this);

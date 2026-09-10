@@ -1,3 +1,4 @@
+import { withAppAuth } from '../lib/app-auth.mjs';
 /*
  * Receipt OCR function (Netlify, Claude-backed).
  *
@@ -70,7 +71,7 @@ function json(body, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 }
 
-export default async (req) => {
+export default withAppAuth(async (req, context) => {
   if (req.method !== 'POST') return json({ ok: false, error: 'METHOD_NOT_ALLOWED' }, 405);
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return json({ ok: false, error: 'MISSING_API_KEY', message: 'Set ANTHROPIC_API_KEY in the Netlify site environment.' }, 500);
@@ -106,6 +107,6 @@ export default async (req) => {
     console.error('Receipt OCR function error', err);
     return json({ ok: false, error: 'OCR_FAILED', message: String((err && err.message) || err) }, status >= 400 && status <= 599 ? status : 500);
   }
-};
+});
 
 export const config = { path: '/api/receipt-ocr' };

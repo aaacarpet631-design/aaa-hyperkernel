@@ -49,7 +49,7 @@
   async function runOcr(base64, mediaType) {
     try {
       const res = await fetch(ocrEndpoint(), {
-        method: 'POST', headers: { 'content-type': 'application/json' },
+        method: 'POST', headers: Object.assign({ 'content-type': 'application/json' }, global.AAA_CONFIG && global.AAA_CONFIG.sessionHeaders ? global.AAA_CONFIG.sessionHeaders() : {}),
         body: JSON.stringify({ image: base64, mediaType: mediaType || 'image/jpeg' })
       });
       if (res.ok) {
@@ -67,7 +67,7 @@
   async function uploadBlob(mediaId, base64, mediaType) {
     try {
       const res = await fetch(blobEndpoint(), {
-        method: 'POST', headers: { 'content-type': 'application/json' },
+        method: 'POST', headers: Object.assign({ 'content-type': 'application/json' }, global.AAA_CONFIG && global.AAA_CONFIG.sessionHeaders ? global.AAA_CONFIG.sessionHeaders() : {}),
         body: JSON.stringify({ key: mediaId, data: base64, mediaType: mediaType || 'image/jpeg' })
       });
       if (res.ok) { const j = await res.json(); if (j && j.ok) return j.key || mediaId; }

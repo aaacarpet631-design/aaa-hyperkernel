@@ -99,7 +99,7 @@
       try {
         res = await global.fetch(endpoint(), {
           method: 'POST',
-          headers: { 'content-type': 'application/json' },
+          headers: Object.assign({ 'content-type': 'application/json' }, global.AAA_CONFIG && global.AAA_CONFIG.sessionHeaders ? global.AAA_CONFIG.sessionHeaders() : {}),
           body: JSON.stringify({ message: q, topic: opts.topic || opts.templateId || null })
         });
       } catch (err) {

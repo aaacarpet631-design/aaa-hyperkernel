@@ -16,7 +16,7 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
   function money(v) { const n = Number(v); return v != null && isFinite(n) ? '$' + n.toFixed(2) : '—'; }
 
-  const state = { filter: 'pipeline' };
+  const state = { filter: 'pipeline', query: '' };
   const STATUS_COLOR = { draft: '#94A3B8', reviewed: '#3B82F6', sent: '#8B5CF6', follow_up_due: '#F59E0B', won: '#10B981', lost: '#EF4444', expired: '#A1A1AA', archived: '#71717A' };
   const FILTERS = [
     { id: 'pipeline', label: 'Pipeline' }, { id: 'follow', label: 'Follow-up' },
@@ -71,10 +71,17 @@
     FILTERS.forEach((f) => filterRow.appendChild(ui.button({ label: f.label, size: 'sm', variant: state.filter === f.id ? 'primary' : 'secondary', onClick: () => { state.filter = f.id; render(container); } })));
     container.appendChild(filterRow);
 
-    // List.
-    container.appendChild(title((FILTERS.find((f) => f.id === state.filter) || {}).label + ' (' + quotes.length + ')'));
-    if (!quotes.length) { container.appendChild(empty('No quotes here.')); return; }
-    quotes.forEach((q) => {
+    const search = ui.el('input', { className: 'aaa-input', attrs: { type: 'search', 'aria-label': 'Search this quote view', placeholder: 'Customer, phone or address' } });
+    search.value = state.query;
+    const results = ui.el('div');
+    container.appendChild(search); container.appendChild(results);
+    function renderMatches() {
+    results.innerHTML = '';
+    const query = state.query.trim().toLowerCase();
+    const matches = quotes.filter(q => [q.customerName, q.customerContact && q.customerContact.phone, q.customerContact && q.customerContact.email, q.customerContact && q.customerContact.address, (q.serviceType || []).join(' ')].join(' ').toLowerCase().includes(query));
+    results.appendChild(title((FILTERS.find((f) => f.id === state.filter) || {}).label + ' (' + matches.length + ')'));
+    if (!matches.length) { results.appendChild(empty(query ? 'No matching quotes in this view. Try All or change your search.' : 'No quotes here.')); return; }
+    matches.forEach((q) => {
       const row = ui.el('button', { className: 'aaa-list-row', attrs: { type: 'button', style: 'width:100%;text-align:left;cursor:pointer' }, html:
         '<strong>' + esc(q.customerName || 'Quote') + ' · ' + money(q.customerTotal) + '</strong>' +
         '<div class="aaa-list-sub"><span style="color:' + (STATUS_COLOR[q.status] || '#A1A1AA') + '">● ' + esc(q.status) + '</span>' +
@@ -82,8 +89,11 @@
         (q.marginPct != null ? ' · margin ' + q.marginPct + '%' : '') +
         (q.risk != null ? ' · risk ' + q.risk : '') + '</div>' });
       row.addEventListener('click', () => openDetail(q.id));
-      container.appendChild(row);
+      results.appendChild(row);
     });
+    }
+    search.addEventListener('input', () => { state.query = search.value; renderMatches(); });
+    renderMatches();
   }
 
   /** Quote detail — internal margin/risk (owner) + customer view + actions + supervisor notes. */

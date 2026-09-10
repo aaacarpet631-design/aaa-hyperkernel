@@ -6,8 +6,8 @@ module.exports = async function run() {
   const t = makeRunner('openai');
   const lib = await import(path.join(ROOT, 'netlify/lib/openai.mjs'));
   const { authorizeOpenAI } = await import(path.join(ROOT, 'netlify/lib/openai-auth.mjs'));
-  const endpoint = (await import(path.join(ROOT, 'netlify/functions/openai.mjs'))).default;
-  const vision = (await import(path.join(ROOT, 'netlify/functions/vision.mjs'))).default;
+  const endpoint = (await import(path.join(ROOT, 'netlify/functions/openai.mjs'))).createHandler({ budget: async () => {} });
+  const vision = (await import(path.join(ROOT, 'netlify/functions/vision.mjs'))).createHandler({ budget: async () => {} });
   const schema = { type: 'object', properties: { answer: { type: 'string' }, notes: { type: 'array', items: { type: 'string' } } }, required: ['answer'], additionalProperties: false };
   const request = { model: lib.MODEL, system: [{ type: 'text', text: 'Use evidence.', cache_control: { type: 'ephemeral' } }], max_tokens: 700,
     output_config: { format: { type: 'json_schema', schema } }, messages: [{ role: 'user', content: [

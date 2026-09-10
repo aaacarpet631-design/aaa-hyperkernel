@@ -25,21 +25,28 @@ module.exports = async function run() {
   t.eq('an unknown mode is rejected', MODE.set('zen').error, 'UNKNOWN_MODE');
 
   // ===== Field Mode Home render model =====
-  const NOON = Date.parse('2026-06-10T17:00:00Z'); // afternoon UTC
-  await data.put('jobs', 'j1', { id: 'j1', customerName: 'Smith', currentState: 'IN_PROGRESS' });
-  await data.put('jobs', 'j2', { id: 'j2', customerName: 'Jones', currentState: 'SCHEDULED' });
+  const NOON = new Date(2026, 5, 10, 17).getTime(); // afternoon UTC
+  await data.put('jobs', 'j1', { id: 'j1', customerName: 'Smith', currentState: 'IN_PROGRESS', workspaceId: 'ws_test', scheduledDate: '2026-06-10', scheduledStartMins: 600 });
+  await data.put('jobs', 'j2', { id: 'j2', customerName: 'Jones', currentState: 'SCHEDULED', workspaceId: 'ws_test', scheduledDate: '2026-06-10', scheduledStartMins: 480 });
   await data.put('jobs', 'j3', { id: 'j3', customerName: 'Old', currentState: 'CLOSED' });
 
+  await data.put('jobs', 'tomorrow', { id: 'tomorrow', workspaceId: 'ws_test', scheduledDate: '2026-06-11' });
+  await data.put('jobs', 'unscheduled', { id: 'unscheduled', workspaceId: 'ws_test' });
+  await data.put('jobs', 'other', { id: 'other', workspaceId: 'other', scheduledDate: '2026-06-10' });
   const m = await HOME.renderModel({ now: NOON });
   t.ok('greeting is time-aware and personal', /Good afternoon, Aaron/.test(m.greeting));
   t.eq('the primary action is START MEASUREMENT', m.primaryAction.label, 'START MEASUREMENT');
   t.ok('four quick actions are offered', m.quickActions.length === 4 && m.quickActions.map((q) => q.id).indexOf('scan_room') !== -1 && m.quickActions.map((q) => q.id).indexOf('voice_note') !== -1);
   t.ok('quick actions are honestly unavailable when no engine is loaded', m.quickActions.every((q) => q.available === false));
   t.ok("today's jobs show active work only (closed excluded)", m.todaysJobs.length === 2 && m.todaysJobs.every((j) => j.id !== 'j3'));
+  t.eq('today’s jobs are in scheduled time order', m.todaysJobs[0].id, 'j2');
+  G.AAA_CAPTURE_SEQUENCER = {};
+  t.eq('support engine alone does not enable a missing scan UI', (await HOME.renderModel({ now: NOON })).quickActions[0].available, false);
+  delete G.AAA_CAPTURE_SEQUENCER;
   t.ok('ask-HyperKernel prompt is present', /focus/i.test(m.ask.placeholder));
 
   // ===== availability flips when an engine exists =====
-  G.AAA_VOICE_HUD_UI = { boot: function () {} };
+  G.AAA_VOICE_HUD_UI = { open: function () {} };
   const m2 = await HOME.renderModel({ now: NOON });
   t.ok('voice note becomes available once the voice HUD is loaded', m2.quickActions.find((q) => q.id === 'voice_note').available === true);
   delete G.AAA_VOICE_HUD_UI;
@@ -52,7 +59,7 @@ module.exports = async function run() {
   t.eq('an unknown quick action is rejected', HOME.startQuick('teleport', {}).reason, 'UNKNOWN_ACTION');
 
   // ===== greeting boundaries =====
-  t.ok('morning greeting before noon', /Good morning/.test((await HOME.renderModel({ now: Date.parse('2026-06-10T08:00:00Z') })).greeting));
+  t.ok('morning greeting before noon', /Good morning/.test((await HOME.renderModel({ now: new Date(2026, 5, 10, 8).getTime() })).greeting));
 
   return t.report();
 };

@@ -63,7 +63,7 @@
   // Default email channel — POSTs the allowlisted payload to the Netlify function.
   async function emailSend(payload) {
     const url = endpoint();
-    const res = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) });
+    const res = await fetch(url, { method: 'POST', headers: Object.assign({ 'content-type': 'application/json' }, cfg().sessionHeaders ? cfg().sessionHeaders() : {}), body: JSON.stringify(payload) });
     let body = null; try { body = await res.json(); } catch (_) {}
     return { ok: res.ok && !(body && body.ok === false), status: res.status, response: body };
   }
