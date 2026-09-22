@@ -5,7 +5,8 @@
   "type": "module",
   "description": "AAA HyperKernel \u2014 local-first field PWA with Claude-backed vision estimating and Netlify Blobs sync.",
   "scripts": {
-    "test": "node test/run.js && node test/intelligence-smoke.mjs",
+    "test": "node test/run.js && node test/intelligence-smoke.mjs && npm run test:agent",
+    "test:agent": "node --test test/agent/*.test.mjs",
     "test:harness": "node test/run.js",
     "test:intel": "node test/intelligence-smoke.mjs",
     "test:rules": "node test/run-rules.js",
@@ -14,7 +15,9 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.124.0",
-    "@netlify/blobs": "11.0.3"
+    "@modelcontextprotocol/sdk": "1.30.0",
+    "@netlify/blobs": "11.0.3",
+    "ajv": "8.20.0"
   },
   "devDependencies": {
     "eslint": "8.57.1"

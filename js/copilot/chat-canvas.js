@@ -34,14 +34,32 @@
     async send(text, opts) {
       const o = opts || {};
       const online = queue() ? queue().isOnline() : true;
-      const userMsg = store() ? await store().add({ role: 'user', text: text, status: online ? 'sent' : 'queued', threadId: o.threadId }) : null;
+      const userMsg = store() ? (o._replay && o.queuedMessageId ? await store().update(o.queuedMessageId, { status: 'sent' }) : await store().add({ role: 'user', text: text, status: online ? 'sent' : 'queued', threadId: o.threadId })) : null;
 
       if (!online && !o._replay) {
-        if (queue()) await queue().enqueue({ text: text, opts: o });
+        // Callbacks and control objects cannot be persisted to IndexedDB.
+        const queuedOpts = o.agentTask ? { agentTask: true, model: o.model || '', taskId: o.taskId || global.crypto.randomUUID(), queuedMessageId: userMsg && userMsg.id, threadId: o.threadId, shareBusiness: !!o.shareBusiness, files: o.files || [] } : o;
+        if (queue()) await queue().enqueue({ text: text, opts: queuedOpts });
         return { queued: true, userMessage: userMsg };
       }
 
       const route = router() ? router().classify(text) : { intent: 'unknown', cardType: 'text', confidence: 0 };
+
+      if (o.agentTask && global.AAA_TASK_AGENT) {
+        const history = store() ? (await store().thread(o.threadId)).filter(m => !userMsg || m.id !== userMsg.id).slice(-8).map(m => m.role + ': ' + m.text).join('\n').slice(-12000) : '';
+        let assistantMsg = null;
+        const progress = async function (run) {
+          const model = global.AAA_TASK_AGENT.card(run);
+          if (store()) {
+            if (assistantMsg) assistantMsg = await store().update(assistantMsg.id, { text: model.summary, card: model });
+            else assistantMsg = await store().add({ role: 'assistant', text: model.summary, card: model, threadId: o.threadId, status: 'sent' });
+          }
+          if (o.onProgress) await o.onProgress(run);
+        };
+        const run = await global.AAA_TASK_AGENT.start(text, Object.assign({}, o, { history: history, onProgress: progress }));
+        const model = global.AAA_TASK_AGENT.card(run);
+        return { queued: false, intent: 'agent_task', cardType: 'agent_task', userMessage: userMsg, assistantMessage: assistantMsg, card: model, answer: run };
+      }
 
       // Company Brain — evidence-cited answers for business questions the
       // copilot router doesn't claim (win rates, profitability, revenue
@@ -85,7 +103,10 @@
       const o = opts || {};
       const self = this;
       if (!queue()) return { replayed: 0 };
-      return queue().replay(function (text) { return self.send(text, Object.assign({}, o, { _replay: true })); });
+      return queue().replay(function (text, savedOpts) {
+        if (o.control && o.control.stop) throw new Error('Replay paused');
+        return self.send(text, Object.assign({}, savedOpts || {}, o, { _replay: true }));
+      });
     }
   };
 

@@ -56,6 +56,8 @@
     get aiProvider() { return read('aiProvider', 'claude'); },
     /** Optional upgrade for premium reasoning; routine task tiers keep their models. */
     get premiumModel() { return read('premiumModel', 'claude-opus-4-8'); },
+    /** The task assistant's independent model choice (no provider secrets). */
+    get taskModel() { return read('taskModel', null); },
     get visionModel() { return read('visionModel', 'claude-opus-4-8'); },
     /** Authenticated Netlify Responses proxy; contains no provider credentials. */
     get openaiProxyUrl() { return read('openaiProxyUrl', '/api/openai'); },

@@ -7,6 +7,9 @@
   node_bundler = "esbuild"
   directory = "netlify/functions"
 
+[functions.agent]
+  included_files = ["agent-skills/**"]
+
 # Friendly routes -> functions (functions also self-declare these via `config.path`).
 [[redirects]]
   from = "/api/vision"
@@ -36,6 +39,11 @@
 [[redirects]]
   from = "/api/research"
   to = "/.netlify/functions/research"
+  status = 200
+
+[[redirects]]
+  from = "/api/agent"
+  to = "/.netlify/functions/agent"
   status = 200
 
 # The current app includes inline boot code and styles. Keep script CSP in
