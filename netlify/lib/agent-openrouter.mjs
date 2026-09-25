@@ -13,8 +13,11 @@ export async function openRouterStep(run, tools, system, { env, fetchImpl = fetc
   if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash) throw new OpenAIError('INVALID_AGENT_PROVIDER_CONFIG', 503);
   const payload = { model: run.model, messages: [{ role: 'system', content: system }, ...run.transcript],
     tools: tools.map(t => ({ type: 'function', function: { name: t.name, description: t.description, parameters: t.inputSchema } })),
-    tool_choice: 'auto', parallel_tool_calls: false, max_tokens: 8192,
+    tool_choice: 'auto', max_tokens: 8192,
     provider: { require_parameters: true, data_collection: 'deny' } };
+  // MiMo and Kimi do not advertise this control. Even false excludes their
+  // endpoints with require_parameters; the runtime still executes tools serially.
+  if (run.model === 'z-ai/glm-5.3') payload.parallel_tool_calls = false;
   let response;
   try {
     response = await boundedFetch(fetchImpl, url.href, { method: 'POST', redirect: 'error',

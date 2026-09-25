@@ -14,6 +14,11 @@ for (const model of OPEN_MODELS) test(model + ' completes the native tool loop w
     assert.equal(options.headers.authorization, 'Bearer fixture-only-secret'); assert.equal(options.redirect, 'error');
     const payload = JSON.parse(options.body);
     assert.equal(payload.model, model); assert.equal(payload.tools[0].type, 'function'); assert.equal(payload.provider.require_parameters, true);
+    assert.equal(payload.provider.data_collection, 'deny');
+    // Match the live routing failure: unsupported controls eliminate all routes,
+    // even when the requested value is false.
+    if (model !== 'z-ai/glm-5.3' && Object.hasOwn(payload, 'parallel_tool_calls')) return new Response('No endpoints support the requested parameters', { status: 404 });
+    if (model === 'z-ai/glm-5.3') assert.equal(payload.parallel_tool_calls, false);
     let message;
     if (++calls === 1) message = { role: 'assistant', content: null, reasoning_details: [{ type: 'reasoning.encrypted', data: 'opaque-block', index: 0 }], tool_calls: [{ type: 'function', id: 'calc_1', function: { name: 'calculate', arguments: '{"operation":"sum","values":[12,30]}' } }] };
     else {
