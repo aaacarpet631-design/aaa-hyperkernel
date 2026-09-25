@@ -58,7 +58,10 @@
       let replayed = 0;
       for (const it of items) {
         try { await handler(it.text, it.opts); await data().put(COLLECTION, it.id, Object.assign({}, it, { status: 'sent', sentAt: nowISO() })); replayed++; }
-        catch (_) { /* leave queued for the next replay */ }
+        catch (e) {
+          // Preserve order: a later request may depend on this one's result.
+          return { replayed: replayed, offline: !this.isOnline(), error: (e && e.code) || 'REPLAY_FAILED' };
+        }
       }
       return { replayed: replayed, offline: false };
     }

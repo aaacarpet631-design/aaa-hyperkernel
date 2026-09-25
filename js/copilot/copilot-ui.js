@@ -70,6 +70,7 @@
     mountChat(el, opts) {
       if (typeof document === 'undefined') return { mounted: false, reason: 'no_dom' };
       const root = el || document.body; const self = this;
+      if (global.AAA_TASK_CHAT_UI && global.AAA_TASK_AGENT) return global.AAA_TASK_CHAT_UI.mount(this, root, opts);
       const wrap = document.createElement('div'); wrap.className = 'cc-root';
       const thread = document.createElement('div'); thread.className = 'cc-thread';
       const bar = document.createElement('div'); bar.className = 'cc-bar';

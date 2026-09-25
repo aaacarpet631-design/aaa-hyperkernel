@@ -28,7 +28,9 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 20
-      # The core suite is zero-dependency: no install needed.
+      # The task runtime tests use the same SDKs and validators as the functions.
+      - name: Install test dependencies
+        run: npm ci --no-audit --no-fund
       - name: Run test suite
         run: |
           set -o pipefail

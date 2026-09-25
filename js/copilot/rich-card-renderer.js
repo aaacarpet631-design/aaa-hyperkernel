@@ -18,6 +18,7 @@
     html(card) {
       if (!card) return '';
       switch (card.type) {
+        case 'agent_task': return this._agent(card);
         case 'executive_briefing': return this._briefing(card);
         case 'simulation': return this._sim(card);
         case 'goal': return this._goal(card);
@@ -29,6 +30,20 @@
 
     _missing(card) { return (card.missingData && card.missingData.length) ? '<div class="cp-missing">Missing: ' + esc(card.missingData.join(', ')) + '</div>' : ''; },
     _conf(card) { return card.confidence == null ? '' : '<div class="cp-meta">confidence ' + pct(card.confidence) + '</div>'; },
+
+    _agent(c) {
+      const r = c.run || {};
+      const states = { starting: 'Starting', running: r.busy ? 'Action in progress' : 'In progress', awaiting_review: 'Review action', completed: 'Completed', limited: 'Budget reached', failed: 'Stopped with an error', interrupted: 'Outcome needs checking', cancelled: 'Stopped' };
+      const review = r.review ? '<div class="task-review"><strong>' + esc(r.review.connection + ' · ' + r.review.tool) + '</strong><pre>' + esc(JSON.stringify(r.review.arguments, null, 2)) + '</pre><p>Review these exact details before continuing.</p><button data-task-action="approve">Approve action</button> <button data-task-action="reject">Decline</button></div>' : '';
+      const controls = ['running', 'starting'].includes(r.status) ? '<button data-task-action="resume">Refresh / resume</button> <button data-task-action="cancel">Stop task</button>' : '';
+      return '<div class="cp-card task-card" data-task-id="' + esc(r.id) + '"><div class="task-state">' + esc(states[r.status] || r.status) + '</div>' +
+        '<div class="task-answer">' + esc(r.text || (r.status === 'running' ? 'Working on your request…' : '')) + '</div>' +
+        (r.error ? '<p class="task-error">' + esc(global.AAA_TASK_AGENT ? global.AAA_TASK_AGENT.errorText(r.error) : r.error) + '</p>' : '') +
+        ((r.receipts || []).length ? '<details class="task-receipts"><summary>' + r.receipts.length + ' tool results</summary><ul>' + li(r.receipts, x => x.tool + ': ' + x.summary) + '</ul></details>' : '') +
+        '<div class="task-files">' + (r.artifacts || []).map((f, i) => '<button data-task-download="' + i + '">Download ' + esc(f.filename) + '</button>').join('') + '</div>' + review +
+        '<div class="task-controls">' + controls + '</div>' +
+        '<div class="cp-meta">' + esc(r.model || '') + (r.modelCalls != null ? ' · ' + r.modelCalls + ' model calls · ' + (r.toolCalls || 0) + ' tool calls' : '') + '</div></div>';
+    },
 
     _briefing(c) {
       return '<div class="cp-card cp-briefing"><h3>' + esc(c.title) + '</h3>' +
