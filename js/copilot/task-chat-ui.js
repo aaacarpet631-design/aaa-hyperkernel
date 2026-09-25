@@ -132,7 +132,8 @@
       setBusy(true); control = { stop: false }; pause.disabled = false;
       try {
         const result = await global.AAA_CHAT_CANVAS.replayQueue({ control: control });
-        await loadThread(); status.textContent = result.offline ? 'Still offline. Your messages are saved.' : result.replayed + ' messages sent.';
+        await loadThread();
+        status.textContent = result.offline ? 'Still offline. Your messages are saved.' : result.error ? agent().errorText(result.error) + ' Remaining messages are queued.' : result.replayed + ' messages sent.';
       } catch (e) { status.textContent = e.message; }
       finally { setBusy(false); }
     };

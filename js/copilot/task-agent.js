@@ -18,6 +18,11 @@
     STALE_TASK_VERSION: 'This task changed in another tab. Refresh its status before continuing.',
     ACTION_OUTCOME_UNKNOWN: 'An action was interrupted. Check its destination before trying it again.',
     NETWORK_ERROR: 'Connection lost. Resume this task to check what finished.',
+    RUN_NOT_FOUND: 'The original task could not be found. Its saved request is unavailable on this device.',
+    RECOVERY_ACCOUNT_MISMATCH: 'Sign in with the account that started this task before resuming it.',
+    RECOVERY_WORKSPACE_MISMATCH: 'Switch back to the workspace that started this task before resuming it.',
+    REPLAY_PAUSED: 'Paused. Remaining messages are still queued.',
+    REPLAY_FAILED: 'A queued message could not be sent. Remaining messages are still saved.',
     TASK_EXPIRED: 'This task has expired. Start a new task.',
     REVIEW_EXPIRED: 'This action review has expired. Start a new task with current information.',
     NO_ALLOWED_MODEL_FOR_TENANT: 'The workspace model policy does not allow an available task model.'
@@ -49,17 +54,25 @@
   }
 
   function card(run) { return { type: 'agent_task', title: 'Task assistant', run: run, summary: run.text || (run.status === 'awaiting_review' ? 'Review the proposed action.' : 'Task ' + run.status) }; }
-  async function remember(run) {
-    if (global.AAA_DATA) await global.AAA_DATA.put('agent_runs', run.id, { id: run.id, workspaceId: workspace(), run: run, updatedAt: Date.now() });
+  async function remember(run, startRequest) {
+    const record = { id: run.id, workspaceId: workspace(), run: run, updatedAt: Date.now() };
+    if (startRequest) record.startRequest = startRequest;
+    if (global.AAA_DATA) await global.AAA_DATA.put('agent_runs', run.id, record);
     return run;
   }
+  async function savedRun(id) { return global.AAA_DATA && global.AAA_DATA.get ? global.AAA_DATA.get('agent_runs', id) : null; }
+  function fail(code) { throw Object.assign(new Error(ERRORS[code]), { code: code }); }
 
   const Agent = {
     request: request, snapshot: snapshot, card: card,
     errorText(code) { return ERRORS[code] || code || 'Task failed.'; },
     async capabilities() { return request({ op: 'capabilities', workspace: workspace() }); },
     async start(text, opts) {
-      const o = opts || {}, caps = await this.capabilities();
+      const o = opts || {};
+      // Queue replay must recover the original request, including its context.
+      // Never replace an acknowledged run or pending payload with a new start.
+      if (o.taskId && await savedRun(o.taskId)) return this.resume(o.taskId, o);
+      const caps = await this.capabilities();
       const preferred = o.model || (cfg().flag && cfg().flag('taskModel', null)) || cfg().premiumModel;
       let model = caps.models.includes(preferred) ? preferred : caps.models[0];
       if (o.model && !caps.models.includes(o.model)) model = null;
@@ -71,9 +84,11 @@
       }
       const id = o.taskId || global.crypto.randomUUID();
       const body = { op: 'start', id: id, prompt: text, model: model, workspace: workspace(), files: o.files || [], business: o.shareBusiness ? await snapshot() : {}, history: String(o.history || '').slice(-12000) };
-      // Persist the id before sending: resume an uncertain start by its id.
+      // Keep the exact request until the server acknowledges it. The account
+      // scope comes from verified server auth; no credentials are persisted.
       const pending = { id: id, status: 'starting', revision: 0, model: model, text: 'Checking task status…', receipts: [], artifacts: [] };
-      await remember(pending); if (o.onProgress) await o.onProgress(pending);
+      await remember(pending, { body: body, accountScope: caps.accountScope, savedAt: Date.now() });
+      if (o.onProgress) await o.onProgress(pending);
       return this.run((await request(body)).run, o);
     },
     async run(run, opts) {
@@ -85,7 +100,29 @@
       }
       return run;
     },
-    async resume(id, opts) { return this.run((await request({ op: 'status', id: id })).run, opts); },
+    async resume(id, opts) {
+      const saved = await savedRun(id);
+      if (saved && saved.workspaceId !== workspace()) fail('RECOVERY_WORKSPACE_MISMATCH');
+      let run;
+      try { run = (await request({ op: 'status', id: id })).run; }
+      catch (e) {
+        // Only a confirmed missing server record permits resubmitting the same
+        // start. A timeout, auth error or uncertain action never does.
+        const pending = saved && saved.startRequest;
+        if (e.code !== 'RUN_NOT_FOUND' || !pending || !saved.run || saved.run.status !== 'starting' || !pending.body || pending.body.op !== 'start' || pending.body.id !== id) throw e;
+        if (pending.body.workspace !== workspace()) fail('RECOVERY_WORKSPACE_MISMATCH');
+        if (!Number.isFinite(pending.savedAt) || Date.now() - pending.savedAt >= 86400000) fail('TASK_EXPIRED');
+        const caps = await this.capabilities();
+        if (!pending.accountScope || pending.accountScope !== caps.accountScope) fail('RECOVERY_ACCOUNT_MISMATCH');
+        if (!caps.models.includes(pending.body.model)) fail('AGENT_MODEL_NOT_CONFIGURED');
+        if (global.AAA_TENANT_MODEL_POLICY && global.AAA_TENANT_MODEL_POLICY.pick) {
+          const picked = await global.AAA_TENANT_MODEL_POLICY.pick(pending.body.model);
+          if (!picked.ok || picked.model !== pending.body.model) fail('NO_ALLOWED_MODEL_FOR_TENANT');
+        }
+        run = (await request(pending.body)).run;
+      }
+      return this.run(run, opts);
+    },
     async decide(run, approve, opts) {
       return this.run((await request({ op: approve ? 'approve' : 'reject', id: run.id, revision: run.revision, callId: run.review.callId })).run, opts);
     },

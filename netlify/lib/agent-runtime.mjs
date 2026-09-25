@@ -40,7 +40,7 @@ export function publicRun(run, now = Date.now()) {
 }
 
 export async function capabilities({ env, userId, store, workspace = 'default' }) {
-  return { ok: true, models: availableModels(env), modelCatalog: modelCatalog(env), tools: TOOLS.map(t => ({ name: t.name, description: t.description })), skills: SKILLS,
+  return { ok: true, accountScope: ownerPrefix(userId), models: availableModels(env), modelCatalog: modelCatalog(env), tools: TOOLS.map(t => ({ name: t.name, description: t.description })), skills: SKILLS,
     connections: connections(env, userId).map(c => ({ id: c.id, label: c.label, configured: !!c.token, readTools: c.readTools, reviewTools: c.reviewTools })),
     researchConfigured: !!env.AIQ_RESEARCH_URL,
     memoryCount: store ? (await readMemory(store, userId, workspace)).length : 0 };

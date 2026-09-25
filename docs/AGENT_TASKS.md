@@ -84,6 +84,10 @@ Memory persists in site-scoped Netlify Blobs across tasks and deploys, isolated 
 
 `POST /api/agent` supports capabilities, start, status, advance, approve, reject and cancel. The server owns the transcript, tools, call arguments, revisions and execution budget. Each request advances one model call or one tool action; the browser drives the loop and can pause/resume. Closing the app stops future steps, although an in-flight action may finish. Offline messages retain a stable task ID and wait for explicit queue replay.
 
+Interrupted starts preserve the exact request on the device until the server acknowledges it, including the selected model, attachments, chat context and opted-in business snapshot. Refresh / resume checks server status first. Only a confirmed missing run permits resubmitting that same ID and payload, within 24 hours, from the original authenticated account and workspace and under the current model policy. A lost response after acceptance resumes the existing run. Retry input is removed from the local run record when acknowledged; it is never included in chat cards or sent with a status check. Older unfinished tasks without saved input cannot be reconstructed automatically.
+
+Queue replay stops on the first failed message and displays the error. Unsent messages stay queued in order, and retries update the existing task card. A message marked sent means the server task was accepted; the card separately shows whether execution completed, paused or requires review.
+
 Each run allows six model calls and twelve tool executions. A 60,000 reported-token threshold is checked between steps, so one response can overshoot it; it is not a dollar spending cap. Provider requests have a 40-second timeout. Use provider-side spending controls. Existing account rate limits also apply.
 
 External review binds the displayed arguments to the authenticated account, run, call ID and revision. Review expires after ten minutes; approval authorizes execution for two minutes. Strong reads, conditional writes and leases prevent concurrent tabs from repeating an action. An interrupted or uncommitted external call is marked as having an unknown outcome and is not automatically retried; check the destination before starting another task.
@@ -99,5 +103,7 @@ npm run build:check
 ```
 
 `test/agent/*.test.mjs` exercises the real runtime, tool execution, all three OpenRouter model contracts, native OpenAI/Anthropic tool loops, private reasoning continuation, account isolation, exact-action review, concurrency, uncertain outcomes, limits, reproducible 100-case simulations and durable candidate memory. The MCP transport tests use the official SDK against deterministic protocol fixtures. Provider responses are fixtures; these tests do not establish live model availability, quality or billing.
+
+Recovery tests connect the real client modules to the real task endpoint with fixture providers. They cover dropped requests and responses, reloads, exact payload retention, one tool execution per task, account/workspace changes, model-policy changes, expiry, uncertain actions, and ordered queue replay without duplicate chat cards. CI installs runtime dependencies before running these tests.
 
 The optional `test/agent/chat-browser.mjs` exercises the real mobile DOM and runtime with fixture providers: downloads, reload persistence, approval/execution, escaped output, offline replay and a 393px viewport. Run with an installed Playwright package, or point `PLAYWRIGHT_MODULE` to its ESM entry and optionally `PLAYWRIGHT_EXECUTABLE` to Chromium. This browser check does not replace live deployment smoke testing.
