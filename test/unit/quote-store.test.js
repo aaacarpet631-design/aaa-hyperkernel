@@ -101,5 +101,12 @@ module.exports = async function run() {
   t.ok('stats close rate computed', stats.closeRatePct === 50 && stats.counts.won === 1 && stats.counts.lost === 1);
   t.ok('stats won revenue + margin', stats.wonRevenue === 2200 && stats.wonMargin === 800);
 
+  // Workspace isolation fails closed for old/unscoped records as well as foreign records.
+  await data.put('quotes', 'legacy-unscoped', { id: 'legacy-unscoped', status: 'draft', customerTotal: 999 });
+  await data.put('quotes', 'foreign-workspace', { id: 'foreign-workspace', workspaceId: 'another-workspace', status: 'draft', customerTotal: 999 });
+  t.eq('unscoped legacy quote is not visible', await Q.get('legacy-unscoped'), null);
+  t.eq('foreign workspace quote is not visible', await Q.get('foreign-workspace'), null);
+  t.ok('quote listing excludes unscoped and foreign records', !(await Q.list()).some((row) => row.id === 'legacy-unscoped' || row.id === 'foreign-workspace'));
+
   return t.report();
 };
