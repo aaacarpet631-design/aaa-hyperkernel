@@ -55,7 +55,8 @@
   function events() { return global.AAA_EVENTS; }
   function ws() { return cfg().workspaceId || 'default'; }
   function nowISO() { return clock() && clock().nowISO ? clock().nowISO() : new Date().toISOString(); }
-  // Fail closed: legacy records without an explicit workspace must be migrated, not exposed to every workspace.\n  function mine(r) { return !!r && r.workspaceId === ws(); }
+  // Fail closed: legacy records without an explicit workspace must be migrated, not exposed to every workspace.
+  function mine(r) { return !!r && r.workspaceId === ws(); }
   function num(v) { const n = Number(v); return isFinite(n) ? n : 0; }
   function round(n) { return Math.round(n * 100) / 100; }
   function newId(p) { return ids() ? ids().createId(p) : p + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7); }
